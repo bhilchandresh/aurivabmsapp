@@ -1,0 +1,683 @@
+import { useState, useEffect, useContext } from "react";
+import api from "../utils/api";
+import toast from "react-hot-toast";
+import { useForm, Controller } from "react-hook-form";
+import Layout from "../components/Layout";
+import { AuthContext } from "../context/AuthContext";
+import TemplatePicker from "../components/TemplatePicker"; 
+import { 
+  Calendar, CheckCircle, AlertCircle, Clock, 
+  IndianRupee, Building2, Users, TrendingUp, 
+  Search, X, Save, Trash2, Edit, Plus, ArrowRight, RotateCcw,
+  History, ShieldCheck, Mail, Lock, Globe, Bell
+} from "lucide-react";
+
+const SuperAdminDashboard = () => {
+  // --- STATE ---
+  const [tenants, setTenants] = useState([]);
+  const [logs, setLogs] = useState([]); 
+  const [stats, setStats] = useState({ totalTenants: 0, activeTenants: 0, totalUsers: 0, estRevenue: 0 });
+  const [viewMode, setViewMode] = useState('list'); 
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [editingTenant, setEditingTenant] = useState(null);
+  const [showLogsModal, setShowLogsModal] = useState(false);
+  const [viewingTenant, setViewingTenant] = useState(null); 
+  const [usageStats, setUsageStats] = useState(null); 
+  const [activeTemplateModal, setActiveTemplateModal] = useState(null);
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
+  const [notificationForm, setNotificationForm] = useState({ message: '', type: 'info', target: 'all_admins' });
+
+  const { token } = useContext(AuthContext);
+  
+  const getDefaultDate = () => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() + 1);
+    return d.toISOString().split('T')[0];
+  };
+
+  const { control: controlEdit, register: registerEdit, handleSubmit: handleSubmitEdit, setValue: setValueEdit, reset: resetEdit, watch: watchEdit } = useForm();
+  
+  const { 
+    control: controlCreate, 
+    register: registerCreate, 
+    handleSubmit: handleSubmitCreate, 
+    reset: resetCreate, 
+    setValue: setValueCreate,
+    watch: watchCreate
+  } = useForm({
+      defaultValues: {
+          subscriptionEnd: getDefaultDate(),
+          plan: 'basic',
+          templatePreference: 'standard',
+          quotationTemplate: 'standard'
+      }
+  });
+
+  const formatINR = (amount) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount || 0);
+  
+  const getDaysLeft = (endDate) => {
+    if (!endDate) return 0;
+    const diff = new Date(endDate) - new Date();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    return new Date(dateString).toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' });
+  };
+
+  const addDaysToDate = (currentDate, daysToAdd) => {
+    const result = currentDate ? new Date(currentDate) : new Date();
+    result.setDate(result.getDate() + daysToAdd);
+    return result.toISOString().split('T')[0];
+  };
+
+  const fetchData = async () => {
+    try {
+      const [resTenants, resStats, resLogs] = await Promise.all([
+        api.get('/auth/tenants'), 
+        api.get('/auth/stats'),
+        api.get('/auth/logs')
+      ]);
+      setTenants(resTenants.data.data || []);
+      setStats(resStats.data.data || { totalTenants: 0, activeTenants: 0, totalUsers: 0, estRevenue: 0 });
+      setLogs(resLogs.data.data || []); 
+    } catch (error) { 
+        console.error("Fetch Error:", error);
+        toast.error("Failed to load admin data");
+    }
+  };
+
+  useEffect(() => { if (token) fetchData(); }, [token]);
+
+  useEffect(() => {
+    if (editingTenant) {
+        resetEdit({
+            name: editingTenant.name,
+            email: editingTenant.email,
+            phone: editingTenant.phone || '',
+            address: editingTenant.address || '',
+            website: editingTenant.website || '',
+            gstEnabled: editingTenant.gstEnabled || false,
+            gstNumber: editingTenant.gstNumber || '',
+            status: editingTenant.status,
+            subscriptionPlan: editingTenant.subscriptionPlan,
+            subscriptionEnd: editingTenant.subscriptionEnd 
+                ? new Date(editingTenant.subscriptionEnd).toISOString().split('T')[0] 
+                : new Date().toISOString().split('T')[0],
+            templatePreference: editingTenant.templatePreference || 'standard',
+            quotationTemplate: editingTenant.quotationTemplate || 'standard'
+        });
+    }
+  }, [editingTenant, resetEdit]);
+
+  const handleOpenCreate = () => {
+    resetCreate({
+        subscriptionEnd: getDefaultDate(),
+        plan: 'basic',
+        templatePreference: 'standard',
+        quotationTemplate: 'standard',
+        companyName: '',
+        slug: '',
+        name: '',
+        email: '',
+        password: ''
+    });
+    window.history.pushState({ mode: 'create' }, '', '#new-company');
+    setViewMode('create');
+  };
+
+  const handleBackToDashboard = () => {
+    setViewMode('list');
+    if (window.location.hash === '#new-company') window.history.back();
+  };
+
+  const handleViewUsage = async (tenant) => {
+    setViewingTenant(tenant);
+    setUsageStats(null);
+    try {
+      const res = await api.get(`/auth/tenants/${tenant._id}/usage`);
+      setUsageStats(res.data.data);
+    } catch { setViewingTenant(null); }
+  };
+
+  const openEdit = (tenant) => { 
+    setEditingTenant(tenant); 
+    setViewMode('manage');
+    window.scrollTo(0, 0);
+  };
+
+  const closeEdit = () => {
+    setEditingTenant(null);
+    setViewMode('list');
+  };
+
+  const handleResetSubscription = () => {
+      if(!window.confirm("Reset to 1 Year from today?")) return;
+      setValueEdit("subscriptionEnd", getDefaultDate());
+  };
+  const extendSubscriptionEdit = (days) => {
+      const currentEnd = watchEdit("subscriptionEnd");
+      setValueEdit("subscriptionEnd", addDaysToDate(currentEnd, days));
+  };
+  const setAllocationCreate = (days) => {
+      const today = new Date();
+      const newDate = addDaysToDate(today, days);
+      setValueCreate("subscriptionEnd", newDate);
+  };
+
+  const handleResetPassword = async () => {
+    const newPassword = prompt("Enter new password for this admin (Min 6 chars):");
+    if (!newPassword) return;
+    if (newPassword.length < 6) {
+        toast.error("Password too short!");
+        return;
+    }
+
+    try {
+      await api.put(`/auth/tenants/${editingTenant._id}/password`, { password: newPassword });
+      toast.success("Password updated successfully!");
+    } catch (e) {
+      toast.error(e.response?.data?.message || "Failed to reset password");
+    }
+  };
+
+  const onCreateSubmit = async (data) => {
+    try {
+      if (!data.password || data.password.length < 6) {
+          toast.error("Password must be at least 6 characters.");
+          return;
+      }
+      const payload = {
+        ...data,
+        templatePreference: data.templatePreference || 'standard',
+        quotationTemplate: data.quotationTemplate || 'standard'
+      };
+
+      await api.post(`/auth/tenants`, payload);
+      toast.success("Company Created Successfully!");
+      resetCreate();
+      handleBackToDashboard();
+      fetchData();
+    } catch (e) { 
+        toast.error(e.response?.data?.message || "Failed to create company."); 
+    }
+  };
+
+  const onEditSubmit = async (data) => {
+    try {
+      await api.put(`/auth/tenants/${editingTenant._id}`, data);
+      toast.success("Settings Updated");
+      setEditingTenant(null);
+      setViewMode('list');
+      fetchData();
+    } catch (e) { toast.error("Update Failed"); }
+  };
+
+  const handleDelete = async (id) => {
+    if(!window.confirm("Are you sure? This cannot be undone.")) return;
+    try { 
+        await api.delete(`/auth/tenants/${id}`); 
+        toast.success("Company deleted");
+        fetchData(); 
+    } catch (e) { toast.error("Delete Failed"); }
+  };
+
+  const filteredTenants = tenants.filter(t => 
+    t.email !== 'riva@auriva.in' && t.name !== 'Platform HQ' &&
+    (t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    t.email.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
+  return (
+    <Layout>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+           <div>
+             <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Super Admin</h1>
+             <p className="text-gray-500 text-sm mt-1">Platform Overview & Management</p>
+           </div>
+           {viewMode === 'list' && (
+             <div className="flex gap-3">
+                 <button onClick={() => setViewMode('notifications')} className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                   <Bell className="w-4 h-4"/> Broadcast
+                 </button>
+                 <button onClick={() => setShowLogsModal(true)} className="bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-lg font-bold hover:bg-gray-50 transition shadow-sm flex items-center gap-2">
+                   <History className="w-4 h-4"/> System Logs
+                 </button>
+                 <button onClick={handleOpenCreate} className="bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 font-bold transition flex items-center gap-2">
+                   <Plus className="w-4 h-4"/> New Company
+                 </button>
+             </div>
+           )}
+        </div>
+
+        {viewMode === 'list' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+            <StatCard icon={<Building2 className="text-blue-600"/>} label="Total Companies" value={stats.totalTenants} />
+            <StatCard icon={<CheckCircle className="text-green-600"/>} label="Active Subs" value={stats.activeTenants} />
+            <StatCard icon={<Users className="text-purple-600"/>} label="Total Users" value={stats.totalUsers} />
+            <StatCard icon={<IndianRupee className="text-yellow-600"/>} label="Est. Monthly Rev" value={formatINR(stats.estRevenue)} />
+          </div>
+        )}
+
+        {viewMode === 'list' && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="p-4 border-b flex items-center justify-between gap-4 bg-gray-50">
+                <div className="relative w-full max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4"/>
+                    <input type="text" placeholder="Search companies..." className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                        value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="th-cell pl-6">Company</th>
+                    <th className="th-cell">Plan & Rate</th>
+                    <th className="th-cell">Expiry Timeline</th>
+                    <th className="th-cell">Status</th>
+                    <th className="th-cell text-right pr-6">Manage</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {filteredTenants.map((t) => {
+                      const daysLeft = getDaysLeft(t.subscriptionEnd);
+                      const isExpiring = daysLeft < 15 && daysLeft > 0;
+                      const isExpired = daysLeft <= 0;
+                      return (
+                        <tr key={t._id} className="hover:bg-gray-50 transition-colors">
+                          <td className="p-4 pl-6">
+                            <div className="font-bold text-gray-900 text-lg">{t.name}</div>
+                            <div className="text-xs text-gray-500">{t.email}</div>
+                          </td>
+                          <td className="p-4">
+                             <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-bold uppercase border border-blue-100">
+                                {t.subscriptionPlan === 'basic' ? 'Starter' : t.subscriptionPlan === 'premium' ? 'Pro' : 'Business'}
+                             </span>
+                             <div className="text-xs text-gray-500 mt-1">
+                                {t.subscriptionPlan === 'enterprise' ? '₹999' : t.subscriptionPlan === 'premium' ? '₹499' : '₹299'}
+                             </div>
+                          </td>
+                          <td className="p-4 min-w-[200px]">
+                             <div className="flex justify-between items-center text-xs mb-1">
+                                <span className="text-gray-500">{formatDate(t.subscriptionEnd).split(',')[0]}</span>
+                                <span className={`font-bold ${isExpired ? 'text-red-600' : isExpiring ? 'text-orange-500' : 'text-green-600'}`}>
+                                    {isExpired ? 'Expired' : `${daysLeft} days left`}
+                                </span>
+                             </div>
+                             <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className={`h-full rounded-full ${isExpired ? 'bg-red-500' : 'bg-green-500'}`} style={{ width: '100%' }}></div>
+                             </div>
+                          </td>
+                          <td className="p-4">
+                             {t.status === 'active' 
+                                ? <span className="text-green-600 font-bold text-xs flex items-center gap-1"><CheckCircle className="w-4 h-4"/> Active</span>
+                                : <span className="text-red-600 font-bold text-xs flex items-center gap-1"><AlertCircle className="w-4 h-4"/> Suspended</span>
+                             }
+                          </td>
+                          <td className="p-4 text-right pr-6">
+                            <div className="flex justify-end gap-2">
+                                <button onClick={() => handleViewUsage(t)} className="p-2 text-purple-600 bg-purple-50 rounded hover:bg-purple-100 border border-purple-200" title="Insights"><TrendingUp className="w-4 h-4"/></button>
+                                <button onClick={() => openEdit(t)} className="px-3 py-2 text-blue-600 bg-blue-50 rounded font-bold hover:bg-blue-100 border border-blue-200 flex items-center gap-2" title="Edit">
+                                    <Edit className="w-4 h-4"/> Manage
+                                </button>
+                                {t.slug !== 'platform-admin' && ( 
+                                    <button onClick={() => handleDelete(t._id)} className="p-2 text-red-600 bg-red-50 rounded hover:bg-red-100 border border-red-200" title="Delete"><Trash2 className="w-4 h-4"/></button>
+                                )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {viewMode === 'create' && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 max-w-5xl mx-auto overflow-hidden">
+             <div className="px-8 py-6 border-b flex justify-between items-center bg-gray-50">
+                <div>
+                    <h2 className="text-2xl font-extrabold text-gray-900">Onboard New Client</h2>
+                    <p className="text-sm text-gray-500 mt-1">Setup company details, admin access & subscription validity.</p>
+                </div>
+                <button onClick={handleBackToDashboard} className="text-gray-500 hover:text-black font-bold text-sm bg-white border px-4 py-2 rounded-lg">Cancel</button>
+             </div>
+             
+             <form onSubmit={handleSubmitCreate(onCreateSubmit)} className="p-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                   <div className="lg:col-span-7 space-y-6">
+                      <h3 className="text-sm font-bold text-blue-600 uppercase tracking-wider border-b pb-2 mb-4">1. Company & Admin Details</h3>
+                      <div className="grid grid-cols-2 gap-6">
+                          <InputGroup label="Company Name" icon={<Building2 className="w-4 h-4"/>} register={registerCreate("companyName", { required: true })} placeholder="Acme Inc" />
+                          <InputGroup label="Slug (Unique URL)" icon={<Globe className="w-4 h-4"/>} register={registerCreate("slug", { required: true })} placeholder="acme" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-6">
+                          <InputGroup label="Admin Name" icon={<ShieldCheck className="w-4 h-4"/>} register={registerCreate("name", { required: true })} placeholder="John Doe" />
+                          <InputGroup label="Admin Email" icon={<Mail className="w-4 h-4"/>} register={registerCreate("email", { required: true })} type="email" />
+                      </div>
+                      <InputGroup label="Password" icon={<Lock className="w-4 h-4"/>} register={registerCreate("password", { required: true, minLength: 6 })} type="password" placeholder="Min 6 chars" />
+                   </div>
+
+                   <div className="lg:col-span-5 space-y-6 bg-gray-50 p-6 rounded-xl border border-gray-200">
+                        <h3 className="text-sm font-bold text-blue-600 uppercase tracking-wider border-b pb-2 mb-4">2. Subscription Plan</h3>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Select Plan</label>
+                            <select {...registerCreate("plan", { required: true })} className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium">
+                                <option value="basic">Starter (₹299)</option>
+                                <option value="premium">Pro (₹499)</option>
+                                <option value="enterprise">Business (₹999)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Valid Until</label>
+                            <div className="relative">
+                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"/>
+                                <input type="date" {...registerCreate("subscriptionEnd", { required: true })} className="w-full pl-10 border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white font-bold text-gray-800" />
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 mt-3">
+                                <button type="button" onClick={() => setAllocationCreate(30)} className="text-xs font-bold bg-white border px-2 py-1.5 rounded hover:bg-blue-50 hover:text-blue-600 transition">+1 Month</button>
+                                <button type="button" onClick={() => setAllocationCreate(180)} className="text-xs font-bold bg-white border px-2 py-1.5 rounded hover:bg-blue-50 hover:text-blue-600 transition">+6 Months</button>
+                                <button type="button" onClick={() => setAllocationCreate(365)} className="text-xs font-bold bg-blue-100 border border-blue-200 text-blue-700 px-2 py-1.5 rounded hover:bg-blue-200 transition">+1 Year</button>
+                            </div>
+                        </div>
+                   </div>
+                </div>
+
+                <div className="mt-8 pt-8 border-t">
+                    <h3 className="text-sm font-bold text-blue-600 uppercase tracking-wider mb-6">3. Default Visual Settings</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                         <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
+                            <div>
+                               <span className="text-xs font-bold text-gray-500 block mb-1 uppercase tracking-widest">Invoice Design</span>
+                               <span className="font-extrabold text-blue-700 uppercase">{watchCreate('templatePreference') || 'standard'}</span>
+                            </div>
+                            <button type="button" onClick={() => setActiveTemplateModal('create-invoice')} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-100 transition text-sm shadow-sm flex items-center gap-2">
+                               <Edit className="w-4 h-4"/> Change
+                            </button>
+                         </div>
+                         <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
+                            <div>
+                               <span className="text-xs font-bold text-gray-500 block mb-1 uppercase tracking-widest">Quotation Design</span>
+                               <span className="font-extrabold text-purple-700 uppercase">{watchCreate('quotationTemplate') || 'standard'}</span>
+                            </div>
+                            <button type="button" onClick={() => setActiveTemplateModal('create-quotation')} className="px-4 py-2 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-100 transition text-sm shadow-sm flex items-center gap-2">
+                               <Edit className="w-4 h-4"/> Change
+                            </button>
+                         </div>
+                    </div>
+                </div>
+                
+                <div className="pt-8 flex justify-end">
+                    <button className="bg-blue-600 text-white font-bold py-3 px-10 rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-200 transition transform hover:-translate-y-1">Create Company & Allocate System</button>
+                </div>
+             </form>
+          </div>
+        )}
+
+        {viewMode === 'manage' && editingTenant && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 max-w-6xl mx-auto overflow-hidden flex flex-col mb-10">
+            <div className="bg-gray-50 border-b border-gray-200 p-6 sm:p-10 flex justify-between items-start flex-col sm:flex-row gap-4 relative overflow-hidden">
+               <div className="absolute top-0 right-0 -mt-10 -mr-10 text-gray-200 opacity-50 rotate-12 scale-150 pointer-events-none">
+                 <Building2 strokeWidth={0.5} size={300} />
+               </div>
+               <div className="z-10 relative">
+                 <h2 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+                   {editingTenant.name} <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full uppercase tracking-widest font-bold">Admin Panel</span>
+                 </h2>
+                 <p className="text-sm text-gray-500 mt-2 flex items-center gap-2 font-medium"><Mail className="w-4 h-4 text-gray-400"/> {editingTenant.email}</p>
+               </div>
+               <button 
+                 onClick={closeEdit} 
+                 className="z-10 px-6 py-2.5 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg hover:bg-gray-50 hover:text-gray-900 transition-all flex items-center gap-2 shadow-sm"
+               >
+                 <ArrowRight className="w-4 h-4 rotate-180"/> Cancel & Return
+               </button>
+            </div>
+            <form onSubmit={handleSubmitEdit(onEditSubmit)} className="flex-1 p-6 sm:p-10 bg-white">
+                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    
+                    <div className="lg:col-span-5 space-y-6">
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                            <h4 className="text-sm font-bold text-gray-900 uppercase flex items-center gap-2 border-b pb-2"><Building2 className="w-4 h-4 text-blue-500"/> Company Details</h4>
+                            <div className="grid grid-cols-1 gap-4">
+                                <InputGroup label="Company Name" register={registerEdit("name", { required: true })} />
+                                <InputGroup label="Admin Email" register={registerEdit("email", { required: true })} type="email" />
+                                <InputGroup label="Phone" register={registerEdit("phone")} />
+                                <InputGroup label="Website" register={registerEdit("website")} />
+                                <div>
+                                    <label className="text-xs font-bold text-gray-500 uppercase block mb-1">Address</label>
+                                    <textarea {...registerEdit("address")} className="w-full border rounded-lg p-2 text-sm bg-gray-50 min-h-[80px]" />
+                                </div>
+                                <div className="flex items-center gap-4 border-t pt-4">
+                                    <div className="flex items-center gap-2">
+                                        <input type="checkbox" {...registerEdit("gstEnabled")} id="editGst" />
+                                        <label htmlFor="editGst" className="text-xs font-bold text-gray-600 uppercase">GST Enabled</label>
+                                    </div>
+                                    <input {...registerEdit("gstNumber")} placeholder="GSTIN" className="flex-1 text-sm border p-2 rounded bg-gray-50" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-orange-50 p-6 rounded-xl border border-orange-200 shadow-sm">
+                            <h4 className="text-sm font-bold text-orange-800 uppercase mb-4 flex items-center gap-2"><Lock className="w-4 h-4"/> Security</h4>
+                            <button type="button" onClick={handleResetPassword} className="w-full py-3 bg-white text-orange-700 font-bold rounded-lg border-2 border-orange-200 hover:bg-orange-100 transition shadow-sm flex items-center justify-center gap-2">
+                               <RotateCcw className="w-4 h-4"/> Reset Admin Password
+                            </button>
+                            <p className="text-[10px] text-orange-600 mt-2 font-medium">This will override the current admin's password.</p>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                            <h4 className="text-sm font-bold text-gray-900 uppercase mb-4 flex items-center gap-2"><CheckCircle className="w-4 h-4 text-blue-500"/> Account Status</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label><select {...registerEdit("status")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="active">Active</option><option value="suspended">Suspended</option></select></div>
+                                <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Plan</label><select {...registerEdit("subscriptionPlan")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="basic">Starter</option><option value="premium">Pro (Popular)</option><option value="enterprise">Business</option></select></div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl border border-blue-200 shadow-sm ring-1 ring-blue-50">
+                            <div className="flex justify-between items-center mb-4"><h4 className="text-sm font-bold text-blue-700 uppercase flex items-center gap-2"><Calendar className="w-4 h-4"/> Subscription Validity</h4><button type="button" onClick={handleResetSubscription} className="text-xs font-bold text-gray-400 hover:text-red-500 flex items-center gap-1 transition"><RotateCcw className="w-3 h-3"/> Reset Default</button></div>
+                            <div className="mb-6"><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Valid Until</label><input type="date" {...registerEdit("subscriptionEnd")} className="w-full border p-3 rounded-lg text-lg font-bold text-gray-800 outline-none focus:ring-2 focus:ring-blue-500" /><p className="text-right text-xs font-bold text-blue-600 mt-2">{getDaysLeft(watchEdit("subscriptionEnd"))} Days Remaining</p></div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button type="button" onClick={() => extendSubscriptionEdit(30)} className="py-2 px-3 bg-blue-50 text-blue-700 font-bold text-sm rounded-lg hover:bg-blue-100 border border-blue-100 transition flex items-center justify-center gap-1"><Plus className="w-3 h-3"/> Add 1 Month</button>
+                                <button type="button" onClick={() => extendSubscriptionEdit(365)} className="py-2 px-3 bg-blue-50 text-blue-700 font-bold text-sm rounded-lg hover:bg-blue-100 border border-blue-100 transition flex items-center justify-center gap-1"><Plus className="w-3 h-3"/> Add 1 Year</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="lg:col-span-7 space-y-10">
+                        <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-xl flex flex-col space-y-12">
+                            <h4 className="text-xl font-black text-gray-900 uppercase tracking-tighter flex items-center gap-3 border-b pb-6">
+                                <div className="p-2 bg-purple-100 rounded-lg"><Edit className="w-5 h-5 text-purple-600"/></div>
+                                Theme Designer
+                            </h4>
+                            
+                            <div className="space-y-4">
+                               <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
+                                  <div>
+                                     <h5 className="text-lg font-extrabold text-gray-800 flex items-center gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm shrink-0"></div> Invoice Layout
+                                     </h5>
+                                     <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest font-bold">Currently Selected: <span className="text-blue-600 font-black">{watchEdit('templatePreference')}</span></p>
+                                  </div>
+                                  <button type="button" onClick={() => setActiveTemplateModal('manage-invoice')} className="px-5 py-2.5 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-100 hover:border-blue-400 transition shadow-sm flex items-center gap-2">
+                                     <Edit className="w-4 h-4"/> Change Layout
+                                  </button>
+                               </div>
+                               
+                               <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
+                                  <div>
+                                     <h5 className="text-lg font-extrabold text-gray-800 flex items-center gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-purple-500 shadow-sm shrink-0"></div> Quotation Layout
+                                     </h5>
+                                     <p className="text-xs text-gray-400 mt-1 uppercase tracking-widest font-bold">Currently Selected: <span className="text-purple-600 font-black">{watchEdit('quotationTemplate')}</span></p>
+                                  </div>
+                                  <button type="button" onClick={() => setActiveTemplateModal('manage-quotation')} className="px-5 py-2.5 bg-white border-2 border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-100 hover:border-purple-400 transition shadow-sm flex items-center gap-2">
+                                     <Edit className="w-4 h-4"/> Change Layout
+                                  </button>
+                               </div>
+                            </div>
+
+                            <div className="mt-6 p-5 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-lg shadow-blue-200 flex items-center gap-5 text-white">
+                                <div className="bg-white/20 p-3 rounded-xl backdrop-blur-md shadow-inner"><Globe className="w-6 h-6 text-white"/></div>
+                                <div>
+                                    <p className="text-sm font-black uppercase tracking-tighter">Instant Cloud Sync</p>
+                                    <p className="text-[11px] text-blue-100 font-bold leading-relaxed">Your design selections are synchronized across all device nodes and client-facing portals in real-time.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+              </form>
+              <div className="p-10 border-t bg-gray-50 flex justify-end gap-4 rounded-b-xl">
+                 <button type="button" onClick={closeEdit} className="px-8 py-4 rounded-xl font-bold text-gray-600 bg-white border border-gray-300 hover:bg-gray-100 transition shadow-sm">Cancel</button>
+                 <button onClick={handleSubmitEdit(onEditSubmit)} className="px-10 py-4 rounded-xl font-extrabold text-white bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200 flex items-center gap-3 transition transform hover:-translate-y-1"><Save className="w-5 h-5"/> Apply System Changes</button>
+              </div>
+          </div>
+        )}
+
+        {showLogsModal && (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+             <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[85vh] flex flex-col">
+                <div className="p-6 border-b flex justify-between items-center"><h3 className="font-bold">System Logs</h3><button onClick={() => setShowLogsModal(false)}>✕</button></div>
+                <div className="overflow-auto flex-1 p-0">
+                  <table className="w-full text-left"><thead className="bg-gray-100 sticky top-0"><tr><th className="p-4 text-xs font-bold">Time</th><th className="p-4 text-xs font-bold">Action</th><th className="p-4 text-xs font-bold">Details</th><th className="p-4 text-xs font-bold text-right">User</th></tr></thead>
+                  <tbody>{logs.map(l => <tr key={l._id} className="border-b"><td className="p-4 text-xs font-mono">{formatDate(l.createdAt)}</td><td className="p-4"><span className="bg-gray-100 px-2 py-1 rounded text-xs font-bold">{l.action}</span></td><td className="p-4 text-sm">{l.details}</td><td className="p-4 text-right text-xs font-bold">{l.tenantId?.name}</td></tr>)}</tbody></table>
+                </div>
+                <div className="p-4 border-t flex justify-end"><button onClick={() => setShowLogsModal(false)} className="bg-gray-800 text-white px-4 py-2 rounded">Close</button></div>
+             </div>
+          </div>
+        )}
+
+        {viewingTenant && (
+            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+                <div className="bg-white p-6 rounded-xl w-full max-w-lg shadow-2xl">
+                    <div className="flex justify-between items-center mb-6"><h3 className="font-bold text-xl">Usage</h3><button onClick={() => setViewingTenant(null)}>✕</button></div>
+                    {!usageStats ? <div className="text-center py-10">Loading...</div> : (
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                             <UsageItem label="Invoices" value={usageStats.invoiceCount} color="text-blue-600" bg="bg-blue-50"/>
+                             <UsageItem label="Quotations" value={usageStats.quotationCount} color="text-purple-600" bg="bg-purple-50"/>
+                             <UsageItem label="Clients" value={usageStats.clientCount} color="text-green-600" bg="bg-green-50"/>
+                             <UsageItem label="Users" value={usageStats.userCount} color="text-yellow-600" bg="bg-yellow-50"/>
+                             <UsageItem label="Items (Inv)" value={usageStats.inventoryCount} color="text-orange-600" bg="bg-orange-50"/>
+                             <UsageItem label="Suppliers" value={usageStats.supplierCount} color="text-teal-600" bg="bg-teal-50"/>
+                        </div>
+                    )}
+                    <button onClick={() => setViewingTenant(null)} className="w-full mt-6 py-2 bg-gray-800 text-white rounded font-bold">Close</button>
+                </div>
+            </div>
+        )}
+
+        {viewMode === 'notifications' && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 max-w-2xl mx-auto overflow-hidden">
+            <div className="px-8 py-6 border-b flex justify-between items-center bg-gray-50">
+                <div>
+                    <h2 className="text-2xl font-extrabold text-gray-900">Broadcast Notification</h2>
+                    <p className="text-sm text-gray-500 mt-1">Send a popup message to all admins.</p>
+                </div>
+                <button onClick={() => setViewMode('list')} className="text-gray-500 hover:text-black font-bold text-sm bg-white border px-4 py-2 rounded-lg">Back</button>
+            </div>
+            <div className="p-8 space-y-6">
+                <div>
+                    <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest">Message Content</label>
+                    <textarea 
+                        className="w-full border rounded-2xl p-4 text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 min-h-[120px] font-medium"
+                        placeholder="Type your message here..."
+                        value={notificationForm.message}
+                        onChange={(e) => setNotificationForm({...notificationForm, message: e.target.value})}
+                    />
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest">Notification Type</label>
+                        <select 
+                            className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
+                            value={notificationForm.type}
+                            onChange={(e) => setNotificationForm({...notificationForm, type: e.target.value})}
+                        >
+                            <option value="info">Information (Blue)</option>
+                            <option value="success">Success (Green)</option>
+                            <option value="warning">Warning (Amber)</option>
+                            <option value="error">Urgent (Red)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest">Target Audience</label>
+                        <select 
+                            className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold disabled:opacity-50"
+                            disabled
+                            value={notificationForm.target}
+                        >
+                            <option value="all_admins">All Admins</option>
+                        </select>
+                    </div>
+                </div>
+                <div className="pt-4">
+                    <button 
+                        onClick={async () => {
+                            if(!notificationForm.message) return toast.error("Message is required");
+                            try {
+                                await api.post('/notifications', notificationForm);
+                                toast.success("Notification broadcasted successfully!");
+                                setNotificationForm({ message: '', type: 'info', target: 'all_admins' });
+                                setViewMode('list');
+                            } catch (e) {
+                                toast.error("Failed to broadcast");
+                            }
+                        }}
+                        className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition transform hover:-translate-y-1 flex items-center justify-center gap-3"
+                    >
+                        <ShieldCheck className="w-6 h-6"/> Push Notification
+                    </button>
+                </div>
+            </div>
+          </div>
+        )}
+
+        {/* TEMPLATE PICKER MODAL */}
+        {activeTemplateModal && (
+           <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-6xl flex flex-col my-8 animate-in zoom-in duration-200">
+                 <div className="px-8 py-6 border-b flex justify-between items-center bg-gray-50 rounded-t-[2rem]">
+                    <div>
+                        <h3 className="text-2xl font-black text-gray-900 tracking-tight">Select Theme Layout</h3>
+                        <p className="text-sm text-gray-500 font-medium">Choose a professional design for your documents.</p>
+                    </div>
+                    <button onClick={() => setActiveTemplateModal(null)} className="text-gray-400 hover:text-red-500 bg-white shadow-sm border p-2 rounded-lg transition">✕</button>
+                 </div>
+                 <div className="p-8 bg-gray-100 overflow-x-auto overflow-y-hidden rounded-b-[2rem]">
+                     <TemplatePicker 
+                        selectedId={
+                          activeTemplateModal === 'create-invoice' ? watchCreate('templatePreference') :
+                          activeTemplateModal === 'create-quotation' ? watchCreate('quotationTemplate') :
+                          activeTemplateModal === 'manage-invoice' ? watchEdit('templatePreference') :
+                          activeTemplateModal === 'manage-quotation' ? watchEdit('quotationTemplate') : 'standard'
+                        } 
+                        onSelect={(id) => {
+                          if (activeTemplateModal === 'create-invoice') setValueCreate('templatePreference', id);
+                          if (activeTemplateModal === 'create-quotation') setValueCreate('quotationTemplate', id);
+                          if (activeTemplateModal === 'manage-invoice') setValueEdit('templatePreference', id);
+                          if (activeTemplateModal === 'manage-quotation') setValueEdit('quotationTemplate', id);
+                          setActiveTemplateModal(null);
+                        }} 
+                     />
+                 </div>
+              </div>
+           </div>
+        )}
+
+      </div>
+    </Layout>
+  );
+};
+
+const StatCard = ({ icon, label, value }) => (<div className="p-5 rounded-xl border border-gray-100 bg-white shadow-sm flex items-center gap-4"><div className="p-3 bg-gray-50 rounded-lg">{icon}</div><div><p className="text-xs font-bold text-gray-400 uppercase tracking-wide">{label}</p><p className="text-xl font-extrabold text-gray-800">{value}</p></div></div>);
+const InputGroup = ({ label, icon, register, type="text", placeholder }) => (<div><label className="text-xs font-bold text-gray-500 uppercase mb-1 flex items-center gap-1">{icon && icon} {label}</label><input {...register} type={type} placeholder={placeholder} className="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none border bg-white font-medium" /></div>);
+const UsageItem = ({ label, value, color, bg }) => (<div className={`${bg} p-4 rounded-xl text-center border border-opacity-50`}><div className={`text-2xl font-extrabold ${color}`}>{value}</div><div className="text-xs font-bold text-gray-500 uppercase mt-1">{label}</div></div>);
+
+export default SuperAdminDashboard;

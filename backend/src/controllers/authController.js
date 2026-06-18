@@ -1,0 +1,462 @@
+const User = require('../models/User');
+const Tenant = require('../models/Tenant');
+const Invoice = require('../models/Invoice');
+const Client = require('../models/Client');
+const Quotation = require('../models/Quotation');
+const AuditLog = require('../models/AuditLog');
+const Inventory = require('../models/Inventory');
+const Supplier = require('../models/Supplier');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const logActivity = require('../utils/logger');
+
+// ==========================================
+// PUBLIC ROUTES (Register & Login)
+// ==========================================
+
+// @desc    Register a new Tenant (Public Sign Up)
+exports.registerTenant = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { companyName, slug, name, email, password } = req.body;
+
+    const userExists = await User.findOne({ email });
+    if (userExists) throw new Error('User with this email already exists');
+
+    const slugExists = await Tenant.findOne({ slug });
+    if (slugExists) throw new Error('Company slug is already taken');
+
+    // Default Subscription: 1 Year from now
+    const defaultExpiry = new Date();
+    defaultExpiry.setFullYear(defaultExpiry.getFullYear() + 1);
+
+    // Create Tenant with Defaults
+    const tenant = await Tenant.create([{
+      name: companyName,
+      slug: slug,
+      email: email,
+      status: 'active',
+      subscriptionPlan: 'basic',
+      subscriptionEnd: defaultExpiry, // ✅ Added Default 1 Year
+      templatePreference: 'standard',
+      quotationTemplate: 'standard'
+    }], { session });
+
+    // Hash Password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create Admin User
+    const user = await User.create([{
+      tenantId: tenant[0]._id,
+      name,
+      email,
+      passwordHash: hashedPassword,
+      role: 'admin'
+    }], { session });
+
+    // LOG ACTIVITY
+    await logActivity({
+      user: { _id: user[0]._id, tenantId: tenant[0]._id },
+      ip: req.ip
+    }, "REGISTER_TENANT", `New Company Registered: ${companyName}`);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({ success: true, message: 'Tenant registered successfully' });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Login User & Generate Token
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // 1. Find User
+    const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+
+    // 2. Check Password
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) return res.status(401).json({ success: false, message: 'Invalid credentials' });
+
+    // 3. Check Active Status (User Level)
+    if (user.isActive === false) {
+      return res.status(403).json({ success: false, message: 'Account deactivated' });
+    }
+
+    // 4. Check Tenant Status (Company Level)
+    const tenant = await Tenant.findById(user.tenantId);
+    if (tenant && tenant.status === 'suspended') {
+      return res.status(403).json({ success: false, message: 'Your company account is suspended. Contact Support.' });
+    }
+
+    // ==========================================
+    // 🔴 NEW ADDITION: Check Plan Expiry Date
+    // ==========================================
+    let expiryWarning = false;
+    let daysLeft = null;
+
+    if (tenant && tenant.subscriptionEnd) {
+      const currentDate = new Date();
+      const expiryDate = new Date(tenant.subscriptionEnd);
+
+      const diffTime = expiryDate - currentDate;
+      daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (expiryDate < currentDate) {
+        return res.status(403).json({
+          success: false,
+          message: "Your subscription plan has expired. Please renew your plan to continue using the services.",
+          isPlanExpired: true // Flag for frontend to trigger specific UI
+        });
+      }
+
+      // If 5 or fewer days left, set warning
+      if (daysLeft <= 5) {
+        expiryWarning = true;
+      }
+    }
+
+    // 5. Generate Token
+    if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is missing in .env");
+
+    const payload = {
+      id: user._id.toString(),
+      tenantId: user.tenantId.toString(),
+      role: user.role
+    };
+
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '30d' });
+
+    // LOG ACTIVITY
+    req.user = user;
+    await logActivity(req, "LOGIN", `${user.name} logged in successfully`);
+
+    // 6. Send Response
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        signatureImage: user.signatureImage,
+        tenantId: user.tenantId
+      },
+      subscription: {
+        plan: tenant?.subscriptionPlan || 'basic',
+        daysLeft,
+        expiryWarning,
+        expiryDate: tenant?.subscriptionEnd
+      }
+    });
+
+  } catch (error) {
+    console.error("Login Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ==========================================
+// TENANT SETTINGS (For Business Owners)
+// ==========================================
+
+// @desc    Get Current Tenant Settings
+exports.getTenantSettings = async (req, res) => {
+  try {
+    const tenant = await Tenant.findById(req.user.tenantId);
+    res.status(200).json({ success: true, data: tenant });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Update Tenant Settings (RESTRICTED)
+exports.updateTenantSettings = async (req, res) => {
+  try {
+    const {
+      name, gstEnabled, gstNumber, state, address, phone, email, website,
+      signatureImage, logoImage,
+      bankDetails,
+      defaultTerms
+    } = req.body;
+
+    // Tenants CANNOT update subscription details or templates here
+    const tenant = await Tenant.findByIdAndUpdate(
+      req.user.tenantId,
+      {
+        name, gstEnabled, gstNumber, state, address, phone, email, website,
+        signatureImage, logoImage,
+        bankDetails,
+        defaultTerms
+      },
+      { new: true, runValidators: true }
+    );
+
+    await logActivity(req, "UPDATE_SETTINGS", "Business settings updated");
+
+    res.status(200).json({ success: true, data: tenant, message: "Settings updated" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ==========================================
+// SUPER ADMIN ROUTES (Platform Control)
+// ==========================================
+
+// @desc    Get All Tenants
+exports.getAllTenants = async (req, res) => {
+  try {
+    const tenants = await Tenant.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, data: tenants });
+  } catch (error) {
+    console.error("Fetch Error:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc   Create Tenant Manually (Super Admin)
+exports.createTenantByAdmin = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { companyName, slug, name, email, password, plan, subscriptionEnd, templatePreference, quotationTemplate } = req.body;
+
+    const userExists = await User.findOne({ email });
+    if (userExists) throw new Error('User email already exists');
+
+    const slugExists = await Tenant.findOne({ slug });
+    if (slugExists) throw new Error('Slug already taken');
+
+    // Calculate Default Expiry if not provided (1 Year)
+    let expiryDate = subscriptionEnd ? new Date(subscriptionEnd) : new Date();
+    if (!subscriptionEnd) expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+
+    // Create Tenant
+    const tenant = await Tenant.create([{
+      name: companyName,
+      slug,
+      email,
+      subscriptionPlan: plan || 'basic',
+      subscriptionEnd: expiryDate, // ✅ Set Expiry
+      status: 'active',
+      templatePreference: templatePreference || 'standard',
+      quotationTemplate: quotationTemplate || 'standard'
+    }], { session });
+
+    // Create Admin User
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    await User.create([{
+      tenantId: tenant[0]._id,
+      name,
+      email,
+      passwordHash: hashedPassword,
+      role: 'admin'
+    }], { session });
+
+    await logActivity(req, "ADMIN_CREATE_COMPANY", `Super Admin created company: ${companyName}`);
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({ success: true, message: 'Company created successfully' });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Update Tenant By Super Admin (Includes Subscription & Templates)
+exports.updateTenantBySuperAdmin = async (req, res) => {
+  try {
+    const {
+      name, email, phone, address, website,
+      gstEnabled, gstNumber, state,
+      status,
+      subscriptionPlan,
+      subscriptionEnd,
+      templatePreference,
+      quotationTemplate
+    } = req.body;
+
+    const updateData = {
+      name, email, phone, address, website,
+      gstEnabled, gstNumber, state,
+      status,
+      subscriptionPlan,
+      templatePreference,
+      quotationTemplate
+    };
+
+    // Only update date if provided
+    if (subscriptionEnd) {
+      updateData.subscriptionEnd = new Date(subscriptionEnd);
+    }
+
+    const tenant = await Tenant.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!tenant) return res.status(404).json({ success: false, message: "Tenant not found" });
+
+    await logActivity(req, "ADMIN_UPDATE_COMPANY", `Updated settings for ${tenant.name}`);
+
+    res.status(200).json({ success: true, data: tenant, message: "Tenant Updated Successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Reset Tenant Admin Password (Super Admin)
+exports.resetAdminPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    const { id } = req.params; // Tenant ID
+
+    if (!password || password.length < 6) {
+      return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
+    }
+
+    // 1. Find the admin user for this tenant
+    const user = await User.findOne({ tenantId: id, role: 'admin' });
+    if (!user) return res.status(404).json({ success: false, message: "Admin user not found for this company" });
+
+    // 2. Hash and Save
+    const salt = await bcrypt.genSalt(10);
+    user.passwordHash = await bcrypt.hash(password, salt);
+    await user.save();
+
+    await logActivity(req, "ADMIN_RESET_PASSWORD", `Super Admin reset password for ${user.email}`);
+
+    res.status(200).json({ success: true, message: "Password reset successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+// @desc    Delete Tenant & All Data
+exports.deleteTenant = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const tenant = await Tenant.findByIdAndDelete(id);
+    if (!tenant) return res.status(404).json({ success: false, message: "Tenant not found" });
+
+    // Cascade Delete
+    await User.deleteMany({ tenantId: id });
+    await Invoice.deleteMany({ tenantId: id });
+    await Client.deleteMany({ tenantId: id });
+    await Quotation.deleteMany({ tenantId: id });
+
+    await logActivity(req, "ADMIN_DELETE_COMPANY", `Deleted company: ${tenant.name} and all data`);
+
+    res.status(200).json({ success: true, message: `Deleted ${tenant.name} and all associated data.` });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get System Stats (Updated Revenue Logic)
+exports.getSystemStats = async (req, res) => {
+  try {
+    const totalTenants = await Tenant.countDocuments();
+    const activeTenants = await Tenant.countDocuments({ status: 'active' });
+    const totalUsers = await User.countDocuments();
+
+    // Calculate Estimated Revenue (INR Logic)
+    // Starter: 299, Pro: 499, Business: 999
+    const starters = await Tenant.countDocuments({ subscriptionPlan: 'basic' }); // 'basic' is used for Starter
+    const pros = await Tenant.countDocuments({ subscriptionPlan: 'premium' }); // 'premium' is used for Pro
+    const businesses = await Tenant.countDocuments({ subscriptionPlan: 'enterprise' }); // 'enterprise' is used for Business
+
+    const estRevenue = (starters * 299) + (pros * 499) + (businesses * 999); // ✅ Updated Formula with new prices
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalTenants,
+        activeTenants,
+        suspendedTenants: totalTenants - activeTenants,
+        totalUsers,
+        estRevenue
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc Get System Activity Logs
+exports.getAuditLogs = async (req, res) => {
+  try {
+    const logs = await AuditLog.find()
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .populate('tenantId', 'name')
+      .populate('userId', 'name email');
+
+    res.status(200).json({ success: true, data: logs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get Usage Stats
+exports.getTenantUsage = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [
+      invoiceCount,
+      quotationCount,
+      clientCount,
+      userCount,
+      paidInvoices,
+      inventoryCount,
+      supplierCount
+    ] = await Promise.all([
+      Invoice.countDocuments({ tenantId: id }),
+      Quotation.countDocuments({ tenantId: id }),
+      Client.countDocuments({ tenantId: id }),
+      User.countDocuments({ tenantId: id }),
+      Invoice.countDocuments({ tenantId: id, status: 'Paid' }),
+      Inventory.countDocuments({ tenantId: id }),
+      Supplier.countDocuments({ tenantId: id })
+    ]);
+
+    const successRate = invoiceCount > 0 ? Math.round((paidInvoices / invoiceCount) * 100) : 0;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        invoiceCount,
+        quotationCount,
+        clientCount,
+        userCount,
+        successRate,
+        inventoryCount,
+        supplierCount
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
