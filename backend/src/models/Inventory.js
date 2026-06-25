@@ -38,6 +38,11 @@ const inventorySchema = new mongoose.Schema({
     type: String,
     enum: ['active', 'inactive'],
     default: 'active'
+  },
+  reorderLevel: {
+    type: Number,
+    min: 0,
+    default: 5
   }
 }, { timestamps: true });
 

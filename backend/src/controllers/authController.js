@@ -141,6 +141,17 @@ exports.login = async (req, res) => {
     req.user = user;
     await logActivity(req, "LOGIN", `${user.name} logged in successfully`);
 
+    // --- AUTOMATED IN-APP / PUSH NOTIFICATION ---
+    const { dispatchNotification } = require('../services/notificationDispatcher');
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
+    dispatchNotification({
+      tenantId: user.tenantId,
+      type: 'security_alert',
+      message: `🔐 New login detected for ${user.name} from IP: ${ip}.`,
+      preferenceKey: 'newDeviceLogin',
+      metadata: { entityId: user._id, entityModel: 'User' }
+    });
+
     // 6. Send Response
     res.status(200).json({
       success: true,
@@ -218,7 +229,7 @@ exports.updateTenantSettings = async (req, res) => {
 // @desc    Get All Tenants
 exports.getAllTenants = async (req, res) => {
   try {
-    const tenants = await Tenant.find().sort({ createdAt: -1 });
+    const tenants = await Tenant.find({ slug: { $ne: 'super-admin-system' } }).sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: tenants });
   } catch (error) {
     console.error("Fetch Error:", error);
@@ -357,8 +368,15 @@ exports.deleteTenant = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const tenant = await Tenant.findByIdAndDelete(id);
+    const tenant = await Tenant.findById(id);
     if (!tenant) return res.status(404).json({ success: false, message: "Tenant not found" });
+
+    // Protect Super Admin
+    if (tenant.slug === 'super-admin-system') {
+      return res.status(403).json({ success: false, message: "Super Admin system cannot be deleted" });
+    }
+
+    await Tenant.findByIdAndDelete(id);
 
     // Cascade Delete
     await User.deleteMany({ tenantId: id });
@@ -382,12 +400,50 @@ exports.getSystemStats = async (req, res) => {
     const totalUsers = await User.countDocuments();
 
     // Calculate Estimated Revenue (INR Logic)
-    // Starter: 299, Pro: 499, Business: 999
-    const starters = await Tenant.countDocuments({ subscriptionPlan: 'basic' }); // 'basic' is used for Starter
+    // Freelancer: 199, Pro: 299, Business: 599
+    const starters = await Tenant.countDocuments({ subscriptionPlan: 'basic' }); // 'basic' is used for Freelancer
     const pros = await Tenant.countDocuments({ subscriptionPlan: 'premium' }); // 'premium' is used for Pro
     const businesses = await Tenant.countDocuments({ subscriptionPlan: 'enterprise' }); // 'enterprise' is used for Business
 
-    const estRevenue = (starters * 299) + (pros * 499) + (businesses * 999); // ✅ Updated Formula with new prices
+    const estRevenue = (starters * 199) + (pros * 299) + (businesses * 599); // ✅ Updated Formula with new prices
+
+    // --- NEW: PLATFORM KPIs ---
+    const platformInvoicesCount = await Invoice.countDocuments();
+    const platformClientsCount = await Client.countDocuments();
+    
+    // Calculate Platform GMV (Gross Merchandise Value)
+    const gmvAggr = await Invoice.aggregate([
+      { $group: { _id: null, totalGMV: { $sum: "$totalAmount" } } }
+    ]);
+    const platformGMV = gmvAggr.length > 0 ? gmvAggr[0].totalGMV : 0;
+
+    // --- NEW: FEATURE ADOPTION ---
+    const tenantsUsingInventory = (await Inventory.distinct('tenantId')).length;
+    const tenantsUsingSuppliers = (await Supplier.distinct('tenantId')).length;
+
+    // Aggregate Historical Data for the last 6 months
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+    sixMonthsAgo.setDate(1); // start of the month
+
+    const tenantsAggr = await Tenant.aggregate([
+      { $match: { createdAt: { $gte: sixMonthsAgo } } },
+      { $group: {
+          _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
+          count: { $sum: 1 },
+          starters: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "basic"] }, 1, 0] } },
+          pros: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "premium"] }, 1, 0] } },
+          businesses: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "enterprise"] }, 1, 0] } }
+      }},
+      { $sort: { "_id.year": 1, "_id.month": 1 } }
+    ]);
+
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const growthData = tenantsAggr.map(item => ({
+      month: `${monthNames[item._id.month - 1]} ${item._id.year}`,
+      newTenants: item.count,
+      mrr: (item.starters * 199) + (item.pros * 299) + (item.businesses * 599)
+    }));
 
     res.status(200).json({
       success: true,
@@ -396,7 +452,21 @@ exports.getSystemStats = async (req, res) => {
         activeTenants,
         suspendedTenants: totalTenants - activeTenants,
         totalUsers,
-        estRevenue
+        estRevenue,
+        growthData,
+        // New data for dashboard
+        planDistribution: [
+          { name: 'Freelancer', value: starters },
+          { name: 'Pro', value: pros },
+          { name: 'Business', value: businesses }
+        ],
+        platformInvoicesCount,
+        platformClientsCount,
+        platformGMV,
+        featureAdoption: [
+          { name: 'Inventory', users: tenantsUsingInventory },
+          { name: 'Suppliers', users: tenantsUsingSuppliers }
+        ]
       }
     });
   } catch (error) {

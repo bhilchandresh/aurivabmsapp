@@ -33,7 +33,11 @@ const userSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
-  }
+  },
+  deviceTokens: [{
+    token: { type: String, required: true },
+    platform: { type: String, enum: ['android', 'ios', 'web'], default: 'android' }
+  }]
 }, { timestamps: true });
 
 

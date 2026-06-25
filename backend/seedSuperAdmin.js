@@ -12,11 +12,12 @@ const seed = async () => {
     // 1. Create a "System" Tenant for You (The Platform Owner)
     // This tenant holds the Super Admin user
     let masterTenant = await Tenant.findOne({ slug: 'super-admin-system' });
-    
+
     if (!masterTenant) {
       masterTenant = await Tenant.create({
-        name: 'Platform HQ',
+        name: 'AurivaBMS Superadmin ',
         slug: 'super-admin-system',
+        email: 'Riva@auriva.in',
         status: 'active',
         invoiceTemplateId: 'template_standard'
       });

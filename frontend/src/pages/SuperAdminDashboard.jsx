@@ -2,21 +2,24 @@ import { useState, useEffect, useContext } from "react";
 import api from "../utils/api";
 import toast from "react-hot-toast";
 import { useForm, Controller } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 import TemplatePicker from "../components/TemplatePicker"; 
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
 import { 
   Calendar, CheckCircle, AlertCircle, Clock, 
   IndianRupee, Building2, Users, TrendingUp, 
   Search, X, Save, Trash2, Edit, Plus, ArrowRight, RotateCcw,
-  History, ShieldCheck, Mail, Lock, Globe, Bell
+  History, ShieldCheck, Mail, Lock, Globe, Bell,
+  Settings, LifeBuoy, MessageSquare, FileText, Package, Truck
 } from "lucide-react";
 
 const SuperAdminDashboard = () => {
   // --- STATE ---
   const [tenants, setTenants] = useState([]);
   const [logs, setLogs] = useState([]); 
-  const [stats, setStats] = useState({ totalTenants: 0, activeTenants: 0, totalUsers: 0, estRevenue: 0 });
+  const [stats, setStats] = useState({ totalTenants: 0, activeTenants: 0, totalUsers: 0, estRevenue: 0, growthData: [], planDistribution: [], featureAdoption: [] });
   const [viewMode, setViewMode] = useState('list'); 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -27,8 +30,11 @@ const SuperAdminDashboard = () => {
   const [activeTemplateModal, setActiveTemplateModal] = useState(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
   const [notificationForm, setNotificationForm] = useState({ message: '', type: 'info', target: 'all_admins' });
+  const [systemSettings, setSystemSettings] = useState({ SMTP_HOST: '', SMTP_PORT: '', SMTP_USER: '', SMTP_PASS: '' });
 
   const { token } = useContext(AuthContext);
+  const location = useLocation();
+  const navigate = useNavigate();
   
   const getDefaultDate = () => {
     const d = new Date();
@@ -81,8 +87,8 @@ const SuperAdminDashboard = () => {
         api.get('/auth/logs')
       ]);
       setTenants(resTenants.data.data || []);
-      setStats(resStats.data.data || { totalTenants: 0, activeTenants: 0, totalUsers: 0, estRevenue: 0 });
-      setLogs(resLogs.data.data || []); 
+      setStats(resStats.data.data || { totalTenants: 0, activeTenants: 0, totalUsers: 0, estRevenue: 0, growthData: [], planDistribution: [], featureAdoption: [] });
+      setLogs(resLogs.data.data || []);
     } catch (error) { 
         console.error("Fetch Error:", error);
         toast.error("Failed to load admin data");
@@ -90,6 +96,24 @@ const SuperAdminDashboard = () => {
   };
 
   useEffect(() => { if (token) fetchData(); }, [token]);
+
+  const loadSettings = async () => {
+    try {
+      const res = await api.get('/settings');
+      setSystemSettings(res.data.data || { SMTP_HOST: '', SMTP_PORT: '', SMTP_USER: '', SMTP_PASS: '' });
+      setViewMode('settings');
+    } catch (e) { toast.error("Failed to load settings"); }
+  };
+  
+  useEffect(() => {
+    if (location.pathname === '/super-admin/analytics') {
+      setViewMode('analytics');
+    } else if (location.pathname === '/super-admin/settings') {
+      loadSettings();
+    } else {
+      setViewMode('list');
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     if (editingTenant) {
@@ -296,10 +320,10 @@ const SuperAdminDashboard = () => {
                           </td>
                           <td className="p-4">
                              <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-bold uppercase border border-blue-100">
-                                {t.subscriptionPlan === 'basic' ? 'Starter' : t.subscriptionPlan === 'premium' ? 'Pro' : 'Business'}
+                                {t.subscriptionPlan === 'basic' ? 'Freelancer' : t.subscriptionPlan === 'premium' ? 'Pro' : 'Business'}
                              </span>
                              <div className="text-xs text-gray-500 mt-1">
-                                {t.subscriptionPlan === 'enterprise' ? '₹999' : t.subscriptionPlan === 'premium' ? '₹499' : '₹299'}
+                                {t.subscriptionPlan === 'enterprise' ? '₹599' : t.subscriptionPlan === 'premium' ? '₹299' : '₹199'}
                              </div>
                           </td>
                           <td className="p-4 min-w-[200px]">
@@ -369,9 +393,9 @@ const SuperAdminDashboard = () => {
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Select Plan</label>
                             <select {...registerCreate("plan", { required: true })} className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium">
-                                <option value="basic">Starter (₹299)</option>
-                                <option value="premium">Pro (₹499)</option>
-                                <option value="enterprise">Business (₹999)</option>
+                                <option value="basic">Freelancer (₹199)</option>
+                                <option value="premium">Pro (₹299)</option>
+                                <option value="enterprise">Business (₹599)</option>
                             </select>
                         </div>
                         <div>
@@ -476,7 +500,7 @@ const SuperAdminDashboard = () => {
                             <h4 className="text-sm font-bold text-gray-900 uppercase mb-4 flex items-center gap-2"><CheckCircle className="w-4 h-4 text-blue-500"/> Account Status</h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label><select {...registerEdit("status")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="active">Active</option><option value="suspended">Suspended</option></select></div>
-                                <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Plan</label><select {...registerEdit("subscriptionPlan")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="basic">Starter</option><option value="premium">Pro (Popular)</option><option value="enterprise">Business</option></select></div>
+                                <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Plan</label><select {...registerEdit("subscriptionPlan")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="basic">Freelancer</option><option value="premium">Pro (Popular)</option><option value="enterprise">Business</option></select></div>
                             </div>
                         </div>
 
@@ -635,6 +659,156 @@ const SuperAdminDashboard = () => {
                         <ShieldCheck className="w-6 h-6"/> Push Notification
                     </button>
                 </div>
+            </div>
+          </div>
+        )}
+
+        {viewMode === 'analytics' && stats.growthData && (
+          <div className="space-y-8 max-w-7xl mx-auto mb-10">
+            {/* Header */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 px-8 py-6 flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-extrabold text-gray-900">Platform Analytics</h2>
+                <p className="text-sm text-gray-500 mt-1">High-level metrics across all companies.</p>
+              </div>
+              <button onClick={() => navigate('/super-admin')} className="text-gray-500 hover:text-black font-bold text-sm bg-white border px-4 py-2 rounded-lg shadow-sm">Back</button>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <IndianRupee className="w-6 h-6"/>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Platform GMV</p>
+                    <h3 className="text-2xl font-black text-gray-900">{formatINR(stats.platformGMV)}</h3>
+                  </div>
+               </div>
+               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <FileText className="w-6 h-6"/>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Invoices Processed</p>
+                    <h3 className="text-2xl font-black text-gray-900">{stats.platformInvoicesCount}</h3>
+                  </div>
+               </div>
+               <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                    <Users className="w-6 h-6"/>
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">End Clients Managed</p>
+                    <h3 className="text-2xl font-black text-gray-900">{stats.platformClientsCount}</h3>
+                  </div>
+               </div>
+            </div>
+
+            {/* Charts Row 1 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-500 uppercase mb-6 tracking-widest text-center">New Companies Growth</h3>
+                <div className="h-80 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={stats.growthData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#888'}} />
+                      <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#888'}} />
+                      <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                      <Bar dataKey="newTenants" fill="#3b82f6" radius={[4, 4, 0, 0]} name="New Companies" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-500 uppercase mb-6 tracking-widest text-center">Estimated MRR (₹)</h3>
+                <div className="h-80 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={stats.growthData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eee" />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#888'}} />
+                      <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#888'}} />
+                      <RechartsTooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                      <Line type="monotone" dataKey="mrr" stroke="#10b981" strokeWidth={3} dot={{r: 4, fill: '#10b981', strokeWidth: 2, stroke: '#fff'}} activeDot={{r: 6}} name="Est. MRR" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Charts Row 2 */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-500 uppercase mb-6 tracking-widest text-center">Plan Distribution</h3>
+                <div className="h-80 w-full flex items-center justify-center">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={stats.planDistribution} innerRadius={80} outerRadius={120} paddingAngle={5} dataKey="value">
+                        {stats.planDistribution?.map((entry, index) => {
+                          const colors = ['#cbd5e1', '#3b82f6', '#8b5cf6'];
+                          return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                        })}
+                      </Pie>
+                      <RechartsTooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                      <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+              <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-gray-500 uppercase mb-6 tracking-widest text-center">Feature Adoption</h3>
+                <div className="h-80 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={stats.featureAdoption} layout="vertical" margin={{top: 20, right: 30, left: 20, bottom: 5}}>
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#eee" />
+                      <XAxis type="number" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#888'}} />
+                      <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#888'}} width={80}/>
+                      <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'}} />
+                      <Bar dataKey="users" fill="#f59e0b" radius={[0, 4, 4, 0]} name="Companies Using" barSize={40} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {viewMode === 'settings' && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 max-w-2xl mx-auto overflow-hidden mb-10">
+            <div className="px-8 py-6 border-b flex justify-between items-center bg-gray-50">
+              <div>
+                  <h2 className="text-2xl font-extrabold text-gray-900">Email Config (SMTP)</h2>
+                  <p className="text-sm text-gray-500 mt-1">Configure global outgoing email server.</p>
+              </div>
+              <button onClick={() => navigate('/super-admin')} className="text-gray-500 hover:text-black font-bold text-sm bg-white border px-4 py-2 rounded-lg">Back</button>
+            </div>
+            <div className="p-8 space-y-6">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Host</label>
+                  <input value={systemSettings.SMTP_HOST} onChange={e => setSystemSettings({...systemSettings, SMTP_HOST: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="smtp.gmail.com" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Port</label>
+                  <input value={systemSettings.SMTP_PORT} onChange={e => setSystemSettings({...systemSettings, SMTP_PORT: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="465" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Username</label>
+                  <input value={systemSettings.SMTP_USER} onChange={e => setSystemSettings({...systemSettings, SMTP_USER: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="billing@domain.com" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Password</label>
+                  <input type="password" value={systemSettings.SMTP_PASS} onChange={e => setSystemSettings({...systemSettings, SMTP_PASS: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="App Password" />
+                </div>
+                <button onClick={async () => {
+                  try {
+                    await api.put('/settings', systemSettings);
+                    toast.success("SMTP settings saved!");
+                  } catch(e) { toast.error("Failed to save settings"); }
+                }} className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition flex justify-center gap-2">
+                  <Save className="w-5 h-5"/> Save Configuration
+                </button>
             </div>
           </div>
         )}

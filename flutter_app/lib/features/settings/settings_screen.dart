@@ -11,6 +11,7 @@ import '../../shared/widgets/app_button.dart';
 import '../../core/utils/api_service.dart';
 import '../../core/constants/api_constants.dart';
 import '../auth/auth_controller.dart';
+import '../import_data/import_data_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -272,9 +273,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Company Settings',
-        subtitle: 'Manage and update your business, taxation, and billing settings',
+      appBar: AppTopBar(
+        title: 'company_settings'.tr,
+        subtitle: 'manage_company_settings'.tr,
         showProfile: false,
         showBadge: false,
         showBackButton: true,
@@ -301,14 +302,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
                 child: _buildSectionCard(
                   index: 0,
-                  title: 'Company Branding',
+                  title: 'company_branding'.tr,
                   icon: LucideIcons.image,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'COMPANY LOGO',
-                        style: TextStyle(
+                      Text(
+                        'company_logo'.tr,
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textSecondary,
@@ -343,9 +344,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               children: [
                                                 Icon(LucideIcons.building, size: 28, color: AppColors.primary.withValues(alpha: 0.8)),
                                                 const SizedBox(height: 4),
-                                                const Text(
-                                                  'LOGO',
-                                                  style: TextStyle(
+                                                Text(
+                                                  'no_logo'.tr,
+                                                  style: const TextStyle(
                                                     fontWeight: FontWeight.w900,
                                                     fontSize: 10,
                                                     color: AppColors.primary,
@@ -389,7 +390,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   Icon(LucideIcons.image, size: 24, color: Colors.grey.shade400),
                                   const SizedBox(height: 4),
                                   Text(
-                                    'No Logo',
+                                    'no_logo'.tr,
                                     style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.bold),
                                   ),
                                 ],
@@ -403,9 +404,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ElevatedButton.icon(
                                   onPressed: _pickLogo,
                                   icon: const Icon(LucideIcons.upload, size: 14),
-                                  label: const Text(
-                                    'Upload New Logo',
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
+                                  label: Text(
+                                    'upload_new_logo'.tr,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
                                   ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
@@ -417,7 +418,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Recommended: Square image, PNG or JPG (Max 500KB).',
+                                  'logo_recommended'.tr,
                                   style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontStyle: FontStyle.italic),
                                 ),
                               ],
@@ -443,13 +444,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
                 child: _buildSectionCard(
                   index: 1,
-                  title: 'Business Information',
+                  title: 'business_info'.tr,
                   icon: LucideIcons.building,
                   child: Column(
                     children: [
                       _buildTextField(
-                        label: 'Company Name *',
-                        hintText: 'Auriva Technologies...',
+                        label: 'company_name_star'.tr,
+                        hintText: 'eg_company_name'.tr,
                         controller: _nameCtrl,
                         validator: (val) {
                           if (val == null || val.trim().isEmpty) return 'Company name is required';
@@ -458,8 +459,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
-                        label: 'Official Email *',
-                        hintText: 'billing@auriva.co',
+                        label: 'official_email_star'.tr,
+                        hintText: 'eg_official_email'.tr,
                         controller: _emailCtrl,
                         keyboardType: TextInputType.emailAddress,
                         validator: (val) {
@@ -473,16 +474,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           Expanded(
                             child: _buildTextField(
-                              label: 'Phone Number',
-                              hintText: '+91 98765 43210',
+                              label: 'phone_number'.tr,
+                              hintText: 'eg_phone_number'.tr,
                               controller: _phoneCtrl,
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildTextField(
-                              label: 'Website (Optional)',
-                              hintText: 'https://auriva.co',
+                              label: 'website_optional'.tr,
+                              hintText: 'eg_website'.tr,
                               controller: _websiteCtrl,
                             ),
                           ),
@@ -493,11 +494,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Padding(
-                            padding: EdgeInsets.only(left: 4, bottom: 4),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4, bottom: 4),
                             child: Text(
-                              'STATE / UT *',
-                              style: TextStyle(
+                              'state_ut_star'.tr,
+                              style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textSecondary,
@@ -507,7 +508,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           DropdownButtonFormField<String>(
                             initialValue: _selectedState,
-                            hint: const Text('Select State', style: TextStyle(fontSize: 12)),
+                            hint: Text('select_state'.tr, style: const TextStyle(fontSize: 12)),
                             items: _indianStates.map((state) {
                               return DropdownMenuItem<String>(
                                 value: state,
@@ -542,8 +543,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
-                        label: 'Business Address *',
-                        hintText: 'Full physical address details...',
+                        label: 'business_address_star'.tr,
+                        hintText: 'eg_business_address'.tr,
                         controller: _addressCtrl,
                         maxLines: 3,
                         validator: (val) {
@@ -569,7 +570,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
                 child: _buildSectionCard(
                   index: 2,
-                  title: 'Taxation & Invoice Terms',
+                  title: 'taxation_invoice_terms'.tr,
                   icon: LucideIcons.fileText,
                   child: Column(
                     children: [
@@ -584,16 +585,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               });
                             },
                           ),
-                          const Text(
-                            'Register for GST',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
+                          Text(
+                            'register_for_gst'.tr,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       _buildTextField(
-                        label: 'GSTIN',
-                        hintText: 'Enter 15-digit GSTIN (e.g. 09AAACA1234A1Z5)',
+                        label: 'gstin'.tr,
+                        hintText: 'eg_gstin'.tr,
                         controller: _gstNumberCtrl,
                         enabled: _gstEnabled,
                         validator: (val) {
@@ -606,8 +607,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
-                        label: 'Default Invoice Terms',
-                        hintText: 'Enter default billing notes...',
+                        label: 'default_invoice_terms'.tr,
+                        hintText: 'eg_invoice_terms'.tr,
                         controller: _termsCtrl,
                         maxLines: 4,
                       ),
@@ -629,19 +630,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
                 child: _buildSectionCard(
                   index: 3,
-                  title: 'Banking Details',
+                  title: 'banking_details'.tr,
                   icon: LucideIcons.creditCard,
                   child: Column(
                     children: [
                       _buildTextField(
-                        label: 'Account Holder Name',
-                        hintText: 'Auriva Tech Pvt Ltd',
+                        label: 'account_holder_name'.tr,
+                        hintText: 'eg_account_holder'.tr,
                         controller: _accNameCtrl,
                       ),
                       const SizedBox(height: 16),
                       _buildTextField(
-                        label: 'Bank Name',
-                        hintText: 'e.g. HDFC Bank',
+                        label: 'bank_name'.tr,
+                        hintText: 'eg_bank_name'.tr,
                         controller: _bankNameCtrl,
                       ),
                       const SizedBox(height: 16),
@@ -649,8 +650,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           Expanded(
                             child: _buildTextField(
-                              label: 'Account Number',
-                              hintText: '1234567890',
+                              label: 'account_number'.tr,
+                              hintText: 'eg_account_number'.tr,
                               controller: _accNumCtrl,
                               keyboardType: TextInputType.number,
                             ),
@@ -658,8 +659,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildTextField(
-                              label: 'IFSC Code',
-                              hintText: 'HDFC0000001',
+                              label: 'ifsc_code'.tr,
+                              hintText: 'eg_ifsc'.tr,
                               controller: _ifscCtrl,
                             ),
                           ),
@@ -669,8 +670,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-
               // Save Button
               TweenAnimationBuilder<double>(
                 duration: const Duration(milliseconds: 650),
@@ -684,7 +683,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: SizedBox(
                   width: double.infinity,
                   child: AppButton(
-                    text: 'Update Business Settings',
+                    text: 'update_business_settings'.tr,
                     icon: const Icon(LucideIcons.save, size: 18, color: Colors.white),
                     isLoading: _isSaving,
                     onPressed: _saveSettings,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../auth/auth_controller.dart';
 
@@ -51,7 +52,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    return Scaffold(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      child: Scaffold(
       backgroundColor: isDark ? const Color(0xFF090D1A) : const Color(0xFFF1F5F9),
       body: Center(
         child: AnimatedBuilder(
@@ -78,11 +81,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Icon(
-                          LucideIcons.hexagon,
-                          color: AppColors.primary,
-                          size: 48,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(24),
+                        child: Image.asset(
+                          'logo.png',
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -109,6 +114,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
               ),
             );
           },
+        ),
         ),
       ),
     );

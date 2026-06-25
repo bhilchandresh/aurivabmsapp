@@ -2,7 +2,7 @@ const Tenant = require('../models/Tenant');
 
 // --- PLAN CONFIGURATION (Simple Hardcoded Limits) ---
 const PLANS = {
-    basic: { maxInvoices: 10, maxUsers: 2, canExport: false, maxInventory: 0, maxSuppliers: 0 },
+    basic: { maxInvoices: 10, maxUsers: 1, canExport: false, maxInventory: 0, maxSuppliers: 0 },
     premium: { maxInvoices: 100, maxUsers: 5, canExport: true, maxInventory: 100, maxSuppliers: 50 },
     enterprise: { maxInvoices: Infinity, maxUsers: Infinity, canExport: true, maxInventory: Infinity, maxSuppliers: Infinity }
 };

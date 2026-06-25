@@ -94,6 +94,23 @@ const tenantSchema = new mongoose.Schema({
   usage: {
     invoicesCount: { type: Number, default: 0 },
     lastResetDate: { type: Date, default: Date.now } 
+  },
+
+  // --- NOTIFICATION SETTINGS ---
+  notificationPreferences: {
+    invoiceDueToday: { type: Boolean, default: true },
+    invoiceDueTomorrow: { type: Boolean, default: true },
+    invoiceOverdue: { type: Boolean, default: true },
+    paymentReceived: { type: Boolean, default: true },
+    quotationExpiring: { type: Boolean, default: true },
+    quotationAccepted: { type: Boolean, default: true },
+    quotationRejected: { type: Boolean, default: true },
+    inventoryLowStock: { type: Boolean, default: true },
+    inventoryOutOfStock: { type: Boolean, default: true },
+    supplierPaymentDue: { type: Boolean, default: true },
+    recurringExpense: { type: Boolean, default: true },
+    newDeviceLogin: { type: Boolean, default: true },
+    morningSummary: { type: Boolean, default: true }
   }
 
 }, { timestamps: true });

@@ -26,9 +26,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Inventory Management',
-        subtitle: 'Manage all your products, SKUs, and stock levels',
+      appBar: AppTopBar(
+        title: 'inventory_management'.tr,
+        subtitle: 'manage_products'.tr,
         showProfile: false,
         showBadge: false,
         showBackButton: true,
@@ -71,10 +71,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Inventory — Pro Feature',
+            Text(
+              'inventory_pro'.tr,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color: AppColors.textPrimary,
@@ -82,31 +82,31 @@ class _InventoryScreenState extends State<InventoryScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Track stock levels, manage SKUs effortlessly, and auto-sync with your invoices.\nUpgrade to Pro or Business to unlock this module.',
+            Text(
+              'inventory_pro_desc'.tr,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
-            _buildUpgradePlanCard('Pro Plan', 'Up to 100 SKU Items', '₹299 / month'),
+            _buildUpgradePlanCard('pro_plan'.tr, 'pro_plan_desc'.tr, 'pro_plan_price'.tr),
             const SizedBox(height: 12),
-            _buildUpgradePlanCard('Business Plan', 'Unlimited Inventory & Locations', '₹799 / month'),
+            _buildUpgradePlanCard('business_plan'.tr, 'business_plan_desc'.tr, 'business_plan_price'.tr),
             ElevatedButton.icon(
               onPressed: () {
                 Get.snackbar(
-                  'Upgrade Required',
-                  'Please contact your Super Admin to upgrade your business plan.',
+                  'upgrade_required'.tr,
+                  'contact_admin_upgrade'.tr,
                   snackPosition: SnackPosition.BOTTOM,
                   backgroundColor: AppColors.primary,
                   colorText: Colors.white,
                 );
               },
               icon: const Icon(LucideIcons.lock, size: 16, color: Colors.white),
-              label: const Text('Contact Admin to Upgrade', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              label: Text('contact_admin_btn'.tr, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
@@ -168,166 +168,234 @@ class _InventoryScreenState extends State<InventoryScreen> {
       color: AppColors.primary,
       child: Skeletonizer(
         enabled: _controller.isLoading.value && _controller.items.isEmpty,
-        child: SingleChildScrollView(
+        child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header SKU Usage Card (Only for Premium Plan)
-            Obx(() {
-              if (_controller.subscriptionPlan.value == 'premium') {
-                final used = _controller.items.length;
-                final max = _controller.maxItems;
-                final pct = _controller.usagePercentage;
-                final limitReached = _controller.isAtLimit;
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Header SKU Usage Card (Only for Premium Plan)
+                    Obx(() {
+                      if (_controller.subscriptionPlan.value == 'premium') {
+                        final used = _controller.items.length;
+                        final max = _controller.maxItems;
+                        final pct = _controller.usagePercentage;
+                        final limitReached = _controller.isAtLimit;
 
-                Color progressColor = AppColors.primary;
-                if (pct >= 1.0) {
-                  progressColor = Colors.red;
-                } else if (pct >= 0.8) {
-                  progressColor = Colors.amber;
-                }
+                        Color progressColor = AppColors.primary;
+                        if (pct >= 1.0) {
+                          progressColor = Colors.red;
+                        } else if (pct >= 0.8) {
+                          progressColor = Colors.amber;
+                        }
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: AppColors.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.01),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'SKU Usage Limit',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: AppColors.border),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.01),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              )
+                            ],
                           ),
-                          Text(
-                            '$used / $max',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 13,
-                              color: limitReached ? Colors.red : AppColors.textPrimary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: pct,
-                          minHeight: 8,
-                          backgroundColor: Colors.grey.shade100,
-                          valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-                        ),
-                      ),
-                      if (limitReached) ...[
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            const Icon(LucideIcons.alertTriangle, size: 12, color: Colors.red),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                'Inventory limits reached. Upgrade to Business for unlimited SKUs.',
-                                style: TextStyle(color: Colors.red.shade600, fontSize: 11, fontWeight: FontWeight.bold),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'sku_usage'.tr,
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
+                                  ),
+                                  Text(
+                                    '$used / $max',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 13,
+                                      color: limitReached ? Colors.red : AppColors.textPrimary,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 10),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: pct,
+                                  minHeight: 8,
+                                  backgroundColor: Colors.grey.shade100,
+                                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                                ),
+                              ),
+                              if (limitReached) ...[
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Icon(LucideIcons.alertTriangle, size: 12, color: Colors.red),
+                                    const SizedBox(width: 4),
+                                    Expanded(
+                                      child: Text(
+                                        'inventory_limit_reached'.tr,
+                                        style: TextStyle(color: Colors.red.shade600, fontSize: 11, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
+
+                    // Selection Bar
+                    Obx(() {
+                      if (_controller.isSelectionMode.value) {
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(LucideIcons.x, color: AppColors.textPrimary),
+                                    onPressed: _controller.clearSelection,
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    '${_controller.selectedItems.length}' + 'selected'.tr,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                              ElevatedButton.icon(
+                                onPressed: _showBulkDeleteConfirmation,
+                                icon: const Icon(LucideIcons.trash2, size: 16, color: Colors.white),
+                                label: Text('delete'.tr, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
+                  ],
+                ),
+              ),
+            ),
+
+            // Search and Action Bar (Floating)
+            SliverAppBar(
+              floating: true,
+              snap: true,
+              elevation: 0,
+              backgroundColor: AppColors.background,
+              automaticallyImplyLeading: false,
+              titleSpacing: 16,
+              toolbarHeight: 65,
+              title: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      onChanged: (val) {
+                        setState(() {
+                          _searchQuery = val;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintText: 'search_products'.tr,
+                        hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
+                        prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 16),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.border),
                         ),
-                      ],
-                    ],
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            }),
-
-            // Search and Action Bar
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    onChanged: (val) {
-                      setState(() {
-                        _searchQuery = val;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Search by Product Name or SKU...',
-                      hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
-                      prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 16),
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 10),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AppColors.border),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: AppColors.border),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.border),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Obx(() {
-                  final atLimit = _controller.isAtLimit;
-                  return ElevatedButton.icon(
-                    onPressed: atLimit ? null : () => _showAddEditItemDialog(),
-                    icon: const Icon(LucideIcons.plus, size: 14),
-                    label: const Text('Add Item', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey.shade200,
-                      disabledForegroundColor: Colors.grey.shade400,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      elevation: 0,
-                    ),
-                  );
-                }),
-              ],
+                  const SizedBox(width: 8),
+                  Obx(() {
+                    final atLimit = _controller.isAtLimit;
+                    return ElevatedButton.icon(
+                      onPressed: atLimit ? null : () => _showAddEditItemDialog(),
+                      icon: const Icon(LucideIcons.plus, size: 14),
+                      label: Text('add_item'.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor: Colors.grey.shade200,
+                        disabledForegroundColor: Colors.grey.shade400,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        elevation: 0,
+                      ),
+                    );
+                  }),
+                ],
+              ),
             ),
-            const SizedBox(height: 20),
-
-            // Registry List Title
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Warehouse Registry',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                ),
-                Icon(LucideIcons.package, size: 16, color: Colors.grey),
-              ],
-            ),
-            const SizedBox(height: 12),
 
             // Product List
-            Obx(() => _buildProductList()),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'warehouse_registry'.tr,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                        ),
+                        const Icon(LucideIcons.package, size: 16, color: Colors.grey),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Obx(() => _buildProductList()),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
-      ),
       ),
     );
   }
@@ -366,7 +434,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
             Icon(LucideIcons.packageOpen, size: 36, color: Colors.grey.shade300),
             const SizedBox(height: 12),
             Text(
-              'No inventory items found.',
+              'no_inventory_found'.tr,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
@@ -401,146 +469,182 @@ class _InventoryScreenState extends State<InventoryScreen> {
               child: Opacity(opacity: value, child: child),
             );
           },
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.01),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // SKU & Stock badge
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      item.sku.toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.grey.shade500,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: badgeBg,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        '${item.currentStock} UNITS',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w900,
-                          color: badgeText,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+          child: Obx(() {
+            final isSelected = _controller.selectedItems.contains(item.id);
+            final isSelectionMode = _controller.isSelectionMode.value;
+
+            return GestureDetector(
+              onLongPress: () => _controller.toggleSelection(item.id),
+              onTap: () {
+                if (isSelectionMode) {
+                  _controller.toggleSelection(item.id);
+                } else {
+                  _showAddEditItemDialog(item: item);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : AppColors.border,
+                    width: isSelected ? 2 : 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.01),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-
-                // Name & Price
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    if (isSelectionMode) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2, right: 12),
+                        child: Icon(
+                          isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
+                          color: isSelected ? AppColors.primary : Colors.grey.shade400,
+                          size: 22,
+                        ),
+                      ),
+                    ],
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            item.itemName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          if (item.description.isNotEmpty) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              item.description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey.shade500,
+                          // SKU & Stock badge
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                item.sku.toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.grey.shade500,
+                                  letterSpacing: 0.5,
+                                ),
                               ),
-                            ),
-                          ],
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: badgeBg,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${item.currentStock}' + 'units'.tr,
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    color: badgeText,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Name & Price
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.itemName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    if (item.description.isNotEmpty) ...[
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        item.description,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                formatCurrency.format(item.unitPrice),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Action panel
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              // Restock Button
+                              _buildCompactAction(
+                                icon: LucideIcons.arrowUpRight,
+                                label: 'restock'.tr,
+                                color: Colors.indigo,
+                                onTap: () => _showRestockDialog(item),
+                              ),
+                              const SizedBox(width: 8),
+
+                              // History Button
+                              _buildCompactAction(
+                                icon: LucideIcons.history,
+                                label: 'history'.tr,
+                                color: Colors.green,
+                                onTap: () => _showHistoryDialog(item),
+                              ),
+                              const SizedBox(width: 8),
+
+                              // Edit Button
+                              _buildCompactAction(
+                                icon: LucideIcons.edit,
+                                label: 'edit'.tr,
+                                color: Colors.blue,
+                                onTap: () => _showAddEditItemDialog(item: item),
+                              ),
+                              if (!isSelectionMode) ...[
+                                const SizedBox(width: 8),
+                                // Delete Button
+                                _buildCompactAction(
+                                  icon: LucideIcons.trash2,
+                                  label: 'delete'.tr,
+                                  color: Colors.red,
+                                  onTap: () => _showDeleteConfirmation(item),
+                                ),
+                              ],
+                            ],
+                          ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      formatCurrency.format(item.unitPrice),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 12),
-
-                // Action panel
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    // Restock Button
-                    _buildCompactAction(
-                      icon: LucideIcons.arrowUpRight,
-                      label: 'Restock',
-                      color: Colors.indigo,
-                      onTap: () => _showRestockDialog(item),
-                    ),
-                    const SizedBox(width: 8),
-
-                    // History Button
-                    _buildCompactAction(
-                      icon: LucideIcons.history,
-                      label: 'History',
-                      color: Colors.green,
-                      onTap: () => _showHistoryDialog(item),
-                    ),
-                    const SizedBox(width: 8),
-
-                    // Edit Button
-                    _buildCompactAction(
-                      icon: LucideIcons.edit,
-                      label: 'Edit',
-                      color: Colors.blue,
-                      onTap: () => _showAddEditItemDialog(item: item),
-                    ),
-                    const SizedBox(width: 8),
-
-                    // Delete Button
-                    _buildCompactAction(
-                      icon: LucideIcons.trash2,
-                      label: 'Delete',
-                      color: Colors.red,
-                      onTap: () => _showDeleteConfirmation(item),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          }),
         );
       },
     ),
@@ -609,7 +713,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      item != null ? 'Edit Product Details' : 'Add New Product SKU',
+                      item != null ? 'edit_product'.tr : 'add_new_sku'.tr,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -627,8 +731,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
                 // Item Name
                 AppInputField(
-                  label: 'Product Name *',
-                  hintText: 'e.g. Wireless Mouse',
+                  label: 'product_name_star'.tr,
+                  hintText: 'eg_mouse'.tr,
                   controller: nameCtrl,
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Please enter product name';
@@ -642,8 +746,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   children: [
                     Expanded(
                       child: AppInputField(
-                        label: 'SKU / Code',
-                        hintText: 'e.g. MS-109X',
+                        label: 'sku_code'.tr,
+                        hintText: 'eg_sku'.tr,
                         controller: skuCtrl,
                       ),
                     ),
@@ -651,8 +755,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: AppInputField(
-                          label: 'Initial Stock *',
-                          hintText: 'e.g. 50',
+                          label: 'initial_stock'.tr,
+                          hintText: 'eg_stock'.tr,
                           controller: stockCtrl,
                           keyboardType: TextInputType.number,
                           validator: (val) {
@@ -669,8 +773,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
                 // Unit Price
                 AppInputField(
-                  label: 'Unit Price (₹) *',
-                  hintText: 'e.g. 1500',
+                  label: 'unit_price'.tr,
+                  hintText: 'eg_price'.tr,
                   controller: priceCtrl,
                   keyboardType: TextInputType.number,
                   validator: (val) {
@@ -683,8 +787,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
                 // Description
                 AppInputField(
-                  label: 'Product Description',
-                  hintText: 'Optional details...',
+                  label: 'product_desc'.tr,
+                  hintText: 'optional_details'.tr,
                   controller: descCtrl,
                 ),
                 const SizedBox(height: 24),
@@ -1067,6 +1171,56 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
                   : const Text('Delete', style: TextStyle(color: Colors.white)),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  // --- BULK DELETE CONFIRMATION DIALOG ---
+  void _showBulkDeleteConfirmation() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text('Delete Selected Items?'),
+        content: Text('This will remove ${_controller.selectedItems.length} items from your warehouse catalog. Are you sure you want to proceed?'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          Obx(() {
+            final isSaving = _controller.isLoading.value;
+            return ElevatedButton(
+              onPressed: isSaving ? null : () async {
+                final success = await _controller.deleteSelectedItems();
+                Get.back(); // close dialog
+                if (success) {
+                  Get.snackbar(
+                    'Removed Items',
+                    'Selected products removed successfully.',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: AppColors.error,
+                    colorText: Colors.white,
+                  );
+                } else {
+                  Get.snackbar(
+                    'Error',
+                    'Failed to delete some or all items. Please try again.',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: AppColors.error,
+                    colorText: Colors.white,
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: isSaving
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : const Text('Delete All', style: TextStyle(color: Colors.white)),
             );
           }),
         ],

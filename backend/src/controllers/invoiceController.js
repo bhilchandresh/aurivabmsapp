@@ -110,13 +110,15 @@ const calculateInvoiceTotals = (items, discountPercentage = 0, taxType = 'exclus
 
 // --- HELPER FUNCTION: Sync Inventory ---
 const syncInventoryForInvoice = async (tenantId, items, invoiceId, clientName, type = 'Sale') => {
+  const { dispatchNotification } = require('../services/notificationDispatcher');
+
   for (const item of items) {
     if (item.inventoryId) {
       const quantity = Number(item.quantity);
       // Update Stock
-      await Inventory.findByIdAndUpdate(item.inventoryId, {
+      const updatedInv = await Inventory.findByIdAndUpdate(item.inventoryId, {
         $inc: { currentStock: type === 'Sale' ? -quantity : quantity }
-      });
+      }, { new: true });
 
       // Create Transaction Record
       await InventoryTransaction.create({
@@ -128,6 +130,27 @@ const syncInventoryForInvoice = async (tenantId, items, invoiceId, clientName, t
         description: type === 'Sale' ? `Sold to ${clientName}` : `Returned from ${clientName}`,
         date: Date.now()
       });
+
+      // Check for Low Stock or Out of Stock Alerts
+      if (updatedInv && type === 'Sale') {
+        if (updatedInv.currentStock <= 0) {
+          dispatchNotification({
+            tenantId,
+            type: 'stock_alert',
+            message: `🚨 ${updatedInv.itemName} is out of stock!`,
+            preferenceKey: 'inventoryOutOfStock',
+            metadata: { entityId: updatedInv._id, entityModel: 'Inventory' }
+          });
+        } else if (updatedInv.currentStock <= (updatedInv.reorderLevel || 5)) {
+          dispatchNotification({
+            tenantId,
+            type: 'stock_alert',
+            message: `⚠️ ${updatedInv.itemName} stock is low. Only ${updatedInv.currentStock} units remaining.`,
+            preferenceKey: 'inventoryLowStock',
+            metadata: { entityId: updatedInv._id, entityModel: 'Inventory' }
+          });
+        }
+      }
     }
   }
 };
@@ -256,6 +279,19 @@ exports.createInvoice = async (req, res) => {
       ...item,
       gstRate: item.gstRate !== undefined ? Number(item.gstRate) : Number(taxRate)
     }));
+
+    // --- INVENTORY VALIDATION ---
+    for (const item of rawItems) {
+       if (item.inventoryId) {
+          const invItem = await Inventory.findById(item.inventoryId);
+          if (invItem && Number(item.quantity) > invItem.currentStock) {
+              return res.status(400).json({ 
+                  success: false, 
+                  message: `Insufficient stock for ${invItem.itemName}. Available: ${invItem.currentStock}, Requested: ${item.quantity}` 
+              });
+          }
+       }
+    }
 
     const financials = calculateInvoiceTotals(
       rawItems, 
@@ -390,6 +426,25 @@ exports.updateInvoice = async (req, res) => {
         gstRate: item.gstRate !== undefined ? Number(item.gstRate) : Number(taxR)
       }));
 
+      // --- INVENTORY VALIDATION FOR UPDATE ---
+      for (const item of rawItems) {
+         if (item.inventoryId) {
+            const invItem = await Inventory.findById(item.inventoryId);
+            if (invItem) {
+               const prevTxs = await InventoryTransaction.find({ referenceId: id, inventoryId: item.inventoryId });
+               const previouslyAllocated = prevTxs.reduce((sum, tx) => sum + Math.abs(tx.quantity), 0);
+               const availablePool = invItem.currentStock + previouslyAllocated;
+               
+               if (Number(item.quantity) > availablePool) {
+                   return res.status(400).json({ 
+                       success: false, 
+                       message: `Insufficient stock for ${invItem.itemName}. Available: ${availablePool}, Requested: ${item.quantity}` 
+                   });
+               }
+            }
+         }
+      }
+
       const financials = calculateInvoiceTotals(rawItems, discPercent, tType, gEnabled, tenantState, pSupply, advPay);
 
       updateData = { ...updateData, items: financials.items, ...financials };
@@ -406,6 +461,18 @@ exports.updateInvoice = async (req, res) => {
       Tenant.findById(req.user.tenantId).then(tenant => {
         sendPaymentEmail(updatedInvoice, detectedPaidAmount, tenant).catch(err => console.error("Payment Email Failed:", err));
       }).catch(err => console.error("Tenant Fetch Failed for Payment Email:", err));
+    }
+
+    // --- AUTOMATED IN-APP / PUSH NOTIFICATION ---
+    if (paymentDetected && detectedPaidAmount > 0) {
+      const { dispatchNotification } = require('../services/notificationDispatcher');
+      dispatchNotification({
+        tenantId: req.user.tenantId,
+        type: 'payment_received',
+        message: `Payment of ₹${detectedPaidAmount} received from ${updatedInvoice.client.name}.`,
+        preferenceKey: 'paymentReceived',
+        metadata: { entityId: updatedInvoice._id, entityModel: 'Invoice' }
+      });
     }
 
     // --- SYNC INVENTORY ON UPDATE ---
@@ -470,5 +537,135 @@ exports.getPublicInvoice = async (req, res) => {
   } catch (error) {
     console.error("Public Invoice Access Error:", error);
     res.status(500).json({ success: false, message: "Error loading public invoice page" });
+  }
+};
+
+exports.bulkImportInvoices = async (req, res) => {
+  try {
+    const invoicesData = req.body;
+    if (!Array.isArray(invoicesData)) {
+      return res.status(400).json({ success: false, message: "Data must be an array" });
+    }
+
+    const tenantId = req.user.tenantId;
+    const tenant = await Tenant.findById(tenantId);
+    let tenantState = tenant ? tenant.state : "";
+    if (!tenantState && tenant && tenant.address) {
+       const foundState = INDIAN_STATES.find(s => 
+           tenant.address.toLowerCase().includes(s.toLowerCase())
+       );
+       if (foundState) tenantState = foundState;
+    }
+
+    let importedCount = 0;
+    let skippedCount = 0;
+
+    for (const invData of invoicesData) {
+      if (!invData.clientName || !invData.items || !Array.isArray(invData.items)) {
+        skippedCount++;
+        continue;
+      }
+
+      // Smart Resolution: Find or Create Client
+      let client = await Client.findOne({ tenantId, name: new RegExp('^' + invData.clientName.trim() + '$', 'i') });
+      if (!client) {
+        client = await Client.create({
+          tenantId,
+          name: invData.clientName.trim(),
+          email: invData.clientEmail || "",
+          phone: invData.clientPhone || "",
+          address: invData.clientAddress || ""
+        });
+      }
+
+      const clientData = {
+        name: client.name, email: client.email, phone: client.phone,
+        address: client.address, gstin: client.gstin, state: client.state, clientId: client._id
+      };
+
+      const taxRate = Number(invData.taxRate) || 0;
+      const rawItems = invData.items.map(item => ({
+        ...item,
+        gstRate: item.gstRate !== undefined ? Number(item.gstRate) : Number(taxRate)
+      }));
+
+      const discountPercentage = Number(invData.discountPercentage) || 0;
+      const advancePayment = Number(invData.advancePayment) || 0;
+
+      const financials = calculateInvoiceTotals(
+        rawItems, 
+        discountPercentage, 
+        invData.taxType || 'exclusive', 
+        invData.gstEnabled === true || invData.gstEnabled === 'true', 
+        tenantState, 
+        invData.placeOfSupply || clientData.state, 
+        advancePayment
+      );
+
+      // Resolve Invoice Number
+      let invoiceNumber = invData.invoiceNumber;
+      if (!invoiceNumber) {
+        const lastInvoice = await Invoice.findOne({ tenantId })
+          .sort({ createdAt: -1 })
+          .collation({ locale: "en_US", numericOrdering: true });
+
+        let nextNum = 1;
+        if (lastInvoice && lastInvoice.invoiceNumber) {
+          const parts = lastInvoice.invoiceNumber.split('-');
+          if (parts.length > 1 && !isNaN(parts[parts.length - 1])) {
+            nextNum = parseInt(parts[parts.length - 1]) + 1;
+          }
+        }
+        invoiceNumber = `INV-${String(nextNum).padStart(4, '0')}`;
+      }
+
+      // Resolve Status
+      let status = invData.status || 'Pending';
+      let remainingAmount = financials.totalAmount;
+      if (status === 'Paid') {
+        remainingAmount = 0;
+      } else if (status === 'Partially Paid' && advancePayment > 0) {
+        remainingAmount = financials.totalAmount - advancePayment;
+      }
+
+      const invoice = await Invoice.create({
+        tenantId,
+        invoiceNumber,
+        client: clientData,
+        items: financials.items,
+        ...financials,
+        discountPercentage,
+        taxRate,
+        gstEnabled: invData.gstEnabled === true || invData.gstEnabled === 'true',
+        taxType: invData.taxType || 'exclusive',
+        placeOfSupply: invData.placeOfSupply || clientData.state,
+        advancePayment,
+        date: invData.date || Date.now(),
+        dueDate: invData.dueDate,
+        notes: invData.notes || '',
+        status,
+        remainingAmount,
+        salesPerson: req.user._id
+      });
+
+      // Since these are historical imports, we won't deduct inventory automatically 
+      // unless items explicitly have inventoryId mapped from frontend.
+      if (financials.items.some(i => i.inventoryId)) {
+        await syncInventoryForInvoice(tenantId, financials.items, invoice._id, clientData.name);
+      }
+
+      importedCount++;
+    }
+
+    if (typeof logActivity === 'function') {
+      await logActivity(req, "BULK_IMPORT", `Imported ${importedCount} historical invoices`);
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      message: `Import complete. Added ${importedCount} invoices. Skipped ${skippedCount} invalid rows.` 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };

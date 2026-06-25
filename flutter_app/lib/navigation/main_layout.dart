@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
 import '../core/theme/app_text_styles.dart';
 import '../features/dashboard/dashboard_screen.dart';
@@ -12,6 +13,7 @@ import '../features/auth/auth_controller.dart';
 
 class MainLayoutController extends GetxController {
   var currentIndex = 0.obs;
+  DateTime? lastBackPressTime;
 
   final List<Widget> screens = [
     const DashboardScreen(),
@@ -33,16 +35,42 @@ class MainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(MainLayoutController());
     
-    return Obx(() {
-      final isFirstTab = controller.currentIndex.value == 0;
-      return PopScope(
-        canPop: isFirstTab,
+    return PopScope(
+      canPop: false, // Always intercept back press
         onPopInvokedWithResult: (didPop, result) {
           if (didPop) return;
-          controller.changeIndex(0);
+          
+          if (controller.currentIndex.value != 0) {
+            // If not on Dashboard, go to Dashboard
+            controller.changeIndex(0);
+          } else {
+            // If on Dashboard, implement Double Tap to Exit
+            final now = DateTime.now();
+            if (controller.lastBackPressTime == null || 
+                now.difference(controller.lastBackPressTime!) > const Duration(seconds: 2)) {
+              // First tap
+              controller.lastBackPressTime = now;
+              Get.snackbar(
+                'Exit App',
+                'Press back again to exit',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.black87,
+                colorText: Colors.white,
+                margin: const EdgeInsets.only(bottom: 100, left: 16, right: 16),
+                duration: const Duration(seconds: 2),
+              );
+            } else {
+              // Second tap within 2 seconds
+              SystemNavigator.pop();
+            }
+          }
         },
-        child: Scaffold(
-          backgroundColor: AppColors.background,
+        child: AnnotatedRegion<SystemUiOverlayStyle>(
+          value: Theme.of(context).brightness == Brightness.dark
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark,
+          child: Scaffold(
+            backgroundColor: AppColors.background,
           body: Obx(() {
             final isLargeScreen = context.width > 800;
             final activeScreen = controller.screens[controller.currentIndex.value];
@@ -106,8 +134,8 @@ class MainLayout extends StatelessWidget {
             },
           ),
         ),
+        ),
       );
-    });
   }
 
   // Floating Bottom Navigation Nav Item (Mobile view)

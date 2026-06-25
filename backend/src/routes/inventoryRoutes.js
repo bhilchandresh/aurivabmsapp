@@ -11,6 +11,9 @@ router.route('/')
   .get(inventoryController.getItems)
   .post(inventoryController.createItem);
 
+router.route('/bulk')
+  .post(inventoryController.bulkImportInventory);
+
 router.route('/:id/transactions')
   .get(inventoryController.getItemTransactions);
 

@@ -23,6 +23,7 @@ import Expenses from "./pages/Expenses";
 import Inventory from "./pages/Inventory"; 
 import Suppliers from "./pages/Suppliers";
 import SupplierProfile from "./pages/SupplierProfile";
+import ImportData from "./pages/ImportData";
 import PrivateRoute from "./components/PrivateRoute";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 
@@ -121,12 +122,22 @@ function App() {
         <PrivateRoute allowedRoles={['admin', 'super_admin']}><Settings /></PrivateRoute>
       } />
 
+      <Route path="/import-data" element={
+        <PrivateRoute allowedRoles={['admin']}><ImportData /></PrivateRoute>
+      } />
+
       <Route path="/team" element={
         <PrivateRoute allowedRoles={['admin']}><Team /></PrivateRoute>
       } />
 
       {/* --- SUPER ADMIN ROUTE --- */}
       <Route path="/super-admin" element={
+        <PrivateRoute allowedRoles={SUPER_ACCESS}><SuperAdminDashboard /></PrivateRoute>
+      } />
+      <Route path="/super-admin/analytics" element={
+        <PrivateRoute allowedRoles={SUPER_ACCESS}><SuperAdminDashboard /></PrivateRoute>
+      } />
+      <Route path="/super-admin/settings" element={
         <PrivateRoute allowedRoles={SUPER_ACCESS}><SuperAdminDashboard /></PrivateRoute>
       } />
 

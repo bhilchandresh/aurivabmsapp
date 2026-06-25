@@ -2,8 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/api_service.dart';
 import '../../core/constants/api_constants.dart';
+import '../../core/services/notification_service.dart';
 import 'notification_model.dart';
 import '../auth/auth_controller.dart';
 
@@ -56,7 +58,8 @@ class NotificationController extends GetxController {
     try {
       if (notifications.isEmpty) isLoading.value = true;
       
-      final response = await ApiService.get('${ApiConstants.baseUrl}/notifications');
+      final response = await ApiService.get(ApiConstants.notifications);
+      debugPrint('Notification Fetch Status: ${response.statusCode}');
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -64,12 +67,52 @@ class NotificationController extends GetxController {
           final List<dynamic> list = data['data'];
           notifications.value = list.map((json) => AppNotification.fromJson(json)).toList();
           _updateUnreadCount();
+          await _showLocalNotificationsForUnread();
         }
       }
     } catch (e) {
       debugPrint('Failed to fetch notifications: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> _showLocalNotificationsForUnread() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Implement daily reset logic
+      final today = DateTime.now().toIso8601String().substring(0, 10); // "YYYY-MM-DD"
+      final lastShownDate = prefs.getString('last_notification_shown_date');
+
+      if (lastShownDate != today) {
+        // First time opening app today: clear previously shown IDs
+        await prefs.remove('shown_local_notifications');
+        await prefs.setString('last_notification_shown_date', today);
+      }
+      
+      List<String> shownIds = prefs.getStringList('shown_local_notifications') ?? [];
+
+      bool updated = false;
+      int localIdCounter = 1000; // start id offset to avoid collision
+      
+      for (var notif in notifications) {
+        if (!notif.isRead && !shownIds.contains(notif.id)) {
+          await NotificationService.showLocalNotification(
+            id: localIdCounter++,
+            title: 'AurivaBMS',
+            body: notif.message,
+          );
+          shownIds.add(notif.id);
+          updated = true;
+        }
+      }
+
+      if (updated) {
+        await prefs.setStringList('shown_local_notifications', shownIds);
+      }
+    } catch (e) {
+      debugPrint('Error showing local notification: $e');
     }
   }
 
@@ -82,7 +125,7 @@ class NotificationController extends GetxController {
       _updateUnreadCount();
 
       try {
-        final response = await ApiService.put('${ApiConstants.baseUrl}/notifications/$id/read', {});
+        final response = await ApiService.put('${ApiConstants.notifications}/$id/read', {});
         if (response.statusCode != 200) {
           // Revert if failed
           notifications[index] = updatedNotif.copyWith(isRead: false);
@@ -101,4 +144,5 @@ class NotificationController extends GetxController {
     unreadCount.value = notifications.where((n) => !n.isRead).length;
   }
 }
+
 

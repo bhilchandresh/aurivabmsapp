@@ -106,48 +106,68 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Clients Directory',
-        subtitle: 'Manage active customer relationships & ledgers',
+      appBar: AppTopBar(
+        title: 'clients'.tr,
+        subtitle: 'manage_customers'.tr,
         showProfile: false,
         showBadge: false,
       ),
       body: Obx(() {
         final listItems = _getFilteredAndSortedClients(_clientsController.clients);
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Actions Header Row (Search, Sort, and Add Button)
-              _buildFilterHeader(context),
-              const SizedBox(height: 20),
+        final isMobile = MediaQuery.of(context).size.width < 700;
+        final double headerHeight = isMobile ? 130.0 : 80.0;
 
-              // Register Label
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Customer Registers (${listItems.length})',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
-                    ),
-                  ),
-                  const Icon(LucideIcons.slidersHorizontal, size: 16, color: Colors.grey),
-                ],
+        return CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          slivers: [
+            SliverAppBar(
+              floating: true,
+              snap: true,
+              automaticallyImplyLeading: false,
+              backgroundColor: isDark ? const Color(0xFF0F172A) : AppColors.background,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              toolbarHeight: headerHeight,
+              flexibleSpace: FlexibleSpaceBar(
+                background: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: _buildFilterHeader(context),
+                ),
               ),
-              const SizedBox(height: 12),
-
-              // Client Cards Grid/List
-              if (listItems.isEmpty)
-                _buildEmptyState()
-              else
-                _buildClientsList(listItems),
-            ],
-          ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Register Label
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Customer Registers (${listItems.length})',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : AppColors.textPrimary,
+                          ),
+                        ),
+                        const Icon(LucideIcons.slidersHorizontal, size: 16, color: Colors.grey),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Client Cards Grid/List
+                    if (listItems.isEmpty)
+                      _buildEmptyState()
+                    else
+                      _buildClientsList(listItems),
+                  ],
+                ),
+              ),
+            ),
+          ],
         );
       }),
     );
@@ -165,7 +185,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
       },
       style: TextStyle(color: isDark ? Colors.white : AppColors.textPrimary),
       decoration: InputDecoration(
-        hintText: 'Search name, email or phone...',
+        hintText: 'search_clients'.tr,
         hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
         prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 18),
         filled: true,
@@ -219,7 +239,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
     Widget addButton = ElevatedButton.icon(
       onPressed: _showAddClientDialog,
       icon: const Icon(LucideIcons.plus, size: 16),
-      label: const Text('Add Client', style: TextStyle(fontWeight: FontWeight.bold)),
+      label: Text('add_client'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -597,7 +617,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
               backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               title: Text(
-                'New Client',
+                'add_client'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -702,7 +722,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -733,7 +753,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text('Save Client', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text('save_client'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
             );

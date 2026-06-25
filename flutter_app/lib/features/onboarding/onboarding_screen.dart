@@ -70,7 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         TextButton(
                           onPressed: _onSkip,
                           child: Text(
-                            'Skip',
+                            'skip'.tr,
                             style: TextStyle(
                               color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                               fontWeight: FontWeight.w600,
@@ -148,11 +148,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               if (_currentPage == 2)
-                                const Padding(
-                                  padding: EdgeInsets.only(right: 8),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8),
                                   child: Text(
-                                    'Get Started',
-                                    style: TextStyle(
+                                    'get_started'.tr,
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -331,7 +331,7 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
           ),
           const SizedBox(height: 40),
           Text(
-            'Smart Dashboard',
+            'smart_dashboard'.tr,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
@@ -342,7 +342,7 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
           ),
           const SizedBox(height: 16),
           Text(
-            'Get real-time insights into your business performance with powerful analytics and visual charts.',
+            'smart_dashboard_desc'.tr,
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
@@ -448,7 +448,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
           ),
           const SizedBox(height: 40),
           Text(
-            'Manage Inventory',
+            'manage_inventory_onboarding'.tr,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
@@ -459,7 +459,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
           ),
           const SizedBox(height: 16),
           Text(
-            'Keep track of your stock levels and manage suppliers effortlessly in one centralized hub.',
+            'manage_inventory_desc'.tr,
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
@@ -592,7 +592,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text('INVOICE', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: isDark ? Colors.grey.shade300 : Colors.grey.shade800, letterSpacing: 1.0)),
+                                    Text('invoice_caps'.tr, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: isDark ? Colors.grey.shade300 : Colors.grey.shade800, letterSpacing: 1.0)),
                                     const SizedBox(height: 4),
                                     Container(width: 40, height: 4, decoration: BoxDecoration(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
                                   ],
@@ -640,7 +640,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
+                                Text('total'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
                                 const Text('₹24,500', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.primary)),
                               ],
                             ),
@@ -680,7 +680,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
           ),
           const SizedBox(height: 40),
           Text(
-            'Seamless Invoicing',
+            'seamless_invoicing'.tr,
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
@@ -691,7 +691,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
           ),
           const SizedBox(height: 16),
           Text(
-            'Generate professional invoices, send quotations, and get paid faster with a few taps.',
+            'seamless_invoicing_desc'.tr,
             style: TextStyle(
               fontSize: 15,
               height: 1.5,

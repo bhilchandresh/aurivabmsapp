@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:get/get.dart';
+import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
+import '../../features/auth/auth_controller.dart';
+import '../../features/notifications/notification_controller.dart';
+import '../../features/notifications/notification_screen.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -10,6 +15,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showMenu;
   final bool showProfile;
   final bool showBadge;
+  final bool showNotification;
   final bool? showBackButton;
   final VoidCallback? onBack;
 
@@ -20,6 +26,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.showMenu = false,
     this.showProfile = true,
     this.showBadge = true,
+    this.showNotification = false,
     this.showBackButton,
     this.onBack,
   });
@@ -35,11 +42,13 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     final titleColor = isDark ? Colors.white : AppColors.textPrimary;
     final subtitleColor = isDark ? const Color(0xFF94A3B8) : AppColors.textSecondary;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: bgColor,
-        border: Border(bottom: BorderSide(color: borderColor)),
-      ),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border(bottom: BorderSide(color: borderColor)),
+        ),
       child: SafeArea(
         child: SizedBox(
           height: 80,
@@ -127,20 +136,70 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                     children: [
                       Icon(LucideIcons.hexagon, size: 12, color: isDark ? Colors.blue.shade300 : AppColors.primary),
                       const SizedBox(width: 6),
-                      Text(
-                        'ADMIN',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: isDark ? Colors.blue.shade300 : AppColors.primary,
-                        ),
-                      ),
+                      Obx(() {
+                        final authCtrl = Get.isRegistered<AuthController>() ? Get.find<AuthController>() : Get.put(AuthController());
+                        final role = authCtrl.userRole.value.toUpperCase();
+                        String displayRole = 'USER';
+                        if (role.isNotEmpty) {
+                          displayRole = role.replaceAll('_', ' ');
+                        }
+                        return Text(
+                          displayRole,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            color: isDark ? Colors.blue.shade300 : AppColors.primary,
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 8),
               ],
               
+              // Notification Icon
+              if (showNotification) ...[
+                Stack(
+                  children: [
+                    IconButton(
+                      icon: Icon(CupertinoIcons.bell, color: titleColor),
+                      onPressed: () {
+                        Get.to(() => const NotificationScreen());
+                      },
+                    ),
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: GetX<NotificationController>(
+                        init: Get.isRegistered<NotificationController>() ? Get.find<NotificationController>() : Get.put(NotificationController()),
+                        builder: (controller) {
+                          if (controller.unreadCount.value > 0) {
+                            return Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Text(
+                                '${controller.unreadCount.value}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 8),
+              ],
+
               // Profile Avatar (Only shown if showProfile is true)
               if (showProfile) ...[
                 Container(
@@ -163,15 +222,29 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       )
                     ],
                   ),
-                  child: const Center(
-                    child: Text(
-                      'A', // First letter of Name
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16,
-                      ),
-                    ),
+                  child: Center(
+                    child: Obx(() {
+                      final authCtrl = Get.isRegistered<AuthController>() ? Get.find<AuthController>() : Get.put(AuthController());
+                      final role = authCtrl.userRole.value.toUpperCase();
+                      
+                      String letter = 'U';
+                      if (role.contains('ADMIN')) {
+                        letter = 'A';
+                      } else if (role.contains('USER')) {
+                        letter = 'U';
+                      } else if (authCtrl.userName.value.isNotEmpty) {
+                        letter = authCtrl.userName.value[0].toUpperCase();
+                      }
+                      
+                      return Text(
+                        letter,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 16,
+                        ),
+                      );
+                    }),
                   ),
                 ),
               ] else ...[
@@ -181,6 +254,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ),
+    ),
     );
   }
 

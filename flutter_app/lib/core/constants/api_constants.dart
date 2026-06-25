@@ -44,4 +44,5 @@ class ApiConstants {
   static const String inventory = '/inventory';
   static const String suppliers = '/suppliers';
   static const String users = '/users';
+  static const String notifications = '/notifications';
 }

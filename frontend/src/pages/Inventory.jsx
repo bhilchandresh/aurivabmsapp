@@ -168,8 +168,13 @@ const Inventory = () => {
                 {/* Header & Usage Tracker */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <div>
-                        <h1 className="text-2xl font-black text-slate-800 flex items-center gap-3"><Package className="text-blue-600"/> Inventory Management</h1>
-                        <p className="text-sm text-slate-500 mt-1 font-medium">Manage all your products, SKUs, and stock limits seamlessly.</p>
+                        <h1 className="text-2xl font-black text-slate-800 flex items-center gap-3">
+                            <Link to="/" className="mr-2 hover:bg-slate-100 p-1.5 rounded-full transition-colors">
+                                <ArrowDownLeft className="h-5 w-5 rotate-45" /> {/* Imitating the left arrow from screenshot */}
+                            </Link>
+                            Inventory Management
+                        </h1>
+                        <p className="text-sm text-slate-500 mt-1 font-medium ml-11">Manage all your products, SKUs, and stock levels</p>
                     </div>
                     
                     <div className="flex items-center gap-4 w-full md:w-auto">
@@ -182,78 +187,91 @@ const Inventory = () => {
                                 <span className={`text-xs font-black ${limitHit ? 'text-rose-600' : 'text-blue-800'}`}>{planDetails.usage} / 100</span>
                             </div>
                         )}
-                        <button 
-                            onClick={() => handleOpenModal()} 
-                            disabled={limitHit}
-                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all shadow-sm ${limitHit ? 'bg-slate-300 cursor-not-allowed hidden md:flex' : 'bg-blue-600 hover:bg-blue-700 hover:-translate-y-0.5 shadow-blue-500/30'}`}
-                        >
-                            <Plus size={18} /> Add Item
-                        </button>
                     </div>
                 </div>
 
-                {/* Filter and Search Bar */}
-                <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3 transition-shadow focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-300">
-                    <Search className="text-slate-400 ml-3" size={20} />
-                    <input 
-                        type="text" 
-                        placeholder="Search by Item Name or SKU..." 
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="flex-1 bg-transparent p-2 outline-none text-slate-700 font-medium placeholder-slate-400"
-                    />
+                {/* Filter, Search Bar, and Add Item */}
+                <div className="flex flex-col md:flex-row gap-3">
+                    <div className="flex-1 bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center gap-3 transition-shadow focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-300">
+                        <Search className="text-slate-400 ml-1" size={20} />
+                        <input 
+                            type="text" 
+                            placeholder="Search by Product Name or SKU..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex-1 bg-transparent p-1 outline-none text-slate-700 font-medium placeholder-slate-400"
+                        />
+                    </div>
+                    
+                    <button 
+                        onClick={() => handleOpenModal()} 
+                        disabled={limitHit}
+                        className={`flex items-center justify-center gap-2 px-6 py-3.5 md:py-2.5 rounded-xl text-sm font-bold text-white transition-all shadow-sm ${limitHit ? 'bg-slate-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/30'}`}
+                    >
+                        <Plus size={18} /> Add Item
+                    </button>
                 </div>
 
-                {/* Item List Data Table */}
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                            <thead>
-                                <tr className="bg-slate-50/50 border-b border-slate-100">
-                                    <th className="p-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">SKU</th>
-                                    <th className="p-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Item Name & Details</th>
-                                    <th className="p-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-right">Unit Price</th>
-                                    <th className="p-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">In Stock</th>
-                                    <th className="p-4 text-[11px] font-black text-slate-400 uppercase tracking-widest text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {filteredItems.map(item => (
-                                    <tr key={item._id} className="hover:bg-slate-50/50 transition-colors group">
-                                        <td className="p-4 text-sm font-bold text-slate-400">{item.sku || 'N/A'}</td>
-                                        <td className="p-4">
-                                            <p className="text-sm font-bold text-slate-800">{item.itemName}</p>
-                                            <p className="text-xs text-slate-500 truncate max-w-[280px] mt-0.5">{item.description}</p>
-                                        </td>
-                                        <td className="p-4 text-sm font-black text-slate-800 text-right">₹{item.unitPrice.toLocaleString('en-IN')}</td>
-                                        <td className="p-4 text-center">
-                                            <span className={`px-3 py-1 text-[11px] font-black rounded-full ring-2 ${item.currentStock <= 5 ? 'bg-rose-50 text-rose-700 ring-rose-100' : 'bg-emerald-50 text-emerald-700 ring-emerald-100'}`}>
-                                                {item.currentStock} Units
-                                            </span>
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onClick={() => { setRestockItem(item); setRestockQuantity(''); setIsRestockModalOpen(true); }} title="Restock" className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"><ArrowUpRight size={16}/></button>
-                                                <button onClick={() => fetchHistory(item)} title="View History" className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all"><History size={16}/></button>
-                                                <button onClick={() => handleOpenModal(item)} title="Edit" className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><Edit size={16}/></button>
-                                                <button onClick={() => handleDelete(item._id)} title="Delete" className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"><Trash2 size={16}/></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {filteredItems.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" className="p-12 text-center">
-                                           <div className="flex flex-col items-center justify-center opacity-60">
-                                              <Package size={40} className="text-slate-300 mb-3" />
-                                              <p className="text-slate-500 font-bold text-sm">No items found in your inventory.</p>
-                                           </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                {/* Sub-heading */}
+                <div className="flex items-center justify-between mt-6 mb-2 px-1">
+                    <h2 className="text-base font-bold text-slate-800">Warehouse Registry</h2>
+                    <Package className="h-5 w-5 text-slate-300" />
+                </div>
+
+                {/* Grid of Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {filteredItems.map(item => (
+                        <div key={item._id} className="bg-white rounded-2xl border border-slate-200 p-5 flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
+                            
+                            {/* Top Row: SKU & Stock Badge */}
+                            <div className="flex justify-between items-center mb-1">
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.sku || 'N/A'}</span>
+                                <span className={`px-2.5 py-1 text-[10px] font-black rounded-full ${item.currentStock <= 5 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                                    {item.currentStock} UNITS
+                                </span>
+                            </div>
+
+                            {/* Middle Row: Name & Price */}
+                            <div className="flex justify-between items-start gap-4">
+                                <h3 className="text-base font-bold text-slate-900 leading-tight">{item.itemName}</h3>
+                                <span className="text-base font-black text-slate-900">₹{item.unitPrice.toLocaleString('en-IN')}</span>
+                            </div>
+
+                            {/* Description */}
+                            <p className="text-xs text-slate-400 mt-[-4px]">
+                                {item.description || 'No description available'}
+                            </p>
+
+                            {/* Action Buttons Row */}
+                            <div className="flex justify-between gap-2 mt-2 pt-3">
+                                <button onClick={() => { setRestockItem(item); setRestockQuantity(''); setIsRestockModalOpen(true); }} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-indigo-50/70 text-indigo-600 hover:bg-indigo-100 transition-colors">
+                                    <ArrowUpRight size={13} strokeWidth={2.5} />
+                                    <span className="text-[10px] font-bold">Restock</span>
+                                </button>
+                                <button onClick={() => fetchHistory(item)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-emerald-50/70 text-emerald-600 hover:bg-emerald-100 transition-colors">
+                                    <History size={13} strokeWidth={2.5} />
+                                    <span className="text-[10px] font-bold">History</span>
+                                </button>
+                                <button onClick={() => handleOpenModal(item)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-blue-50/70 text-blue-600 hover:bg-blue-100 transition-colors">
+                                    <Edit size={13} strokeWidth={2.5} />
+                                    <span className="text-[10px] font-bold">Edit</span>
+                                </button>
+                                <button onClick={() => handleDelete(item._id)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-rose-50/70 text-rose-600 hover:bg-rose-100 transition-colors">
+                                    <Trash2 size={13} strokeWidth={2.5} />
+                                    <span className="text-[10px] font-bold">Delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Empty State */}
+                    {filteredItems.length === 0 && (
+                        <div className="col-span-full flex flex-col items-center justify-center py-16 px-4 text-center bg-white rounded-2xl border border-slate-100 border-dashed">
+                            <Package size={48} className="text-slate-300 mb-4" />
+                            <h3 className="text-lg font-bold text-slate-800 mb-1">No items found</h3>
+                            <p className="text-slate-500 font-medium text-sm">Your inventory registry is currently empty.</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Create/Edit Pop-up Modal */}

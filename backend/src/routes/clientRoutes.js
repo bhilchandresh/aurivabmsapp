@@ -9,9 +9,10 @@ const {
   deleteClient,
   addPayment,         // 🔴 Smart Settlement Logic Controller
   getClientPayments,  // 🔴 Ledger Fetch Controller
-  syncClientLedger,   // 🔴 NEW: Sync Ledger Controller Import add kar diya gaya hai
+  syncClientLedger,
   sendClientEmail,
-  sendAccountSummary
+  sendAccountSummary,
+  bulkImportClients
 } = require('../controllers/clientController');
 
 const { protect } = require('../middleware/authMiddleware');
@@ -25,6 +26,9 @@ router.use(protect);
 router.route('/')
   .get(getClients)
   .post(createClient);
+
+router.route('/bulk')
+  .post(bulkImportClients);
 
 // ---------------------------------------------------------
 // 2. 🔴 SPECIFIC SUB-ROUTES (Must be ABOVE /:id)

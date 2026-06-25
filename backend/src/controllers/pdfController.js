@@ -130,12 +130,16 @@ exports.downloadPublicQuotationPDF = async (req, res) => {
 exports.emailInvoice = async (req, res) => {
     try {
         const { id } = req.params;
+        const templateName = req.query.template || 'standard';
 
         const invoice = await Invoice.findOne({ _id: id, tenantId: req.user.tenantId });
         if (!invoice || !invoice.client.email) return res.status(400).json({ message: "Email not found" });
 
+        const htmlContent = getTemplate(templateName, invoice);
+        const pdfBuffer = await generatePdfBuffer(htmlContent);
+
         const { sendInvoiceEmail } = require('../utils/emailService');
-        await sendInvoiceEmail(invoice); // tenant is optional
+        await sendInvoiceEmail(invoice, pdfBuffer);
 
         res.json({ success: true, message: "Email sent!" });
     } catch (error) {

@@ -32,9 +32,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F172A) : AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Expenses',
-        subtitle: 'Track and manage your business outflows',
+      appBar: AppTopBar(
+        title: 'expenses'.tr,
+        subtitle: 'track_manage_outflows'.tr,
         showProfile: false,
         showBadge: false,
         showBackButton: true,
@@ -79,9 +79,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(LucideIcons.plus, size: 18),
-        label: const Text(
-          'Add Expense',
-          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
+        label: Text(
+          'add_expense'.tr,
+          style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5),
         ),
       ),
     );
@@ -93,7 +93,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     final totalAllTime = _controller.totalAllTimeSpent;
     final filterMonth = _controller.filterMonth.value;
 
-    String monthLabel = 'Filtered Period';
+    String monthLabel = 'filtered_period'.tr;
     if (filterMonth.isNotEmpty) {
       try {
         final parsed = DateTime.parse('$filterMonth-01');
@@ -101,8 +101,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       } catch (_) {
         monthLabel = filterMonth;
       }
-    } else {
-      monthLabel = 'All Time Outflow';
+      monthLabel = 'all_time_outflow'.tr;
     }
 
     return Row(
@@ -162,7 +161,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'ALL TIME TOTAL',
+                    'all_time_total'.tr,
                     style: TextStyle(
                       color: isDark ? const Color(0xFF64748B) : Colors.grey.shade500,
                       fontSize: 10,
@@ -227,7 +226,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               const Icon(LucideIcons.barChart3, size: 18, color: Colors.purple),
               const SizedBox(width: 8),
               Text(
-                'Spending Analysis',
+                'spending_analysis'.tr,
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -236,7 +235,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               ),
               const SizedBox(width: 6),
               Text(
-                '(By Category)',
+                'by_category'.tr,
                 style: TextStyle(
                   fontSize: 11,
                   color: isDark ? const Color(0xFF64748B) : Colors.grey.shade400,
@@ -401,7 +400,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     Expanded(
                       child: Obx(() {
                         final val = _controller.filterMonth.value;
-                        if (val.isEmpty) return const Text('All Time', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold));
+                        if (val.isEmpty) return Text('all_time'.tr, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold));
                         try {
                           final parsed = DateTime.parse('$val-01');
                           return Text(
@@ -441,11 +440,11 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     color: isDark ? Colors.white : AppColors.textPrimary,
                   ),
                   dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  items: const [
-                    DropdownMenuItem(value: 'date-desc', child: Text('Newest First')),
-                    DropdownMenuItem(value: 'date-asc', child: Text('Oldest First')),
-                    DropdownMenuItem(value: 'amount-desc', child: Text('High Amount')),
-                    DropdownMenuItem(value: 'amount-asc', child: Text('Low Amount')),
+                  items: [
+                    DropdownMenuItem(value: 'date-desc', child: Text('newest_first'.tr)),
+                    DropdownMenuItem(value: 'date-asc', child: Text('oldest_first'.tr)),
+                    DropdownMenuItem(value: 'amount-desc', child: Text('high_amount'.tr)),
+                    DropdownMenuItem(value: 'amount-asc', child: Text('low_amount'.tr)),
                   ],
                   onChanged: (val) {
                     if (val != null) {
@@ -508,7 +507,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Select Outflow Period',
+                  'select_outflow_period'.tr,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -521,7 +520,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     Get.back();
                   },
                   child: Text(
-                    'Clear Filter',
+                    'clear_filter'.tr,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.blue.shade600,
@@ -588,7 +587,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   void _exportCSV() {
     final list = _controller.processedExpenses;
     if (list.isEmpty) {
-      Get.snackbar('Error', 'No data available to export', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+      Get.snackbar('Error', 'no_data_export'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
       return;
     }
 
@@ -604,8 +603,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     Clipboard.setData(ClipboardData(text: buffer.toString()));
 
     Get.snackbar(
-      'Export Successful',
-      'CSV ledger copied to clipboard! You can paste it into Excel or Google Sheets.',
+      'export_success'.tr,
+      'csv_copied'.tr,
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green,
       colorText: Colors.white,
@@ -649,7 +648,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'No expense logs found for this period.',
+              'no_expense_logs'.tr,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
@@ -799,7 +798,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  _showAll.value ? 'Show Less' : 'View All ${list.length} Records',
+                  _showAll.value ? 'show_less'.tr : 'view_all'.tr + ' ${list.length} ',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
                 const SizedBox(width: 4),
@@ -818,8 +817,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
     await Get.dialog(
       AlertDialog(
         backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-        title: const Text('Delete Expense Entry'),
-        content: Text('Are you sure you want to delete this expense record for "${expense.description}"?'),
+        content: Text('delete_expense_confirm'.tr),
         actions: [
           Obx(() {
             final isSaving = _controller.isLoading.value;
@@ -1024,7 +1022,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Add New Expense',
+                          'log_expense'.tr,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -1047,7 +1045,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         Padding(
                           padding: const EdgeInsets.only(left: 4, bottom: 4),
                           child: Text(
-                            'Category'.toUpperCase(),
+                            'category_star'.tr,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 10,
@@ -1097,7 +1095,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
                     // Description Field
                     AppInputField(
-                      label: 'Description / Notes *',
+                      label: 'expense_desc'.tr,
                       hintText: 'e.g. AWS Servers, Office desks',
                       controller: descCtrl,
                       validator: (val) {
@@ -1114,7 +1112,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                       children: [
                         Expanded(
                           child: AppInputField(
-                            label: 'Amount Paid *',
+                            label: 'amount_rupees'.tr,
                             hintText: '0.00',
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             controller: amountCtrl,
@@ -1141,7 +1139,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                               Padding(
                                 padding: const EdgeInsets.only(left: 4, bottom: 4),
                                 child: Text(
-                                  'Date'.toUpperCase(),
+                                  'select_date'.tr,
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 10,
@@ -1243,7 +1241,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                 )
-                              : const Text('Save Expense Log', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              : Text('save_expense'.tr, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

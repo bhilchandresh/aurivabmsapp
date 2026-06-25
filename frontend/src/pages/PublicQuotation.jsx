@@ -1,18 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import { Download, Printer, Loader2, Hexagon, AlertCircle } from "lucide-react";
 import TemplateSelector from "../components/TemplateSelector";
 import { renderToStaticMarkup } from 'react-dom/server';
 import A4Wrapper from "../components/A4Wrapper";
-
-// Using axios directly or a simplified api instance for public requests
-const publicApi = axios.create({
-  baseURL: import.meta.env.VITE_API_URL 
-    ? `${import.meta.env.VITE_API_URL}/api/v1` 
-    : 'http://localhost:5001/api/v1',
-  headers: { 'Content-Type': 'application/json' }
-});
+import api from "../utils/api";
 
 const PublicQuotation = () => {
   const { id } = useParams();
@@ -25,7 +17,7 @@ const PublicQuotation = () => {
   useEffect(() => {
     const fetchPublicData = async () => {
       try {
-        const res = await publicApi.get(`/quotations/public/${id}`);
+        const res = await api.get(`/quotations/public/${id}`);
         setData(res.data.data);
       } catch (err) {
         console.error("Error fetching public quotation:", err);
@@ -73,7 +65,7 @@ const PublicQuotation = () => {
         </html>
       `;
 
-      const res = await publicApi.post(
+      const res = await api.post(
         `/quotations/public/${id}/download`,
         { html: fullHtml },
         { responseType: 'blob' }

@@ -1,5 +1,96 @@
 package com.aurivabms.app
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.os.Build
+import android.widget.RemoteViews
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import android.graphics.Rect
+import android.graphics.RectF
+import androidx.core.app.NotificationCompat
 import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.engine.FlutterEngine
+import io.flutter.plugin.common.MethodChannel
 
-class MainActivity : FlutterActivity()
+class MainActivity : FlutterActivity() {
+    private val CHANNEL = "com.aurivabms.app/notifications"
+
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
+        super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
+            if (call.method == "showCustomNotification") {
+                val title = call.argument<String>("title") ?: "AurivaBMS"
+                val body = call.argument<String>("body") ?: ""
+                val id = call.argument<Int>("id") ?: System.currentTimeMillis().toInt()
+                
+                showCustomNotification(title, body, id)
+                result.success(null)
+            } else {
+                result.notImplemented()
+            }
+        }
+    }
+
+    private fun showCustomNotification(title: String, body: String, notificationId: Int) {
+        val customView = RemoteViews(packageName, R.layout.custom_notification)
+        customView.setTextViewText(R.id.custom_notif_title, title)
+        customView.setTextViewText(R.id.custom_notif_message, body)
+        
+        val originalBitmap = BitmapFactory.decodeResource(resources, R.mipmap.launcher_icon)
+        if (originalBitmap != null) {
+            val roundedBitmap = getRoundedCornerBitmap(originalBitmap, 32)
+            customView.setImageViewBitmap(R.id.custom_notif_icon, roundedBitmap)
+        }
+        
+        val channelId = "onesignal_custom_channel"
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelName = "Custom Notifications"
+            val channel = NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val intent = packageManager.getLaunchIntentForPackage(packageName)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.mipmap.launcher_icon)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .setCustomContentView(customView)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        notificationManager.notify(notificationId, builder.build())
+    }
+
+    private fun getRoundedCornerBitmap(bitmap: Bitmap, pixels: Int): Bitmap {
+        val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(output)
+        val color = -0xbdbdbe
+        val paint = Paint()
+        val rect = Rect(0, 0, bitmap.width, bitmap.height)
+        val rectF = RectF(rect)
+        val roundPx = pixels.toFloat()
+
+        paint.isAntiAlias = true
+        canvas.drawARGB(0, 0, 0, 0)
+        paint.color = color
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+        canvas.drawBitmap(bitmap, rect, rect, paint)
+        return output
+    }
+}

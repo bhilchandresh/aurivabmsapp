@@ -1,18 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import { renderToStaticMarkup } from 'react-dom/server';
 import TemplateSelector from "../components/TemplateSelector";
 import A4Wrapper from "../components/A4Wrapper";
 import { Hexagon as HexagonIcon, Printer as PrinterIcon, Download as DownloadIcon, Loader2, AlertCircle } from "lucide-react";
-
-// Using axios directly or a simplified api instance for public requests
-const publicApi = axios.create({
-  baseURL: import.meta.env.VITE_API_URL 
-    ? `${import.meta.env.VITE_API_URL}/api/v1` 
-    : 'http://localhost:5001/api/v1',
-  headers: { 'Content-Type': 'application/json' }
-});
+import api from "../utils/api";
 
 const PublicInvoice = () => {
   const { id } = useParams();
@@ -25,7 +17,7 @@ const PublicInvoice = () => {
   useEffect(() => {
     const fetchPublicData = async () => {
       try {
-        const res = await publicApi.get(`/invoices/public/${id}`);
+        const res = await api.get(`/invoices/public/${id}`);
         setData(res.data.data);
       } catch (err) {
         console.error("Error fetching public invoice:", err);
@@ -73,7 +65,7 @@ const PublicInvoice = () => {
         </html>
       `;
 
-      const res = await publicApi.post(
+      const res = await api.post(
         `/invoices/public/${id}/download`,
         { html: fullHtml },
         { responseType: 'blob' }

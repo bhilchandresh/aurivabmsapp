@@ -25,6 +25,10 @@ const expenseSchema = new mongoose.Schema({
     required: true, 
     default: Date.now 
   },
+  
+  dueDate: {
+    type: Date
+  },
 
   // --- Additional Context ---
   description: { 

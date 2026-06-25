@@ -9,37 +9,10 @@ import { AlertCircle, CheckCircle, Plus, Trash2, Upload, RefreshCw, Lock, ArrowR
 
 // Plan limits mirror the backend PLANS config
 const PLAN_LIMITS = {
-  basic:      { maxUsers: 2 },
+  basic:      { maxUsers: 1 },
   premium:    { maxUsers: 5 },
   enterprise: { maxUsers: Infinity },
 };
-
-const StarterLock = () => (
-  <div className="flex flex-col items-center justify-center py-24 text-center">
-    <div className="bg-amber-100 rounded-full p-6 mb-6">
-      <Lock className="h-12 w-12 text-amber-500" />
-    </div>
-    <h2 className="text-2xl font-bold text-gray-800 mb-3">Team Members — Pro Feature</h2>
-    <p className="text-gray-500 max-w-md mb-8">
-      Add sales staff, assign roles, and manage digital signatures.
-      Upgrade to <strong>Pro</strong> or <strong>Business</strong> to unlock multi-user access.
-    </p>
-    <div className="grid grid-cols-2 gap-4 max-w-md w-full text-sm mb-8">
-      {[
-        ["Pro Plan", "Up to 5 Team Members"],
-        ["Business Plan", "Unlimited Members"],
-      ].map(([plan, desc]) => (
-        <div key={plan} className="bg-white border border-gray-200 rounded-xl p-4 text-left">
-          <p className="font-bold text-gray-800">{plan}</p>
-          <p className="text-gray-500 mt-1">{desc}</p>
-        </div>
-      ))}
-    </div>
-    <Link to="/settings" className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-8 py-3 rounded-xl transition flex items-center gap-2">
-      Upgrade Now <ArrowRight className="h-4 w-4" />
-    </Link>
-  </div>
-);
 
 const Team = () => {
   const [team, setTeam] = useState([]);
@@ -153,8 +126,7 @@ const Team = () => {
   if (pageLoading) return <Layout><div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" /></div></Layout>;
 
   // Plan-based gating
-  const isLocked = plan === "basic";
-  const maxUsers = PLAN_LIMITS[plan]?.maxUsers ?? 2;
+  const maxUsers = PLAN_LIMITS[plan]?.maxUsers ?? 1;
   const usagePct = maxUsers === Infinity ? 0 : Math.min(100, (team.length / maxUsers) * 100);
   const isAtLimit = maxUsers !== Infinity && team.length >= maxUsers;
 
@@ -168,7 +140,7 @@ const Team = () => {
             </h2>
             <p className="text-sm text-gray-500 mt-1">Manage your staff and digital signatures</p>
           </div>
-          {!isLocked && user?.role === 'admin' && (
+          {user?.role === 'admin' && (
             <button
               onClick={() => setIsModalOpen(true)}
               disabled={isAtLimit}
@@ -183,121 +155,107 @@ const Team = () => {
           )}
         </div>
 
-        {/* Lock screen for Starter plan */}
-        {isLocked ? <StarterLock /> : (
-          <>
-            {/* Pro Usage Bar */}
-            {plan === "premium" && (
-              <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-semibold text-gray-700">Team Slots Used</span>
-                  <span className={`font-bold ${usagePct >= 100 ? 'text-red-600' : 'text-gray-600'}`}>
-                    {team.length} / {maxUsers}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full transition-all ${usagePct >= 100 ? 'bg-red-500' : usagePct >= 80 ? 'bg-amber-500' : 'bg-blue-500'}`}
-                    style={{ width: `${usagePct}%` }}
-                  />
-                </div>
-                {isAtLimit && (
-                  <p className="text-xs text-red-600 mt-2 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" /> Team limit reached. <Link to="/settings" className="underline font-bold">Upgrade to Business</Link> for unlimited members.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {/* Success Banner */}
-            {apiSuccess && (
-              <div className="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-md flex items-start gap-3 shadow-sm">
-                <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5" />
-                <div>
-                  <h3 className="text-sm font-bold text-emerald-800">Success</h3>
-                  <p className="text-sm text-emerald-700 mt-1">{apiSuccess}</p>
-                </div>
-              </div>
-            )}
-
-            {/* Error Banner */}
-            {apiError && (
-              <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start gap-3 shadow-sm">
-                <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
-                <div>
-                  <h3 className="text-sm font-bold text-red-800">Error</h3>
-                  <p className="text-sm text-red-700 mt-1">{apiError}</p>
-                </div>
-              </div>
-            )}
-
-            {/* Team Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50 border-b border-gray-200">
-                  <tr>
-                    <th className="p-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Name</th>
-                    <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">Role</th>
-                    <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">Signature Status</th>
-                    <th className="p-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-right">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {team.map((member) => (
-                    <tr key={member._id} className="hover:bg-gray-50 transition">
-                      <td className="p-4 px-6 font-bold text-gray-900">
-                        {member.name}<br />
-                        <span className="text-xs text-gray-500 font-medium">{member.email}</span>
-                      </td>
-                      <td className="p-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${member.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                          {member.role}
-                        </span>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-4">
-                          {member.signatureImage ? (
-                            <div className="flex flex-col items-start gap-1">
-                              <span className="text-emerald-600 text-xs font-bold flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Uploaded</span>
-                              <img src={member.signatureImage} className="h-10 border border-gray-200 rounded bg-white object-contain p-1 shadow-sm" alt="sig" />
-                            </div>
-                          ) : (
-                            <span className="text-rose-500 text-xs font-bold flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> No Signature</span>
-                          )}
-                          <label className={`cursor-pointer flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded border transition ${uploadingId === member._id ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 shadow-sm'}`}>
-                            {uploadingId === member._id ? (
-                              <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Uploading</>
-                            ) : (
-                              <>{member.signatureImage ? <RefreshCw className="w-3.5 h-3.5" /> : <Upload className="w-3.5 h-3.5" />} {member.signatureImage ? "Change" : "Upload"}</>
-                            )}
-                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleSignatureUpload(e, member._id)} disabled={uploadingId === member._id} />
-                          </label>
-                        </div>
-                      </td>
-                      <td className="p-4 px-6 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <button 
-                            onClick={() => { setEditData({ id: member._id, name: member.name }); setIsEditModalOpen(true); }}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit Name"
-                          >
-                            <Edit2 className="w-5 h-5" />
-                          </button>
-                          {member._id !== user._id ? (
-                            <button onClick={() => handleDelete(member._id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Remove User">
-                              <Trash2 className="w-5 h-5" />
-                            </button>
-                          ) : (
-                            <span className="text-xs text-gray-400 font-medium italic mx-2">You</span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {plan !== "enterprise" && (
+          <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
+            <div className="flex justify-between text-sm mb-2">
+              <span className="font-semibold text-gray-700">Team Slots Used</span>
+              <span className={`font-bold ${usagePct >= 100 ? 'text-red-600' : 'text-gray-600'}`}>
+                {team.length} / {maxUsers}
+              </span>
             </div>
-          </>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className={`h-2 rounded-full transition-all ${usagePct >= 100 ? 'bg-red-500' : usagePct >= 80 ? 'bg-amber-500' : 'bg-blue-500'}`}
+                style={{ width: `${usagePct}%` }}
+              />
+            </div>
+            {isAtLimit && (
+              <p className="text-xs text-red-600 mt-2 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" /> Team limit reached. <Link to="/settings" className="underline font-bold">Upgrade to {plan === 'basic' ? 'Pro' : 'Business'}</Link> for more members.
+              </p>
+            )}
+          </div>
         )}
+
+        {/* Success Banner */}
+        {apiSuccess && (
+          <div className="mb-6 bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-md flex items-start gap-3 shadow-sm">
+            <CheckCircle className="h-5 w-5 text-emerald-500 mt-0.5" />
+            <div>
+              <h3 className="text-sm font-bold text-emerald-800">Success</h3>
+              <p className="text-sm text-emerald-700 mt-1">{apiSuccess}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Error Banner */}
+        {apiError && (
+          <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start gap-3 shadow-sm">
+            <AlertCircle className="h-5 w-5 text-red-500 mt-0.5" />
+            <div>
+              <h3 className="text-sm font-bold text-red-800">Error</h3>
+              <p className="text-sm text-red-700 mt-1">{apiError}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Team Table */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <table className="w-full text-left">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="p-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Name</th>
+                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">Role</th>
+                <th className="p-4 text-xs font-bold uppercase tracking-wider text-gray-500">Signature Status</th>
+                <th className="p-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {team.map((member) => (
+                <tr key={member._id} className="hover:bg-gray-50 transition">
+                  <td className="p-4 px-6 font-bold text-gray-900">
+                    {member.name}<br />
+                    <span className="text-xs text-gray-500 font-medium">{member.email}</span>
+                  </td>
+                  <td className="p-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${member.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                      {member.role}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-4">
+                      {member.signatureImage ? (
+                        <div className="flex flex-col items-start gap-1">
+                          <span className="text-emerald-600 text-xs font-bold flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" /> Uploaded</span>
+                          <img src={member.signatureImage} className="h-10 border border-gray-200 rounded bg-white object-contain p-1 shadow-sm" alt="sig" />
+                        </div>
+                      ) : (
+                        <span className="text-rose-500 text-xs font-bold flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> No Signature</span>
+                      )}
+                      <label className={`cursor-pointer flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded border transition ${uploadingId === member._id ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 shadow-sm'}`}>
+                        {uploadingId === member._id ? (
+                          <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Uploading</>
+                        ) : (
+                          <>{member.signatureImage ? <RefreshCw className="w-3.5 h-3.5" /> : <Upload className="w-3.5 h-3.5" />} {member.signatureImage ? "Change" : "Upload"}</>
+                        )}
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleSignatureUpload(e, member._id)} disabled={uploadingId === member._id} />
+                      </label>
+                    </div>
+                  </td>
+                  <td className="p-4 px-6 text-right">
+                    {member._id !== user._id ? (
+                      <button onClick={() => handleDelete(member._id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Remove User">
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    ) : (
+                      <span className="text-xs text-gray-400 font-medium italic mr-2">It's You</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         {/* Add User Modal */}
         {isModalOpen && (

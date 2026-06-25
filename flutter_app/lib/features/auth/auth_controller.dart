@@ -4,7 +4,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../../core/constants/api_constants.dart';
+import '../../core/services/notification_service.dart';
 import '../../navigation/app_routes.dart';
 
 class AuthController extends GetxController {
@@ -36,6 +38,10 @@ class AuthController extends GetxController {
       userSignature.value = await _storage.read(key: 'user_signature') ?? '';
       fetchTenantSettings();
       
+      // Register Device for Push Notifications
+      NotificationService.registerDeviceWithBackend();
+      NotificationService.setExternalIdAndTags(userId.value, userEmail.value);
+      
       // Auto login and navigate to main dashboard only if we are currently on the login or root screen
       if (Get.currentRoute == AppRoutes.login || Get.currentRoute == '/' || Get.currentRoute.isEmpty) {
         // Handled by splash screen or manual check now to avoid race conditions
@@ -54,7 +60,13 @@ class AuthController extends GetxController {
     if (hasSeenOnboarding != 'true') {
       Get.offAllNamed(AppRoutes.onboarding);
     } else if (token.value.isNotEmpty) {
-      Get.offAllNamed(AppRoutes.main);
+      if (userRole.value.toLowerCase().contains('superadmin') || 
+          userRole.value.toLowerCase().contains('super_admin') || 
+          userEmail.value.toLowerCase() == 'riva@auriva.in') {
+        Get.offAllNamed(AppRoutes.superAdminMain);
+      } else {
+        Get.offAllNamed(AppRoutes.main);
+      }
     } else {
       Get.offAllNamed(AppRoutes.login);
     }
@@ -127,6 +139,10 @@ class AuthController extends GetxController {
 
         await fetchTenantSettings();
 
+        // Register Device for Push Notifications
+        NotificationService.registerDeviceWithBackend();
+        NotificationService.setExternalIdAndTags(userId.value, userEmail.value);
+
         Fluttertoast.showToast(
           msg: "Welcome back, ${user['name']}!",
           toastLength: Toast.LENGTH_SHORT,
@@ -136,7 +152,13 @@ class AuthController extends GetxController {
           fontSize: 14.0,
         );
 
-        Get.offAllNamed(AppRoutes.main);
+        if (userRole.value.toLowerCase().contains('superadmin') || 
+            userRole.value.toLowerCase().contains('super_admin') || 
+            userEmail.value.toLowerCase() == 'riva@auriva.in') {
+          Get.offAllNamed(AppRoutes.superAdminMain);
+        } else {
+          Get.offAllNamed(AppRoutes.main);
+        }
         return true;
       } else {
         final msg = data['message'] ?? 'Invalid credentials';
@@ -178,6 +200,15 @@ class AuthController extends GetxController {
     await _storage.delete(key: 'user_role');
     await _storage.delete(key: 'user_id');
     await _storage.delete(key: 'user_signature');
+    await _storage.delete(key: 'app_lang_code');
+    await _storage.delete(key: 'app_country_code');
+    
+    // Reset locale to English
+    Get.updateLocale(const Locale('en', 'US'));
+    
+    // Log out from OneSignal
+    OneSignal.logout();
+    
     Get.offAllNamed(AppRoutes.login);
   }
 

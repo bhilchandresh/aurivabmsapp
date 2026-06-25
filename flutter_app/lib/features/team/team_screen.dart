@@ -143,9 +143,9 @@ class _TeamScreenState extends State<TeamScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Team & Access',
-        subtitle: 'Manage roles and verify digital signatures',
+      appBar: AppTopBar(
+        title: 'team_access'.tr,
+        subtitle: 'manage_roles'.tr,
         showProfile: false,
         showBadge: false,
         showBackButton: true,
@@ -188,10 +188,10 @@ class _TeamScreenState extends State<TeamScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'Team Members — Pro Feature',
+            Text(
+              'team_pro_feature'.tr,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color: AppColors.textPrimary,
@@ -199,19 +199,19 @@ class _TeamScreenState extends State<TeamScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'Add sales staff, assign access roles, and manage digital signatures.\nUpgrade to Pro or Business to unlock multi-user access.',
+            Text(
+              'team_pro_desc'.tr,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
-            _buildUpgradePlanCard('Pro Plan', 'Up to 5 Team Members', '₹299 / month'),
+            _buildUpgradePlanCard('pro_plan_team'.tr, 'pro_plan_team_desc'.tr, 'pro_plan_price'.tr),
             const SizedBox(height: 12),
-            _buildUpgradePlanCard('Business Plan', 'Unlimited Members & Roles', '₹799 / month'),
+            _buildUpgradePlanCard('business_plan_team'.tr, 'business_plan_team_desc'.tr, 'business_plan_price'.tr),
             const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: () {
@@ -225,7 +225,7 @@ class _TeamScreenState extends State<TeamScreen> {
                 );
               },
               icon: const Icon(LucideIcons.zap, size: 16, color: Colors.white),
-              label: const Text('Upgrade Now', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              label: Text('upgrade_now'.tr, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.amber.shade600,
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
@@ -329,9 +329,9 @@ class _TeamScreenState extends State<TeamScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Team Slots Used',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
+                        Text(
+                          'team_slots_used'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
                         ),
                         Text(
                           '$used / $max',
@@ -361,7 +361,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              'Team slots full. Upgrade to Business for unlimited members.',
+                              'team_slots_full'.tr,
                               style: TextStyle(color: Colors.red.shade600, fontSize: 11, fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -386,7 +386,7 @@ class _TeamScreenState extends State<TeamScreen> {
                     });
                   },
                   decoration: InputDecoration(
-                    hintText: 'Search staff name or email...',
+                    hintText: 'search_staff'.tr,
                     hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
                     prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 16),
                     filled: true,
@@ -413,7 +413,7 @@ class _TeamScreenState extends State<TeamScreen> {
                 return ElevatedButton.icon(
                   onPressed: atLimit ? null : () => _showAddMemberBottomSheet(context),
                   icon: const Icon(LucideIcons.plus, size: 14),
-                  label: const Text('Add Staff', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  label: Text('add_staff'.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -430,14 +430,14 @@ class _TeamScreenState extends State<TeamScreen> {
           const SizedBox(height: 20),
 
           // Registry List Title
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Access Registry & Signatures',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                'access_registry'.tr,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
               ),
-              Icon(LucideIcons.users, size: 16, color: Colors.grey),
+              const Icon(LucideIcons.users, size: 16, color: Colors.grey),
             ],
           ),
           const SizedBox(height: 12),
@@ -478,7 +478,7 @@ class _TeamScreenState extends State<TeamScreen> {
             Icon(LucideIcons.users, size: 36, color: Colors.grey.shade300),
             const SizedBox(height: 12),
             Text(
-              'No staff members found.',
+              'no_staff_found'.tr,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
@@ -609,7 +609,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                             ),
                                             const SizedBox(width: 4),
                                             Text(
-                                              member.signatureImage != null ? 'Change' : 'Upload',
+                                              member.signatureImage != null ? 'change'.tr : 'upload'.tr,
                                               style: TextStyle(
                                                 fontSize: 9,
                                                 fontWeight: FontWeight.bold,
@@ -651,7 +651,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       const SizedBox(height: 8),
                       if (isMe)
                         Text(
-                          'It\'s You',
+                          'its_you'.tr,
                           style: TextStyle(
                             fontSize: 10,
                             fontStyle: FontStyle.italic,
@@ -684,14 +684,14 @@ class _TeamScreenState extends State<TeamScreen> {
   void _confirmDeleteMember(BuildContext context, TeamMember member) {
     Get.dialog(
       AlertDialog(
-        title: const Text('Remove Team Member'),
-        content: Text('Are you sure you want to remove "${member.name}" from your team? This action is irreversible.'),
+        title: Text('remove_member'.tr),
+        content: Text('remove_member_confirm'.tr),
         actions: [
           Obx(() {
             final isSaving = _controller.isLoading.value;
             return TextButton(
               onPressed: isSaving ? null : () => Get.back(),
-              child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+              child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
             );
           }),
           Obx(() {
@@ -703,7 +703,7 @@ class _TeamScreenState extends State<TeamScreen> {
                 if (success) {
                   Get.snackbar(
                     'Removed',
-                    'Staff member removed successfully.',
+                    'member_removed'.tr,
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: AppColors.error,
                     colorText: Colors.white,
@@ -711,7 +711,7 @@ class _TeamScreenState extends State<TeamScreen> {
                 } else {
                   Get.snackbar(
                     'Error',
-                    'Failed to remove staff member. Please try again.',
+                    'member_remove_error'.tr,
                     snackPosition: SnackPosition.BOTTOM,
                     backgroundColor: Colors.red,
                     colorText: Colors.white,
@@ -725,7 +725,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       width: 16,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
-                  : const Text('Remove', style: TextStyle(color: Colors.white)),
+                  : Text('remove'.tr, style: const TextStyle(color: Colors.white)),
             );
           }),
         ],
@@ -821,9 +821,9 @@ class _TeamScreenState extends State<TeamScreen> {
             const Divider(height: 36),
 
             // Digital Signature Preview Card
-            const Text(
-              'Digital Signature',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textPrimary),
+            Text(
+              'digital_signature'.tr,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Container(
@@ -866,7 +866,7 @@ class _TeamScreenState extends State<TeamScreen> {
                     },
                     icon: Icon(member.signatureImage != null ? LucideIcons.refreshCw : LucideIcons.upload, size: 14, color: Colors.white),
                     label: Text(
-                      member.signatureImage != null ? 'Change Signature' : 'Upload Signature',
+                      member.signatureImage != null ? 'change'.tr : 'upload_signature'.tr,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
@@ -891,7 +891,7 @@ class _TeamScreenState extends State<TeamScreen> {
                         _confirmDeleteMember(context, member);
                       },
                       icon: const Icon(LucideIcons.trash2, size: 14, color: Colors.red),
-                      label: const Text('Remove Staff Member', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
+                      label: Text('remove_member'.tr, style: const TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Colors.red),
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -932,9 +932,9 @@ class _TeamScreenState extends State<TeamScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Add Sales Staff',
-                          style: TextStyle(
+                        Text(
+                          'add_staff'.tr,
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
@@ -951,8 +951,8 @@ class _TeamScreenState extends State<TeamScreen> {
 
                     // Name
                     AppInputField(
-                      label: 'Full Name *',
-                      hintText: 'e.g. Rahul Sharma',
+                      label: 'full_name_star'.tr,
+                      hintText: 'eg_name'.tr,
                       controller: _nameCtrl,
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) return 'Please enter name';
@@ -963,8 +963,8 @@ class _TeamScreenState extends State<TeamScreen> {
 
                     // Email
                     AppInputField(
-                      label: 'Email Address *',
-                      hintText: 'rahul@company.com',
+                      label: 'email'.tr,
+                      hintText: 'eg_email'.tr,
                       keyboardType: TextInputType.emailAddress,
                       controller: _emailCtrl,
                       validator: (val) {
@@ -977,7 +977,7 @@ class _TeamScreenState extends State<TeamScreen> {
 
                     // Password
                     AppInputField(
-                      label: 'Password *',
+                      label: 'password_star'.tr,
                       hintText: '••••••••',
                       obscureText: true,
                       controller: _passwordCtrl,
@@ -996,7 +996,7 @@ class _TeamScreenState extends State<TeamScreen> {
                         Padding(
                           padding: const EdgeInsets.only(left: 4, bottom: 4),
                           child: Text(
-                            'Access Role'.toUpperCase(),
+                            'role'.tr.toUpperCase(),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 10,
@@ -1092,7 +1092,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                   width: 20,
                                   child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                 )
-                              : const Text('Add Sales Staff', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                              : Text('add_staff'.tr, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

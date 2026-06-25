@@ -231,6 +231,18 @@ exports.updateQuotation = async (req, res) => {
     const updatedQuotation = await Quotation.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
     if (typeof logActivity === 'function') await logActivity(req, "UPDATE_QUOTATION", `Updated Quote ${updatedQuotation.quotationNumber}`);
 
+    // --- AUTOMATED IN-APP / PUSH NOTIFICATION ---
+    if (updateData.status === 'Accepted' && existingQuotation.status !== 'Accepted') {
+      const { dispatchNotification } = require('../services/notificationDispatcher');
+      dispatchNotification({
+        tenantId: req.user.tenantId,
+        type: 'quotation_alert',
+        message: `🎉 ${updatedQuotation.client.name} accepted your quotation ${updatedQuotation.quotationNumber}.`,
+        preferenceKey: 'quotationAccepted',
+        metadata: { entityId: updatedQuotation._id, entityModel: 'Quotation' }
+      });
+    }
+
     res.status(200).json({ success: true, data: updatedQuotation });
   } catch (error) {
     console.error("Update Quotation Error:", error);
@@ -345,14 +357,35 @@ exports.downloadQuotationPDF = async (req, res) => {
 exports.emailQuotation = async (req, res) => {
   try {
     const { id } = req.params;
+    const templateName = req.query.template || 'standard';
 
     const quotation = await Quotation.findOne({ _id: id, tenantId: req.user.tenantId });
     if (!quotation || !quotation.client.email) {
       return res.status(400).json({ message: "Client email not found" });
     }
 
-    const { sendQuotationEmail } = require('../utils/emailService');
-    await sendQuotationEmail(quotation); // tenant is optional or passed if available
+    const htmlContent = getTemplate(templateName, quotation);
+    const pdfBuffer = await generatePdfBuffer(htmlContent);
+
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+    });
+
+    await transporter.sendMail({
+      from: `"Auriva Proposals" <${process.env.EMAIL_USER}>`,
+      to: quotation.client.email,
+      subject: `Quotation #${quotation.quotationNumber} from Auriva`,
+      html: `
+            <p>Dear <strong>${quotation.client.name}</strong>,</p>
+            <p>Please find attached the quotation <strong>#${quotation.quotationNumber}</strong>.</p>
+            <p><strong>Total Amount: ₹${quotation.totalAmount}</strong></p>
+            <p>Looking forward to your positive response.</p>
+            <br>
+            <p>Best Regards,<br>Auriva Solutions</p>
+        `,
+      attachments: [{ filename: `Quotation-${quotation.quotationNumber}.pdf`, content: pdfBuffer }]
+    });
 
     res.json({ success: true, message: "Email sent successfully!" });
 

@@ -16,7 +16,6 @@ export default function A4Wrapper({ children }) {
 
       if (desktop) return;
 
-
       if (!containerRef.current || !contentRef.current || !containerRef.current.parentElement) return;
       
       const parentWidth = containerRef.current.parentElement.clientWidth;
@@ -72,7 +71,6 @@ export default function A4Wrapper({ children }) {
       </div>
     );
   }
-
 
   return (
     <>

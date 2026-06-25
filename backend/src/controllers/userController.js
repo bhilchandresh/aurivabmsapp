@@ -10,7 +10,7 @@ const getPlanLimits = (planName) => {
 // @desc    Get all users for the current Tenant
 exports.getTeamMembers = async (req, res) => {
   try {
-    const users = await User.find({ tenantId: req.user.tenantId })
+    const users = await User.find({ tenantId: req.user.tenantId, role: { $ne: 'super_admin' } })
       .select('-passwordHash')
       .sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: users });
@@ -87,6 +87,13 @@ exports.deleteTeamMember = async (req, res) => {
       return res.status(400).json({ success: false, message: "You cannot delete your own account" });
     }
 
+    const targetUser = await User.findById(req.params.id);
+    if (!targetUser) return res.status(404).json({ success: false, message: "User not found" });
+
+    if (targetUser.role === 'super_admin') {
+      return res.status(403).json({ success: false, message: "Super Admin cannot be deleted" });
+    }
+
     const user = await User.findOneAndDelete({ _id: req.params.id, tenantId: req.user.tenantId });
     
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
@@ -126,6 +133,35 @@ exports.updateTeamMember = async (req, res) => {
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
     res.status(200).json({ success: true, data: user, message: "Profile updated successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Register a Device Token for Push Notifications
+// @route   POST /api/v1/users/register-device
+exports.registerDevice = async (req, res) => {
+  try {
+    const { token, platform } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ success: false, message: "Device token is required" });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Check if token already exists to avoid duplicates
+    const tokenExists = user.deviceTokens.find(dt => dt.token === token);
+    
+    if (!tokenExists) {
+      user.deviceTokens.push({ token, platform: platform || 'android' });
+      await user.save();
+    }
+
+    res.status(200).json({ success: true, message: "Device registered for push notifications" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

@@ -8,12 +8,21 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['info', 'warning', 'success', 'error', 'renewal'],
+    enum: [
+      'info', 'warning', 'success', 'error', 'renewal',
+      'invoice_due', 'payment_received', 'stock_alert', 
+      'security_alert', 'summary', 'quotation_alert', 
+      'supplier_alert', 'expense_alert'
+    ],
     default: 'info'
+  },
+  metadata: {
+    entityId: { type: mongoose.Schema.Types.ObjectId },
+    entityModel: { type: String }
   },
   target: {
     type: String,
-    enum: ['all_admins', 'specific_tenant'],
+    enum: ['all_admins', 'specific_tenant', 'specific_user'],
     default: 'all_admins'
   },
   tenantId: {

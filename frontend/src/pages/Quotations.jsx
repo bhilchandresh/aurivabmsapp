@@ -9,6 +9,47 @@ import {
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 
+const StatusDropdown = ({ q, statusStyle, isUpdating, handleStatusChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative inline-block" onMouseLeave={() => setIsOpen(false)}>
+      {isUpdating ? (
+        <div className="flex items-center gap-2 text-sm text-gray-500"><Loader2 className="w-4 h-4 animate-spin text-blue-600" /> Updating...</div>
+      ) : (
+        <div className="relative">
+          <div 
+            onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer transition-colors w-fit ${statusStyle.css}`}
+          >
+            {statusStyle.icon}
+            <span className="text-xs font-bold uppercase pr-4">{q.status}</span>
+            <svg className={`w-3 h-3 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-60 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+          
+          {isOpen && (
+            <div className="absolute left-0 top-full mt-1 w-32 rounded-xl shadow-xl bg-white border border-gray-100 z-50 overflow-hidden origin-top">
+              {['Pending', 'Accepted', 'Rejected'].map(opt => (
+                <div 
+                  key={opt}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpen(false);
+                    handleStatusChange(q._id, opt);
+                  }}
+                  className={`px-4 py-2.5 text-xs font-bold uppercase cursor-pointer hover:bg-slate-50 transition-colors ${opt === q.status ? 'text-blue-600 bg-blue-50/50' : 'text-slate-600'}`}
+                >
+                  {opt}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Quotations = () => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate(); 
@@ -183,21 +224,31 @@ const Quotations = () => {
                       <td className="px-6 py-4 font-bold text-blue-600">#{q.quotationNumber}</td>
                       <td className="px-6 py-4">{q.client?.name}</td>
                       <td className="px-6 py-4 text-sm text-gray-500">{new Date(q.date).toLocaleDateString()}</td>
-                      <td className="px-6 py-4 font-bold">{formatCurrency(q.totalAmount || q.grandTotal)}</td>
+                      <td className="px-6 py-4 font-bold">
+                        {(() => {
+                          const subTotal = q.subTotal || (q.items?.reduce((sum, item) => sum + ((Number(item.quantity) || 0) * (Number(item.rate || item.price) || 0)), 0) || 0);
+                          const taxableAmount = subTotal - (subTotal * ((q.discountPercentage || 0) / 100));
+                          const isGstEnabled = q.gstEnabled !== undefined ? q.gstEnabled : (Number(q.taxRate) > 0);
+                          const taxRate = isGstEnabled ? (Number(q.taxRate) || 0) : 0;
+                          const calculatedTotal = taxableAmount + (taxableAmount * (taxRate / 100));
+                          
+                          // If DB totalAmount erroneously includes GST when gstEnabled is false, override it
+                          let displayAmount = q.totalAmount || q.grandTotal || calculatedTotal;
+                          if (!isGstEnabled && displayAmount > taxableAmount + 0.1) {
+                            displayAmount = calculatedTotal;
+                          }
+                          
+                          return formatCurrency(displayAmount);
+                        })()}
+                      </td>
                       
                       <td className="px-6 py-4">
-                        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border w-fit ${getStatusStyle(q.status).css}`}>
-                           {updatingId === q._id ? <Loader2 className="w-3 h-3 animate-spin"/> : getStatusStyle(q.status).icon}
-                           <select 
-                              className="bg-transparent text-xs font-bold uppercase outline-none cursor-pointer"
-                              value={q.status}
-                              onChange={e => handleStatusChange(q._id, e.target.value)}
-                           >
-                              <option value="Pending">Pending</option>
-                              <option value="Accepted">Accepted</option>
-                              <option value="Rejected">Rejected</option>
-                           </select>
-                        </div>
+                        <StatusDropdown 
+                          q={q} 
+                          statusStyle={getStatusStyle(q.status)} 
+                          isUpdating={updatingId === q._id} 
+                          handleStatusChange={handleStatusChange} 
+                        />
                       </td>
                       
                       <td className="px-6 py-4 text-right flex justify-end items-center gap-2">

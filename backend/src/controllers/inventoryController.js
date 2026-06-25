@@ -118,3 +118,84 @@ exports.getItemTransactions = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+exports.bulkImportInventory = async (req, res) => {
+  try {
+    const itemsData = req.body;
+    if (!Array.isArray(itemsData)) {
+      return res.status(400).json({ success: false, message: "Data must be an array" });
+    }
+
+    const tenantId = req.user.tenantId;
+    const tenant = await Tenant.findById(tenantId);
+    if (!tenant) return res.status(404).json({ success: false, message: "Tenant not found" });
+
+    const limits = getPlanLimits(tenant.subscriptionPlan);
+    if (limits.maxInventory === 0) {
+        return res.status(403).json({ success: false, message: "Inventory is not available on your current plan." });
+    }
+
+    let importedCount = 0;
+    let skippedCount = 0;
+    let currentCount = await Inventory.countDocuments({ tenantId });
+
+    for (const item of itemsData) {
+      if (!item.itemName) {
+        skippedCount++;
+        continue;
+      }
+      
+      if (currentCount >= limits.maxInventory) {
+        break; // Stop importing if limit reached
+      }
+
+      // Check for exact sku match or name match to avoid duplicates
+      let existing = null;
+      if (item.sku && item.sku.trim() !== '') {
+        existing = await Inventory.findOne({ sku: item.sku, tenantId });
+      } else {
+        existing = await Inventory.findOne({ itemName: item.itemName, tenantId });
+      }
+
+      if (existing) {
+        skippedCount++;
+        continue;
+      }
+
+      const newItem = await Inventory.create({
+        tenantId,
+        itemName: item.itemName,
+        sku: item.sku || '',
+        description: item.description || '',
+        unitPrice: Number(item.unitPrice) || 0,
+        currentStock: Number(item.currentStock) || 0,
+        status: item.status || 'In Stock'
+      });
+      importedCount++;
+      currentCount++;
+
+      if (newItem.currentStock > 0) {
+        await InventoryTransaction.create({
+          tenantId,
+          inventoryId: newItem._id,
+          type: 'Adjustment',
+          quantity: newItem.currentStock,
+          description: 'Initial Stock (Bulk Import)',
+          date: Date.now()
+        });
+      }
+    }
+
+    if (typeof logActivity === 'function') {
+      await logActivity(req, "BULK_IMPORT", `Imported ${importedCount} inventory items`);
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      message: `Import complete. Added ${importedCount} items. Skipped ${skippedCount} duplicates/invalid.` 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+

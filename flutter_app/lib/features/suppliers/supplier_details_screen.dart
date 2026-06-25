@@ -601,12 +601,28 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                       ),
                       ...bill.items.map((item) => TableRow(
                         children: [
-                          _buildTableCell(item.description, isDark: isDark),
+                          _buildTableCell(item.description.isNotEmpty ? item.description : 'Item', isDark: isDark),
                           _buildTableCell(item.quantity.toString(), isRightAlign: true, isDark: isDark),
                           _buildTableCell(formatCurrency.format(item.rate), isRightAlign: true, isDark: isDark),
                           _buildTableCell(formatCurrency.format(item.amount), isRightAlign: true, isBold: true, isDark: isDark),
                         ],
                       )),
+                      TableRow(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                              color: isDark ? const Color(0xFF334155) : Colors.grey.shade300,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        children: [
+                          const SizedBox(),
+                          const SizedBox(),
+                          _buildTableCell('Total Bill:', isHeader: true, isRightAlign: true, isDark: isDark),
+                          _buildTableCell(formatCurrency.format(bill.totalAmount), isRightAlign: true, isBold: true, isDark: isDark),
+                        ],
+                      ),
                     ],
                   ),
                   if (bill.notes.isNotEmpty) ...[
@@ -1030,11 +1046,27 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: _buildCustomTextField(
-                                  label: 'TOTAL AMOUNT',
-                                  hint: '₹ Optional',
-                                  controller: overrideAmountController,
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text('TOTAL AMOUNT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                    const SizedBox(height: 6),
+                                    Container(
+                                      height: 40,
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade100,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.grey.shade300),
+                                      ),
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        '₹${subTotal.toStringAsFixed(2)}',
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey.shade600),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
@@ -1318,11 +1350,23 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                           return ElevatedButton(
                             onPressed: isSaving ? null : () async {
                               if (billNoController.text.trim().isEmpty) {
-                                Get.snackbar('Error', 'Bill number is required', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+                                Get.snackbar('Error', 'Bill number / Invoice number is required', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+                                return;
+                              }
+                              if (selectedItems.isEmpty) {
+                                Get.snackbar('Error', 'Please add at least one item', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
                                 return;
                               }
                               if (selectedItems.any((item) => item['desc'].toString().trim().isEmpty)) {
-                                Get.snackbar('Error', 'Please fill in descriptions for all items', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+                                Get.snackbar('Error', 'Item name is required for all items', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+                                return;
+                              }
+                              if (selectedItems.any((item) => (item['qty'] as int) <= 0)) {
+                                Get.snackbar('Error', 'Quantity must be greater than 0 for all items', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+                                return;
+                              }
+                              if (selectedItems.any((item) => (item['rate'] as double) <= 0)) {
+                                Get.snackbar('Error', 'Rate must be greater than 0 for all items', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
                                 return;
                               }
 
@@ -1338,7 +1382,6 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                 );
                               }).toList();
 
-                              double override = double.tryParse(overrideAmountController.text) ?? 0.0;
                               String dueDateStr = dueDate != null ? DateFormat('yyyy-MM-dd').format(dueDate!) : '';
 
                               final success = await _suppliersController.addPurchaseBill(
@@ -1347,7 +1390,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                 DateFormat('yyyy-MM-dd').format(billDate),
                                 dueDateStr,
                                 notesController.text.trim(),
-                                override,
+                                0.0, // No longer passing override amount
                                 billItems,
                               );
 

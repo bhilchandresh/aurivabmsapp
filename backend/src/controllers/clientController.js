@@ -95,6 +95,62 @@ exports.createClient = async (req, res) => {
   }
 };
 
+// Bulk Import Clients
+exports.bulkImportClients = async (req, res) => {
+  try {
+    const clientsData = req.body;
+    if (!Array.isArray(clientsData)) {
+      return res.status(400).json({ success: false, message: "Data must be an array" });
+    }
+
+    const tenantId = req.user.tenantId;
+    let importedCount = 0;
+    let skippedCount = 0;
+
+    for (const client of clientsData) {
+      if (!client.name) {
+        skippedCount++;
+        continue;
+      }
+      
+      // Check for exact email match to avoid duplicates if email exists
+      let existing = null;
+      if (client.email && client.email.trim() !== '') {
+        existing = await Client.findOne({ email: client.email, tenantId });
+      } else if (client.phone && client.phone.trim() !== '') {
+        existing = await Client.findOne({ phone: client.phone, tenantId });
+      }
+
+      if (existing) {
+        skippedCount++;
+        continue;
+      }
+
+      await Client.create({
+        tenantId,
+        name: client.name,
+        email: client.email || '',
+        phone: client.phone || '',
+        address: client.address || '',
+        gstin: client.gstin || '',
+        state: client.state || ''
+      });
+      importedCount++;
+    }
+
+    if (typeof logActivity === 'function') {
+      await logActivity(req, "BULK_IMPORT", `Imported ${importedCount} clients`);
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      message: `Import complete. Added ${importedCount} new clients. Skipped ${skippedCount} duplicates/invalid.` 
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Update Client
 exports.updateClient = async (req, res) => {
   try {

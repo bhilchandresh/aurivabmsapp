@@ -10,6 +10,47 @@ import {
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 
+const StatusDropdown = ({ inv, statusStyle, isUpdating, handleStatusChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative inline-block" onMouseLeave={() => setIsOpen(false)}>
+      {isUpdating ? (
+        <div className="flex items-center gap-2 text-sm text-gray-500"><Loader2 className="w-4 h-4 animate-spin text-blue-600" /> Updating...</div>
+      ) : (
+        <div className="relative">
+          <div 
+            onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen); }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer transition-colors ${statusStyle.css}`}
+          >
+            {statusStyle.icon}
+            <span className="text-xs font-bold uppercase pr-4">{inv.status}</span>
+            <svg className={`w-3 h-3 absolute right-2.5 top-1/2 -translate-y-1/2 opacity-60 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+          </div>
+          
+          {isOpen && (
+            <div className="absolute left-0 top-full mt-1 w-36 rounded-xl shadow-xl bg-white border border-gray-100 z-50 overflow-hidden origin-top">
+              {['Pending', 'Paid', 'Overdue'].map(opt => (
+                <div 
+                  key={opt}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpen(false);
+                    handleStatusChange(inv._id, opt);
+                  }}
+                  className={`px-4 py-2.5 text-xs font-bold uppercase cursor-pointer hover:bg-slate-50 transition-colors ${opt === inv.status ? 'text-blue-600 bg-blue-50/50' : 'text-slate-600'}`}
+                >
+                  {opt}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Invoices = () => {
   const { token } = useContext(AuthContext);
 
@@ -29,8 +70,8 @@ const Invoices = () => {
     const fetchInvoices = async () => {
       try {
         const res = await api.get("/invoices");
-        setInvoices(res.data.data);
-        setFilteredInvoices(res.data.data);
+        setInvoices(res.data?.data || []);
+        setFilteredInvoices(res.data?.data || []);
       } catch (err) {
         console.error("Error fetching invoices:", err);
         toast.error("Failed to load invoices");
@@ -42,7 +83,7 @@ const Invoices = () => {
   }, [token]);
 
   useEffect(() => {
-    let result = [...invoices];
+    let result = Array.isArray(invoices) ? [...invoices] : [];
 
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
@@ -153,13 +194,13 @@ const Invoices = () => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(amount);
   };
 
-  // 🔴 FIX: Added Partially Paid styling
+  // 🔴 FIX: Added Partially Paid styling and differentiated Pending vs Overdue
   const getStatusStyle = (status) => {
     switch (status.toLowerCase()) {
       case 'paid': return { css: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: <CheckCircle className="w-3 h-3" /> };
       case 'partially paid': return { css: 'bg-amber-100 text-amber-700 border-amber-200', icon: <Clock className="w-3 h-3" /> };
-      case 'pending': case 'unpaid': return { css: 'bg-rose-100 text-rose-700 border-rose-200', icon: <Clock className="w-3 h-3" /> };
-      case 'overdue': return { css: 'bg-red-100 text-red-700 border-red-200', icon: <AlertCircle className="w-3 h-3" /> };
+      case 'pending': case 'unpaid': return { css: 'bg-blue-100 text-blue-700 border-blue-200', icon: <Clock className="w-3 h-3" /> };
+      case 'overdue': return { css: 'bg-rose-100 text-rose-700 border-rose-200', icon: <AlertCircle className="w-3 h-3" /> };
       default: return { css: 'bg-gray-100 text-gray-700 border-gray-200', icon: <FileText className="w-3 h-3" /> };
     }
   };
@@ -235,8 +276,8 @@ const Invoices = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredInvoices.length > 0 ? (
-                    filteredInvoices.map((inv) => {
+                  {(filteredInvoices || []).length > 0 ? (
+                    (filteredInvoices || []).map((inv) => {
                       const statusStyle = getStatusStyle(inv.status);
                       const isUpdating = updatingId === inv._id;
 
@@ -247,26 +288,12 @@ const Invoices = () => {
                           <td className="px-6 py-4 text-gray-500 text-sm">{new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                           <td className="px-6 py-4 font-bold text-gray-900">{formatCurrency(inv.totalAmount)}</td>
                           <td className="px-6 py-4">
-                            <div className="relative inline-block">
-                              {isUpdating ? (
-                                <div className="flex items-center gap-2 text-sm text-gray-500"><Loader2 className="w-4 h-4 animate-spin text-blue-600" /> Updating...</div>
-                              ) : (
-                                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border cursor-pointer transition-colors ${statusStyle.css}`}>
-                                  {statusStyle.icon}
-                                  <select
-                                    className="bg-transparent text-xs font-bold uppercase focus:outline-none cursor-pointer appearance-none pr-1"
-                                    value={inv.status}
-                                    onChange={(e) => handleStatusChange(inv._id, e.target.value)}
-                                  >
-                                    <option value="Pending" className="bg-white text-gray-700">Pending</option>
-                                    <option value="Paid" className="bg-white text-gray-700">Paid</option>
-                                    {/* 🔴 FIX: Allows "Partially Paid" to show up without breaking */}
-                                    {inv.status === 'Partially Paid' && <option value="Partially Paid" className="bg-white text-gray-700">Partially Paid</option>}
-                                    <option value="Overdue" className="bg-white text-gray-700">Overdue</option>
-                                  </select>
-                                </div>
-                              )}
-                            </div>
+                            <StatusDropdown 
+                              inv={inv} 
+                              statusStyle={statusStyle} 
+                              isUpdating={isUpdating} 
+                              handleStatusChange={handleStatusChange} 
+                            />
                           </td>
                           <td className="px-6 py-4 text-right">
                             <div className="flex items-center justify-end gap-2">

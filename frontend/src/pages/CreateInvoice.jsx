@@ -26,7 +26,7 @@ const CreateInvoice = () => {
    // --- FORM SETUP ---
    const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
       defaultValues: {
-         items: [{ description: "", additionalDetails: "", hsnCode: "", gstRate: 18, quantity: 1, rate: 0, inventoryId: null }],
+         items: [{ description: "", additionalDetails: "", hsnCode: "", gstRate: 18, quantity: 1, rate: 0, inventoryId: null, availableStock: null }],
          taxRate: 18,
          discountPercentage: 0,
          advancePayment: 0,
@@ -415,6 +415,7 @@ const CreateInvoice = () => {
                                        if (selectedItem) {
                                            setValue(`items.${index}.inventoryId`, selectedItem._id);
                                            setValue(`items.${index}.rate`, selectedItem.unitPrice);
+                                           setValue(`items.${index}.availableStock`, selectedItem.currentStock);
                                            if (selectedItem.description) {
                                                setValue(`items.${index}.additionalDetails`, selectedItem.description);
                                            }
@@ -423,6 +424,7 @@ const CreateInvoice = () => {
                                            }
                                        } else {
                                            setValue(`items.${index}.inventoryId`, null);
+                                           setValue(`items.${index}.availableStock`, null);
                                        }
                                     }}
                                     className={`w-full border rounded p-2 font-bold text-gray-800 placeholder-gray-400 outline-none ${errors.items?.[index]?.description ? 'border-red-400 focus:ring-2 focus:ring-red-500' : 'border-gray-300 focus:ring-2 focus:ring-blue-500'}`}
@@ -460,11 +462,23 @@ const CreateInvoice = () => {
                                  type="number"
                                  {...register(`items.${index}.quantity`, {
                                     required: "Required",
-                                    min: { value: 0.1, message: "> 0" }
+                                    min: { value: 0.1, message: "> 0" },
+                                    validate: (value) => {
+                                       const stock = items?.[index]?.availableStock;
+                                       if (stock !== undefined && stock !== null && Number(value) > stock) {
+                                          return `Max: ${stock}`;
+                                       }
+                                       return true;
+                                    }
                                  })}
                                  className={`w-full border p-2 rounded text-center outline-none font-medium ${errors.items?.[index]?.quantity ? 'border-red-400 focus:ring-2 focus:ring-red-500' : 'border-gray-300 focus:ring-2 focus:ring-blue-500'}`}
                                  step="any"
                               />
+                              {items?.[index]?.availableStock !== undefined && items?.[index]?.availableStock !== null && (
+                                  <div className="text-[9px] text-center text-gray-500 mt-1 font-bold">
+                                      In Stock: {items[index].availableStock}
+                                  </div>
+                              )}
                               {errors.items?.[index]?.quantity && <p className="text-red-500 text-[10px] mt-1 text-center font-medium">{errors.items[index].quantity.message}</p>}
                            </div>
 
@@ -526,7 +540,7 @@ const CreateInvoice = () => {
 
                      <button
                         type="button"
-                        onClick={() => append({ description: "", additionalDetails: "", hsnCode: "", gstRate: 18, quantity: 1, rate: 0, inventoryId: null })}
+                        onClick={() => append({ description: "", additionalDetails: "", hsnCode: "", gstRate: 18, quantity: 1, rate: 0, inventoryId: null, availableStock: null })}
                         className="mt-2 text-blue-600 font-bold text-sm hover:underline flex items-center gap-1"
                      >
                         <Plus className="h-4 w-4" /> Add New Item Line

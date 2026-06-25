@@ -9,8 +9,11 @@ import '../suppliers/suppliers_screen.dart';
 import '../expenses/expenses_screen.dart';
 import '../team/team_screen.dart';
 import '../settings/settings_screen.dart';
+import '../import_data/import_data_screen.dart';
 import '../notifications/notification_controller.dart';
-import '../notifications/notifications_bottom_sheet.dart';
+
+import '../notifications/notification_screen.dart';
+import 'your_information_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -44,184 +47,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return SafeArea(
       child: Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          // Gorgeous Header Hero with Premium Gradient (FIXED - DOES NOT SCROLL)
-          Container(
-            height: 200,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF0F172A), // slate-900
-                  Color(0xFF1E3A8A), // dark blue
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Code-generated Logo Header matching Super Admin Profile
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 40, bottom: 40),
+              decoration: const BoxDecoration(
+                color: Color(0xFF1E293B), // Dark background from screenshot
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(32),
+                  bottomRight: Radius.circular(32),
+                ),
               ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(32),
-                bottomRight: Radius.circular(32),
-              ),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'My Account',
-                          style: AppTextStyles.heading2.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            IconButton(
-                              icon: const Icon(LucideIcons.bell, color: Colors.white),
-                              onPressed: () {
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  builder: (context) => const NotificationsBottomSheet(),
-                                );
-                              },
-                            ),
-                            Obx(() {
-                              if (notificationController.unreadCount.value > 0) {
-                                return Positioned(
-                                  right: 8,
-                                  top: 8,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Text(
-                                      '${notificationController.unreadCount.value}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }
-                              return const SizedBox.shrink();
-                            }),
-                          ],
-                        ),
-                      ],
+              child: Column(
+                children: [
+                  // App Icon (White square, blue hexagon)
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        // Elegant Circular Avatar with Glowing Gradient Border
-                        Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            gradient: LinearGradient(
-                              colors: [Colors.tealAccent, AppColors.primary],
-                            ),
-                          ),
-                        child: Container(
-                          width: 56,
-                          height: 56,
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: Obx(() => Text(
-                              _getInitials(authController.userName.value),
-                              style: const TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 20,
-                                letterSpacing: 0.5,
-                              ),
-                            )),
-                          ),
+                    child: const Center(
+                      child: Icon(
+                        LucideIcons.hexagon,
+                        color: Color(0xFF2563EB),
+                        size: 36,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // AurivaBMS Text
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      const Text(
+                        'Auriva',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Obx(() => Text(
-                              authController.userName.value.isNotEmpty
-                                  ? authController.userName.value
-                                  : 'My Account',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.12),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.white.withOpacity(0.15)),
-                                  ),
-                                  child: Obx(() {
-                                    final role = authController.userRole.value.isNotEmpty
-                                        ? authController.userRole.value
-                                        : 'USER';
-                                    return Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        const Icon(LucideIcons.shield, color: Colors.tealAccent, size: 10),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          '${role.toUpperCase()} ACCESS',
-                                          style: const TextStyle(
-                                            color: Colors.tealAccent,
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.bold,
-                                            letterSpacing: 0.5,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  }),
-                                ),
-                              ],
-                            ),
-                          ],
+                      Text(
+                        'BMS',
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.blue.shade600,
+                          letterSpacing: -0.5,
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'BUSINESS MANAGEMENT SYSTEM',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF94A3B8),
+                      letterSpacing: 2.0,
+                    ),
+                  ),
                 ],
               ),
             ),
-          ),
-        ),
 
-        // Scrollable Body Content (Menu Items and Operations)
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Section: Business Operations
-                _buildSectionHeader('BUSINESS OPERATIONS'),
+            // Body Content (Menu Items and Operations)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Section: Business Operations
+                _buildSectionHeader('business_operations'.tr),
                 const SizedBox(height: 8),
                 
                 // Animated Block 1
@@ -251,9 +157,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       children: [
                         _buildMenuRow(
                           context,
+                          index: 99, // Unique index for your info
+                          title: 'Your Information',
+                          subtitle: 'View your personal details and role',
+                          icon: LucideIcons.user,
+                          iconColor: Colors.blue.shade600,
+                          iconBg: Colors.blue.shade50,
+                          onTap: () => Get.to(() => const YourInformationScreen()),
+                        ),
+                        _buildDivider(),
+                        _buildMenuRow(
+                          context,
                           index: 0,
-                          title: 'Inventory',
-                          subtitle: 'Stock tracking & products',
+                          title: 'inventory'.tr,
+                          subtitle: 'inventory_sub'.tr,
                           icon: LucideIcons.package,
                           iconColor: Colors.blue.shade600,
                           iconBg: Colors.blue.shade50,
@@ -263,8 +180,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildMenuRow(
                           context,
                           index: 1,
-                          title: 'Suppliers',
-                          subtitle: 'Manage vendors & history',
+                          title: 'suppliers'.tr,
+                          subtitle: 'suppliers_sub'.tr,
                           icon: LucideIcons.truck,
                           iconColor: Colors.orange.shade600,
                           iconBg: Colors.orange.shade50,
@@ -274,12 +191,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildMenuRow(
                           context,
                           index: 2,
-                          title: 'Expenses',
-                          subtitle: 'Track outflows & bills',
+                          title: 'expenses'.tr,
+                          subtitle: 'expenses_sub'.tr,
                           icon: LucideIcons.wallet,
                           iconColor: Colors.green.shade600,
                           iconBg: Colors.green.shade50,
                           onTap: () => Get.to(() => const ExpensesScreen()),
+                        ),
+                        _buildDivider(),
+                        _buildMenuRow(
+                          context,
+                          index: 5, // Unique index
+                          title: 'import_data'.tr,
+                          subtitle: 'import_data_sub'.tr,
+                          icon: LucideIcons.database,
+                          iconColor: Colors.teal.shade600,
+                          iconBg: Colors.teal.shade50,
+                          onTap: () => Get.to(() => ImportDataScreen()),
+                        ),
+                        _buildDivider(),
+                        _buildMenuRow(
+                          context,
+                          index: 10,
+                          title: 'Notifications',
+                          subtitle: 'Your recent updates',
+                          icon: LucideIcons.bell,
+                          iconColor: Colors.red.shade500,
+                          iconBg: Colors.red.shade50,
+                          onTap: () => Get.to(() => const NotificationScreen()),
+                        ),
+                        _buildDivider(),
+                        _buildMenuRow(
+                          context,
+                          index: 6,
+                          title: 'language'.tr,
+                          subtitle: 'change_language_sub'.tr,
+                          icon: LucideIcons.languages,
+                          iconColor: Colors.indigo.shade600,
+                          iconBg: Colors.indigo.shade50,
+                          onTap: () => Get.toNamed('/language'),
                         ),
                       ],
                     ),
@@ -288,7 +238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 20),
 
                 // Section: Administration
-                _buildSectionHeader('ADMINISTRATION'),
+                _buildSectionHeader('administration'.tr),
                 const SizedBox(height: 8),
 
                 // Animated Block 2
@@ -319,8 +269,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildMenuRow(
                           context,
                           index: 3,
-                          title: 'Team & Access',
-                          subtitle: 'Permissions & staff logs',
+                          title: 'team_access'.tr,
+                          subtitle: 'team_access_sub'.tr,
                           icon: LucideIcons.shieldCheck,
                           iconColor: Colors.purple.shade600,
                           iconBg: Colors.purple.shade50,
@@ -330,8 +280,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _buildMenuRow(
                           context,
                           index: 4,
-                          title: 'Settings',
-                          subtitle: 'App & business settings',
+                          title: 'settings'.tr,
+                          subtitle: 'settings_sub'.tr,
                           icon: LucideIcons.settings,
                           iconColor: Colors.blueGrey.shade600,
                           iconBg: Colors.blueGrey.shade50,
@@ -359,9 +309,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => authController.logout(),
                       icon: const Icon(LucideIcons.logOut, size: 18),
-                      label: const Text(
-                        'SIGN OUT',
-                        style: TextStyle(
+                      label: Text(
+                        'sign_out'.tr,
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           letterSpacing: 1.5,
                           fontSize: 14,
@@ -382,14 +332,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
+        ],
         ),
-      ],
       ),
-     ),
-  );
-}
+      ),
+    );
+  }
 
-Widget _buildSectionHeader(String title) {
+ Widget _buildSectionHeader(String title) {
   return Padding(
     padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
     child: Text(
@@ -400,6 +350,38 @@ Widget _buildSectionHeader(String title) {
         color: Colors.grey,
         letterSpacing: 1.5,
       ),
+    ),
+  );
+}
+
+Widget _buildProfileItem({required IconData icon, required String title, required String value, required bool showBorder}) {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      border: showBorder ? Border(bottom: BorderSide(color: Colors.grey.shade100)) : null,
+    ),
+    child: Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: Colors.blue.shade600, size: 20),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 2),
+              Text(value, style: const TextStyle(fontSize: 15, color: const Color(0xFF1E293B), fontWeight: FontWeight.w600)),
+            ],
+          ),
+        ),
+      ],
     ),
   );
 }

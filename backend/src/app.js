@@ -22,7 +22,7 @@ const inventoryRoutes = require('./routes/inventoryRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
-
+const settingsRoutes = require('./routes/settingsRoutes');
 const app = express();
 
 // --- 2. Middleware ---
@@ -74,7 +74,7 @@ app.use('/api/v1/inventory', inventoryRoutes);
 app.use('/api/v1/suppliers', supplierRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/payments', paymentRoutes);
-
+app.use('/api/v1/settings', settingsRoutes);
 // --- 4. Base Route ---
 app.get('/', (req, res) => {
   res.send('AurivaBMS API is running securely...');
@@ -113,6 +113,10 @@ const connectDB = async () => {
 const PORT = process.env.PORT || 5001;
 
 connectDB().then(() => {
+  // Initialize Cron Jobs
+  const cronService = require('./services/cronService');
+  cronService.initCronJobs();
+
   app.listen(PORT, () => {
     console.log(`Server running securely on port ${PORT}`);
   });

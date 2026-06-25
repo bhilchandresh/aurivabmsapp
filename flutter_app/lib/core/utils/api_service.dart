@@ -26,7 +26,7 @@ class ApiService {
     ).timeout(const Duration(seconds: 30));
   }
 
-  static Future<http.Response> post(String endpoint, Map<String, dynamic> body) async {
+  static Future<http.Response> post(String endpoint, dynamic body) async {
     final headers = await _getHeaders();
     return http.post(
       Uri.parse(ApiConstants.baseUrl + endpoint),
@@ -35,7 +35,7 @@ class ApiService {
     ).timeout(const Duration(seconds: 30));
   }
 
-  static Future<http.Response> put(String endpoint, Map<String, dynamic> body) async {
+  static Future<http.Response> put(String endpoint, dynamic body) async {
     final headers = await _getHeaders();
     return http.put(
       Uri.parse(ApiConstants.baseUrl + endpoint),
@@ -49,6 +49,18 @@ class ApiService {
     return http.delete(
       Uri.parse(ApiConstants.baseUrl + endpoint),
       headers: headers,
+    ).timeout(const Duration(seconds: 30));
+  }
+
+  static Future<http.Response> registerDeviceToken(String token, String platform) async {
+    final headers = await _getHeaders();
+    return http.post(
+      Uri.parse('${ApiConstants.baseUrl}/users/register-device'),
+      headers: headers,
+      body: jsonEncode({
+        'token': token,
+        'platform': platform,
+      }),
     ).timeout(const Duration(seconds: 30));
   }
 }

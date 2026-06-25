@@ -79,7 +79,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void _handlePaymentSubmit() async {
     if (_selectedClientId == null || _selectedClientId!.isEmpty) {
       Fluttertoast.showToast(
-        msg: "Please select a client.",
+        msg: 'please_select_client'.tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: const Color(0xFFEF4444),
@@ -92,7 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final amount = double.tryParse(amountStr);
     if (amount == null || amount <= 0) {
       Fluttertoast.showToast(
-        msg: "Please enter a valid amount.",
+        msg: 'please_enter_amount'.tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: const Color(0xFFEF4444),
@@ -125,7 +125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       });
 
       Fluttertoast.showToast(
-        msg: "Payment Logged Successfully!",
+        msg: 'payment_logged_success'.tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: const Color(0xFF10B981),
@@ -184,12 +184,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Dashboard',
-        subtitle: 'Overview & Insights',
+      appBar: AppTopBar(
+        title: 'dashboard'.tr,
+        subtitle: 'overview_insights'.tr,
         showMenu: false,
         showProfile: true,
         showBadge: true,
+        showNotification: true,
+        showBackButton: false,
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -451,7 +453,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               crossAxisAlignment: WrapCrossAlignment.center,
                               children: [
                                 Text(
-                                  'Welcome back, ',
+                                  'welcome_back'.tr,
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.normal,
@@ -525,7 +527,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      daysLeft > 0 ? '$daysLeft Days Left' : 'Expired',
+                                      daysLeft > 0 ? '$daysLeft ${'days_left'.tr}' : 'expired'.tr,
                                       style: TextStyle(
                                         fontSize: 9,
                                         fontWeight: FontWeight.bold,
@@ -566,12 +568,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
-                              children: const [
-                                Icon(LucideIcons.plus, size: 16, color: Colors.white),
-                                SizedBox(width: 8),
+                              children: [
+                                const Icon(LucideIcons.plus, size: 16, color: Colors.white),
+                                const SizedBox(width: 8),
                                 Text(
-                                  'New Invoice',
-                                  style: TextStyle(
+                                  'new_invoice'.tr,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
@@ -624,9 +626,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     switch (index) {
                       case 0:
                         return _buildStatCard(
-                          title: 'REVENUE',
+                          title: 'revenue'.tr,
                           value: formatCurrency.format(totalRevenue),
-                          subtitle: '↗ Income',
+                          subtitle: 'income_arrow'.tr,
                           icon: LucideIcons.wallet,
                           color: tailwindEmerald,
                           bgColor: tailwindEmeraldLight,
@@ -634,9 +636,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       case 1:
                         return _buildStatCard(
-                          title: 'EXPENSES',
+                          title: 'expenses_caps'.tr,
                           value: formatCurrency.format(totalExpenses),
-                          subtitle: 'Outflow',
+                          subtitle: 'outflow'.tr,
                           icon: LucideIcons.trendingUp,
                           iconRotation: 3.1415, // upside down
                           color: tailwindRose,
@@ -645,9 +647,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       case 2:
                         return _buildStatCard(
-                          title: 'NET PROFIT',
+                          title: 'net_profit'.tr,
                           value: formatCurrency.format(netProfit),
-                          subtitle: 'Bottom Line',
+                          subtitle: 'bottom_line'.tr,
                           icon: LucideIcons.trendingUp,
                           color: AppColors.primary,
                           bgColor: AppColors.primary.withValues(alpha: 0.1),
@@ -656,9 +658,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       case 3:
                         return _buildStatCard(
-                          title: 'PENDING',
+                          title: 'pending'.tr,
                           value: formatCurrency.format(totalPendingAmount),
-                          subtitle: '$pendingCount unpaid',
+                          subtitle: '$pendingCount ${'unpaid'.tr}',
                           icon: LucideIcons.clock,
                           color: tailwindAmber,
                           bgColor: tailwindAmberLight,
@@ -666,9 +668,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       case 4:
                         return _buildStatCard(
-                          title: 'INVOICES',
+                          title: 'invoices'.tr,
                           value: '$totalInvoices',
-                          subtitle: 'Lifetime billed',
+                          subtitle: 'lifetime_billed'.tr,
                           icon: LucideIcons.fileText,
                           color: tailwindViolet,
                           bgColor: tailwindVioletLight,
@@ -677,9 +679,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       case 5:
                       default:
                         return _buildStatCard(
-                          title: 'SUCCESS',
+                          title: 'success'.tr,
                           value: '$successRate%',
-                          subtitle: 'Invoices paid',
+                          subtitle: 'invoices_paid'.tr,
                           icon: LucideIcons.checkCircle,
                           color: tailwindPurple,
                           bgColor: tailwindPurpleLight,
@@ -887,15 +889,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'Revenue Overview',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                      'revenue_overview'.tr,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      'Income and Expense comparison',
-                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                      'income_expense_comparison'.tr,
+                      style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -918,14 +920,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       },
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                       icon: const Icon(LucideIcons.chevronDown, size: 14),
-                      items: const [
+                      items: [
                         DropdownMenuItem(
                           value: 'monthly',
-                          child: Text('Last 6 Months'),
+                          child: Text('last_6_months'.tr),
                         ),
                         DropdownMenuItem(
                           value: 'yearly',
-                          child: Text('Last 5 Years'),
+                          child: Text('last_5_years'.tr),
                         ),
                       ],
                     ),
@@ -937,9 +939,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             // Legends
             Row(
               children: [
-                _buildLegendItem('Income', AppColors.primary),
+                _buildLegendItem('income'.tr, AppColors.primary),
                 const SizedBox(width: 16),
-                _buildLegendItem('Expense', tailwindRose),
+                _buildLegendItem('expense'.tr, tailwindRose),
               ],
             ),
             const SizedBox(height: 20),
@@ -1044,7 +1046,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       getTooltipColor: (group) => const Color(0xFF0F172A),
                       tooltipRoundedRadius: 8,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final title = rodIndex == 0 ? 'Income' : 'Expense';
+                        final title = rodIndex == 0 ? 'income'.tr : 'expense'.tr;
                         return BarTooltipItem(
                           '$title\n${formatCurrency.format(rod.toY)}',
                           TextStyle(
@@ -1115,15 +1117,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
-                      'Recent Invoices',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                      'recent_invoices'.tr,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
-                      'Latest billing activities',
-                      style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                      'latest_billing_activities'.tr,
+                      style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -1138,9 +1140,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Get.to(() => const InvoiceListScreen());
                     }
                   },
-                  child: const Text(
-                    'View All',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.primary),
+                  child: Text(
+                    'view_all'.tr,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.primary),
                   ),
                 ),
               ],
@@ -1151,7 +1153,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 20),
                 child: Center(
                   child: Text(
-                    'No invoices created yet.',
+                    'no_invoices_yet'.tr,
                     style: TextStyle(
                       fontSize: 13, 
                       color: Colors.grey.shade400, 
@@ -1357,12 +1359,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              children: const [
-                Icon(LucideIcons.wallet, size: 16, color: tailwindEmerald),
-                SizedBox(width: 8),
+              children: [
+                const Icon(LucideIcons.wallet, size: 16, color: tailwindEmerald),
+                const SizedBox(width: 8),
                 Text(
-                  'Collect Payment',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+                  'collect_payment'.tr,
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
                 ),
               ],
             ),
@@ -1379,7 +1381,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: _selectedClientId,
-                  hint: const Text('Select a Client...', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                  hint: Text('select_client'.tr, style: const TextStyle(fontSize: 13, color: Colors.grey)),
                   isExpanded: true,
                   onChanged: (val) {
                     setState(() {
@@ -1411,7 +1413,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total Billed:', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
+                        Text('total_billed'.tr, style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
@@ -1427,7 +1429,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total Received:', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
+                        Text('total_received'.tr, style: const TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
@@ -1445,26 +1447,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Ledger Balance:', style: TextStyle(fontSize: 11, color: Colors.grey.shade800, fontWeight: FontWeight.w900)),
+                        Text('ledger_balance'.tr, style: TextStyle(fontSize: 11, color: Colors.grey.shade800, fontWeight: FontWeight.w900)),
                         const SizedBox(width: 8),
                         Flexible(
                           child: activeClient.balance > 0
                               ? Text(
-                                  '${formatCurrency.format(activeClient.balance)} Due',
+                                  '${formatCurrency.format(activeClient.balance)}${'due'.tr}',
                                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: tailwindRose),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 )
                               : activeClient.balance < 0
                                   ? Text(
-                                      '${formatCurrency.format(activeClient.balance.abs())} Adv',
+                                      '${formatCurrency.format(activeClient.balance.abs())}${'adv'.tr}',
                                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: tailwindBlue),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     )
-                                  : const Text(
-                                      'Settled ✓',
-                                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: tailwindEmerald),
+                                  : Text(
+                                      'settled'.tr,
+                                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: tailwindEmerald),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
@@ -1530,12 +1532,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           )
                         : Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(LucideIcons.checkCircle, size: 14, color: Colors.white),
-                              SizedBox(width: 6),
+                            children: [
+                              const Icon(LucideIcons.checkCircle, size: 14, color: Colors.white),
+                              const SizedBox(width: 6),
                               Text(
-                                'Log Pay',
-                                style: TextStyle(
+                                'log_pay'.tr,
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
@@ -1574,7 +1576,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'QUICK ACTIONS',
+              'quick_actions'.tr,
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
@@ -1606,12 +1608,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(LucideIcons.users, size: 16, color: AppColors.primary),
-                          SizedBox(width: 8),
+                        children: [
+                          const Icon(LucideIcons.users, size: 16, color: AppColors.primary),
+                          const SizedBox(width: 8),
                           Text(
-                            'Add Client',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                            'add_client'.tr,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                           ),
                         ],
                       ),
@@ -1640,12 +1642,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(LucideIcons.arrowRight, size: 16, color: AppColors.primary),
-                          SizedBox(width: 8),
+                        children: [
+                          const Icon(LucideIcons.arrowRight, size: 16, color: AppColors.primary),
+                          const SizedBox(width: 8),
                           Text(
-                            'All Invoices',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                            'all_invoices'.tr,
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                           ),
                         ],
                       ),

@@ -40,9 +40,9 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Suppliers',
-        subtitle: 'Manage your vendors and purchase history',
+      appBar: AppTopBar(
+        title: 'suppliers'.tr,
+        subtitle: 'manage_vendors'.tr,
         showProfile: false,
         showBadge: false,
         showBackButton: true,
@@ -68,7 +68,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                         });
                       },
                       decoration: InputDecoration(
-                        hintText: 'Search vendors by name, email or GST...',
+                        hintText: 'search_vendors'.tr,
                         hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
                         prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 18),
                         filled: true,
@@ -93,7 +93,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                   ElevatedButton.icon(
                     onPressed: () => _showAddSupplierDialog(context),
                     icon: const Icon(LucideIcons.plus, size: 16),
-                    label: const Text('Add Vendor'),
+                    label: Text('add_vendor'.tr),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
@@ -107,14 +107,14 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
               const SizedBox(height: 20),
 
               // Section Label
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Vendors & Supply Registers',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                    'vendors_registry'.tr,
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                   ),
-                  Icon(LucideIcons.slidersHorizontal, size: 16, color: Colors.grey),
+                  const Icon(LucideIcons.slidersHorizontal, size: 16, color: Colors.grey),
                 ],
               ),
               const SizedBox(height: 12),
@@ -145,14 +145,14 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppColors.border),
                     ),
-                    child: const Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(LucideIcons.truck, size: 40, color: Colors.grey),
-                        SizedBox(height: 12),
+                        const Icon(LucideIcons.truck, size: 40, color: Colors.grey),
+                        const SizedBox(height: 12),
                         Text(
-                          'No suppliers matching search',
-                          style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
+                          'no_suppliers_found'.tr,
+                          style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -298,7 +298,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                       Get.to(() => SupplierDetailsScreen(supplierId: supplier.id));
                                     },
                                     icon: const Icon(LucideIcons.arrowRight, size: 12),
-                                    label: const Text('View Ledger'),
+                                    label: Text('view_ledger'.tr),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.primary.withOpacity(0.1),
                                       foregroundColor: AppColors.primary,
@@ -344,11 +344,11 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
 
     Get.dialog(
       AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(LucideIcons.truck, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Add Supplier'),
+            const Icon(LucideIcons.truck, color: AppColors.primary),
+            const SizedBox(width: 8),
+            Text('add_supplier'.tr),
           ],
         ),
         content: SingleChildScrollView(
@@ -356,35 +356,35 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               AppInputField(
-                label: 'Supplier Name *',
+                label: 'supplier_name_star'.tr,
                 controller: nameController,
-                hintText: 'e.g. Apex Technologies',
+                hintText: 'eg_supplier_name'.tr,
               ),
               const SizedBox(height: 12),
               AppInputField(
-                label: 'Email',
+                label: 'email'.tr,
                 controller: emailController,
-                hintText: 'e.g. sales@apextech.com',
+                hintText: 'eg_email'.tr,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 12),
               AppInputField(
-                label: 'Phone',
+                label: 'phone'.tr,
                 controller: phoneController,
-                hintText: 'e.g. +91 98765 43210',
+                hintText: 'eg_phone'.tr,
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: 12),
               AppInputField(
-                label: 'GST Number',
+                label: 'gst_number'.tr,
                 controller: gstController,
-                hintText: 'e.g. 29ABCDE1234F1Z1',
+                hintText: 'eg_gst'.tr,
               ),
               const SizedBox(height: 12),
               AppInputField(
-                label: 'Address',
+                label: 'address'.tr,
                 controller: addressController,
-                hintText: 'e.g. 22, Industrial Area, Bangalore',
+                hintText: 'eg_address'.tr,
               ),
             ],
           ),
@@ -392,14 +392,14 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
           ),
           Obx(() {
             final isSaving = _suppliersController.isLoading.value;
             return ElevatedButton(
               onPressed: isSaving ? null : () async {
                 if (nameController.text.trim().isEmpty) {
-                  Get.snackbar('Error', 'Supplier name is required', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+                  Get.snackbar('Error', 'supplier_name_req'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
                   return;
                 }
                 
@@ -413,9 +413,9 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 
                 if (success) {
                   Get.back();
-                  Get.snackbar('Success', 'Supplier added successfully', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+                  Get.snackbar('Success', 'supplier_added_success'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
                 } else {
-                  Get.snackbar('Error', 'Failed to add supplier. Please try again.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+                  Get.snackbar('Error', 'supplier_add_error'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
@@ -425,7 +425,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                       width: 16,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
-                  : const Text('Save Supplier', style: TextStyle(color: Colors.white)),
+                  : Text('save_supplier'.tr, style: const TextStyle(color: Colors.white)),
             );
           }),
         ],
@@ -436,12 +436,12 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
   void _confirmDeleteSupplier(String id, String name) {
     Get.dialog(
       AlertDialog(
-        title: const Text('Delete Supplier'),
-        content: Text('Are you sure you want to delete supplier "$name"? This action cannot be undone.'),
+        title: Text('delete_supplier'.tr),
+        content: Text('delete_supplier_confirm'.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
           ),
           Obx(() {
             final isDeleting = _suppliersController.isLoading.value;
@@ -450,9 +450,9 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 final success = await _suppliersController.deleteSupplier(id);
                 Get.back();
                 if (success) {
-                  Get.snackbar('Success', 'Supplier deleted successfully', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+                  Get.snackbar('Success', 'supplier_deleted'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
                 } else {
-                  Get.snackbar('Error', 'Failed to delete supplier', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
+                  Get.snackbar('Error', 'supplier_delete_error'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -462,7 +462,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                       width: 16,
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
-                  : const Text('Delete', style: TextStyle(color: Colors.white)),
+                  : Text('delete_vendor'.tr, style: const TextStyle(color: Colors.white)),
             );
           }),
         ],

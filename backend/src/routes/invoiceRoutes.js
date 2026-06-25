@@ -10,7 +10,8 @@ const {
   createInvoice, 
   updateInvoice, 
   deleteInvoice,
-  getPublicInvoice 
+  getPublicInvoice,
+  bulkImportInvoices
 } = require('../controllers/invoiceController');
 
 // Debugging: Check if functions are imported correctly
@@ -29,6 +30,8 @@ router.use(protect);
 router.route('/')
   .get(getInvoices)      // Get all invoices
   .post(createInvoice);  // Create new invoice
+
+router.post('/bulk', checkSubscription, bulkImportInvoices);
 
 // Route: /api/v1/invoices/:id
 router.route('/:id')

@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
     if (!success && mounted) {
       setState(() {
-        _errorMessage = 'Invalid email or password. Please try again.';
+        _errorMessage = 'invalid_credentials'.tr;
       });
     }
   }
@@ -242,7 +242,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
-                                        'Business Management System',
+                                        'bms_subtitle'.tr,
                                         style: AppTextStyles.label.copyWith(
                                           color: subtextColor,
                                           fontWeight: FontWeight.w500,
@@ -304,13 +304,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                         controller: _introController,
                                         delay: 0.15,
                                         child: AppInputField(
-                                          label: 'Work Email',
+                                          label: 'work_email'.tr,
                                           hintText: 'name@company.com',
                                           controller: _emailController,
                                           keyboardType: TextInputType.emailAddress,
                                           prefixIcon: const Icon(LucideIcons.mail, size: 20),
                                           validator: (val) => val == null || val.isEmpty
-                                              ? 'Email is required'
+                                              ? 'email_req'.tr
                                               : null,
                                         ),
                                       ),
@@ -319,7 +319,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                         controller: _introController,
                                         delay: 0.25,
                                         child: AppInputField(
-                                          label: 'Password',
+                                          label: 'password'.tr,
                                           hintText: '••••••••',
                                           controller: _passwordController,
                                           obscureText: !_showPassword,
@@ -333,7 +333,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                                 setState(() => _showPassword = !_showPassword),
                                           ),
                                           validator: (val) => val == null || val.isEmpty
-                                              ? 'Password is required'
+                                              ? 'password_req'.tr
                                               : null,
                                         ),
                                       ),
@@ -342,7 +342,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                         controller: _introController,
                                         delay: 0.35,
                                         child: Obx(() => AppButton(
-                                          text: 'Sign In to Dashboard',
+                                          text: 'sign_in_btn'.tr,
                                           isLoading: _authController.isLoading.value,
                                           onPressed: _handleLogin,
                                           icon: const Icon(LucideIcons.arrowRight, size: 16),
@@ -360,7 +360,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       Divider(color: cardBorderColor),
                                       const SizedBox(height: 20),
                                       Text(
-                                        'Protected by Enterprise Security.\n© 2026 Auriva Solutions.',
+                                        'protected_by_security'.tr,
                                         textAlign: TextAlign.center,
                                         style: AppTextStyles.caption.copyWith(
                                           color: subtextColor,

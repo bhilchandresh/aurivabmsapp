@@ -86,6 +86,48 @@ class InventoryController extends GetxController {
   var transactions = <String, List<InventoryTransaction>?>{}.obs;
   var isLoading = false.obs;
 
+  // Multiple selection state
+  var selectedItems = <String>{}.obs;
+  var isSelectionMode = false.obs;
+
+  void toggleSelection(String id) {
+    if (selectedItems.contains(id)) {
+      selectedItems.remove(id);
+      if (selectedItems.isEmpty) {
+        isSelectionMode.value = false;
+      }
+    } else {
+      selectedItems.add(id);
+      isSelectionMode.value = true;
+    }
+  }
+
+  void clearSelection() {
+    selectedItems.clear();
+    isSelectionMode.value = false;
+  }
+
+  Future<bool> deleteSelectedItems() async {
+    if (selectedItems.isEmpty) return false;
+    try {
+      isLoading.value = true;
+      List<Future> futures = [];
+      for (String id in selectedItems) {
+        futures.add(ApiService.delete('${ApiConstants.inventory}/$id'));
+      }
+      await Future.wait(futures);
+      
+      clearSelection();
+      await fetchItems();
+      return true;
+    } catch (e) {
+      debugPrint('Error in bulk delete: $e');
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   @override
   void onInit() {
     super.onInit();

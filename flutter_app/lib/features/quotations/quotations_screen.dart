@@ -170,7 +170,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('cancel'.tr),
           ),
           TextButton(
             onPressed: () async {
@@ -190,7 +190,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                 );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text('delete'.tr, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -224,7 +224,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text('cancel'.tr),
           ),
           TextButton(
             onPressed: () async {
@@ -274,9 +274,9 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Quotations',
-        subtitle: 'Manage estimates and convert to invoices',
+      appBar: AppTopBar(
+        title: 'quotations'.tr,
+        subtitle: 'estimates_proposals'.tr,
         showProfile: false,
         showBadge: false,
       ),
@@ -323,12 +323,23 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
 
           return Skeletonizer(
             enabled: showSkeleton,
-            child: SingleChildScrollView(
+            child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+              slivers: [
+                SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  automaticallyImplyLeading: false,
+                  backgroundColor: AppColors.background,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  toolbarHeight: 160,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
             // Action Button with ScaleOnPress & Premium Gradient Styling
             FadeInUp(
               delay: Duration.zero,
@@ -359,14 +370,14 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                             )
                           ],
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(LucideIcons.plus, size: 16, color: Colors.white),
-                            SizedBox(width: 8),
+                            const Icon(LucideIcons.plus, size: 16, color: Colors.white),
+                            const SizedBox(width: 8),
                             Text(
-                              'Create Quotation',
-                              style: TextStyle(
+                              'create_quotation'.tr,
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
@@ -410,7 +421,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                           });
                         },
                         decoration: InputDecoration(
-                          hintText: 'Search quote # or client...',
+                          hintText: 'search_quotations'.tr,
                           hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
                           prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 18),
                           filled: true,
@@ -446,11 +457,11 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                             value: _selectedStatus,
                             icon: const Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey),
                             style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
-                            items: const [
-                              DropdownMenuItem(value: 'all', child: Text('All Status')),
-                              DropdownMenuItem(value: 'Accepted', child: Text('Accepted')),
-                              DropdownMenuItem(value: 'Pending', child: Text('Pending')),
-                              DropdownMenuItem(value: 'Rejected', child: Text('Rejected')),
+                            items: [
+                              DropdownMenuItem(value: 'all', child: Text('all'.tr)),
+                              DropdownMenuItem(value: 'Accepted', child: Text('accepted'.tr)),
+                              DropdownMenuItem(value: 'Pending', child: Text('pending'.tr)),
+                              DropdownMenuItem(value: 'Rejected', child: Text('rejected'.tr)),
                             ],
                             onChanged: (val) {
                               if (val != null) {
@@ -467,8 +478,17 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
             // Register Header with FadeInUp
             FadeInUp(
               delay: const Duration(milliseconds: 100),
@@ -497,27 +517,30 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: const Column(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(LucideIcons.fileSearch, size: 40, color: Colors.grey),
-                      SizedBox(height: 12),
+                      const Icon(LucideIcons.fileSearch, size: 40, color: Colors.grey),
+                      const SizedBox(height: 12),
                       Text(
-                        'No quotes matching filter',
-                        style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
+                        'no_quotations_found'.tr,
+                        style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
                       ),
                     ],
                   ),
                 ),
-              )
-            else
-              ListView.separated(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: listItems.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
+              ),
+            ],
+          ),
+        ),
+      ),
+      if (listItems.isNotEmpty)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            sliver: SliverList.separated(
+              itemCount: listItems.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
                   final qt = listItems[index];
                   final statusColor = _getStatusColor(qt.status);
                   final isHovered = _hoveredIndex == index;
@@ -651,33 +674,33 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                       _changeStatus(qt, newStatus);
                                                     },
                                                     itemBuilder: (context) => [
-                                                      const PopupMenuItem(
+                                                      PopupMenuItem(
                                                         value: 'Accepted',
                                                         child: Row(
                                                           children: [
-                                                            Icon(LucideIcons.checkCircle, size: 16, color: AppColors.success),
-                                                            SizedBox(width: 8),
-                                                            Text('Accepted'),
+                                                            const Icon(LucideIcons.checkCircle, size: 16, color: AppColors.success),
+                                                            const SizedBox(width: 8),
+                                                            Text('accepted'.tr),
                                                           ],
                                                         ),
                                                       ),
-                                                      const PopupMenuItem(
+                                                      PopupMenuItem(
                                                         value: 'Pending',
                                                         child: Row(
                                                           children: [
-                                                            Icon(LucideIcons.clock, size: 16, color: AppColors.warning),
-                                                            SizedBox(width: 8),
-                                                            Text('Pending'),
+                                                            const Icon(LucideIcons.clock, size: 16, color: AppColors.warning),
+                                                            const SizedBox(width: 8),
+                                                            Text('pending'.tr),
                                                           ],
                                                         ),
                                                       ),
-                                                      const PopupMenuItem(
+                                                      PopupMenuItem(
                                                         value: 'Rejected',
                                                         child: Row(
                                                           children: [
-                                                            Icon(LucideIcons.xCircle, size: 16, color: AppColors.error),
-                                                            SizedBox(width: 8),
-                                                            Text('Rejected'),
+                                                            const Icon(LucideIcons.xCircle, size: 16, color: AppColors.error),
+                                                            const SizedBox(width: 8),
+                                                            Text('rejected'.tr),
                                                           ],
                                                         ),
                                                       ),
@@ -928,9 +951,9 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                     ),
                   );
                 },
+                ),
               ),
           ],
-        ),
         ),
       );
     }),

@@ -189,7 +189,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('cancel'.tr),
           ),
           TextButton(
             onPressed: () async {
@@ -209,7 +209,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
                 );
               }
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text('delete'.tr, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -253,9 +253,9 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppTopBar(
-        title: 'Invoices',
-        subtitle: 'Manage billing & track payouts',
+      appBar: AppTopBar(
+        title: 'invoices'.tr,
+        subtitle: 'manage_billing'.tr,
         showProfile: false,
         showBadge: false,
       ),
@@ -303,12 +303,23 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
 
           return Skeletonizer(
             enabled: showSkeleton,
-            child: SingleChildScrollView(
+            child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+              slivers: [
+                SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  automaticallyImplyLeading: false,
+                  backgroundColor: AppColors.background,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  toolbarHeight: 225,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
               // Action Buttons
               Row(
                 children: [
@@ -450,7 +461,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
                         });
                       },
                       decoration: InputDecoration(
-                        hintText: 'Search invoice # or client...',
+                        hintText: 'search_invoices'.tr,
                         hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
                         prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 18),
                         filled: true,
@@ -486,12 +497,12 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
                                 value: _selectedStatus,
                                 icon: const Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey),
                                 style: const TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
-                                items: const [
-                                  DropdownMenuItem(value: 'all', child: Text('All Status')),
-                                  DropdownMenuItem(value: 'paid', child: Text('Paid')),
-                                  DropdownMenuItem(value: 'pending', child: Text('Pending')),
-                                  DropdownMenuItem(value: 'partially paid', child: Text('Partially Paid')),
-                                  DropdownMenuItem(value: 'overdue', child: Text('Overdue')),
+                                items: [
+                                  DropdownMenuItem(value: 'all', child: Text('all'.tr)),
+                                  DropdownMenuItem(value: 'paid', child: Text('paid'.tr)),
+                                  DropdownMenuItem(value: 'pending', child: Text('pending'.tr)),
+                                  DropdownMenuItem(value: 'partially paid', child: Text('partially_paid'.tr)),
+                                  DropdownMenuItem(value: 'overdue', child: Text('overdue'.tr)),
                                 ],
                                 onChanged: (val) {
                                   if (val != null) {
@@ -538,9 +549,18 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Invoices Header
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Invoices Header
               const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -563,26 +583,29 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: const Column(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(LucideIcons.fileSearch, size: 40, color: Colors.grey),
-                      SizedBox(height: 12),
+                      const Icon(LucideIcons.fileSearch, size: 40, color: Colors.grey),
+                      const SizedBox(height: 12),
                       Text(
-                        'No invoices matching filter',
-                        style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
+                        'no_invoices_found'.tr,
+                        style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
                       ),
                     ],
                   ),
-                )
-              else
-                ListView.separated(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: listItems.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (listItems.isNotEmpty)
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            sliver: SliverList.separated(
+              itemCount: listItems.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              itemBuilder: (context, index) {
                     final inv = listItems[index];
                     final statusColor = _getStatusColor(inv.status);
                     final isHovered = _hoveredIndex == index;
@@ -701,43 +724,43 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
                                                 _changeStatus(inv, newStatus);
                                               },
                                               itemBuilder: (context) => [
-                                                const PopupMenuItem(
+                                                PopupMenuItem(
                                                   value: 'Paid',
                                                   child: Row(
                                                     children: [
-                                                      Icon(LucideIcons.checkCircle, size: 16, color: AppColors.success),
-                                                      SizedBox(width: 8),
-                                                      Text('Paid'),
+                                                      const Icon(LucideIcons.checkCircle, size: 16, color: AppColors.success),
+                                                      const SizedBox(width: 8),
+                                                      Text('paid'.tr),
                                                     ],
                                                   ),
                                                 ),
-                                                const PopupMenuItem(
+                                                PopupMenuItem(
                                                   value: 'Pending',
                                                   child: Row(
                                                     children: [
-                                                      Icon(LucideIcons.clock, size: 16, color: AppColors.warning),
-                                                      SizedBox(width: 8),
-                                                      Text('Pending'),
+                                                      const Icon(LucideIcons.clock, size: 16, color: AppColors.warning),
+                                                      const SizedBox(width: 8),
+                                                      Text('pending'.tr),
                                                     ],
                                                   ),
                                                 ),
-                                                const PopupMenuItem(
+                                                PopupMenuItem(
                                                   value: 'Partially Paid',
                                                   child: Row(
                                                     children: [
-                                                      Icon(LucideIcons.clock, size: 16, color: Colors.blue),
-                                                      SizedBox(width: 8),
-                                                      Text('Partially Paid'),
+                                                      const Icon(LucideIcons.clock, size: 16, color: Colors.blue),
+                                                      const SizedBox(width: 8),
+                                                      Text('partially_paid'.tr),
                                                     ],
                                                   ),
                                                 ),
-                                                const PopupMenuItem(
+                                                PopupMenuItem(
                                                   value: 'Overdue',
                                                   child: Row(
                                                     children: [
-                                                      Icon(LucideIcons.alertTriangle, size: 16, color: AppColors.error),
-                                                      SizedBox(width: 8),
-                                                      Text('Overdue'),
+                                                      const Icon(LucideIcons.alertTriangle, size: 16, color: AppColors.error),
+                                                      const SizedBox(width: 8),
+                                                      Text('overdue'.tr),
                                                     ],
                                                   ),
                                                 ),
@@ -934,8 +957,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> with SingleTicker
                     );
                   },
                 ),
-            ],
-          ),
+              ),
+          ],
         ),
       );
     }),

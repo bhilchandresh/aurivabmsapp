@@ -1,14 +1,31 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.hostinger.com',
-  port: process.env.EMAIL_PORT || 465,
-  secure: true, // true for 465, false for other ports
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+let transporter;
+
+const refreshTransporter = async () => {
+  try {
+    const SystemSettings = require('../models/SystemSettings');
+    const settings = await SystemSettings.find();
+    const config = {};
+    settings.forEach(s => config[s.key] = s.value);
+
+    transporter = nodemailer.createTransport({
+      host: config.SMTP_HOST || process.env.EMAIL_HOST || 'smtp.hostinger.com',
+      port: config.SMTP_PORT || process.env.EMAIL_PORT || 465,
+      secure: true, // true for 465, false for other ports
+      auth: {
+        user: config.SMTP_USER || process.env.EMAIL_USER,
+        pass: config.SMTP_PASS || process.env.EMAIL_PASS
+      }
+    });
+    console.log("Email Transporter Initialized with Dynamic Settings");
+  } catch (err) {
+    console.error("Failed to initialize transporter", err);
   }
-});
+};
+
+// Initialize on boot
+refreshTransporter();
 
 /**
  * Premium HTML Template for Invoices (White-Labeled)
@@ -86,96 +103,6 @@ const getInvoiceEmailTemplate = (invoice, tenant = null) => {
           
           <div style="text-align: center;">
             <a href="${process.env.APP_URL || 'http://localhost:5173'}/public/invoice/${invoice._id}" class="button">View Online</a>
-          </div>
-        </div>
-        <div class="footer">
-          <b>${businessName}</b>
-          ${businessAddress ? `${businessAddress}<br>` : ''}
-          ${businessPhone ? `Phone: ${businessPhone}  ` : ''}${businessEmail ? `| Email: ${businessEmail}` : ''}
-          <p style="margin-top: 20px; font-size: 10px; opacity: 0.6;">&copy; ${new Date().getFullYear()} ${businessName}. Professional Document Delivery.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
-};
-
-/**
- * Premium HTML Template for Quotations (White-Labeled)
- */
-const getQuotationEmailTemplate = (quotation, tenant = null) => {
-  const formattedAmount = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR'
-  }).format(quotation.totalAmount);
-
-  const businessName = tenant ? tenant.name : "Business Manager";
-  const businessAddress = tenant ? tenant.address : "";
-  const businessPhone = tenant ? tenant.phone : "";
-  const businessEmail = tenant ? tenant.email : "";
-  const businessLogo = tenant && tenant.logoImage ? tenant.logoImage : null;
-
-  return `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <style>
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; margin: 0; padding: 0; background-color: #f8fafc; }
-        .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
-        .header { background: #1e293b; padding: 50px 40px; text-align: center; color: white; }
-        .header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.025em; }
-        .header p { margin: 5px 0 0; opacity: 0.8; font-weight: 500; font-size: 14px; }
-        .logo { max-width: 150px; margin-bottom: 20px; }
-        .content { padding: 40px; }
-        .greeting { font-size: 18px; font-weight: 700; margin-bottom: 24px; color: #0f172a; }
-        .invoice-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin: 32px 0; text-align: center; }
-        .amount-label { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
-        .amount-value { font-size: 42px; font-weight: 900; color: #1e293b; margin-bottom: 24px; }
-        .details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; text-align: left; border-top: 1px solid #e2e8f0; padding-top: 24px; }
-        .detail-item .label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; }
-        .detail-item .value { font-size: 14px; font-weight: 700; color: #334155; }
-        .button { display: inline-block; background: #0f172a; color: white !important; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-weight: 700; font-size: 15px; margin-top: 32px; transition: all 0.2s; }
-        .footer { padding: 40px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #f1f5f9; background: #ffffff; }
-        .footer b { color: #475569; display: block; margin-bottom: 5px; }
-        @media (max-width: 600px) {
-          .container { margin: 0; border-radius: 0; }
-          .header { padding: 40px 20px; }
-          .content { padding: 30px 20px; }
-          .details-grid { grid-template-columns: 1fr; gap: 15px; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          ${businessLogo ? `<img src="${businessLogo}" alt="${businessName}" class="logo">` : ''}
-          <h1>New Quotation</h1>
-          <p>${businessName}</p>
-        </div>
-        <div class="content">
-          <div class="greeting">Dear ${quotation.client.name},</div>
-          <p>Please find the details of your new quotation from <strong>${businessName}</strong> below. You can securely view and download your full quotation online.</p>
-          
-          <div class="invoice-card">
-            <div class="amount-label">Quotation Amount</div>
-            <div class="amount-value">${formattedAmount}</div>
-            
-            <div class="details-grid">
-              <div class="detail-item">
-                <div class="label">Quotation Number</div>
-                <div class="value">${quotation.quotationNumber}</div>
-              </div>
-              <div class="detail-item">
-                <div class="label">Valid Until</div>
-                <div class="value">${new Date(quotation.validUntil || quotation.date).toLocaleDateString('en-IN')}</div>
-              </div>
-            </div>
-          </div>
-          
-          <div style="text-align: center;">
-            <a href="${process.env.APP_URL || 'https://app.aurivabms.in'}/public/quotation/${quotation._id}" class="button">View Online</a>
           </div>
         </div>
         <div class="footer">
@@ -386,30 +313,6 @@ exports.sendInvoiceEmail = async (invoice, pdfBuffer = null, tenant = null) => {
   }
 };
 
-exports.sendQuotationEmail = async (quotation, tenant = null) => {
-  if (!quotation.client || !quotation.client.email) {
-    console.log(`Skipping email: No email for client ${quotation.client.name}`);
-    return;
-  }
-
-  try {
-    const businessName = tenant ? tenant.name : "Billing Manager";
-    const mailOptions = {
-      from: `"${businessName}" <${process.env.EMAIL_USER}>`,
-      to: quotation.client.email,
-      subject: `Quotation #${quotation.quotationNumber} from ${businessName}`,
-      html: getQuotationEmailTemplate(quotation, tenant)
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-    console.log(`Quotation Email sent: ${info.messageId}`);
-    return info;
-  } catch (error) {
-    console.error('Email Error:', error);
-    throw error;
-  }
-};
-
 exports.sendPaymentEmail = async (invoice, amountPaid, tenant = null) => {
   if (!invoice.client || !invoice.client.email) return;
 
@@ -469,3 +372,5 @@ exports.sendClientEmail = async (client, subject, message) => {
     throw error;
   }
 };
+
+exports.refreshTransporter = refreshTransporter;

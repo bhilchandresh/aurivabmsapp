@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, FileText, FileStack, Users, Wallet, 
   ShieldCheck, Settings, LogOut, BarChart3, Menu, X, 
-  ChevronRight, Hexagon, Shield, Package, Truck
+  ChevronRight, Hexagon, Shield, Package, Truck, Database, LifeBuoy, TrendingUp
 } from "lucide-react"; 
 import { AuthContext } from "../context/AuthContext";
 import NotificationBell from "./NotificationBell";
@@ -22,7 +22,11 @@ const Layout = ({ children }) => {
 
   const getMenuItems = (role) => {
     if (role === 'super_admin') {
-      return [{ name: "Master Control", path: "/super-admin", icon: BarChart3 }];
+      return [
+        { name: "Master Control", path: "/super-admin", icon: BarChart3 },
+        { name: "Analytics", path: "/super-admin/analytics", icon: TrendingUp },
+        { name: "SMTP Settings", path: "/super-admin/settings", icon: Settings },
+      ];
     }
     
     let items = [
@@ -37,6 +41,7 @@ const Layout = ({ children }) => {
 
     if (role === 'admin') {
       items.push(
+        { name: "Import Data", path: "/import-data", icon: Database },
         { name: "Team & Access", path: "/team", icon: ShieldCheck },
         { name: "Settings", path: "/settings", icon: Settings }
       );
@@ -78,7 +83,7 @@ const Layout = ({ children }) => {
         {/* NAVIGATION */}
         <nav className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
           {menuItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path);
+            const isActive = item.path === '/super-admin' ? location.pathname === '/super-admin' : location.pathname.startsWith(item.path);
             const Icon = item.icon;
             
             return (
