@@ -14,7 +14,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
     final controller = Get.put(SuperAdminLogsController());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Color(0xFFF8FAFC),
       body: SafeArea(
         child: Column(
           children: [
@@ -25,9 +25,20 @@ class SuperAdminLogsScreen extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Row(
                 children: [
-                  const Icon(LucideIcons.history, color: Color(0xFF1E293B), size: 20),
+                  Icon(
+                    LucideIcons.history,
+                    color: Color(0xFF1E293B),
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
-                  const Text('System Logs', style: TextStyle(fontSize: 18, color: Color(0xFF1E293B), fontWeight: FontWeight.bold)),
+                  Text(
+                    'system_logs'.tr,
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Color(0xFF1E293B),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -40,7 +51,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                   return Center(
                     child: Text(
                       'No logs found',
-                      style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 16,
+                      ),
                     ),
                   );
                 }
@@ -53,9 +67,12 @@ class SuperAdminLogsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogsContent(BuildContext context, SuperAdminLogsController controller) {
+  Widget _buildLogsContent(
+    BuildContext context,
+    SuperAdminLogsController controller,
+  ) {
     final isMobile = MediaQuery.of(context).size.width < 800;
-    
+
     if (isMobile) {
       return RefreshIndicator(
         onRefresh: controller.fetchLogs,
@@ -65,7 +82,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             final log = controller.logsList[index];
             final timeStr = DateFormat('dd MMM yyyy').format(log.createdAt);
-            
+
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.all(16),
@@ -81,37 +98,59 @@ class SuperAdminLogsScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           log.action,
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF374151)),
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF374151),
+                          ),
                         ),
                       ),
                       Text(
                         timeStr,
-                        style: TextStyle(fontSize: 12, fontFamily: 'monospace', color: Colors.grey.shade500),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontFamily: 'monospace',
+                          color: Colors.grey.shade500,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Text(
                     log.details,
-                    style: const TextStyle(fontSize: 14, color: Color(0xFF1F2937)),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF1F2937),
+                    ),
                   ),
                   const SizedBox(height: 12),
-                  const Divider(height: 1),
+                  Divider(height: 1),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(LucideIcons.user, size: 14, color: Colors.grey.shade400),
+                      Icon(
+                        LucideIcons.user,
+                        size: 14,
+                        color: Colors.grey.shade400,
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         log.userName,
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF111827)),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF111827),
+                        ),
                       ),
                     ],
                   ),
@@ -139,53 +178,141 @@ class SuperAdminLogsScreen extends StatelessWidget {
             children: [
               // Header Row
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF3F4F6), // bg-gray-100
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
                 ),
-                child: const Row(
+                decoration: BoxDecoration(
+                  color: Color(0xFFF3F4F6), // bg-gray-100
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    topRight: Radius.circular(12),
+                  ),
+                ),
+                child: Row(
                   children: [
-                    Expanded(flex: 1, child: Text('Time', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF374151)))),
-                    Expanded(flex: 2, child: Text('Action', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF374151)))),
-                    Expanded(flex: 4, child: Text('Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF374151)))),
-                    Expanded(flex: 2, child: Text('User', textAlign: TextAlign.right, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF374151)))),
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        'time'.tr,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF374151),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        'action'.tr,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF374151),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: Text(
+                        'details'.tr,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF374151),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        'user'.tr,
+                        textAlign: TextAlign.right,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF374151),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
               // Data Rows
               ...controller.logsList.map((log) {
-                final timeStr = DateFormat('dd MMM\nyyyy').format(log.createdAt);
+                final timeStr = DateFormat(
+                  'dd MMM\nyyyy',
+                ).format(log.createdAt);
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
                   decoration: BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade100),
+                    ),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(
                         flex: 1,
-                        child: Text(timeStr, style: const TextStyle(fontSize: 12, fontFamily: 'monospace', color: Color(0xFF4B5563))),
+                        child: Text(
+                          timeStr,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'monospace',
+                            color: Color(0xFF4B5563),
+                          ),
+                        ),
                       ),
                       Expanded(
                         flex: 2,
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(4)),
-                            child: Text(log.action, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: Color(0xFF374151))),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              log.action,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF374151),
+                              ),
+                            ),
                           ),
                         ),
                       ),
                       Expanded(
                         flex: 4,
-                        child: Text(log.details, style: const TextStyle(fontSize: 14, color: Color(0xFF1F2937))),
+                        child: Text(
+                          log.details,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF1F2937),
+                          ),
+                        ),
                       ),
                       Expanded(
                         flex: 2,
-                        child: Text(log.userName, textAlign: TextAlign.right, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF111827))),
+                        child: Text(
+                          log.userName,
+                          textAlign: TextAlign.right,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF111827),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -232,30 +359,37 @@ class SuperAdminLogsScreen extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Container(height: 48, color: const Color(0xFFF3F4F6)),
-            ...List.generate(6, (index) => Shimmer.fromColors(
-              baseColor: baseColor,
-              highlightColor: highlightColor,
-              child: Container(
-                height: 70,
-                decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.grey.shade100)),
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 24),
-                    Container(width: 60, height: 30, color: Colors.white),
-                    const SizedBox(width: 40),
-                    Container(width: 80, height: 20, color: Colors.white),
-                    const SizedBox(width: 60),
-                    Expanded(child: Container(height: 16, color: Colors.white)),
-                    const SizedBox(width: 40),
-                    Container(width: 100, height: 16, color: Colors.white),
-                    const SizedBox(width: 24),
-                  ],
+            Container(height: 48, color: Color(0xFFF3F4F6)),
+            ...List.generate(
+              6,
+              (index) => Shimmer.fromColors(
+                baseColor: baseColor,
+                highlightColor: highlightColor,
+                child: Container(
+                  height: 70,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade100),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 24),
+                      Container(width: 60, height: 30, color: Colors.white),
+                      const SizedBox(width: 40),
+                      Container(width: 80, height: 20, color: Colors.white),
+                      const SizedBox(width: 60),
+                      Expanded(
+                        child: Container(height: 16, color: Colors.white),
+                      ),
+                      const SizedBox(width: 40),
+                      Container(width: 100, height: 16, color: Colors.white),
+                      const SizedBox(width: 24),
+                    ],
+                  ),
                 ),
               ),
-            )),
+            ),
           ],
         ),
       ),

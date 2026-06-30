@@ -39,7 +39,9 @@ class TenantModel {
       address: json['address'],
       status: json['status'] ?? 'active',
       subscriptionPlan: json['subscriptionPlan'] ?? 'basic',
-      subscriptionEnd: json['subscriptionEnd'] != null ? DateTime.tryParse(json['subscriptionEnd']) : null,
+      subscriptionEnd: json['subscriptionEnd'] != null
+          ? DateTime.tryParse(json['subscriptionEnd'])
+          : null,
       gstEnabled: json['gstEnabled'] ?? false,
       gstNumber: json['gstNumber'],
       templatePreference: json['templatePreference'] ?? 'standard',

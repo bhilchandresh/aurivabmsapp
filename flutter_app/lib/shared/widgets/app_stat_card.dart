@@ -29,13 +29,13 @@ class AppStatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 1),
+        border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Container(
@@ -43,53 +43,53 @@ class AppStatCard extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: isFeatured ? color : Colors.transparent, 
+              color: isFeatured ? color : Colors.transparent,
               width: isFeatured ? 3 : 0,
             ),
           ),
         ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: backgroundColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, size: 16, color: color),
                 ),
-                child: Icon(icon, size: 16, color: color),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                title.toUpperCase(),
-                style: AppTextStyles.caption.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                  color: AppColors.textSecondary,
+                const SizedBox(width: 12),
+                Text(
+                  title.toUpperCase(),
+                  style: AppTextStyles.caption.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                    color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                  ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              amount,
+              style: AppTextStyles.heading2.copyWith(
+                fontWeight: FontWeight.w900,
+                color: isFeatured ? color : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            amount,
-            style: AppTextStyles.heading2.copyWith(
-              fontWeight: FontWeight.w900,
-              color: isFeatured ? color : AppColors.textPrimary,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: AppTextStyles.caption.copyWith(
-              fontWeight: FontWeight.bold,
-              color: color,
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: AppTextStyles.caption.copyWith(
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }

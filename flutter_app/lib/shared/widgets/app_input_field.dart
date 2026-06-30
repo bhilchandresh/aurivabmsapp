@@ -41,7 +41,7 @@ class AppInputField extends StatelessWidget {
             label.toUpperCase(),
             style: AppTextStyles.caption.copyWith(
               fontWeight: FontWeight.bold,
-              color: isDark ? const Color(0xFF94A3B8) : AppColors.textSecondary,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
               letterSpacing: 0.5,
             ),
           ),
@@ -55,43 +55,39 @@ class AppInputField extends StatelessWidget {
           maxLines: maxLines,
           style: AppTextStyles.body.copyWith(
             fontWeight: FontWeight.w500,
-            color: isDark ? Colors.white : AppColors.textPrimary,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
           ),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: AppTextStyles.body.copyWith(
-              color: isDark ? const Color(0xFF64748B) : Colors.grey[400],
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
-            filled: true,
-            fillColor: isDark ? const Color(0xFF1E293B) : Colors.grey[50],
-            prefixIcon: prefixIcon != null ? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: IconTheme(
-                data: IconThemeData(color: isDark ? const Color(0xFF94A3B8) : AppColors.textSecondary),
-                child: prefixIcon!,
-              ),
-            ) : null,
-            prefixIconConstraints: const BoxConstraints(minWidth: 40, minHeight: 40),
-            suffixIcon: suffixIcon != null ? IconTheme(
-              data: IconThemeData(color: isDark ? const Color(0xFF94A3B8) : AppColors.textSecondary),
-              child: suffixIcon!,
-            ) : null,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : Colors.grey[300]!),
+            prefixIcon: prefixIcon != null
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: IconTheme(
+                      data: IconThemeData(
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                      ),
+                      child: prefixIcon!,
+                    ),
+                  )
+                : null,
+            prefixIconConstraints: const BoxConstraints(
+              minWidth: 40,
+              minHeight: 40,
             ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : Colors.grey[300]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.primary, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error, width: 2),
+            suffixIcon: suffixIcon != null
+                ? IconTheme(
+                    data: IconThemeData(
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                    child: suffixIcon!,
+                  )
+                : null,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 16,
             ),
           ),
         ),

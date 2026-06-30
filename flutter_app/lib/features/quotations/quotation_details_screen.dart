@@ -87,7 +87,11 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
   bool _isTemplateLoading = true;
 
   final ScreenshotController screenshotController = ScreenshotController();
-  final formatCurrency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
+  final formatCurrency = NumberFormat.currency(
+    locale: 'en_IN',
+    symbol: '₹',
+    decimalDigits: 2,
+  );
 
   Map<String, String> _companyInfo = {};
   Map<String, dynamic> _mockBankDetails = {};
@@ -106,7 +110,8 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
         'website': 'www.aurivatech.com',
         'gstNumber': '36AAAAA1111A1Z1',
         'state': 'Telangana',
-        'defaultTerms': '1. Standard validity is 30 days from the estimate date.\n2. 50% advance payment required to commence work.\n3. Goods once sold/services rendered cannot be returned.',
+        'defaultTerms':
+            '1. Standard validity is 30 days from the estimate date.\n2. 50% advance payment required to commence work.\n3. Goods once sold/services rendered cannot be returned.',
       };
       _mockBankDetails = {
         'bankName': 'HDFC Bank Ltd',
@@ -134,10 +139,14 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
       final bank = tenant['bankDetails'];
       if (bank is Map) {
         _mockBankDetails = {
-          'accountName': bank['accountName']?.toString() ?? bank['accountHolderName']?.toString() ?? '',
+          'accountName':
+              bank['accountName']?.toString() ??
+              bank['accountHolderName']?.toString() ??
+              '',
           'bankName': bank['bankName']?.toString() ?? '',
           'accountNumber': bank['accountNumber']?.toString() ?? '',
-          'ifscCode': bank['ifscCode']?.toString() ?? bank['ifsc']?.toString() ?? '',
+          'ifscCode':
+              bank['ifscCode']?.toString() ?? bank['ifsc']?.toString() ?? '',
         };
       } else {
         _mockBankDetails = {
@@ -168,13 +177,14 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
 
   double get _taxAmount {
     if (!_gstEnabled) return 0.0;
-    
+
     double calculatedTax = 0.0;
     for (var item in _proposalItems) {
       double qty = ((item['quantity'] ?? 1) as num).toDouble();
       double rate = ((item['rate'] ?? 0.0) as num).toDouble();
-      double gstRate = ((item['gst'] ?? item['gstRate'] ?? 18.0) as num).toDouble();
-      
+      double gstRate = ((item['gst'] ?? item['gstRate'] ?? 18.0) as num)
+          .toDouble();
+
       double itemSubtotal = qty * rate;
       double itemDiscount = itemSubtotal * (_discountPercentage / 100);
       double itemTaxable = itemSubtotal - itemDiscount;
@@ -206,21 +216,49 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
     _discountPercentage = widget.discountPercentage ?? 0.0;
     _gstEnabled = widget.gstEnabled ?? true;
     _taxType = widget.taxType ?? 'exclusive';
-    _clientEmail = widget.clientEmail ?? '${widget.clientName.toLowerCase().replaceAll(' ', '')}@acme.com';
-    _clientAddress = widget.clientAddress ?? 'Corporate Hub, Sector V, Hitech Avenue, Suite 101';
+    _clientEmail =
+        widget.clientEmail ??
+        '${widget.clientName.toLowerCase().replaceAll(' ', '')}@acme.com';
+    _clientAddress =
+        widget.clientAddress ??
+        'Corporate Hub, Sector V, Hitech Avenue, Suite 101';
 
     if (widget.items != null) {
       _proposalItems = widget.items!;
     } else {
       if (widget.amount > 30000) {
         _proposalItems = [
-          {'description': 'Enterprise Web Suite - Modular Engineering', 'quantity': 1.0, 'rate': 28000.0, 'gst': 18.0, 'additionalDetails': 'NextJS Frontend + Node Backend Wiring'},
-          {'description': 'Cloud Setup & Devops Configs', 'quantity': 1.0, 'rate': 7000.0, 'gst': 18.0, 'additionalDetails': 'CI/CD Pipelines, AWS deployment setup'},
+          {
+            'description': 'Enterprise Web Suite - Modular Engineering',
+            'quantity': 1.0,
+            'rate': 28000.0,
+            'gst': 18.0,
+            'additionalDetails': 'NextJS Frontend + Node Backend Wiring',
+          },
+          {
+            'description': 'Cloud Setup & Devops Configs',
+            'quantity': 1.0,
+            'rate': 7000.0,
+            'gst': 18.0,
+            'additionalDetails': 'CI/CD Pipelines, AWS deployment setup',
+          },
         ];
       } else {
         _proposalItems = [
-          {'description': 'Mobile App UI/UX Mockups & Interactive Prototype', 'quantity': 1.0, 'rate': 10000.0, 'gst': 18.0, 'additionalDetails': 'Figma deliverables and design tokens'},
-          {'description': 'Consultation & System Architecture Plan', 'quantity': 1.0, 'rate': 5000.0, 'gst': 18.0, 'additionalDetails': 'Database and schema diagrams'},
+          {
+            'description': 'Mobile App UI/UX Mockups & Interactive Prototype',
+            'quantity': 1.0,
+            'rate': 10000.0,
+            'gst': 18.0,
+            'additionalDetails': 'Figma deliverables and design tokens',
+          },
+          {
+            'description': 'Consultation & System Architecture Plan',
+            'quantity': 1.0,
+            'rate': 5000.0,
+            'gst': 18.0,
+            'additionalDetails': 'Database and schema diagrams',
+          },
         ];
       }
     }
@@ -229,21 +267,29 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
-    
-    final String initialTemplate = authController.tenantInfo.value?['quotationTemplate'] ?? 
-                                   authController.tenantInfo.value?['templatePreference'] ?? 
-                                   authController.tenantInfo.value?['selectedTemplate'] ?? 'standard';
-                                   
-    _selectedTemplate = widget.templateId?.isNotEmpty == true ? widget.templateId! : initialTemplate;
+
+    final String initialTemplate =
+        authController.tenantInfo.value?['quotationTemplate'] ??
+        authController.tenantInfo.value?['templatePreference'] ??
+        authController.tenantInfo.value?['selectedTemplate'] ??
+        'standard';
+
+    _selectedTemplate = widget.templateId?.isNotEmpty == true
+        ? widget.templateId!
+        : initialTemplate;
 
     authController.fetchTenantSettings().then((_) {
       if (mounted) {
         setState(() {
           _updateTenantInfo();
-          final String updatedTemplate = authController.tenantInfo.value?['quotationTemplate'] ?? 
-                                         authController.tenantInfo.value?['templatePreference'] ?? 
-                                         authController.tenantInfo.value?['selectedTemplate'] ?? 'standard';
-          _selectedTemplate = widget.templateId?.isNotEmpty == true ? widget.templateId! : updatedTemplate;
+          final String updatedTemplate =
+              authController.tenantInfo.value?['quotationTemplate'] ??
+              authController.tenantInfo.value?['templatePreference'] ??
+              authController.tenantInfo.value?['selectedTemplate'] ??
+              'standard';
+          _selectedTemplate = widget.templateId?.isNotEmpty == true
+              ? widget.templateId!
+              : updatedTemplate;
           _isTemplateLoading = false;
         });
       }
@@ -348,7 +394,9 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AnimatedDocumentLoader(message: 'Compiling premium proposal document...'),
+      builder: (context) => AnimatedDocumentLoader(
+        message: 'Compiling premium proposal document...',
+      ),
     );
 
     try {
@@ -395,13 +443,14 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
           ),
         );
 
-        final Uint8List imageBytes = await screenshotController.captureFromWidget(
-          previewWidget,
-          delay: const Duration(milliseconds: 250),
-          pixelRatio: 4.0,
-          context: context,
-          targetSize: const Size(794, 1123),
-        );
+        final Uint8List imageBytes = await screenshotController
+            .captureFromWidget(
+              previewWidget,
+              delay: const Duration(milliseconds: 250),
+              pixelRatio: 4.0,
+              context: context,
+              targetSize: const Size(794, 1123),
+            );
 
         final image = pw.MemoryImage(imageBytes);
 
@@ -413,10 +462,7 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
               return pw.Stack(
                 children: [
                   pw.Positioned.fill(
-                    child: pw.Image(
-                      image,
-                      fit: pw.BoxFit.fill,
-                    ),
+                    child: pw.Image(image, fit: pw.BoxFit.fill),
                   ),
                 ],
               );
@@ -427,7 +473,9 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
 
       final pdfBytes = await pdf.save();
 
-      if (action == 'Print Invoice' || action == 'Download PDF' || action == 'Print Quotation') {
+      if (action == 'Print Invoice' ||
+          action == 'Download PDF' ||
+          action == 'Print Quotation') {
         navigator.pop();
         await Printing.layoutPdf(
           format: PdfPageFormat.a4,
@@ -440,11 +488,16 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
         );
       } else {
         final tempDir = await getTemporaryDirectory();
-        final safeId = widget.quotationId.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
+        final safeId = widget.quotationId.replaceAll(
+          RegExp(r'[^a-zA-Z0-9]'),
+          '_',
+        );
         final file = File('${tempDir.path}/Quotation_$safeId.pdf');
         await file.writeAsBytes(pdfBytes);
         navigator.pop();
-        await Share.shareXFiles([XFile(file.path)], text: 'Here is your quotation.');
+        await Share.shareXFiles([
+          XFile(file.path),
+        ], text: 'Here is your quotation.');
       }
     } catch (e) {
       navigator.pop();
@@ -596,11 +649,14 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
 
   void _triggerAction(String actionName) {
     if (actionName == 'WhatsApp') {
-      String phone = (widget.clientPhone ?? '').replaceAll(RegExp(r'[^0-9+]'), '');
+      String phone = (widget.clientPhone ?? '').replaceAll(
+        RegExp(r'[^0-9+]'),
+        '',
+      );
       if (phone.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Client phone number is missing.'),
+          SnackBar(
+            content: Text('client_phone_number_is_missing'.tr),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -612,13 +668,19 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
       } else if (phone.length == 10) {
         phone = '91$phone'; // Default to India if 10 digits
       }
-      
-      final String link = '${ApiConstants.publicWebUrl}/public/quotation/${widget.dbId}';
-      final String message = 'Hello ${widget.clientName},\n\nHere is your proposal *${widget.quotationId}* for the amount of *Rs ${widget.amount}*.\n\nYou can view and download it here:\n$link\n\nThank you!';
-      
-      final String url = 'https://wa.me/$phone?text=${Uri.encodeComponent(message)}';
-      
-      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication).catchError((e) {
+
+      final String link =
+          '${ApiConstants.publicWebUrl}/public/quotation/${widget.dbId}';
+      final String message =
+          'Hello ${widget.clientName},\n\nHere is your proposal *${widget.quotationId}* for the amount of *Rs ${widget.amount}*.\n\nYou can view and download it here:\n$link\n\nThank you!';
+
+      final String url =
+          'https://wa.me/$phone?text=${Uri.encodeComponent(message)}';
+
+      launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      ).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Could not open WhatsApp: $e'),
@@ -644,8 +706,8 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
     String email = widget.clientEmail ?? '';
     if (email.isEmpty || email == 'billing@client.com') {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Client email address is missing.'),
+        SnackBar(
+          content: Text('client_email_address_is_missing'.tr),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
@@ -656,22 +718,24 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AnimatedDocumentLoader(message: 'Sending quotation via email...'),
+      builder: (context) => const AnimatedDocumentLoader(
+        message: 'Sending quotation via email...',
+      ),
     );
 
     final clientsController = Get.isRegistered<ClientsController>()
         ? Get.find<ClientsController>()
         : Get.put(ClientsController());
     final errorMsg = await clientsController.sendQuotationEmail(widget.dbId);
-    
+
     if (mounted) {
       Navigator.pop(context); // Dismiss loader
     }
 
     if (errorMsg == null) {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Quotation sent successfully via email.'),
+        SnackBar(
+          content: Text('quotation_sent_successfully_via_email'.tr),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
@@ -689,11 +753,12 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
 
   // --- ACTIONS HEADER PANEL ---
   Widget _buildActionBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outline)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -703,10 +768,10 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
               onTap: () => _triggerAction('WhatsApp'),
               icon: LucideIcons.messageCircle,
               label: 'WhatsApp',
-              iconColor: const Color(0xFF059669),
-              textColor: const Color(0xFF059669),
-              backgroundColor: const Color(0xFFECFDF5),
-              borderColor: const Color(0xFFD1FAE5),
+              iconColor: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+              textColor: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+              backgroundColor: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
+              borderColor: isDark ? const Color(0xFF065F46) : const Color(0xFFD1FAE5),
             ),
           ),
           const SizedBox(width: 6),
@@ -715,24 +780,28 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
               onTap: () => _triggerAction('Email'),
               icon: LucideIcons.mail,
               label: 'Email',
-              iconColor: const Color(0xFF2563EB),
-              textColor: const Color(0xFF2563EB),
-              backgroundColor: const Color(0xFFEFF6FF),
-              borderColor: const Color(0xFFDBEAFE),
+              iconColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+              textColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+              backgroundColor: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+              borderColor: isDark ? const Color(0xFF1E40AF) : const Color(0xFFDBEAFE),
             ),
           ),
           const SizedBox(width: 8),
-          Container(width: 1, height: 24, color: const Color(0xFFE2E8F0)), // Divider
+          Container(
+            width: 1,
+            height: 24,
+            color: Theme.of(context).colorScheme.outline,
+          ), // Divider
           const SizedBox(width: 8),
           Expanded(
             child: DynamicActionButton(
               onTap: () => _triggerAction('Share'),
               icon: LucideIcons.share2,
               label: 'Share',
-              iconColor: const Color(0xFF475569),
-              textColor: const Color(0xFF0F172A),
-              backgroundColor: Colors.white,
-              borderColor: const Color(0xFFE2E8F0),
+              iconColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+              textColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              borderColor: Theme.of(context).colorScheme.outline,
             ),
           ),
           const SizedBox(width: 6),
@@ -751,7 +820,6 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
       ),
     );
   }
-
 
   // --- HORIZONTAL TEMPLATE SELECTOR WIDGET ---
   Widget _buildTemplateSelector() {
@@ -802,9 +870,9 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
 
     return Container(
       height: 94,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3))),
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -838,12 +906,17 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         width: 100,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
-                          color: isSelected ? activeColor.withOpacity(0.08) : Colors.white,
+                          color: isSelected
+                              ? activeColor.withOpacity(0.08)
+                              : Theme.of(context).cardTheme.color,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isSelected ? activeColor : AppColors.border,
+                            color: isSelected ? activeColor : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                             width: isSelected ? 2 : 1,
                           ),
                           boxShadow: isSelected
@@ -869,8 +942,12 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                               temp['name'] as String,
                               style: TextStyle(
                                 fontSize: 11,
-                                fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-                                color: isSelected ? activeColor : AppColors.textSecondary,
+                                fontWeight: isSelected
+                                    ? FontWeight.w900
+                                    : FontWeight.bold,
+                                color: isSelected
+                                    ? activeColor
+                                    : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                               ),
                               textAlign: TextAlign.center,
                               maxLines: 1,
@@ -940,9 +1017,9 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leadingWidth: 48,
         titleSpacing: 4,
@@ -955,11 +1032,15 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
               child: Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF8FAFC),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).cardTheme.color,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(LucideIcons.arrowLeft, color: Color(0xFF0F172A), size: 18),
+                child: Icon(
+                  LucideIcons.arrowLeft,
+                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                  size: 18,
+                ),
               ),
             ),
           ),
@@ -969,8 +1050,8 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
           children: [
             Text(
               widget.quotationId,
-              style: const TextStyle(
-                color: Color(0xFF0F172A),
+              style: TextStyle(
+                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                 fontWeight: FontWeight.w900,
                 fontSize: 18,
               ),
@@ -978,11 +1059,7 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Icon(
-                  LucideIcons.hexagon,
-                  size: 10,
-                  color: Color(0xFF6366F1),
-                ),
+                Icon(LucideIcons.hexagon, size: 10, color: Color(0xFF6366F1)),
                 SizedBox(width: 4),
                 Text(
                   'AURIVA PROPOSAL',
@@ -1005,20 +1082,27 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
               onTap: () => _triggerAction('Print Quotation'),
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                 ),
                 child: Row(
-                  children: const [
-                    Icon(LucideIcons.printer, size: 14, color: Color(0xFF0F172A)),
-                    SizedBox(width: 6),
+                  children: [
+                    Icon(
+                      LucideIcons.printer,
+                      size: 14,
+                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                    ),
+                    const SizedBox(width: 6),
                     Text(
                       'Print',
                       style: TextStyle(
-                        color: Color(0xFF0F172A),
+                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -1032,90 +1116,95 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
         ],
       ),
       body: Column(
-              children: [
-                _buildActionBar(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Center(
-                      child: Column(
+        children: [
+          _buildActionBar(),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: Column(
+                  children: [
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.04),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primary.withOpacity(0.1),
+                        ),
+                      ),
+                      child: Row(
                         children: [
-                          Container(
-                            constraints: const BoxConstraints(maxWidth: 800),
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.04),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.primary.withOpacity(0.1)),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  LucideIcons.monitor,
-                                  size: 14,
-                                  color: AppColors.primary,
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'A4 LIVE PREVIEW CANVAS',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.primary,
-                                    letterSpacing: 1.0,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Container(
-                                  width: 6,
-                                  height: 6,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.green,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                const Text(
-                                  'Interactive Scaling',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    color: Colors.grey,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
+                          Icon(
+                            LucideIcons.monitor,
+                            size: 14,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'A4 LIVE PREVIEW CANVAS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                              letterSpacing: 1.0,
                             ),
                           ),
+                          const Spacer(),
                           Container(
-                            constraints: const BoxConstraints(maxWidth: 800),
+                            width: 6,
+                            height: 6,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppColors.border),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                )
-                              ],
+                              shape: BoxShape.circle,
+                              color: Colors.green,
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Skeletonizer(
-                                enabled: _isTemplateLoading,
-                                child: _buildResponsiveTemplateWrapper(),
-                              ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Interactive Scaling',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ),
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Theme.of(context).colorScheme.outline),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Skeletonizer(
+                          enabled: _isTemplateLoading,
+                          child: _buildResponsiveTemplateWrapper(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1129,15 +1218,22 @@ class FadeInUp extends StatefulWidget {
   State<FadeInUp> createState() => _FadeInUpState();
 }
 
-class _FadeInUpState extends State<FadeInUp> with SingleTickerProviderStateMixin {
+class _FadeInUpState extends State<FadeInUp>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
-    _animation = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutCubic,
+    );
     Future.delayed(widget.delay, () => _controller.forward());
   }
 
@@ -1152,7 +1248,10 @@ class _FadeInUpState extends State<FadeInUp> with SingleTickerProviderStateMixin
     return FadeTransition(
       opacity: _animation,
       child: SlideTransition(
-        position: Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(_animation),
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.1),
+          end: Offset.zero,
+        ).animate(_animation),
         child: widget.child,
       ),
     );
@@ -1168,7 +1267,8 @@ class ScaleOnPress extends StatefulWidget {
   State<ScaleOnPress> createState() => _ScaleOnPressState();
 }
 
-class _ScaleOnPressState extends State<ScaleOnPress> with SingleTickerProviderStateMixin {
+class _ScaleOnPressState extends State<ScaleOnPress>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
@@ -1179,9 +1279,10 @@ class _ScaleOnPressState extends State<ScaleOnPress> with SingleTickerProviderSt
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
   @override
@@ -1197,10 +1298,7 @@ class _ScaleOnPressState extends State<ScaleOnPress> with SingleTickerProviderSt
       onTapUp: (_) => _controller.reverse(),
       onTapCancel: () => _controller.reverse(),
       onTap: widget.onTap,
-      child: ScaleTransition(
-        scale: _scaleAnimation,
-        child: widget.child,
-      ),
+      child: ScaleTransition(scale: _scaleAnimation, child: widget.child),
     );
   }
 }
@@ -1213,7 +1311,8 @@ class PulsingStatusBadge extends StatefulWidget {
   State<PulsingStatusBadge> createState() => _PulsingStatusBadgeState();
 }
 
-class _PulsingStatusBadgeState extends State<PulsingStatusBadge> with SingleTickerProviderStateMixin {
+class _PulsingStatusBadgeState extends State<PulsingStatusBadge>
+    with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
@@ -1224,7 +1323,7 @@ class _PulsingStatusBadgeState extends State<PulsingStatusBadge> with SingleTick
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
-    
+
     _pulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
@@ -1247,7 +1346,7 @@ class _PulsingStatusBadgeState extends State<PulsingStatusBadge> with SingleTick
     } else {
       baseColor = AppColors.warning;
     }
-    
+
     return AnimatedBuilder(
       animation: _pulseAnimation,
       builder: (context, child) {
@@ -1265,7 +1364,7 @@ class _PulsingStatusBadgeState extends State<PulsingStatusBadge> with SingleTick
                 color: baseColor.withOpacity(0.15 * _pulseAnimation.value),
                 blurRadius: 8,
                 spreadRadius: 1,
-              )
+              ),
             ],
           ),
           child: Row(
@@ -1282,7 +1381,7 @@ class _PulsingStatusBadgeState extends State<PulsingStatusBadge> with SingleTick
                       color: baseColor.withOpacity(0.6),
                       blurRadius: 4,
                       spreadRadius: 1 * _pulseAnimation.value,
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -1330,7 +1429,8 @@ class DynamicActionButton extends StatefulWidget {
   State<DynamicActionButton> createState() => _DynamicActionButtonState();
 }
 
-class _DynamicActionButtonState extends State<DynamicActionButton> with SingleTickerProviderStateMixin {
+class _DynamicActionButtonState extends State<DynamicActionButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
@@ -1341,9 +1441,10 @@ class _DynamicActionButtonState extends State<DynamicActionButton> with SingleTi
       vsync: this,
       duration: const Duration(milliseconds: 100),
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
   @override
@@ -1364,13 +1465,23 @@ class _DynamicActionButtonState extends State<DynamicActionButton> with SingleTi
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
           decoration: BoxDecoration(
-            color: widget.gradientColors == null ? (widget.backgroundColor ?? Colors.white) : null,
-            gradient: widget.gradientColors != null ? LinearGradient(colors: widget.gradientColors!) : null,
+            color: widget.gradientColors == null
+                ? (widget.backgroundColor ?? Theme.of(context).cardTheme.color)
+                : null,
+            gradient: widget.gradientColors != null
+                ? LinearGradient(colors: widget.gradientColors!)
+                : null,
             borderRadius: BorderRadius.circular(10),
-            border: widget.borderColor != null ? Border.all(color: widget.borderColor!) : null,
+            border: widget.borderColor != null
+                ? Border.all(color: widget.borderColor!)
+                : null,
             boxShadow: [
               BoxShadow(
-                color: (widget.gradientColors != null ? widget.gradientColors![0] : (widget.backgroundColor ?? Colors.black)).withValues(alpha: 0.08),
+                color:
+                    (widget.gradientColors != null
+                            ? widget.gradientColors![0]
+                            : (widget.backgroundColor ?? Colors.black))
+                        .withValues(alpha: 0.08),
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
@@ -1385,7 +1496,7 @@ class _DynamicActionButtonState extends State<DynamicActionButton> with SingleTi
                 child: Text(
                   widget.label,
                   style: TextStyle(
-                    color: widget.textColor ?? AppColors.textPrimary,
+                    color: widget.textColor ?? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),

@@ -5,6 +5,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/services/notification_service.dart';
 import '../../navigation/app_routes.dart';
@@ -37,13 +38,15 @@ class AuthController extends GetxController {
       userId.value = await _storage.read(key: 'user_id') ?? '';
       userSignature.value = await _storage.read(key: 'user_signature') ?? '';
       fetchTenantSettings();
-      
+
       // Register Device for Push Notifications
       NotificationService.registerDeviceWithBackend();
       NotificationService.setExternalIdAndTags(userId.value, userEmail.value);
-      
+
       // Auto login and navigate to main dashboard only if we are currently on the login or root screen
-      if (Get.currentRoute == AppRoutes.login || Get.currentRoute == '/' || Get.currentRoute.isEmpty) {
+      if (Get.currentRoute == AppRoutes.login ||
+          Get.currentRoute == '/' ||
+          Get.currentRoute.isEmpty) {
         // Handled by splash screen or manual check now to avoid race conditions
       }
     }
@@ -51,17 +54,17 @@ class AuthController extends GetxController {
 
   Future<void> determineInitialRoute() async {
     await checkLoginStatus();
-    
+
     // Add a small delay to allow splash animation to show
     await Future.delayed(const Duration(seconds: 2));
-    
+
     final hasSeenOnboarding = await _storage.read(key: 'has_seen_onboarding');
-    
+
     if (hasSeenOnboarding != 'true') {
       Get.offAllNamed(AppRoutes.onboarding);
     } else if (token.value.isNotEmpty) {
-      if (userRole.value.toLowerCase().contains('superadmin') || 
-          userRole.value.toLowerCase().contains('super_admin') || 
+      if (userRole.value.toLowerCase().contains('superadmin') ||
+          userRole.value.toLowerCase().contains('super_admin') ||
           userEmail.value.toLowerCase() == 'riva@auriva.in') {
         Get.offAllNamed(AppRoutes.superAdminMain);
       } else {
@@ -80,13 +83,15 @@ class AuthController extends GetxController {
   Future<void> fetchTenantSettings() async {
     if (token.isEmpty) return;
     try {
-      final response = await http.get(
-        Uri.parse(ApiConstants.baseUrl + ApiConstants.settings),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${token.value}',
-        },
-      ).timeout(const Duration(seconds: 5));
+      final response = await http
+          .get(
+            Uri.parse(ApiConstants.baseUrl + ApiConstants.settings),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ${token.value}',
+            },
+          )
+          .timeout(const Duration(seconds: 5));
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 200 && data['success'] == true) {
@@ -100,14 +105,13 @@ class AuthController extends GetxController {
   Future<bool> login(String email, String password) async {
     try {
       isLoading.value = true;
-      final response = await http.post(
-        Uri.parse(ApiConstants.baseUrl + ApiConstants.login),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      ).timeout(const Duration(seconds: 5));
+      final response = await http
+          .post(
+            Uri.parse(ApiConstants.baseUrl + ApiConstants.login),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email, 'password': password}),
+          )
+          .timeout(const Duration(seconds: 5));
 
       final data = jsonDecode(response.body);
 
@@ -143,17 +147,31 @@ class AuthController extends GetxController {
         NotificationService.registerDeviceWithBackend();
         NotificationService.setExternalIdAndTags(userId.value, userEmail.value);
 
+        // Request essential permissions on login
+        try {
+          await [
+            Permission.notification,
+            Permission.camera,
+            Permission.storage,
+            Permission.sms,
+            Permission.phone,
+            Permission.contacts,
+          ].request();
+        } catch (e) {
+          debugPrint('Error requesting permissions: $e');
+        }
+
         Fluttertoast.showToast(
           msg: "Welcome back, ${user['name']}!",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
-          backgroundColor: const Color(0xFF10B981),
+          backgroundColor: Color(0xFF10B981),
           textColor: Colors.white,
           fontSize: 14.0,
         );
 
-        if (userRole.value.toLowerCase().contains('superadmin') || 
-            userRole.value.toLowerCase().contains('super_admin') || 
+        if (userRole.value.toLowerCase().contains('superadmin') ||
+            userRole.value.toLowerCase().contains('super_admin') ||
             userEmail.value.toLowerCase() == 'riva@auriva.in') {
           Get.offAllNamed(AppRoutes.superAdminMain);
         } else {
@@ -166,7 +184,7 @@ class AuthController extends GetxController {
           msg: msg,
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM,
-          backgroundColor: const Color(0xFFEF4444),
+          backgroundColor: Color(0xFFEF4444),
           textColor: Colors.white,
           fontSize: 14.0,
         );
@@ -174,10 +192,11 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       Fluttertoast.showToast(
-        msg: "Connection Failed: Please ensure server is running and accessible.",
+        msg:
+            "Connection Failed: Please ensure server is running and accessible.",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
-        backgroundColor: const Color(0xFFEF4444),
+        backgroundColor: Color(0xFFEF4444),
         textColor: Colors.white,
         fontSize: 14.0,
       );
@@ -202,13 +221,13 @@ class AuthController extends GetxController {
     await _storage.delete(key: 'user_signature');
     await _storage.delete(key: 'app_lang_code');
     await _storage.delete(key: 'app_country_code');
-    
+
     // Reset locale to English
     Get.updateLocale(const Locale('en', 'US'));
-    
+
     // Log out from OneSignal
     OneSignal.logout();
-    
+
     Get.offAllNamed(AppRoutes.login);
   }
 
@@ -217,4 +236,3 @@ class AuthController extends GetxController {
     await _storage.write(key: 'user_signature', value: signatureBase64);
   }
 }
-

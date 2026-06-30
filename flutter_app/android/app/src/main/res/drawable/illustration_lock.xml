@@ -1,0 +1,59 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <!-- Shadow/Background Circle (Optional) -->
+    <path
+        android:fillColor="#E0F2FE"
+        android:pathData="M32,32m-28,0a28,28 0,1 1,56 0a28,28 0,1 1,-56 0" />
+
+    <!-- Lock Shackle (Silver) -->
+    <path
+        android:strokeColor="#94A3B8"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:pathData="M24,28 v-6 a8,8 0 0,1 16,0 v6" />
+
+    <!-- Lock Body (Blue) -->
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M16,28 h32 a6,6 0 0,1 6,6 v16 a6,6 0 0,1 -6,6 h-32 a6,6 0 0,1 -6,-6 v-16 a6,6 0 0,1 6,-6 z" />
+
+    <!-- Lock Keyhole (White) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32,38m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,39 l4,0 l-1.5,5 l-1,0 z" />
+
+    <!-- User Credentials Card / Info Card -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,34 h18 a4,4 0 0,1 4,4 v14 a4,4 0 0,1 -4,4 h-18 a4,4 0 0,1 -4,-4 v-14 a4,4 0 0,1 4,-4 z" />
+    
+    <!-- User Avatar Circle -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M45,41m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+
+    <!-- Text line placeholders -->
+    <path
+        android:strokeColor="#CBD5E1"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M42,47 h6 M40,51 h10" />
+
+    <!-- Green Check Badge -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M52,48m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M49.5,48 l1.5,1.5 l3,-3" />
+</vector>

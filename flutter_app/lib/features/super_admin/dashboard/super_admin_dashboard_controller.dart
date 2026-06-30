@@ -34,7 +34,11 @@ class SuperAdminDashboardController extends GetxController {
           final List list = data['data'];
           tenantsList.value = list
               .map((e) => TenantModel.fromJson(e))
-              .where((t) => t.email.toLowerCase() != 'riva@auriva.in' && t.name.toLowerCase() != 'platform hq') // filter main admin
+              .where(
+                (t) =>
+                    t.email.toLowerCase() != 'riva@auriva.in' &&
+                    t.name.toLowerCase() != 'platform hq',
+              ) // filter main admin
               .toList();
         }
       }
@@ -69,15 +73,26 @@ class SuperAdminDashboardController extends GetxController {
 
   Future<void> deleteCompany(String tenantId) async {
     try {
-      Get.dialog(Center(child: CircularProgressIndicator()), barrierDismissible: false);
+      Get.dialog(
+        Center(child: CircularProgressIndicator()),
+        barrierDismissible: false,
+      );
       final response = await ApiService.delete('/auth/tenants/$tenantId');
       if (Get.isDialogOpen ?? false) Get.back(); // close loading
 
       if (response.statusCode == 200) {
-        Get.snackbar('Success', 'Company and all associated data deleted successfully', backgroundColor: Colors.green.shade100);
+        Get.snackbar(
+          'Success',
+          'Company and all associated data deleted successfully',
+          backgroundColor: Colors.green.shade100,
+        );
         fetchDashboardData(); // Refresh the list
       } else {
-        Get.snackbar('Error', 'Failed to delete company', backgroundColor: Colors.red.shade100);
+        Get.snackbar(
+          'Error',
+          'Failed to delete company',
+          backgroundColor: Colors.red.shade100,
+        );
       }
     } catch (e) {
       if (Get.isDialogOpen ?? false) Get.back(); // close loading
@@ -94,9 +109,12 @@ class SuperAdminDashboardController extends GetxController {
       return tenantsList;
     }
     final q = searchQuery.value.toLowerCase();
-    return tenantsList.where((t) => 
-      t.name.toLowerCase().contains(q) ||
-      t.email.toLowerCase().contains(q)
-    ).toList();
+    return tenantsList
+        .where(
+          (t) =>
+              t.name.toLowerCase().contains(q) ||
+              t.email.toLowerCase().contains(q),
+        )
+        .toList();
   }
 }

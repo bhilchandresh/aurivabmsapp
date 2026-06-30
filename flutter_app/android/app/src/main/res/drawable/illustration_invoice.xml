@@ -1,0 +1,56 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <!-- Shadow/Background Circle (Optional) -->
+    <path
+        android:fillColor="#E0E7FF"
+        android:pathData="M32,32m-28,0a28,28 0,1 1,56 0a28,28 0,1 1,-56 0" />
+
+    <!-- Invoice Card Base -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M16,12 h32 a4,4 0 0,1 4,4 v36 a4,4 0 0,1 -4,4 h-32 a4,4 0 0,1 -4,-4 v-36 a4,4 0 0,1 4,-4 z" />
+    
+    <!-- Header background -->
+    <path
+        android:fillColor="#2563EB"
+        android:pathData="M16,12 h32 a4,4 0 0,1 4,4 v8 h-40 v-8 a4,4 0 0,1 4,-4 z" />
+
+    <!-- INVOICE TEXT Placeholder (White lines on header) -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M18,18 h20" />
+
+    <!-- Document Lines -->
+    <path
+        android:strokeColor="#94A3B8"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:pathData="M18,30 h28 M18,36 h28 M18,42 h16" />
+
+    <!-- Price Box -->
+    <path
+        android:fillColor="#F1F5F9"
+        android:pathData="M34,40 h14 a2,2 0 0,1 2,2 v6 a2,2 0 0,1 -2,2 h-14 a2,2 0 0,1 -2,-2 v-6 a2,2 0 0,1 2,-2 z" />
+    <path
+        android:strokeColor="#0F172A"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M37,45 h8" />
+
+    <!-- Green Check Badge -->
+    <path
+        android:fillColor="#10B981"
+        android:pathData="M44,48m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M41.5,48 l1.5,1.5 l3,-3" />
+</vector>

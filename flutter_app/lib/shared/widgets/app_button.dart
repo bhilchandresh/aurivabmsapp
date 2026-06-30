@@ -52,10 +52,7 @@ class AppButton extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (icon != null) ...[
-                    const SizedBox(width: 8),
-                    icon!,
-                  ],
+                  if (icon != null) ...[const SizedBox(width: 8), icon!],
                 ],
               ),
       ),

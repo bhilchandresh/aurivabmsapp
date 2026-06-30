@@ -1,15 +1,20 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:screenshot/screenshot.dart';
+import 'package:path_provider/path_provider.dart';
+import '../../shared/widgets/custom_notification_overlay.dart';
 import '../utils/api_service.dart';
 
 class NotificationService {
   // Use the App ID provided by the user
   static const String _oneSignalAppId = "ae78db29-5631-45b0-b385-d288de528141";
-  
-  static final FlutterLocalNotificationsPlugin _localNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+  static final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
   static Future<void> init() async {
     // Remove this method to stop OneSignal Debugging
@@ -20,21 +25,34 @@ class NotificationService {
     OneSignal.initialize(_oneSignalAppId);
 
     // Initialize Local Notifications
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings();
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings();
+    const InitializationSettings initializationSettings =
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
+    await _localNotificationsPlugin.initialize(
+      settings: initializationSettings,
     );
-    await _localNotificationsPlugin.initialize(settings: initializationSettings);
 
     // Request permissions
     await OneSignal.Notifications.requestPermission(true);
 
     if (Platform.isAndroid) {
-      _localNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.requestNotificationsPermission();
+      _localNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.requestNotificationsPermission();
     } else if (Platform.isIOS) {
-      _localNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(alert: true, badge: true, sound: true);
+      _localNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin
+          >()
+          ?.requestPermissions(alert: true, badge: true, sound: true);
     }
 
     // Optional: Add listeners for notifications
@@ -57,41 +75,47 @@ class NotificationService {
       if (kDebugMode) {
         print('PUSH SUBSCRIPTION STATE CHANGED: ${state.current.id}');
       }
-      
+
       // If the subscription ID changes and we have it, register with backend immediately
       if (state.current.id?.isNotEmpty == true) {
-         registerDeviceWithBackend();
+        registerDeviceWithBackend();
       }
     });
   }
 
-  static const MethodChannel _channel = MethodChannel('com.aurivabms.app/notifications');
-
   /// Shows a local notification in the system tray
-  static Future<void> showLocalNotification({required int id, required String title, required String body}) async {
+  static Future<void> showLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? chipText,
+    String? illustrationType,
+  }) async {
     try {
-      if (Platform.isAndroid) {
-        await _channel.invokeMethod('showCustomNotification', {
-          'id': id,
-          'title': title,
-          'body': body,
-        });
-      } else {
-        const DarwinNotificationDetails iosPlatformChannelSpecifics = DarwinNotificationDetails();
-        const NotificationDetails platformChannelSpecifics = NotificationDetails(
-          iOS: iosPlatformChannelSpecifics,
-        );
-        
-        await _localNotificationsPlugin.show(
-          id: id,
-          title: title,
-          body: body,
-          notificationDetails: platformChannelSpecifics,
-        );
-      }
+      const AndroidNotificationDetails androidPlatformChannelSpecifics =
+          AndroidNotificationDetails(
+        'aurivabms_channel',
+        'AurivaBMS Notifications',
+        importance: Importance.max,
+        priority: Priority.high,
+        icon: '@mipmap/launcher_icon',
+      );
+      const DarwinNotificationDetails iosPlatformChannelSpecifics =
+          DarwinNotificationDetails();
+      const NotificationDetails platformChannelSpecifics = NotificationDetails(
+        android: androidPlatformChannelSpecifics,
+        iOS: iosPlatformChannelSpecifics,
+      );
+
+      await _localNotificationsPlugin.show(
+        id: id,
+        title: title,
+        body: body,
+        notificationDetails: platformChannelSpecifics,
+      );
     } catch (e) {
       if (kDebugMode) {
-        print('Error showing custom notification: $e');
+        print('Error showing standard notification: $e');
       }
     }
   }
@@ -106,25 +130,33 @@ class NotificationService {
     final playerId = getPlayerId();
     if (playerId == null || playerId.isEmpty) {
       if (kDebugMode) {
-        print('NotificationService: Player ID is null. Cannot register with backend.');
+        print(
+          'NotificationService: Player ID is null. Cannot register with backend.',
+        );
       }
       return;
     }
 
     String platform = 'web';
     if (!kIsWeb) {
-      platform = Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'unknown');
+      platform = Platform.isAndroid
+          ? 'android'
+          : (Platform.isIOS ? 'ios' : 'unknown');
     }
 
     try {
       final response = await ApiService.registerDeviceToken(playerId, platform);
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (kDebugMode) {
-          print('NotificationService: Device registered successfully with backend.');
+          print(
+            'NotificationService: Device registered successfully with backend.',
+          );
         }
       } else {
         if (kDebugMode) {
-          print('NotificationService: Failed to register device. Status code: ${response.statusCode}');
+          print(
+            'NotificationService: Failed to register device. Status code: ${response.statusCode}',
+          );
         }
       }
     } catch (e) {

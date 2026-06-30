@@ -27,17 +27,23 @@ class ModernTemplate extends StatelessWidget {
     this.isOffline = false,
   });
 
-  Widget? _buildLogoWidget(String? logoImage, {double height = 50, bool invert = false}) {
+  Widget? _buildLogoWidget(
+    String? logoImage, {
+    double height = 50,
+    bool invert = false,
+  }) {
     if (logoImage == null || logoImage.isEmpty) {
       return null;
     }
-    
+
     final imageColor = invert ? Colors.white : null;
     final blendMode = invert ? BlendMode.srcIn : null;
 
     if (logoImage.startsWith('data:image') || !logoImage.startsWith('http')) {
       try {
-        final base64Str = logoImage.contains(',') ? logoImage.split(',')[1] : logoImage;
+        final base64Str = logoImage.contains(',')
+            ? logoImage.split(',')[1]
+            : logoImage;
         return Image.memory(
           base64Decode(base64Str),
           height: height,
@@ -69,7 +75,7 @@ class ModernTemplate extends StatelessWidget {
           width: 50,
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.w500,
               color: Colors.grey,
@@ -83,7 +89,7 @@ class ModernTemplate extends StatelessWidget {
             style: TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF0F172A),
+              color: Color(0xFF0F172A),
               fontFamily: isMono ? 'monospace' : null,
             ),
           ),
@@ -94,7 +100,9 @@ class ModernTemplate extends StatelessWidget {
 
   Widget _buildPaymentDetailsCard() {
     final bank = params.bankDetails;
-    final hasBank = bank['accountNumber'] != null && bank['accountNumber']!.toString().isNotEmpty;
+    final hasBank =
+        bank['accountNumber'] != null &&
+        bank['accountNumber']!.toString().isNotEmpty;
 
     Widget buildCardRow(String label, String value, {bool isMono = false}) {
       return Padding(
@@ -104,14 +112,14 @@ class ModernTemplate extends StatelessWidget {
           children: [
             Text(
               label,
-              style: const TextStyle(fontSize: 9, color: Colors.grey),
+              style: TextStyle(fontSize: 9, color: Colors.grey),
             ),
             Text(
               value,
               style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF0F172A),
+                color: Color(0xFF0F172A),
                 fontFamily: isMono ? 'monospace' : null,
               ),
             ),
@@ -122,8 +130,8 @@ class ModernTemplate extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        color: Color(0xFFF8FAFC),
+        border: Border.all(color: Color(0xFFE2E8F0)),
         borderRadius: BorderRadius.circular(6),
       ),
       padding: const EdgeInsets.all(12),
@@ -131,7 +139,7 @@ class ModernTemplate extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
               ),
@@ -140,7 +148,11 @@ class ModernTemplate extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 6),
             child: Row(
               children: [
-                const Icon(LucideIcons.creditCard, color: Colors.grey, size: 12),
+                Icon(
+                  LucideIcons.creditCard,
+                  color: Colors.grey,
+                  size: 12,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   'PAYMENT DETAILS',
@@ -155,15 +167,28 @@ class ModernTemplate extends StatelessWidget {
             ),
           ),
           if (hasBank) ...[
-            if (bank['accountName'] != null && bank['accountName']!.toString().isNotEmpty)
+            if (bank['accountName'] != null &&
+                bank['accountName']!.toString().isNotEmpty)
               buildCardRow('Name:', bank['accountName']!.toString()),
             buildCardRow('Bank:', bank['bankName']?.toString() ?? ''),
-            buildCardRow('Acc No:', bank['accountNumber']?.toString() ?? '', isMono: true),
-            buildCardRow('IFSC:', bank['ifscCode']?.toString() ?? '', isMono: true),
+            buildCardRow(
+              'Acc No:',
+              bank['accountNumber']?.toString() ?? '',
+              isMono: true,
+            ),
+            buildCardRow(
+              'IFSC:',
+              bank['ifscCode']?.toString() ?? '',
+              isMono: true,
+            ),
           ] else
-            const Text(
+            Text(
               'No payment details available.',
-              style: TextStyle(fontSize: 9, color: Colors.grey, fontStyle: FontStyle.italic),
+              style: TextStyle(
+                fontSize: 9,
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ),
             ),
         ],
       ),
@@ -173,9 +198,11 @@ class ModernTemplate extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemsList = pageItems ?? params.items;
-    final showHsn = itemsList.any((item) =>
-        item['hsnCode'] != null &&
-        item['hsnCode'].toString().trim().isNotEmpty);
+    final showHsn = itemsList.any(
+      (item) =>
+          item['hsnCode'] != null &&
+          item['hsnCode'].toString().trim().isNotEmpty,
+    );
 
     return Container(
       color: Colors.white,
@@ -185,9 +212,7 @@ class ModernTemplate extends StatelessWidget {
           // Header (Solid Dark Slate)
           if (isFirstPage) ...[
             Container(
-              decoration: const BoxDecoration(
-                color: Color(0xFF0F172A),
-              ),
+              decoration: BoxDecoration(color: Color(0xFF0F172A)),
               padding: const EdgeInsets.all(24.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -201,12 +226,17 @@ class ModernTemplate extends StatelessWidget {
                         if (params.tenant['logoImage'] != null &&
                             params.tenant['logoImage']!.isNotEmpty) ...[
                           // Render logo in original colors (invert: false) or white? Web uses brightness-0 invert
-                          _buildLogoWidget(params.tenant['logoImage'], height: 40, invert: false) ?? const SizedBox.shrink(),
+                          _buildLogoWidget(
+                                params.tenant['logoImage'],
+                                height: 40,
+                                invert: false,
+                              ) ??
+                              const SizedBox.shrink(),
                           const SizedBox(height: 8),
                         ],
                         Text(
                           (params.tenant['name'] ?? '').toUpperCase(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
                             color: Colors.white,
@@ -219,12 +249,19 @@ class ModernTemplate extends StatelessWidget {
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Icon(LucideIcons.mapPin, color: Colors.white70, size: 12),
+                                Icon(
+                                  LucideIcons.mapPin,
+                                  color: Colors.white70,
+                                  size: 12,
+                                ),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
                                     params.tenant['address']!,
-                                    style: const TextStyle(color: Colors.white70, fontSize: 10),
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 10,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -239,11 +276,18 @@ class ModernTemplate extends StatelessWidget {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(LucideIcons.mail, color: Colors.white70, size: 10),
+                                    Icon(
+                                      LucideIcons.mail,
+                                      color: Colors.white70,
+                                      size: 10,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       params.tenant['email']!,
-                                      style: const TextStyle(color: Colors.white70, fontSize: 9),
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 9,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -254,11 +298,18 @@ class ModernTemplate extends StatelessWidget {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(LucideIcons.phone, color: Colors.white70, size: 10),
+                                    Icon(
+                                      LucideIcons.phone,
+                                      color: Colors.white70,
+                                      size: 10,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       params.tenant['phone']!,
-                                      style: const TextStyle(color: Colors.white70, fontSize: 9),
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 9,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -269,11 +320,18 @@ class ModernTemplate extends StatelessWidget {
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const Icon(LucideIcons.globe, color: Colors.white70, size: 10),
+                                    Icon(
+                                      LucideIcons.globe,
+                                      color: Colors.white70,
+                                      size: 10,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(
                                       params.tenant['website']!,
-                                      style: const TextStyle(color: Colors.white70, fontSize: 9),
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 9,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -285,14 +343,17 @@ class ModernTemplate extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 6),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.white30),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
                                 'GSTIN: ${params.tenant['gstNumber']}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 8,
                                   fontWeight: FontWeight.bold,
@@ -314,12 +375,12 @@ class ModernTemplate extends StatelessWidget {
                           vertical: 3,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: Color(0xFF1E293B),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           params.numberLabel.toUpperCase(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white70,
                             fontWeight: FontWeight.bold,
                             fontSize: 9,
@@ -330,7 +391,7 @@ class ModernTemplate extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         params.invoiceId,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
@@ -341,11 +402,14 @@ class ModernTemplate extends StatelessWidget {
                       Text.rich(
                         TextSpan(
                           text: 'Date: ',
-                          style: const TextStyle(color: Colors.white70, fontSize: 10),
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 10,
+                          ),
                           children: [
                             TextSpan(
                               text: formatCleanDate(params.date),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -356,12 +420,16 @@ class ModernTemplate extends StatelessWidget {
                       const SizedBox(height: 2),
                       Text.rich(
                         TextSpan(
-                          text: '${params.numberLabel.contains('Quote') ? 'Valid' : 'Due'}: ',
-                          style: const TextStyle(color: Colors.white70, fontSize: 10),
+                          text:
+                              '${params.numberLabel.contains('Quote') ? 'Valid' : 'Due'}: ',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 10,
+                          ),
                           children: [
                             TextSpan(
                               text: formatCleanDate(params.dueDate),
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -376,7 +444,7 @@ class ModernTemplate extends StatelessWidget {
             ),
           ] else ...[
             Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF0F172A), Color(0xFF334155)],
                 ),
@@ -387,7 +455,7 @@ class ModernTemplate extends StatelessWidget {
                 children: [
                   Text(
                     '${params.numberLabel}: #${params.invoiceId}',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -395,7 +463,7 @@ class ModernTemplate extends StatelessWidget {
                   ),
                   Text(
                     'Date: ${formatCleanDate(params.date)}',
-                    style: const TextStyle(fontSize: 10, color: Colors.white70),
+                    style: TextStyle(fontSize: 10, color: Colors.white70),
                   ),
                 ],
               ),
@@ -404,7 +472,10 @@ class ModernTemplate extends StatelessWidget {
 
           // Main body elements (Inner Padding wrapper)
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24.0,
+              vertical: 20.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -423,11 +494,17 @@ class ModernTemplate extends StatelessWidget {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(LucideIcons.user, color: Colors.grey, size: 12),
+                                Icon(
+                                  LucideIcons.user,
+                                  color: Colors.grey,
+                                  size: 12,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
-                                  params.numberLabel.contains('Quote') ? 'QUOTE TO' : 'BILLED TO',
-                                  style: const TextStyle(
+                                  params.numberLabel.contains('Quote')
+                                      ? 'QUOTE TO'
+                                      : 'BILLED TO',
+                                  style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey,
@@ -439,7 +516,7 @@ class ModernTemplate extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               params.clientName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
                                 color: Color(0xFF0F172A),
@@ -449,7 +526,7 @@ class ModernTemplate extends StatelessWidget {
                             if (params.clientAddress.isNotEmpty)
                               Text(
                                 params.clientAddress,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                   height: 1.3,
@@ -458,18 +535,25 @@ class ModernTemplate extends StatelessWidget {
                             if (params.clientEmail.isNotEmpty)
                               Text(
                                 params.clientEmail,
-                                style: const TextStyle(fontSize: 10, color: Colors.black54),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                ),
                               ),
                             if (params.clientPhone.isNotEmpty)
                               Text(
                                 params.clientPhone,
-                                style: const TextStyle(fontSize: 10, color: Colors.black54),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                ),
                               ),
-                            if (params.gstEnabled && params.clientGst.isNotEmpty) ...[
+                            if (params.gstEnabled &&
+                                params.clientGst.isNotEmpty) ...[
                               const SizedBox(height: 4),
                               Text(
                                 'GSTIN: ${params.clientGst}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF1E293B),
@@ -481,10 +565,7 @@ class ModernTemplate extends StatelessWidget {
                       ),
                       const SizedBox(width: 24),
                       // Payment Details Card (Right)
-                      Expanded(
-                        flex: 5,
-                        child: _buildPaymentDetailsCard(),
-                      ),
+                      Expanded(flex: 5, child: _buildPaymentDetailsCard()),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -493,7 +574,7 @@ class ModernTemplate extends StatelessWidget {
                 // Custom Items Table matching web styling (encased in a border box)
                 Container(
                   decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    border: Border.all(color: Color(0xFFE2E8F0)),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: ClipRRect(
@@ -512,14 +593,14 @@ class ModernTemplate extends StatelessWidget {
                       Expanded(
                         flex: 6,
                         child: DashedBorderContainer(
-                          backgroundColor: const Color(0xFFF8FAFC),
-                          color: const Color(0xFFE2E8F0),
+                          backgroundColor: Color(0xFFF8FAFC),
+                          color: Color(0xFFE2E8F0),
                           borderRadius: 8.0,
                           padding: const EdgeInsets.all(12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'TOTAL AMOUNT (IN WORDS)',
                                 style: TextStyle(
                                   fontSize: 8,
@@ -531,7 +612,7 @@ class ModernTemplate extends StatelessWidget {
                               const SizedBox(height: 6),
                               Text(
                                 convertNumberToWords(params.total),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF0F172A),
@@ -543,10 +624,7 @@ class ModernTemplate extends StatelessWidget {
                       ),
                       const SizedBox(width: 24),
                       // Summary box
-                      Expanded(
-                        flex: 5,
-                        child: _buildSummaryBox(),
-                      ),
+                      Expanded(flex: 5, child: _buildSummaryBox()),
                     ],
                   ),
                 ],
@@ -560,22 +638,25 @@ class ModernTemplate extends StatelessWidget {
           if (isLastPage) ...[
             Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: Color(0xFFF8FAFC),
                 border: Border(
                   top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
                 ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 12.0,
+              ),
               child: _buildTermsAndConditionsBox(),
             ),
           ],
           // Bottom Address Bar (Full-width dark bar)
           Container(
-            color: const Color(0xFF0F172A),
+            color: Color(0xFF0F172A),
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: const Text(
+            child: Text(
               'THANK YOU FOR YOUR BUSINESS!',
               style: TextStyle(
                 color: Colors.white70,
@@ -594,7 +675,7 @@ class ModernTemplate extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Thank you for your business! Generated via Auriva BMS.',
                     style: TextStyle(
                       fontSize: 8,
@@ -604,7 +685,7 @@ class ModernTemplate extends StatelessWidget {
                   ),
                   Text(
                     'Page ${pageIndex + 1} of $totalPages',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 8,
                       color: Colors.grey,
                       fontWeight: FontWeight.bold,
@@ -639,7 +720,7 @@ class ModernTemplate extends StatelessWidget {
             4: FlexColumnWidth(2.0), // Total
           };
 
-    final headerStyle = const TextStyle(
+    final headerStyle = TextStyle(
       fontSize: 9,
       fontWeight: FontWeight.bold,
       color: Color(0xFF0F172A),
@@ -651,16 +732,40 @@ class ModernTemplate extends StatelessWidget {
       children: [
         // Header Row
         TableRow(
-          decoration: const BoxDecoration(
-            color: Color(0xFFF8FAFC),
-          ),
+          decoration: BoxDecoration(color: Color(0xFFF8FAFC)),
           children: [
-            _buildHeaderCell('#', headerStyle, align: TextAlign.center, hasBorder: true),
+            _buildHeaderCell(
+              '#',
+              headerStyle,
+              align: TextAlign.center,
+              hasBorder: true,
+            ),
             _buildHeaderCell('DESCRIPTION', headerStyle, hasBorder: true),
-            if (showHsn) _buildHeaderCell('HSN/SAC', headerStyle, align: TextAlign.center, hasBorder: true),
-            _buildHeaderCell('QTY', headerStyle, align: TextAlign.center, hasBorder: true),
-            _buildHeaderCell('RATE', headerStyle, align: TextAlign.right, hasBorder: true),
-            _buildHeaderCell('TOTAL', headerStyle, align: TextAlign.right, hasBorder: true),
+            if (showHsn)
+              _buildHeaderCell(
+                'HSN/SAC',
+                headerStyle,
+                align: TextAlign.center,
+                hasBorder: true,
+              ),
+            _buildHeaderCell(
+              'QTY',
+              headerStyle,
+              align: TextAlign.center,
+              hasBorder: true,
+            ),
+            _buildHeaderCell(
+              'RATE',
+              headerStyle,
+              align: TextAlign.right,
+              hasBorder: true,
+            ),
+            _buildHeaderCell(
+              'TOTAL',
+              headerStyle,
+              align: TextAlign.right,
+              hasBorder: true,
+            ),
           ],
         ),
         // Data Rows
@@ -676,7 +781,9 @@ class ModernTemplate extends StatelessWidget {
               color: Colors.white,
               border: Border(
                 bottom: BorderSide(
-                  color: isLastRow ? Colors.transparent : const Color(0xFFF1F5F9),
+                  color: isLastRow
+                      ? Colors.transparent
+                      : Color(0xFFF1F5F9),
                   width: 1,
                 ),
               ),
@@ -685,29 +792,34 @@ class ModernTemplate extends StatelessWidget {
               // #
               _buildDataCell(
                 (index + 1).toString(),
-                const TextStyle(fontSize: 10, color: Colors.grey),
+                TextStyle(fontSize: 10, color: Colors.grey),
                 align: TextAlign.center,
               ),
               // Description
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6.0,
+                  vertical: 8.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       item['description'] as String? ?? 'Item',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF0F172A),
                       ),
                     ),
                     if (item['additionalDetails'] != null &&
-                        (item['additionalDetails'] as String).trim().isNotEmpty) ...[
+                        (item['additionalDetails'] as String)
+                            .trim()
+                            .isNotEmpty) ...[
                       const SizedBox(height: 2),
                       Text(
                         item['additionalDetails'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 8,
                           color: Colors.grey,
                           height: 1.2,
@@ -721,25 +833,33 @@ class ModernTemplate extends StatelessWidget {
               if (showHsn)
                 _buildDataCell(
                   item['hsnCode']?.toString() ?? '-',
-                  const TextStyle(fontSize: 10, color: Colors.grey, fontFamily: 'monospace'),
+                  TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey,
+                    fontFamily: 'monospace',
+                  ),
                   align: TextAlign.center,
                 ),
               // Qty
               _buildDataCell(
                 qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(2),
-                const TextStyle(fontSize: 10, color: Colors.black87),
+                TextStyle(fontSize: 10, color: Colors.black87),
                 align: TextAlign.center,
               ),
               // Rate
               _buildDataCell(
                 params.formatCurrency.format(rate),
-                const TextStyle(fontSize: 10, color: Colors.black87),
+                TextStyle(fontSize: 10, color: Colors.black87),
                 align: TextAlign.right,
               ),
               // Total
               _buildDataCell(
                 params.formatCurrency.format(amount),
-                const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF0F172A),
+                ),
                 align: TextAlign.right,
               ),
             ],
@@ -749,11 +869,16 @@ class ModernTemplate extends StatelessWidget {
     );
   }
 
-  Widget _buildHeaderCell(String text, TextStyle style, {TextAlign align = TextAlign.left, bool hasBorder = false}) {
+  Widget _buildHeaderCell(
+    String text,
+    TextStyle style, {
+    TextAlign align = TextAlign.left,
+    bool hasBorder = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
         border: hasBorder
-            ? const Border(
+            ? Border(
                 bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
               )
             : null,
@@ -763,7 +888,11 @@ class ModernTemplate extends StatelessWidget {
     );
   }
 
-  Widget _buildDataCell(String text, TextStyle style, {TextAlign align = TextAlign.left}) {
+  Widget _buildDataCell(
+    String text,
+    TextStyle style, {
+    TextAlign align = TextAlign.left,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8.0),
       child: Text(text, style: style, textAlign: align),
@@ -772,15 +901,21 @@ class ModernTemplate extends StatelessWidget {
 
   Widget _buildSummaryBox() {
     final String place = params.placeOfSupply.toLowerCase();
-    final bool isOutstate = place.isNotEmpty &&
+    final bool isOutstate =
+        place.isNotEmpty &&
         !place.contains("telangana") &&
         !place.contains("36");
 
-    final double taxableAmount = params.subtotal - params.discountAmount;
+    final double taxableAmount =
+        (params.taxType == 'inclusive' && params.gstEnabled)
+        ? (params.subtotal - params.discountAmount - params.taxAmount)
+        : (params.subtotal - params.discountAmount);
 
-    Widget buildRow(String label, String value, {
+    Widget buildRow(
+      String label,
+      String value, {
       bool isTotal = false,
-      Color labelColor = const Color(0xFF64748B), 
+      Color labelColor = const Color(0xFF64748B),
       Color valueColor = const Color(0xFF0F172A),
       FontWeight labelWeight = FontWeight.normal,
       FontWeight valueWeight = FontWeight.w600,
@@ -790,8 +925,8 @@ class ModernTemplate extends StatelessWidget {
       if (isTotal) {
         labelWeight = FontWeight.w900;
         valueWeight = FontWeight.w900;
-        labelColor = const Color(0xFF0F172A);
-        valueColor = const Color(0xFF0F172A);
+        labelColor = Color(0xFF0F172A);
+        valueColor = Color(0xFF0F172A);
         fontSize = 12;
         valueFontSize = 14;
       }
@@ -827,29 +962,32 @@ class ModernTemplate extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+            color: Color(0xFFF8FAFC),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFFE2E8F0)),
+            border: Border.all(color: Color(0xFFE2E8F0)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              buildRow('Subtotal', params.formatCurrency.format(params.subtotal)),
+              buildRow(
+                'Subtotal',
+                params.formatCurrency.format(params.subtotal),
+              ),
               if (params.discountAmount > 0)
                 buildRow(
                   'Discount (${params.discountPercentage.toStringAsFixed(0)}%)',
                   '- ${params.formatCurrency.format(params.discountAmount)}',
-                  labelColor: const Color(0xFFEF4444),
-                  valueColor: const Color(0xFFEF4444),
+                  labelColor: Color(0xFFEF4444),
+                  valueColor: Color(0xFFEF4444),
                 ),
-              
+
               if (params.discountAmount > 0) ...[
                 const SizedBox(height: 6),
                 SizedBox(
                   width: double.infinity,
                   height: 1,
                   child: CustomPaint(
-                    painter: _DashedLinePainter(color: const Color(0xFFCBD5E1)),
+                    painter: _DashedLinePainter(color: Color(0xFFCBD5E1)),
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -857,60 +995,60 @@ class ModernTemplate extends StatelessWidget {
 
               if (params.gstEnabled && params.taxAmount > 0) ...[
                 buildRow(
-                  'Taxable Amount', 
+                  'Taxable Amount',
                   params.formatCurrency.format(taxableAmount),
                   labelWeight: FontWeight.bold,
-                  labelColor: const Color(0xFF0F172A),
+                  labelColor: Color(0xFF0F172A),
                   valueWeight: FontWeight.bold,
                 ),
                 buildRow(
-                  'CGST', 
+                  'CGST',
                   '+ ${params.formatCurrency.format(params.taxAmount / 2)}',
-                  labelColor: const Color(0xFF64748B),
-                  valueColor: const Color(0xFF64748B),
+                  labelColor: Color(0xFF64748B),
+                  valueColor: Color(0xFF64748B),
                   valueWeight: FontWeight.normal,
                 ),
                 buildRow(
-                  'SGST', 
+                  'SGST',
                   '+ ${params.formatCurrency.format(params.taxAmount / 2)}',
-                  labelColor: const Color(0xFF64748B),
-                  valueColor: const Color(0xFF64748B),
+                  labelColor: Color(0xFF64748B),
+                  valueColor: Color(0xFF64748B),
                   valueWeight: FontWeight.normal,
                 ),
               ],
-              
+
               const SizedBox(height: 6),
-              Container(
-                height: 1,
-                color: const Color(0xFFE2E8F0),
+              Container(height: 1, color: Color(0xFFE2E8F0)),
+              const SizedBox(height: 6),
+
+              buildRow(
+                'TOTAL',
+                params.formatCurrency.format(params.total),
+                isTotal: true,
               ),
-              const SizedBox(height: 6),
-              
-              buildRow('TOTAL', params.formatCurrency.format(params.total), isTotal: true),
-              
+
               if (params.advancePayment > 0) ...[
                 buildRow(
-                  'Advance Paid', 
+                  'Advance Paid',
                   '- ${params.formatCurrency.format(params.advancePayment)}',
-                  labelColor: const Color(0xFF10B981),
-                  valueColor: const Color(0xFF10B981),
+                  labelColor: Color(0xFF10B981),
+                  valueColor: Color(0xFF10B981),
                   labelWeight: FontWeight.bold,
                   valueWeight: FontWeight.bold,
                 ),
               ],
-              
+
               const SizedBox(height: 6),
-              Container(
-                height: 1.5,
-                color: const Color(0xFF0F172A),
-              ),
+              Container(height: 1.5, color: Color(0xFF0F172A)),
               const SizedBox(height: 6),
-              
+
               buildRow(
-                'Balance Due', 
-                params.formatCurrency.format(params.total - params.advancePayment),
+                'Balance Due',
+                params.formatCurrency.format(
+                  params.total - params.advancePayment,
+                ),
                 labelWeight: FontWeight.bold,
-                labelColor: const Color(0xFF0F172A),
+                labelColor: Color(0xFF0F172A),
                 valueWeight: FontWeight.bold,
                 fontSize: 11,
                 valueFontSize: 12,
@@ -927,19 +1065,25 @@ class ModernTemplate extends StatelessWidget {
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
-        
+
     final TeamController teamController = Get.isRegistered<TeamController>()
         ? Get.find<TeamController>()
         : Get.put(TeamController());
 
     return Obx(() {
       final currentUserMember = teamController.teamMembers.firstWhereOrNull(
-        (m) => m.email.trim().toLowerCase() == authController.userEmail.value.trim().toLowerCase()
+        (m) =>
+            m.email.trim().toLowerCase() ==
+            authController.userEmail.value.trim().toLowerCase(),
       );
-      final userSignature = (currentUserMember?.signatureImage != null && currentUserMember!.signatureImage!.isNotEmpty)
+      final userSignature =
+          (currentUserMember?.signatureImage != null &&
+              currentUserMember!.signatureImage!.isNotEmpty)
           ? currentUserMember.signatureImage
-          : (authController.userSignature.value.isNotEmpty ? authController.userSignature.value : null);
-      
+          : (authController.userSignature.value.isNotEmpty
+                ? authController.userSignature.value
+                : null);
+
       final signatureWidget = _buildLogoWidget(
         (userSignature != null && userSignature.isNotEmpty)
             ? userSignature
@@ -962,34 +1106,32 @@ class ModernTemplate extends StatelessWidget {
                 width: 100,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey[200]!, style: BorderStyle.solid),
-                ),
-                child: const Text(
-                  'Sign Here',
-                  style: TextStyle(
-                    fontSize: 8,
-                    color: Colors.grey,
+                  border: Border.all(
+                    color: Colors.grey[200]!,
+                    style: BorderStyle.solid,
                   ),
+                ),
+                child: Text(
+                  'Sign Here',
+                  style: TextStyle(fontSize: 8, color: Colors.grey),
                 ),
               ),
               const SizedBox(height: 4),
             ],
-            Container(
-              width: 130,
-              height: 1,
-              color: Colors.grey[300]!,
-            ),
+            Container(width: 130, height: 1, color: Colors.grey[300]!),
             const SizedBox(height: 4),
             Text(
-              params.tenant['authorizedSignatoryName'] ?? params.tenant['name'] ?? '',
-              style: const TextStyle(
+              params.tenant['authorizedSignatoryName'] ??
+                  params.tenant['name'] ??
+                  '',
+              style: TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF0F172A),
               ),
               textAlign: TextAlign.center,
             ),
-            const Text(
+            Text(
               'AUTHORIZED SIGNATORY',
               style: TextStyle(
                 fontSize: 8,
@@ -1014,43 +1156,47 @@ class ModernTemplate extends StatelessWidget {
       children: [
         Row(
           children: [
-            const Icon(LucideIcons.fileText, color: Color(0xFF64748B), size: 12),
+            Icon(
+              LucideIcons.fileText,
+              color: Color(0xFF64748B),
+              size: 12,
+            ),
             const SizedBox(width: 4),
             Text(
               'TERMS & CONDITIONS',
               style: TextStyle(
                 fontSize: 8,
                 fontWeight: FontWeight.bold,
-                color: const Color(0xFF64748B),
+                color: Color(0xFF64748B),
                 letterSpacing: 0.8,
               ),
             ),
           ],
         ),
+        const SizedBox(height: 6),
+        Text(
+          terms,
+          style: TextStyle(
+            fontSize: 8,
+            color: Colors.black54,
+            height: 1.3,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        if (params.placeOfSupply.isNotEmpty) ...[
           const SizedBox(height: 6),
           Text(
-            terms,
-            style: const TextStyle(
+            'Place of Supply: ${params.placeOfSupply}${params.tenant["state"] != null && params.tenant["state"]!.isNotEmpty ? " | Dispatch State: ${params.tenant["state"]}" : ""}',
+            style: TextStyle(
               fontSize: 8,
               color: Colors.black54,
-              height: 1.3,
+              fontWeight: FontWeight.bold,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
-          if (params.placeOfSupply.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(
-              'Place of Supply: ${params.placeOfSupply}${params.tenant["state"] != null && params.tenant["state"]!.isNotEmpty ? " | Dispatch State: ${params.tenant["state"]}" : ""}',
-              style: const TextStyle(
-                fontSize: 8,
-                color: Colors.black54,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
         ],
-      );
+      ],
+    );
   }
 }
 
@@ -1115,10 +1261,12 @@ class _DashedRectPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final path = Path()
-      ..addRRect(RRect.fromRectAndRadius(
-        Rect.fromLTWH(0, 0, size.width, size.height),
-        Radius.circular(borderRadius),
-      ));
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          Radius.circular(borderRadius),
+        ),
+      );
 
     final dashedPath = Path();
     double distance = 0.0;

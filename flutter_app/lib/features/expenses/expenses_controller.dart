@@ -94,7 +94,9 @@ class ExpensesController extends GetxController {
 
     // Filter by Month
     if (filterMonth.value.isNotEmpty) {
-      list = list.where((exp) => exp.date.startsWith(filterMonth.value)).toList();
+      list = list
+          .where((exp) => exp.date.startsWith(filterMonth.value))
+          .toList();
     }
 
     // Sort
@@ -119,7 +121,12 @@ class ExpensesController extends GetxController {
     return expenses.fold(0.0, (sum, exp) => sum + exp.amount);
   }
 
-  Future<bool> addExpense(String category, double amount, String date, String description) async {
+  Future<bool> addExpense(
+    String category,
+    double amount,
+    String date,
+    String description,
+  ) async {
     try {
       isLoading.value = true;
       final response = await ApiService.post(ApiConstants.expenses, {
@@ -170,4 +177,3 @@ class ExpensesController extends GetxController {
     return breakdown;
   }
 }
-

@@ -19,54 +19,57 @@ class SuperAdminDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC), // Light gray background
+      backgroundColor: Color(0xFFF8FAFC), // Light gray background
       body: SafeArea(
         child: Column(
           children: [
             const SuperAdminTopBar(),
             Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value) {
-                return _buildDashboardSkeleton(context);
-              }
-              return CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        _buildHeader(),
-                        const SizedBox(height: 24),
-                        _buildMetricsCards(context),
-                      ]),
-                    ),
-                  ),
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: _StickyHeaderDelegate(
-                      minHeight: 70, // Estimated height of search bar container
-                      maxHeight: 70,
-                      backgroundColor: const Color(0xFFF8FAFC), // Same as scaffold background to cover content behind
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: _buildSearchBar(context),
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return _buildDashboardSkeleton(context);
+                }
+                return CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+                      sliver: SliverList(
+                        delegate: SliverChildListDelegate([
+                          _buildHeader(),
+                          const SizedBox(height: 24),
+                          _buildMetricsCards(context),
+                        ]),
                       ),
                     ),
-                  ),
-                  SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(24, 0, 24, 80),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        _buildCompaniesTableBody(context),
-                      ]),
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: _StickyHeaderDelegate(
+                        minHeight:
+                            70, // Estimated height of search bar container
+                        maxHeight: 70,
+                        backgroundColor: Color(
+                          0xFFF8FAFC,
+                        ), // Same as scaffold background to cover content behind
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: _buildSearchBar(context),
+                        ),
+                      ),
                     ),
-                  ),
-                ],
-              );
-            }),
-          ),
-        ],
-      ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 80),
+                      sliver: SliverList(
+                        delegate: SliverChildListDelegate([
+                          _buildCompaniesTableBody(context),
+                        ]),
+                      ),
+                    ),
+                  ],
+                );
+              }),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -86,7 +89,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF5B6CF9).withOpacity(0.3),
+                color: Color(0xFF5B6CF9).withOpacity(0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
@@ -97,14 +100,22 @@ class SuperAdminDashboardScreen extends StatelessWidget {
               Positioned(
                 right: -20,
                 top: -20,
-                child: Icon(LucideIcons.barChart2, size: isMobile ? 80 : 120, color: Colors.white.withOpacity(0.15)),
+                child: Icon(
+                  LucideIcons.barChart2,
+                  size: isMobile ? 80 : 120,
+                  color: Colors.white.withOpacity(0.15),
+                ),
               ),
               Positioned(
                 right: isMobile ? 60 : 100,
                 bottom: -20,
-                child: Icon(LucideIcons.pieChart, size: isMobile ? 50 : 80, color: Colors.white.withOpacity(0.1)),
+                child: Icon(
+                  LucideIcons.pieChart,
+                  size: isMobile ? 50 : 80,
+                  color: Colors.white.withOpacity(0.1),
+                ),
               ),
-              
+
               Padding(
                 padding: EdgeInsets.all(isMobile ? 16.0 : 20.0),
                 child: Row(
@@ -118,20 +129,42 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              Text('Super Admin ', style: TextStyle(color: Colors.white, fontSize: isMobile ? 18 : 24, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
-                              Text('👋', style: TextStyle(fontSize: isMobile ? 16 : 20)),
+                              Text(
+                                'super_admin'.tr,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: isMobile ? 18 : 24,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              Text(
+                                '👋',
+                                style: TextStyle(fontSize: isMobile ? 16 : 20),
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Text('Here\'s what\'s happening with your business today.', style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 11, height: 1.3)),
+                          SizedBox(height: 4),
+                          Text(
+                            'here_is_whats_happening'.tr,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 11,
+                              height: 1.3,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(width: 16),
                     InkWell(
-                      onTap: () => Get.to(() => const SuperAdminAddCompanyScreen()),
+                      onTap: () =>
+                          Get.to(() => const SuperAdminAddCompanyScreen()),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
@@ -140,15 +173,26 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                               color: Colors.black.withOpacity(0.1),
                               blurRadius: 5,
                               offset: const Offset(0, 2),
-                            )
+                            ),
                           ],
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(LucideIcons.plus, size: 14, color: Color(0xFF2563EB)),
+                            Icon(
+                              LucideIcons.plus,
+                              size: 14,
+                              color: Color(0xFF2563EB),
+                            ),
                             const SizedBox(width: 4),
-                            Text(isMobile ? 'New' : 'New Company', style: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold, fontSize: 12)),
+                            Text(
+                              isMobile ? 'New' : 'New Company',
+                              style: TextStyle(
+                                color: Colors.blue.shade700,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -159,13 +203,13 @@ class SuperAdminDashboardScreen extends StatelessWidget {
             ],
           ),
         );
-      }
+      },
     );
   }
 
   Widget _buildDashboardSkeleton(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
-    
+
     // Colorful shimmer effect parameters
     final baseColor = Colors.blue.shade50;
     final highlightColor = Colors.white;
@@ -184,13 +228,29 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Shimmer.fromColors(
-                    baseColor: baseColor, highlightColor: highlightColor,
-                    child: Container(width: 200, height: 32, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(8))),
+                    baseColor: baseColor,
+                    highlightColor: highlightColor,
+                    child: Container(
+                      width: 200,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: skeletonBg,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Shimmer.fromColors(
-                    baseColor: baseColor, highlightColor: highlightColor,
-                    child: Container(width: 250, height: 16, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(4))),
+                    baseColor: baseColor,
+                    highlightColor: highlightColor,
+                    child: Container(
+                      width: 250,
+                      height: 16,
+                      decoration: BoxDecoration(
+                        color: skeletonBg,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -205,79 +265,182 @@ class SuperAdminDashboardScreen extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             childAspectRatio: isMobile ? 1.3 : 2.2,
-            children: List.generate(4, (index) => Shimmer.fromColors(
-              baseColor: baseColor, highlightColor: highlightColor,
-              child: Container(
-                padding: EdgeInsets.all(isMobile ? 16 : 20),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade100)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Container(width: 40, height: 40, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(10))),
-                        const SizedBox(width: 12),
-                        Container(width: 80, height: 12, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(4))),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Container(width: 60, height: 24, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(6))),
-                  ],
+            children: List.generate(
+              4,
+              (index) => Shimmer.fromColors(
+                baseColor: baseColor,
+                highlightColor: highlightColor,
+                child: Container(
+                  padding: EdgeInsets.all(isMobile ? 16 : 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade100),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: skeletonBg,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            width: 80,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: skeletonBg,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        width: 60,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: skeletonBg,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            )),
+            ),
           ),
           const SizedBox(height: 24),
           // List Skeleton
           Container(
             width: double.infinity,
-            decoration: isMobile ? null : BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade100),
-            ),
+            decoration: isMobile
+                ? null
+                : BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade100),
+                  ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Shimmer.fromColors(
-                    baseColor: baseColor, highlightColor: highlightColor,
-                    child: Container(height: 48, width: double.infinity, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(12))),
-                  ),
-                ),
-                if (!isMobile) const Divider(height: 1),
-                ...List.generate(4, (index) => Padding(
-                  padding: EdgeInsets.all(isMobile ? 16 : 20),
-                  child: Shimmer.fromColors(
-                    baseColor: baseColor, highlightColor: highlightColor,
-                    child: Row(
-                      children: [
-                        Container(width: 48, height: 48, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(14))),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(width: 120, height: 16, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(4))),
-                              const SizedBox(height: 8),
-                              Container(width: 80, height: 12, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(4))),
-                            ],
-                          ),
-                        ),
-                        if (!isMobile) ...[
-                          const SizedBox(width: 16),
-                          Expanded(flex: 2, child: Container(height: 16, margin: const EdgeInsets.only(right: 20), decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(4)))),
-                          Expanded(flex: 3, child: Container(height: 16, margin: const EdgeInsets.only(right: 20), decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(4)))),
-                          Expanded(flex: 2, child: Container(height: 16, margin: const EdgeInsets.only(right: 20), decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(4)))),
-                          Expanded(flex: 2, child: Container(height: 16, decoration: BoxDecoration(color: skeletonBg, borderRadius: BorderRadius.circular(4)))),
-                        ]
-                      ],
+                    baseColor: baseColor,
+                    highlightColor: highlightColor,
+                    child: Container(
+                      height: 48,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: skeletonBg,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
-                )),
+                ),
+                if (!isMobile) Divider(height: 1),
+                ...List.generate(
+                  4,
+                  (index) => Padding(
+                    padding: EdgeInsets.all(isMobile ? 16 : 20),
+                    child: Shimmer.fromColors(
+                      baseColor: baseColor,
+                      highlightColor: highlightColor,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: skeletonBg,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 120,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    color: skeletonBg,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  width: 80,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: skeletonBg,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (!isMobile) ...[
+                            const SizedBox(width: 16),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                height: 16,
+                                margin: const EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                  color: skeletonBg,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Container(
+                                height: 16,
+                                margin: const EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                  color: skeletonBg,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                height: 16,
+                                margin: const EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                  color: skeletonBg,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 2,
+                              child: Container(
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: skeletonBg,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -290,10 +453,10 @@ class SuperAdminDashboardScreen extends StatelessWidget {
   Widget _buildMetricsCards(BuildContext context) {
     final stats = controller.stats.value;
     final width = MediaQuery.of(context).size.width;
-    
+
     // Always use at least a 2-column grid to match the image, 4 on desktop
     int crossAxisCount = width < 800 ? 2 : 4;
-    
+
     return GridView.count(
       crossAxisCount: crossAxisCount,
       crossAxisSpacing: width < 800 ? 12 : 16,
@@ -302,15 +465,40 @@ class SuperAdminDashboardScreen extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: width < 800 ? 1.6 : 2.5,
       children: [
-        _buildNewMetricCard(LucideIcons.building, 'TOTAL COMPANIES', stats?.totalTenants.toString() ?? '12', Colors.blue),
-        _buildNewMetricCard(LucideIcons.checkCircle2, 'ACTIVE SUBS', stats?.activeTenants.toString() ?? '12', Colors.green),
-        _buildNewMetricCard(LucideIcons.users, 'TOTAL USERS', stats?.totalUsers.toString() ?? '14', Colors.purple),
-        _buildNewMetricCard(LucideIcons.indianRupee, 'MONTHLY REV', '₹${stats?.estRevenue ?? '3,888'}', Colors.orange),
+        _buildNewMetricCard(
+          LucideIcons.building,
+          'TOTAL COMPANIES',
+          stats?.totalTenants.toString() ?? '12',
+          Colors.blue,
+        ),
+        _buildNewMetricCard(
+          LucideIcons.checkCircle2,
+          'ACTIVE SUBS',
+          stats?.activeTenants.toString() ?? '12',
+          Colors.green,
+        ),
+        _buildNewMetricCard(
+          LucideIcons.users,
+          'TOTAL USERS',
+          stats?.totalUsers.toString() ?? '14',
+          Colors.purple,
+        ),
+        _buildNewMetricCard(
+          LucideIcons.indianRupee,
+          'MONTHLY REV',
+          '₹${stats?.estRevenue ?? '3,888'}',
+          Colors.orange,
+        ),
       ],
     );
   }
 
-  Widget _buildNewMetricCard(IconData icon, String title, String value, MaterialColor color) {
+  Widget _buildNewMetricCard(
+    IconData icon,
+    String title,
+    String value,
+    MaterialColor color,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -333,9 +521,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
               left: 0,
               right: 0,
               height: 50,
-              child: CustomPaint(
-                painter: _WavePainter(color),
-              ),
+              child: CustomPaint(painter: _WavePainter(color)),
             ),
             Padding(
               padding: const EdgeInsets.all(16),
@@ -358,9 +544,28 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(title, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey.shade500), maxLines: 1, overflow: TextOverflow.ellipsis),
+                            Text(
+                              title,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                             const SizedBox(height: 2),
-                            Text(value, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: -0.5), maxLines: 1, overflow: TextOverflow.ellipsis),
+                            Text(
+                              value,
+                              style: TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF0F172A),
+                                letterSpacing: -0.5,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ],
                         ),
                       ),
@@ -378,15 +583,19 @@ class SuperAdminDashboardScreen extends StatelessWidget {
   Widget _buildSearchBar(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 800;
     return Container(
-      decoration: isMobile ? null : BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-          left: BorderSide(color: Colors.grey.shade200),
-          right: BorderSide(color: Colors.grey.shade200),
-        ),
-      ),
+      decoration: isMobile
+          ? null
+          : BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              border: Border(
+                top: BorderSide(color: Colors.grey.shade200),
+                left: BorderSide(color: Colors.grey.shade200),
+                right: BorderSide(color: Colors.grey.shade200),
+              ),
+            ),
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 10 : 12,
         horizontal: isMobile ? 0 : 20,
@@ -401,8 +610,12 @@ class SuperAdminDashboardScreen extends StatelessWidget {
         child: TextField(
           onChanged: controller.updateSearchQuery,
           decoration: InputDecoration(
-            icon: Icon(LucideIcons.search, color: Colors.grey.shade400, size: 20),
-            hintText: 'Search companies...',
+            icon: Icon(
+              LucideIcons.search,
+              color: Colors.grey.shade400,
+              size: 20,
+            ),
+            hintText: 'search_companies'.tr,
             hintStyle: TextStyle(color: Colors.grey.shade400),
             border: InputBorder.none,
           ),
@@ -416,27 +629,37 @@ class SuperAdminDashboardScreen extends StatelessWidget {
     final companies = controller.filteredTenants;
 
     return Container(
-      decoration: isMobile ? null : BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-          left: BorderSide(color: Colors.grey.shade200),
-          right: BorderSide(color: Colors.grey.shade200),
-        ),
-      ),
+      decoration: isMobile
+          ? null
+          : BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(16),
+              ),
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade200),
+                left: BorderSide(color: Colors.grey.shade200),
+                right: BorderSide(color: Colors.grey.shade200),
+              ),
+            ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!isMobile) const Divider(height: 1),
+          if (!isMobile) Divider(height: 1),
           if (isMobile)
             Column(
               children: companies.map((t) {
                 final isPro = t.subscriptionPlan == 'premium';
                 final isBusiness = t.subscriptionPlan == 'enterprise';
-                final rate = t.subscriptionPlan == 'enterprise' ? '₹999' : (isPro ? '₹499' : '₹299');
-                final planName = isBusiness ? 'BUSINESS' : (isPro ? 'PRO' : 'STARTER');
-                final expiryDateStr = t.subscriptionEnd != null ? DateFormat('dd MMM yyyy').format(t.subscriptionEnd!) : 'N/A';
+                final rate = t.subscriptionPlan == 'enterprise'
+                    ? '₹999'
+                    : (isPro ? '₹499' : '₹299');
+                final planName = isBusiness
+                    ? 'BUSINESS'
+                    : (isPro ? 'PRO' : 'STARTER');
+                final expiryDateStr = t.subscriptionEnd != null
+                    ? DateFormat('dd MMM yyyy').format(t.subscriptionEnd!)
+                    : 'N/A';
                 return _buildMobileCompanyCard(
                   context: context,
                   tenantId: t.id,
@@ -463,25 +686,80 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                     // Table Header
                     Container(
                       width: 800,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
                       child: Row(
                         children: [
-                          Expanded(flex: 3, child: Text('Company', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade800))),
-                          Expanded(flex: 2, child: Text('Plan & Rate', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade800))),
-                          Expanded(flex: 3, child: Text('Expiry Timeline', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade800))),
-                          Expanded(flex: 2, child: Text('Status', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade800))),
-                          Expanded(flex: 2, child: Text('Manage', textAlign: TextAlign.right, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade800))),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              'company'.tr,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade800,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              'plan_rate'.tr,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade800,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              'expiry_timeline'.tr,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade800,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              'status'.tr,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade800,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              'manage'.tr,
+                              textAlign: TextAlign.right,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade800,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                    const Divider(height: 1),
+                    Divider(height: 1),
                     // Table Body
                     ...companies.map((t) {
                       final isPro = t.subscriptionPlan == 'premium';
                       final isBusiness = t.subscriptionPlan == 'enterprise';
-                      final rate = t.subscriptionPlan == 'enterprise' ? '₹999' : (isPro ? '₹499' : '₹299');
-                      final planName = isBusiness ? 'BUSINESS' : (isPro ? 'PRO' : 'STARTER');
-                      final expiryDateStr = t.subscriptionEnd != null ? DateFormat('dd MMM yyyy').format(t.subscriptionEnd!) : 'N/A';
+                      final rate = t.subscriptionPlan == 'enterprise'
+                          ? '₹999'
+                          : (isPro ? '₹499' : '₹299');
+                      final planName = isBusiness
+                          ? 'BUSINESS'
+                          : (isPro ? 'PRO' : 'STARTER');
+                      final expiryDateStr = t.subscriptionEnd != null
+                          ? DateFormat('dd MMM yyyy').format(t.subscriptionEnd!)
+                          : 'N/A';
                       return Column(
                         children: [
                           _buildCompanyRow(
@@ -497,7 +775,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                             isPro: isPro,
                             isBusiness: isBusiness,
                           ),
-                          const Divider(height: 1),
+                          Divider(height: 1),
                         ],
                       );
                     }),
@@ -511,12 +789,19 @@ class SuperAdminDashboardScreen extends StatelessWidget {
   }
 
   void _showUsageDialog(BuildContext context, String tenantId) async {
-    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+    Get.dialog(
+      const Center(child: CircularProgressIndicator()),
+      barrierDismissible: false,
+    );
     final data = await controller.fetchTenantUsage(tenantId);
     if (Get.isDialogOpen ?? false) Get.back(); // close loading
 
     if (data == null) {
-      Get.snackbar('Error', 'Failed to fetch usage data', backgroundColor: Colors.red.shade100);
+      Get.snackbar(
+        'Error',
+        'Failed to fetch usage data',
+        backgroundColor: Colors.red.shade100,
+      );
       return;
     }
 
@@ -533,8 +818,22 @@ class SuperAdminDashboardScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Usage', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
-                  IconButton(onPressed: () => Get.back(), icon: const Icon(LucideIcons.x, size: 20, color: Colors.black)),
+                  Text(
+                    'usage'.tr,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: Icon(
+                      LucideIcons.x,
+                      size: 20,
+                      color: Colors.black,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -546,12 +845,36 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
                 children: [
-                  _buildUsageCard('INVOICES', data['invoiceCount'] ?? 0, Colors.blue),
-                  _buildUsageCard('QUOTATIONS', data['quotationCount'] ?? 0, Colors.purple),
-                  _buildUsageCard('CLIENTS', data['clientCount'] ?? 0, Colors.green),
-                  _buildUsageCard('USERS', data['userCount'] ?? 0, Colors.amber),
-                  _buildUsageCard('ITEMS (INV)', data['inventoryCount'] ?? 0, Colors.orange),
-                  _buildUsageCard('SUPPLIERS', data['supplierCount'] ?? 0, Colors.teal),
+                  _buildUsageCard(
+                    'INVOICES',
+                    data['invoiceCount'] ?? 0,
+                    Colors.blue,
+                  ),
+                  _buildUsageCard(
+                    'QUOTATIONS',
+                    data['quotationCount'] ?? 0,
+                    Colors.purple,
+                  ),
+                  _buildUsageCard(
+                    'CLIENTS',
+                    data['clientCount'] ?? 0,
+                    Colors.green,
+                  ),
+                  _buildUsageCard(
+                    'USERS',
+                    data['userCount'] ?? 0,
+                    Colors.amber,
+                  ),
+                  _buildUsageCard(
+                    'ITEMS (INV)',
+                    data['inventoryCount'] ?? 0,
+                    Colors.orange,
+                  ),
+                  _buildUsageCard(
+                    'SUPPLIERS',
+                    data['supplierCount'] ?? 0,
+                    Colors.teal,
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -560,11 +883,20 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 height: 48,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1E293B), // Dark slate
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    backgroundColor: Color(0xFF1E293B), // Dark slate
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: () => Get.back(),
-                  child: const Text('Close', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: Text(
+                    'close'.tr,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -584,31 +916,50 @@ class SuperAdminDashboardScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(count.toString(), style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: color.shade600)),
+          Text(
+            count.toString(),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              color: color.shade600,
+            ),
+          ),
           const SizedBox(height: 4),
-          Text(title, style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey.shade600)),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 9,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey.shade600,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  void _showDeleteDialog(BuildContext context, String tenantId, String companyName) {
+  void _showDeleteDialog(
+    BuildContext context,
+    String tenantId,
+    String companyName,
+  ) {
     Get.dialog(
       AlertDialog(
-        title: const Text('Delete Company'),
-        content: Text('Are you sure you want to delete "$companyName"? This action will remove all associated data, users, and invoices, and cannot be undone.'),
+        title: Text('delete_company'.tr),
+        content: Text(
+          'Are you sure you want to delete "$companyName"? This action will remove all associated data, users, and invoices, and cannot be undone.',
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade600),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade600,
+            ),
             onPressed: () {
               Get.back();
               controller.deleteCompany(tenantId);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text('delete'.tr, style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -649,9 +1000,18 @@ class SuperAdminDashboardScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(email, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+                Text(
+                  email,
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -662,15 +1022,28 @@ class SuperAdminDashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: planBg,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text(plan, style: TextStyle(color: planColor, fontSize: 10, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    plan,
+                    style: TextStyle(
+                      color: planColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 4),
-                Text(rate, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+                Text(
+                  rate,
+                  style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                ),
               ],
             ),
           ),
@@ -685,13 +1058,22 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(expiryDate, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
-                      Text(isExpired ? 'Expired' : '$daysLeft days left', 
+                      Text(
+                        expiryDate,
                         style: TextStyle(
-                          color: isExpired ? Colors.red.shade600 : Colors.green.shade600, 
-                          fontSize: 12, 
-                          fontWeight: FontWeight.bold
-                        )
+                          color: Colors.grey.shade500,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        isExpired ? 'Expired' : '$daysLeft days left',
+                        style: TextStyle(
+                          color: isExpired
+                              ? Colors.red.shade600
+                              : Colors.green.shade600,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -699,9 +1081,13 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
-                      value: isExpired ? 1.0 : (daysLeft / 365.0).clamp(0.0, 1.0),
+                      value: isExpired
+                          ? 1.0
+                          : (daysLeft / 365.0).clamp(0.0, 1.0),
                       backgroundColor: Colors.grey.shade200,
-                      valueColor: AlwaysStoppedAnimation<Color>(isExpired ? Colors.red.shade500 : Colors.green.shade500),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        isExpired ? Colors.red.shade500 : Colors.green.shade500,
+                      ),
                       minHeight: 6,
                     ),
                   ),
@@ -714,9 +1100,24 @@ class SuperAdminDashboardScreen extends StatelessWidget {
             flex: 2,
             child: Row(
               children: [
-                Icon(isExpired ? LucideIcons.xCircle : LucideIcons.checkCircle2, color: isExpired ? Colors.red.shade500 : Colors.green.shade500, size: 16),
+                Icon(
+                  isExpired ? LucideIcons.xCircle : LucideIcons.checkCircle2,
+                  color: isExpired
+                      ? Colors.red.shade500
+                      : Colors.green.shade500,
+                  size: 16,
+                ),
                 const SizedBox(width: 6),
-                Text('Active', style: TextStyle(color: isExpired ? Colors.red.shade600 : Colors.green.shade600, fontWeight: FontWeight.bold, fontSize: 12)),
+                Text(
+                  'active'.tr,
+                  style: TextStyle(
+                    color: isExpired
+                        ? Colors.red.shade600
+                        : Colors.green.shade600,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
@@ -735,14 +1136,27 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: Colors.purple.shade100),
                     ),
-                    child: Icon(LucideIcons.lineChart, size: 14, color: Colors.purple.shade600),
+                    child: Icon(
+                      LucideIcons.lineChart,
+                      size: 14,
+                      color: Colors.purple.shade600,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 InkWell(
-                  onTap: () => Get.to(() => SuperAdminEditCompanyScreen(tenant: controller.filteredTenants.firstWhere((t) => t.name == name))),
+                  onTap: () => Get.to(
+                    () => SuperAdminEditCompanyScreen(
+                      tenant: controller.filteredTenants.firstWhere(
+                        (t) => t.name == name,
+                      ),
+                    ),
+                  ),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
                       borderRadius: BorderRadius.circular(6),
@@ -750,9 +1164,20 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Icon(LucideIcons.edit, size: 14, color: Colors.blue.shade600),
+                        Icon(
+                          LucideIcons.edit,
+                          size: 14,
+                          color: Colors.blue.shade600,
+                        ),
                         const SizedBox(width: 4),
-                        Text('Manage', style: TextStyle(color: Colors.blue.shade600, fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text(
+                          'manage'.tr,
+                          style: TextStyle(
+                            color: Colors.blue.shade600,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -767,7 +1192,11 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                       border: Border.all(color: Colors.red.shade100),
                     ),
-                    child: Icon(LucideIcons.trash2, size: 14, color: Colors.red.shade600),
+                    child: Icon(
+                      LucideIcons.trash2,
+                      size: 14,
+                      color: Colors.red.shade600,
+                    ),
                   ),
                 ),
               ],
@@ -825,7 +1254,14 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(
-                  child: Text(name[0].toUpperCase(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
+                  child: Text(
+                    name[0].toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -834,22 +1270,49 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1E293B)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFF1E293B),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 4),
-                    Text(email, style: TextStyle(color: Colors.grey.shade500, fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(
+                      email,
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
               // Plan Badge
               Container(
                 width: 65, // Smaller width
-                padding: const EdgeInsets.symmetric(vertical: 4), // Reduced padding for better top alignment
+                padding: const EdgeInsets.symmetric(
+                  vertical: 4,
+                ), // Reduced padding for better top alignment
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: planBg,
-                  borderRadius: BorderRadius.circular(6), 
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                child: Text(plan, style: TextStyle(color: planColor, fontSize: 9, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                child: Text(
+                  plan,
+                  style: TextStyle(
+                    color: planColor,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ),
             ],
           ),
@@ -858,13 +1321,23 @@ class SuperAdminDashboardScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(isExpired ? 'Subscription Expired' : 'Expires: $expiryDate', style: TextStyle(color: Colors.grey.shade600, fontSize: 12, fontWeight: FontWeight.w600)),
-              Text(isExpired ? '0 days' : '$daysLeft days left', 
+              Text(
+                isExpired ? 'Subscription Expired' : 'Expires: $expiryDate',
                 style: TextStyle(
-                  color: isExpired ? Colors.red.shade600 : Colors.green.shade600, 
-                  fontSize: 12, 
-                  fontWeight: FontWeight.bold
-                )
+                  color: Colors.grey.shade600,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                isExpired ? '0 days' : '$daysLeft days left',
+                style: TextStyle(
+                  color: isExpired
+                      ? Colors.red.shade600
+                      : Colors.green.shade600,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -874,7 +1347,9 @@ class SuperAdminDashboardScreen extends StatelessWidget {
             child: LinearProgressIndicator(
               value: isExpired ? 1.0 : (daysLeft / 365.0).clamp(0.0, 1.0),
               backgroundColor: Colors.grey.shade100,
-              valueColor: AlwaysStoppedAnimation<Color>(isExpired ? Colors.red.shade500 : Colors.green.shade500),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isExpired ? Colors.red.shade500 : Colors.green.shade500,
+              ),
               minHeight: 8,
             ),
           ),
@@ -885,16 +1360,36 @@ class SuperAdminDashboardScreen extends StatelessWidget {
             children: [
               // Status Badge
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isExpired ? Colors.red.shade50 : Colors.green.shade50,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   children: [
-                    Icon(isExpired ? LucideIcons.xCircle : LucideIcons.checkCircle2, color: isExpired ? Colors.red.shade600 : Colors.green.shade600, size: 14),
+                    Icon(
+                      isExpired
+                          ? LucideIcons.xCircle
+                          : LucideIcons.checkCircle2,
+                      color: isExpired
+                          ? Colors.red.shade600
+                          : Colors.green.shade600,
+                      size: 14,
+                    ),
                     const SizedBox(width: 6),
-                    Text(isExpired ? 'Inactive' : 'Active', style: TextStyle(color: isExpired ? Colors.red.shade600 : Colors.green.shade600, fontWeight: FontWeight.bold, fontSize: 12)),
+                    Text(
+                      isExpired ? 'Inactive' : 'Active',
+                      style: TextStyle(
+                        color: isExpired
+                            ? Colors.red.shade600
+                            : Colors.green.shade600,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -902,19 +1397,25 @@ class SuperAdminDashboardScreen extends StatelessWidget {
               Row(
                 children: [
                   _buildIconButton(
-                    LucideIcons.lineChart, 
+                    LucideIcons.lineChart,
                     Colors.purple,
                     onTap: () => _showUsageDialog(context, tenantId),
                   ),
                   const SizedBox(width: 12),
                   _buildIconButton(
-                    LucideIcons.edit, 
+                    LucideIcons.edit,
                     Colors.blue,
-                    onTap: () => Get.to(() => SuperAdminEditCompanyScreen(tenant: controller.filteredTenants.firstWhere((t) => t.name == name))),
+                    onTap: () => Get.to(
+                      () => SuperAdminEditCompanyScreen(
+                        tenant: controller.filteredTenants.firstWhere(
+                          (t) => t.name == name,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   _buildIconButton(
-                    LucideIcons.trash2, 
+                    LucideIcons.trash2,
                     Colors.red,
                     onTap: () => _showDeleteDialog(context, tenantId, name),
                   ),
@@ -927,7 +1428,11 @@ class SuperAdminDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIconButton(IconData icon, MaterialColor color, {VoidCallback? onTap}) {
+  Widget _buildIconButton(
+    IconData icon,
+    MaterialColor color, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -962,19 +1467,20 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: backgroundColor,
-      child: child,
-    );
+  Widget build(
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
+    return Container(color: backgroundColor, child: child);
   }
 
   @override
   bool shouldRebuild(_StickyHeaderDelegate oldDelegate) {
-    return child != oldDelegate.child || 
-           minHeight != oldDelegate.minHeight || 
-           maxHeight != oldDelegate.maxHeight ||
-           backgroundColor != oldDelegate.backgroundColor;
+    return child != oldDelegate.child ||
+        minHeight != oldDelegate.minHeight ||
+        maxHeight != oldDelegate.maxHeight ||
+        backgroundColor != oldDelegate.backgroundColor;
   }
 }
 
@@ -992,11 +1498,36 @@ class _MiniChartPainter extends CustomPainter {
 
     final path = Path();
     path.moveTo(0, size.height * 0.9);
-    path.quadraticBezierTo(size.width * 0.1, size.height * 0.6, size.width * 0.2, size.height * 0.8);
-    path.quadraticBezierTo(size.width * 0.3, size.height * 0.9, size.width * 0.4, size.height * 0.6);
-    path.quadraticBezierTo(size.width * 0.5, size.height * 0.3, size.width * 0.6, size.height * 0.4);
-    path.quadraticBezierTo(size.width * 0.7, size.height * 0.5, size.width * 0.8, size.height * 0.2);
-    path.quadraticBezierTo(size.width * 0.9, size.height * 0.1, size.width, size.height * 0.2);
+    path.quadraticBezierTo(
+      size.width * 0.1,
+      size.height * 0.6,
+      size.width * 0.2,
+      size.height * 0.8,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.3,
+      size.height * 0.9,
+      size.width * 0.4,
+      size.height * 0.6,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.5,
+      size.height * 0.3,
+      size.width * 0.6,
+      size.height * 0.4,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.7,
+      size.height * 0.5,
+      size.width * 0.8,
+      size.height * 0.2,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.9,
+      size.height * 0.1,
+      size.width,
+      size.height * 0.2,
+    );
 
     // Draw shadow/gradient fill
     final fillPath = Path.from(path)
@@ -1033,13 +1564,24 @@ class _WavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.08) // Subtle wave
+      ..color = color
+          .withOpacity(0.08) // Subtle wave
       ..style = PaintingStyle.fill;
 
     final path = Path();
     path.moveTo(0, size.height * 0.6);
-    path.quadraticBezierTo(size.width * 0.25, size.height * 0.3, size.width * 0.5, size.height * 0.6);
-    path.quadraticBezierTo(size.width * 0.75, size.height * 0.9, size.width, size.height * 0.5);
+    path.quadraticBezierTo(
+      size.width * 0.25,
+      size.height * 0.3,
+      size.width * 0.5,
+      size.height * 0.6,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.75,
+      size.height * 0.9,
+      size.width,
+      size.height * 0.5,
+    );
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();

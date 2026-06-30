@@ -5,6 +5,7 @@ import '../../auth/auth_controller.dart';
 import '../../team/team_controller.dart';
 import 'quotation_template_params.dart';
 import 'template_helper.dart';
+import '../../../core/constants/app_typography.dart';
 
 class StandardTemplate extends StatelessWidget {
   final QuotationTemplateParams params;
@@ -34,7 +35,11 @@ class StandardTemplate extends StatelessWidget {
     final accountName = params.bankDetails['accountName']?.toString() ?? '';
     final accountNumber = params.bankDetails['accountNumber']?.toString() ?? '';
     final ifscCode = params.bankDetails['ifscCode']?.toString() ?? '';
-    final hasBankDetails = bankName.isNotEmpty || accountName.isNotEmpty || accountNumber.isNotEmpty || ifscCode.isNotEmpty;
+    final hasBankDetails =
+        bankName.isNotEmpty ||
+        accountName.isNotEmpty ||
+        accountNumber.isNotEmpty ||
+        ifscCode.isNotEmpty;
     final logoWidget = _buildLogoWidget(params.tenant['logoImage'], height: 56);
 
     return Container(
@@ -57,8 +62,8 @@ class StandardTemplate extends StatelessWidget {
                   child: Text(
                     (params.tenant['name'] ?? '').toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontFamily: 'serif',
+                    style: TextStyle(
+                      fontFamily: AppTypography.serifFontFamily,
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                       letterSpacing: 1.5,
@@ -71,7 +76,7 @@ class StandardTemplate extends StatelessWidget {
                   child: Text(
                     (params.tenant['address'] ?? '').toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -85,7 +90,7 @@ class StandardTemplate extends StatelessWidget {
                     '${(params.tenant['email'] ?? '').toUpperCase()}  •  ${(params.tenant['phone'] ?? '').toUpperCase()}'
                     '${params.tenant['website'] != null && params.tenant['website']!.isNotEmpty ? '  •  ${params.tenant['website']!.toUpperCase()}' : ''}',
                     textAlign: TextAlign.center,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -93,13 +98,15 @@ class StandardTemplate extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (params.gstEnabled && params.tenant['gstNumber'] != null && params.tenant['gstNumber']!.isNotEmpty) ...[
+                if (params.gstEnabled &&
+                    params.tenant['gstNumber'] != null &&
+                    params.tenant['gstNumber']!.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Center(
                     child: Text(
                       'GSTIN: ${(params.tenant['gstNumber'] ?? '').toUpperCase()}',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
@@ -109,10 +116,7 @@ class StandardTemplate extends StatelessWidget {
                   ),
                 ],
                 const SizedBox(height: 12),
-                Container(
-                  height: 1.5,
-                  color: Colors.black87,
-                ),
+                Container(height: 1.5, color: Colors.black87),
                 const SizedBox(height: 16),
               ],
             ),
@@ -124,8 +128,8 @@ class StandardTemplate extends StatelessWidget {
               children: [
                 Text(
                   params.documentTitle.toUpperCase(),
-                  style: const TextStyle(
-                    fontFamily: 'serif',
+                  style: TextStyle(
+                    fontFamily: AppTypography.serifFontFamily,
                     fontSize: 26,
                     fontWeight: FontWeight.w100, // thin
                     color: Colors.black26, // text-gray-300 equivalent
@@ -137,8 +141,8 @@ class StandardTemplate extends StatelessWidget {
                   children: [
                     Text(
                       '#${params.quotationId}',
-                      style: const TextStyle(
-                        fontFamily: 'serif',
+                      style: TextStyle(
+                        fontFamily: AppTypography.serifFontFamily,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -148,14 +152,14 @@ class StandardTemplate extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        const Text(
+                        Text(
                           'Date:',
                           style: TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           formatCleanDate(params.date),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -167,14 +171,14 @@ class StandardTemplate extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        const Text(
+                        Text(
                           'Valid Until:',
                           style: TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           formatCleanDate(params.dueDate),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -199,17 +203,17 @@ class StandardTemplate extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.black12, width: 1),
                           ),
                         ),
                         padding: const EdgeInsets.only(bottom: 2),
                         margin: const EdgeInsets.only(bottom: 6),
-                        child: const Text(
+                        child: Text(
                           'TO',
                           style: TextStyle(
-                            fontFamily: 'serif',
+                            fontFamily: AppTypography.serifFontFamily,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.grey,
@@ -219,8 +223,8 @@ class StandardTemplate extends StatelessWidget {
                       ),
                       Text(
                         params.clientName,
-                        style: const TextStyle(
-                          fontFamily: 'serif',
+                        style: TextStyle(
+                          fontFamily: AppTypography.serifFontFamily,
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -230,7 +234,7 @@ class StandardTemplate extends StatelessWidget {
                       if (params.clientAddress.isNotEmpty) ...[
                         Text(
                           params.clientAddress,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
                             color: Colors.black54,
                             height: 1.4,
@@ -241,7 +245,7 @@ class StandardTemplate extends StatelessWidget {
                       if (params.clientEmail.isNotEmpty) ...[
                         Text(
                           params.clientEmail,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
                             color: Colors.black54,
                           ),
@@ -251,7 +255,7 @@ class StandardTemplate extends StatelessWidget {
                       if (params.clientPhone.isNotEmpty) ...[
                         Text(
                           params.clientPhone,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 10,
                             color: Colors.black54,
                           ),
@@ -264,10 +268,13 @@ class StandardTemplate extends StatelessWidget {
                             border: Border.all(color: Colors.black12),
                             color: Colors.black.withOpacity(0.02),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           child: Text(
                             'GSTIN: ${params.clientGst}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -286,17 +293,20 @@ class StandardTemplate extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 border: Border(
-                                  bottom: BorderSide(color: Colors.black12, width: 1),
+                                  bottom: BorderSide(
+                                    color: Colors.black12,
+                                    width: 1,
+                                  ),
                                 ),
                               ),
                               padding: const EdgeInsets.only(bottom: 2),
                               margin: const EdgeInsets.only(bottom: 6),
-                              child: const Text(
+                              child: Text(
                                 'PAY TO',
                                 style: TextStyle(
-                                  fontFamily: 'serif',
+                                  fontFamily: AppTypography.serifFontFamily,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.grey,
@@ -307,34 +317,50 @@ class StandardTemplate extends StatelessWidget {
                             RichText(
                               textAlign: TextAlign.right,
                               text: TextSpan(
-                                style: const TextStyle(fontSize: 10, color: Colors.black54, height: 1.5),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                  height: 1.5,
+                                ),
                                 children: [
                                   if (accountName.isNotEmpty) ...[
                                     const TextSpan(text: 'Name: '),
                                     TextSpan(
                                       text: '$accountName\n',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                                   ],
                                   if (bankName.isNotEmpty) ...[
                                     const TextSpan(text: 'Bank: '),
                                     TextSpan(
                                       text: '$bankName\n',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                                   ],
                                   if (accountNumber.isNotEmpty) ...[
                                     const TextSpan(text: 'A/C: '),
                                     TextSpan(
                                       text: '$accountNumber\n',
-                                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                                   ],
                                   if (ifscCode.isNotEmpty) ...[
                                     const TextSpan(text: 'IFSC: '),
                                     TextSpan(
                                       text: ifscCode,
-                                      style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
                                     ),
                                   ],
                                 ],
@@ -353,30 +379,27 @@ class StandardTemplate extends StatelessWidget {
               children: [
                 Text(
                   '${params.documentTitle} Ref: #${params.quotationId}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     color: Colors.black54,
-                    fontFamily: 'serif',
+                    fontFamily: AppTypography.serifFontFamily,
                   ),
                 ),
                 Text(
                   'Date: ${formatCleanDate(params.date)}',
-                  style: const TextStyle(fontSize: 9, color: Colors.black54),
+                  style: TextStyle(fontSize: 9, color: Colors.black54),
                 ),
               ],
             ),
             const SizedBox(height: 4),
-            Container(
-              height: 1,
-              color: Colors.black12,
-            ),
+            Container(height: 1, color: Colors.black12),
             const SizedBox(height: 12),
           ],
 
           // Elegant double-line table header
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(color: Colors.black12, width: 1.0),
                 bottom: BorderSide(color: Colors.black12, width: 1.0),
@@ -385,23 +408,23 @@ class StandardTemplate extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Row(
               children: [
-                const SizedBox(
+                SizedBox(
                   width: 30,
                   child: Text(
                     'NO.',
                     style: TextStyle(
-                      fontFamily: 'serif',
+                      fontFamily: AppTypography.serifFontFamily,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: Colors.black45,
                     ),
                   ),
                 ),
-                const Expanded(
+                Expanded(
                   child: Text(
                     'DESCRIPTION',
                     style: TextStyle(
-                      fontFamily: 'serif',
+                      fontFamily: AppTypography.serifFontFamily,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: Colors.black45,
@@ -409,52 +432,52 @@ class StandardTemplate extends StatelessWidget {
                   ),
                 ),
                 if (params.gstEnabled)
-                  const SizedBox(
+                  SizedBox(
                     width: 60,
                     child: Text(
                       'HSN/SAC',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: 'serif',
+                        fontFamily: AppTypography.serifFontFamily,
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         color: Colors.black45,
                       ),
                     ),
                   ),
-                const SizedBox(
+                SizedBox(
                   width: 40,
                   child: Text(
                     'QTY',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontFamily: 'serif',
+                      fontFamily: AppTypography.serifFontFamily,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: Colors.black45,
                     ),
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   width: 80,
                   child: Text(
                     'PRICE',
                     textAlign: TextAlign.right,
                     style: TextStyle(
-                      fontFamily: 'serif',
+                      fontFamily: AppTypography.serifFontFamily,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: Colors.black45,
                     ),
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   width: 90,
                   child: Text(
                     'AMOUNT',
                     textAlign: TextAlign.right,
                     style: TextStyle(
-                      fontFamily: 'serif',
+                      fontFamily: AppTypography.serifFontFamily,
                       fontSize: 9,
                       fontWeight: FontWeight.bold,
                       color: Colors.black45,
@@ -471,10 +494,13 @@ class StandardTemplate extends StatelessWidget {
             final double qty = ((item['quantity'] ?? 1) as num).toDouble();
             final double rate = ((item['rate'] ?? 0.0) as num).toDouble();
             final double amount = qty * rate;
-            final itemNo = (pageIndex * 10 + index + 1).toString().padLeft(2, '0');
+            final itemNo = (pageIndex * 10 + index + 1).toString().padLeft(
+              2,
+              '0',
+            );
 
             return Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(color: Colors.black12, width: 0.5),
                 ),
@@ -487,8 +513,8 @@ class StandardTemplate extends StatelessWidget {
                     width: 30,
                     child: Text(
                       itemNo,
-                      style: const TextStyle(
-                        fontFamily: 'serif',
+                      style: TextStyle(
+                        fontFamily: AppTypography.serifFontFamily,
                         fontSize: 9,
                         color: Colors.black87,
                       ),
@@ -500,19 +526,21 @@ class StandardTemplate extends StatelessWidget {
                       children: [
                         Text(
                           item['description'] as String? ?? '',
-                          style: const TextStyle(
-                            fontFamily: 'serif',
+                          style: TextStyle(
+                            fontFamily: AppTypography.serifFontFamily,
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
                         ),
                         if (item['additionalDetails'] != null &&
-                            (item['additionalDetails'] as String).trim().isNotEmpty) ...[
+                            (item['additionalDetails'] as String)
+                                .trim()
+                                .isNotEmpty) ...[
                           const SizedBox(height: 2),
                           Text(
                             item['additionalDetails'] as String,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 8,
                               color: Colors.grey,
                               fontStyle: FontStyle.italic,
@@ -528,7 +556,7 @@ class StandardTemplate extends StatelessWidget {
                       child: Text(
                         (item['hsn'] ?? '').toString(),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 9,
                           color: Colors.black87,
                         ),
@@ -537,9 +565,11 @@ class StandardTemplate extends StatelessWidget {
                   SizedBox(
                     width: 40,
                     child: Text(
-                      qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(2),
+                      qty % 1 == 0
+                          ? qty.toStringAsFixed(0)
+                          : qty.toStringAsFixed(2),
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 9,
                         color: Colors.black87,
                       ),
@@ -550,7 +580,7 @@ class StandardTemplate extends StatelessWidget {
                     child: Text(
                       params.formatCurrency.format(rate),
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 9,
                         color: Colors.black87,
                       ),
@@ -561,7 +591,7 @@ class StandardTemplate extends StatelessWidget {
                     child: Text(
                       params.formatCurrency.format(amount),
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -574,10 +604,7 @@ class StandardTemplate extends StatelessWidget {
           }),
 
           // Table Bottom Solid Line
-          Container(
-            height: 1.5,
-            color: Colors.black87,
-          ),
+          Container(height: 1.5, color: Colors.black87),
 
           if (isLastPage) ...[
             const SizedBox(height: 24),
@@ -590,10 +617,10 @@ class StandardTemplate extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'AMOUNT IN WORDS',
                         style: TextStyle(
-                          fontFamily: 'serif',
+                          fontFamily: AppTypography.serifFontFamily,
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey,
@@ -603,8 +630,8 @@ class StandardTemplate extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         convertNumberToWords(params.total),
-                        style: const TextStyle(
-                          fontFamily: 'serif',
+                        style: TextStyle(
+                          fontFamily: AppTypography.serifFontFamily,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           fontStyle: FontStyle.italic,
@@ -624,8 +651,20 @@ class StandardTemplate extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Subtotal', style: TextStyle(fontSize: 10, color: Colors.black54)),
-                          Text(params.formatCurrency.format(params.subtotal), style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                          Text(
+                            'subtotal'.tr,
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          Text(
+                            params.formatCurrency.format(params.subtotal),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.black87,
+                            ),
+                          ),
                         ],
                       ),
                       if (params.discountAmount > 0) ...[
@@ -633,47 +672,104 @@ class StandardTemplate extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Discount (${params.discountPercentage.toStringAsFixed(0)}%)', style: const TextStyle(fontSize: 10, color: Colors.black54)),
-                            Text('- ${params.formatCurrency.format(params.discountAmount)}', style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                            Text(
+                              'Discount (${params.discountPercentage.toStringAsFixed(0)}%)',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            Text(
+                              '- ${params.formatCurrency.format(params.discountAmount)}',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.black87,
+                              ),
+                            ),
                           ],
                         ),
                       ],
                       if (params.gstEnabled && params.taxAmount > 0) ...[
                         const SizedBox(height: 4),
-                        if (params.placeOfSupply.toLowerCase().contains((params.tenant['state'] ?? 'telangana').toString().toLowerCase()) || params.placeOfSupply.contains('36')) ...[
+                        if (params.placeOfSupply.toLowerCase().contains(
+                              (params.tenant['state'] ?? 'telangana')
+                                  .toString()
+                                  .toLowerCase(),
+                            ) ||
+                            params.placeOfSupply.contains('36')) ...[
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('CGST', style: TextStyle(fontSize: 10, color: Colors.black54)),
-                              Text(params.formatCurrency.format(params.taxAmount / 2), style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                              Text(
+                                'cgst'.tr,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              Text(
+                                params.formatCurrency.format(
+                                  params.taxAmount / 2,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 4),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('SGST', style: TextStyle(fontSize: 10, color: Colors.black54)),
-                              Text(params.formatCurrency.format(params.taxAmount / 2), style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                              Text(
+                                'sgst'.tr,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              Text(
+                                params.formatCurrency.format(
+                                  params.taxAmount / 2,
+                                ),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ],
                           ),
                         ] else ...[
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text('IGST', style: TextStyle(fontSize: 10, color: Colors.black54)),
-                              Text(params.formatCurrency.format(params.taxAmount), style: const TextStyle(fontSize: 10, color: Colors.black87)),
+                              Text(
+                                'igst'.tr,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              Text(
+                                params.formatCurrency.format(params.taxAmount),
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.black87,
+                                ),
+                              ),
                             ],
                           ),
                         ],
                       ],
-                      const Divider(height: 12, color: Colors.black12),
+                      Divider(height: 12, color: Colors.black12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'TOTAL',
                             style: TextStyle(
-                              fontFamily: 'serif',
+                              fontFamily: AppTypography.serifFontFamily,
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -681,8 +777,8 @@ class StandardTemplate extends StatelessWidget {
                           ),
                           Text(
                             params.formatCurrency.format(params.total),
-                            style: const TextStyle(
-                              fontFamily: 'serif',
+                            style: TextStyle(
+                              fontFamily: AppTypography.serifFontFamily,
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -693,7 +789,7 @@ class StandardTemplate extends StatelessWidget {
                       const SizedBox(height: 8),
                       Container(
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0F172A),
+                          color: Color(0xFF0F172A),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.08),
@@ -702,14 +798,17 @@ class StandardTemplate extends StatelessWidget {
                             ),
                           ],
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 8,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Balance Due',
                               style: TextStyle(
-                                fontFamily: 'serif',
+                                fontFamily: AppTypography.serifFontFamily,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -718,8 +817,8 @@ class StandardTemplate extends StatelessWidget {
                             ),
                             Text(
                               params.formatCurrency.format(params.total),
-                              style: const TextStyle(
-                                fontFamily: 'serif',
+                              style: TextStyle(
+                                fontFamily: AppTypography.serifFontFamily,
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -742,12 +841,9 @@ class StandardTemplate extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            Container(
-              height: 2,
-              color: Colors.black87,
-            ),
+            Container(height: 2, color: Colors.black87),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'TERMS & CONDITIONS',
               style: TextStyle(
                 fontSize: 8,
@@ -759,13 +855,17 @@ class StandardTemplate extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               params.tenant['defaultTerms'] ?? '',
-              style: const TextStyle(fontSize: 8, color: Colors.grey, height: 1.3),
+              style: TextStyle(
+                fontSize: 8,
+                color: Colors.grey,
+                height: 1.3,
+              ),
             ),
             if (params.placeOfSupply.isNotEmpty) ...[
               const SizedBox(height: 6),
               Text(
                 'Place of Supply: ${params.placeOfSupply}${params.tenant['state'] != null && params.tenant['state']!.isNotEmpty ? ' | Dispatch State: ${params.tenant['state']}' : ''}',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 8,
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
@@ -784,7 +884,9 @@ class StandardTemplate extends StatelessWidget {
     }
     if (logoImage.startsWith('data:image') || !logoImage.startsWith('http')) {
       try {
-        final base64Str = logoImage.contains(',') ? logoImage.split(',')[1] : logoImage;
+        final base64Str = logoImage.contains(',')
+            ? logoImage.split(',')[1]
+            : logoImage;
         return Image.memory(
           base64Decode(base64Str),
           height: height,
@@ -808,24 +910,35 @@ class StandardTemplate extends StatelessWidget {
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
-        
+
     final TeamController teamController = Get.isRegistered<TeamController>()
         ? Get.find<TeamController>()
         : Get.put(TeamController());
 
     return Obx(() {
       final currentUserMember = teamController.teamMembers.firstWhereOrNull(
-        (m) => m.email.trim().toLowerCase() == authController.userEmail.value.trim().toLowerCase()
+        (m) =>
+            m.email.trim().toLowerCase() ==
+            authController.userEmail.value.trim().toLowerCase(),
       );
-      final userSignature = (currentUserMember?.signatureImage != null && currentUserMember!.signatureImage!.isNotEmpty)
+      final userSignature =
+          (currentUserMember?.signatureImage != null &&
+              currentUserMember!.signatureImage!.isNotEmpty)
           ? currentUserMember.signatureImage
-          : (authController.userSignature.value.isNotEmpty ? authController.userSignature.value : null);
-      
+          : (authController.userSignature.value.isNotEmpty
+                ? authController.userSignature.value
+                : null);
+
       final String displayName;
-      if (userSignature != null && userSignature.isNotEmpty && currentUserMember != null) {
+      if (userSignature != null &&
+          userSignature.isNotEmpty &&
+          currentUserMember != null) {
         displayName = currentUserMember.name;
       } else {
-        displayName = params.tenant['authorizedSignatoryName'] ?? params.tenant['name'] ?? '';
+        displayName =
+            params.tenant['authorizedSignatoryName'] ??
+            params.tenant['name'] ??
+            '';
       }
 
       final signatureWidget = _buildLogoWidget(
@@ -842,10 +955,10 @@ class StandardTemplate extends StatelessWidget {
             signatureWidget,
             const SizedBox(height: 4),
           ] else ...[
-            const Text(
+            Text(
               'Authorized Sign',
               style: TextStyle(
-                fontFamily: 'serif',
+                fontFamily: AppTypography.serifFontFamily,
                 fontStyle: FontStyle.italic,
                 fontSize: 14,
                 color: Colors.grey,
@@ -853,22 +966,18 @@ class StandardTemplate extends StatelessWidget {
             ),
             const SizedBox(height: 4),
           ],
-          Container(
-            width: 120,
-            height: 1,
-            color: Colors.black26,
-          ),
+          Container(width: 120, height: 1, color: Colors.black26),
           const SizedBox(height: 4),
           Text(
             displayName,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
             textAlign: TextAlign.center,
           ),
-          const Text(
+          Text(
             'AUTHORIZED SIGNATORY',
             style: TextStyle(
               fontSize: 8,

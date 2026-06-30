@@ -24,8 +24,8 @@ class AppNotification {
       type: json['type'] ?? 'info',
       target: json['target'] ?? '',
       isRead: json['isRead'] ?? false,
-      createdAt: json['createdAt'] != null 
-          ? DateTime.parse(json['createdAt']) 
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
       actionLink: json['actionLink'],
     );

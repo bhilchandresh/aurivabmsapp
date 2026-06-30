@@ -53,10 +53,10 @@ class TeamMember {
 class TeamController extends GetxController {
   // Subscription Plan state
   var subscriptionPlan = 'premium'.obs; // 'basic', 'premium', 'enterprise'
-  
+
   // Loaded list of team members
   var teamMembers = <TeamMember>[].obs;
-  
+
   // Current logged in user ID to prevent self-deletion
   var currentUserId = 'u1'.obs;
 
@@ -68,9 +68,10 @@ class TeamController extends GetxController {
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
-        
-    subscriptionPlan.value = authController.tenantInfo.value?['subscriptionPlan'] ?? 'premium';
-    
+
+    subscriptionPlan.value =
+        authController.tenantInfo.value?['subscriptionPlan'] ?? 'premium';
+
     // Bind subscription plan from authController's tenantInfo if it changes
     ever(authController.tenantInfo, (Map<String, dynamic>? info) {
       if (info != null) {
@@ -89,7 +90,9 @@ class TeamController extends GetxController {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
-          teamMembers.assignAll(data.map((m) => TeamMember.fromJson(m)).toList());
+          teamMembers.assignAll(
+            data.map((m) => TeamMember.fromJson(m)).toList(),
+          );
         }
       }
     } catch (e) {
@@ -119,14 +122,19 @@ class TeamController extends GetxController {
     return (teamMembers.length / maxUsers).clamp(0.0, 1.0);
   }
 
-  Future<bool> addMember(String name, String email, String password, String role) async {
+  Future<bool> addMember(
+    String name,
+    String email,
+    String password,
+    String role,
+  ) async {
     if (isAtLimit) return false;
     try {
       isLoading.value = true;
-      
+
       // Map frontend 'sales' -> backend 'user'
       final backendRole = role == 'sales' ? 'user' : role;
-      
+
       final response = await ApiService.post(ApiConstants.users, {
         'name': name,
         'email': email,
@@ -186,4 +194,3 @@ class TeamController extends GetxController {
     }
   }
 }
-

@@ -16,7 +16,9 @@ class SuppliersScreen extends StatefulWidget {
 }
 
 class _SuppliersScreenState extends State<SuppliersScreen> {
-  final SuppliersController _suppliersController = Get.put(SuppliersController());
+  final SuppliersController _suppliersController = Get.put(
+    SuppliersController(),
+  );
   String _searchQuery = '';
   int? _hoveredIndex;
 
@@ -39,7 +41,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'suppliers'.tr,
         subtitle: 'manage_vendors'.tr,
@@ -51,7 +53,9 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
         onRefresh: () => _suppliersController.fetchSuppliers(),
         color: AppColors.primary,
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,22 +73,34 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: 'search_vendors'.tr,
-                        hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-                        prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 18),
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                        ),
+                        prefixIcon: Icon(
+                          LucideIcons.search,
+                          color: Colors.grey,
+                          size: 18,
+                        ),
                         filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                        fillColor: Theme.of(context).cardTheme.color,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                          borderSide: BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
                         ),
                       ),
                     ),
@@ -92,14 +108,19 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                   const SizedBox(width: 12),
                   ElevatedButton.icon(
                     onPressed: () => _showAddSupplierDialog(context),
-                    icon: const Icon(LucideIcons.plus, size: 16),
+                    icon: Icon(LucideIcons.plus, size: 16),
                     label: Text('add_vendor'.tr),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       elevation: 1,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ],
@@ -112,28 +133,41 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 children: [
                   Text(
                     'vendors_registry'.tr,
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                    ),
                   ),
-                  const Icon(LucideIcons.slidersHorizontal, size: 16, color: Colors.grey),
+                  Icon(
+                    LucideIcons.slidersHorizontal,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
 
               // Vendor list
               Obx(() {
-                final showSkeleton = _suppliersController.isLoading.value && _suppliersController.suppliers.isEmpty;
-                
+                final showSkeleton =
+                    _suppliersController.isLoading.value &&
+                    _suppliersController.suppliers.isEmpty;
+
                 final listItems = showSkeleton
-                    ? List.generate(5, (index) => Supplier(
-                        id: 'loading_$index',
-                        name: 'Loading Supplier Name',
-                        email: 'supplier@loading.com',
-                        phone: '+91 9876543210',
-                        gstNumber: '29ABCDE1234F1Z1',
-                        address: '123 Loading Street, Bangalore',
-                        totalPurchased: 0.0,
-                        totalPaid: 0.0,
-                      ))
+                    ? List.generate(
+                        5,
+                        (index) => Supplier(
+                          id: 'loading_$index',
+                          name: 'Loading Supplier Name',
+                          email: 'supplier@loading.com',
+                          phone: '+91 9876543210',
+                          gstNumber: '29ABCDE1234F1Z1',
+                          address: '123 Loading Street, Bangalore',
+                          totalPurchased: 0.0,
+                          totalPaid: 0.0,
+                        ),
+                      )
                     : _filteredSuppliers;
 
                 if (listItems.isEmpty) {
@@ -141,18 +175,25 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     height: 200,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Theme.of(context).cardTheme.color,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(LucideIcons.truck, size: 40, color: Colors.grey),
+                        Icon(
+                          LucideIcons.truck,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
                         const SizedBox(height: 12),
                         Text(
                           'no_suppliers_found'.tr,
-                          style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.grey),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -165,167 +206,232 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                  itemCount: listItems.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final supplier = listItems[index];
-                    final isHovered = _hoveredIndex == index;
+                    itemCount: listItems.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
+                    itemBuilder: (context, index) {
+                      final supplier = listItems[index];
+                      final isHovered = _hoveredIndex == index;
 
-                    return TweenAnimationBuilder<double>(
-                      duration: Duration(milliseconds: 200 + (index * 40)),
-                      tween: Tween<double>(begin: 0.0, end: 1.0),
-                      builder: (context, value, child) {
-                        return Transform.translate(
-                          offset: Offset(0, 15 * (1.0 - value)),
-                          child: Opacity(
-                            opacity: value,
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: InkWell(
-                        onTap: () {
-                          Get.to(() => SupplierDetailsScreen(supplierId: supplier.id));
+                      return TweenAnimationBuilder<double>(
+                        duration: Duration(milliseconds: 200 + (index * 40)),
+                        tween: Tween<double>(begin: 0.0, end: 1.0),
+                        builder: (context, value, child) {
+                          return Transform.translate(
+                            offset: Offset(0, 15 * (1.0 - value)),
+                            child: Opacity(opacity: value, child: child),
+                          );
                         },
-                        onHover: (hovering) {
-                          setState(() {
-                            _hoveredIndex = hovering ? index : null;
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(16),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isHovered ? AppColors.primary.withOpacity(0.5) : AppColors.border,
-                              width: 1,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
+                        child: InkWell(
+                          onTap: () {
+                            Get.to(
+                              () => SupplierDetailsScreen(
+                                supplierId: supplier.id,
+                              ),
+                            );
+                          },
+                          onHover: (hovering) {
+                            setState(() {
+                              _hoveredIndex = hovering ? index : null;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(16),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardTheme.color,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
                                 color: isHovered
-                                    ? AppColors.primary.withOpacity(0.04)
-                                    : Colors.black.withOpacity(0.01),
-                                blurRadius: isHovered ? 12 : 6,
-                                offset: const Offset(0, 4),
-                              )
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary.withOpacity(0.05),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        supplier.name.substring(0, 1).toUpperCase(),
-                                        style: const TextStyle(
-                                          color: AppColors.primary,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
+                                    ? AppColors.primary.withOpacity(0.5)
+                                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isHovered
+                                      ? AppColors.primary.withOpacity(0.04)
+                                      : Colors.black.withOpacity(0.01),
+                                  blurRadius: isHovered ? 12 : 6,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 44,
+                                      height: 44,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withOpacity(
+                                          0.05,
+                                        ),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          supplier.name
+                                              .substring(0, 1)
+                                              .toUpperCase(),
+                                          style: TextStyle(
+                                            color: AppColors.primary,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 14),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          supplier.name,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                            color: AppColors.textPrimary,
+                                    const SizedBox(width: 14),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            supplier.name,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                              color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            const Icon(LucideIcons.phone, size: 12, color: Colors.grey),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              supplier.phone.isNotEmpty ? supplier.phone : 'N/A',
-                                              style: const TextStyle(fontSize: 11, color: Colors.grey),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            const Icon(LucideIcons.mail, size: 12, color: Colors.grey),
-                                            const SizedBox(width: 4),
-                                            Expanded(
-                                              child: Text(
-                                                supplier.email.isNotEmpty ? supplier.email : 'N/A',
-                                                style: const TextStyle(fontSize: 11, color: Colors.grey),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        if (supplier.gstNumber.isNotEmpty) ...[
-                                          const SizedBox(height: 4),
+                                          const SizedBox(height: 6),
                                           Row(
                                             children: [
-                                              const Icon(LucideIcons.hash, size: 12, color: Colors.grey),
+                                              Icon(
+                                                LucideIcons.phone,
+                                                size: 12,
+                                                color: Colors.grey,
+                                              ),
                                               const SizedBox(width: 4),
                                               Text(
-                                                'GST: ${supplier.gstNumber}',
-                                                style: const TextStyle(fontSize: 11, color: Colors.grey),
+                                                supplier.phone.isNotEmpty
+                                                    ? supplier.phone
+                                                    : 'N/A',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Icon(
+                                                LucideIcons.mail,
+                                                size: 12,
+                                                color: Colors.grey,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Expanded(
+                                                child: Text(
+                                                  supplier.email.isNotEmpty
+                                                      ? supplier.email
+                                                      : 'N/A',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: Colors.grey,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
                                               ),
                                             ],
                                           ),
+                                          if (supplier
+                                              .gstNumber
+                                              .isNotEmpty) ...[
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  LucideIcons.hash,
+                                                  size: 12,
+                                                  color: Colors.grey,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  'GST: ${supplier.gstNumber}',
+                                                  style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ],
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 14),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () {
-                                      Get.to(() => SupplierDetailsScreen(supplierId: supplier.id));
-                                    },
-                                    icon: const Icon(LucideIcons.arrowRight, size: 12),
-                                    label: Text('view_ledger'.tr),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary.withOpacity(0.1),
-                                      foregroundColor: AppColors.primary,
-                                      elevation: 0,
-                                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  ],
+                                ),
+                                const SizedBox(height: 14),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        Get.to(
+                                          () => SupplierDetailsScreen(
+                                            supplierId: supplier.id,
+                                          ),
+                                        );
+                                      },
+                                      icon: Icon(
+                                        LucideIcons.arrowRight,
+                                        size: 12,
+                                      ),
+                                      label: Text('view_ledger'.tr),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primary
+                                            .withOpacity(0.1),
+                                        foregroundColor: AppColors.primary,
+                                        elevation: 0,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 8,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  IconButton(
-                                    onPressed: () => _confirmDeleteSupplier(supplier.id, supplier.name),
-                                    icon: const Icon(LucideIcons.trash2, size: 16, color: Colors.red),
-                                    style: IconButton.styleFrom(
-                                      backgroundColor: Colors.red.withOpacity(0.1),
-                                      padding: const EdgeInsets.all(8),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                    const SizedBox(width: 8),
+                                    IconButton(
+                                      onPressed: () => _confirmDeleteSupplier(
+                                        supplier.id,
+                                        supplier.name,
+                                      ),
+                                      icon: Icon(
+                                        LucideIcons.trash2,
+                                        size: 16,
+                                        color: Colors.red,
+                                      ),
+                                      style: IconButton.styleFrom(
+                                        backgroundColor: Colors.red.withOpacity(
+                                          0.1,
+                                        ),
+                                        padding: const EdgeInsets.all(8),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      );
+                    },
+                  ),
                 );
               }),
             ],
@@ -346,7 +452,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
       AlertDialog(
         title: Row(
           children: [
-            const Icon(LucideIcons.truck, color: AppColors.primary),
+            Icon(LucideIcons.truck, color: AppColors.primary),
             const SizedBox(width: 8),
             Text('add_supplier'.tr),
           ],
@@ -392,40 +498,71 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
+            child: Text(
+              'cancel'.tr,
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
           Obx(() {
             final isSaving = _suppliersController.isLoading.value;
             return ElevatedButton(
-              onPressed: isSaving ? null : () async {
-                if (nameController.text.trim().isEmpty) {
-                  Get.snackbar('Error', 'supplier_name_req'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                  return;
-                }
-                
-                final success = await _suppliersController.addSupplier(
-                  nameController.text.trim(),
-                  emailController.text.trim(),
-                  phoneController.text.trim(),
-                  gstController.text.trim(),
-                  addressController.text.trim(),
-                );
-                
-                if (success) {
-                  Get.back();
-                  Get.snackbar('Success', 'supplier_added_success'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-                } else {
-                  Get.snackbar('Error', 'supplier_add_error'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                }
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              onPressed: isSaving
+                  ? null
+                  : () async {
+                      if (nameController.text.trim().isEmpty) {
+                        Get.snackbar(
+                          'Error',
+                          'supplier_name_req'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                        );
+                        return;
+                      }
+
+                      final success = await _suppliersController.addSupplier(
+                        nameController.text.trim(),
+                        emailController.text.trim(),
+                        phoneController.text.trim(),
+                        gstController.text.trim(),
+                        addressController.text.trim(),
+                      );
+
+                      if (success) {
+                        Get.back();
+                        Get.snackbar(
+                          'Success',
+                          'supplier_added_success'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.green,
+                          colorText: Colors.white,
+                        );
+                      } else {
+                        Get.snackbar(
+                          'Error',
+                          'supplier_add_error'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
               child: isSaving
                   ? const SizedBox(
                       height: 16,
                       width: 16,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
-                  : Text('save_supplier'.tr, style: const TextStyle(color: Colors.white)),
+                  : Text(
+                      'save_supplier'.tr,
+                      style: TextStyle(color: Colors.white),
+                    ),
             );
           }),
         ],
@@ -441,28 +578,53 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
+            child: Text(
+              'cancel'.tr,
+              style: TextStyle(color: Colors.grey),
+            ),
           ),
           Obx(() {
             final isDeleting = _suppliersController.isLoading.value;
             return ElevatedButton(
-              onPressed: isDeleting ? null : () async {
-                final success = await _suppliersController.deleteSupplier(id);
-                Get.back();
-                if (success) {
-                  Get.snackbar('Success', 'supplier_deleted'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-                } else {
-                  Get.snackbar('Error', 'supplier_delete_error'.tr, snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                }
-              },
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                      final success = await _suppliersController.deleteSupplier(
+                        id,
+                      );
+                      Get.back();
+                      if (success) {
+                        Get.snackbar(
+                          'Success',
+                          'supplier_deleted'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.green,
+                          colorText: Colors.white,
+                        );
+                      } else {
+                        Get.snackbar(
+                          'Error',
+                          'supplier_delete_error'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: isDeleting
                   ? const SizedBox(
                       height: 16,
                       width: 16,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
-                  : Text('delete_vendor'.tr, style: const TextStyle(color: Colors.white)),
+                  : Text(
+                      'delete_vendor'.tr,
+                      style: TextStyle(color: Colors.white),
+                    ),
             );
           }),
         ],

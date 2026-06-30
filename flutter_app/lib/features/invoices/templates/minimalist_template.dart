@@ -49,22 +49,22 @@ class MinimalistTemplate extends StatelessWidget {
         children: [
           if (isFirstPage) _buildHeader(),
           if (!isFirstPage) _buildCompactHeader(),
-          
+
           if (isFirstPage) ...[
             const SizedBox(height: 24),
             _buildClientAndPaymentInfo(),
             const SizedBox(height: 24),
           ],
-          
+
           _buildItemsTable(itemsList),
-          
+
           if (isLastPage) ...[
             const SizedBox(height: 24),
             _buildTotalsSection(),
             const SizedBox(height: 16),
             _buildSignatorySection(),
           ],
-          
+
           const Spacer(),
           if (isLastPage) _buildTermsSection(),
         ],
@@ -89,11 +89,15 @@ class MinimalistTemplate extends StatelessWidget {
                   if ((tenant['logoImage'] ?? '').isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
-                      child: _buildLogoWidget(tenant['logoImage'], height: 48, fit: BoxFit.contain),
+                      child: _buildLogoWidget(
+                        tenant['logoImage'],
+                        height: 48,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   Text(
                     (tenant['name'] ?? '').toUpperCase(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0,
@@ -109,7 +113,8 @@ class MinimalistTemplate extends StatelessWidget {
                       ),
                     ),
                   ],
-                  if ((tenant['email'] ?? '').isNotEmpty || (tenant['phone'] ?? '').isNotEmpty) ...[
+                  if ((tenant['email'] ?? '').isNotEmpty ||
+                      (tenant['phone'] ?? '').isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Row(
                       children: [
@@ -118,9 +123,19 @@ class MinimalistTemplate extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 12.0),
                             child: Row(
                               children: [
-                                const Icon(Icons.email, size: 8, color: Colors.black87),
+                                Icon(
+                                  Icons.email,
+                                  size: 8,
+                                  color: Colors.black87,
+                                ),
                                 const SizedBox(width: 4),
-                                Text(tenant['email'] ?? '', style: TextStyle(fontSize: 8, color: Colors.grey.shade600)),
+                                Text(
+                                  tenant['email'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -129,21 +144,35 @@ class MinimalistTemplate extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 12.0),
                             child: Row(
                               children: [
-                                const Icon(Icons.phone, size: 8, color: Colors.black87),
+                                Icon(
+                                  Icons.phone,
+                                  size: 8,
+                                  color: Colors.black87,
+                                ),
                                 const SizedBox(width: 4),
-                                Text(tenant['phone'] ?? '', style: TextStyle(fontSize: 8, color: Colors.grey.shade600)),
+                                Text(
+                                  tenant['phone'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: 8,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                       ],
                     ),
                   ],
-                  if (params.gstEnabled && (tenant['gstNumber'] ?? '').isNotEmpty)
+                  if (params.gstEnabled &&
+                      (tenant['gstNumber'] ?? '').isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Text(
                         'GSTIN: ${tenant['gstNumber']}',
-                        style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                 ],
@@ -164,7 +193,7 @@ class MinimalistTemplate extends StatelessWidget {
                 ),
                 Text(
                   '#${params.invoiceId}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -173,16 +202,40 @@ class MinimalistTemplate extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('ISSUED:  ', style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
-                    Text(_formatDate(params.date), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
+                    Text(
+                      'issued'.tr,
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    Text(
+                      _formatDate(params.date),
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('${params.documentTitle == "QUOTATION" ? "VALID UNTIL" : "DUE DATE"}:  ', style: TextStyle(fontSize: 9, color: Colors.grey.shade500)),
-                    Text(_formatDate(params.dueDate), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
+                    Text(
+                      '${params.documentTitle == "QUOTATION" ? "VALID UNTIL" : "DUE DATE"}:  ',
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: Colors.grey.shade500,
+                      ),
+                    ),
+                    Text(
+                      _formatDate(params.dueDate),
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -190,7 +243,7 @@ class MinimalistTemplate extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        const Divider(thickness: 1.5, color: Colors.black),
+        Divider(thickness: 1.5, color: Colors.black),
       ],
     );
   }
@@ -204,32 +257,40 @@ class MinimalistTemplate extends StatelessWidget {
           children: [
             Text(
               '${params.numberLabel} Ref: ${params.invoiceId}',
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
             ),
             Text(
               'Date: ${_formatDate(params.date)}',
-              style: const TextStyle(fontSize: 10),
+              style: TextStyle(fontSize: 10),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        const Divider(thickness: 1.5, color: Colors.black),
+        Divider(thickness: 1.5, color: Colors.black),
         const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildLogoWidget(String? logoImage, {double height = 50, double? width, BoxFit fit = BoxFit.contain}) {
+  Widget _buildLogoWidget(
+    String? logoImage, {
+    double height = 50,
+    double? width,
+    BoxFit fit = BoxFit.contain,
+  }) {
     if (logoImage == null || logoImage.isEmpty) return const SizedBox.shrink();
     if (logoImage.startsWith('data:image') || !logoImage.startsWith('http')) {
       try {
-        final base64Str = logoImage.contains(',') ? logoImage.split(',')[1] : logoImage;
+        final base64Str = logoImage.contains(',')
+            ? logoImage.split(',')[1]
+            : logoImage;
         return Image.memory(
           base64Decode(base64Str),
           height: height,
           width: width,
           fit: fit,
-          errorBuilder: (context, error, stackTrace) => SizedBox(height: height, width: width),
+          errorBuilder: (context, error, stackTrace) =>
+              SizedBox(height: height, width: width),
         );
       } catch (e) {
         return SizedBox(height: height, width: width);
@@ -240,7 +301,8 @@ class MinimalistTemplate extends StatelessWidget {
         height: height,
         width: width,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) => SizedBox(height: height, width: width),
+        errorBuilder: (context, error, stackTrace) =>
+            SizedBox(height: height, width: width),
       );
     }
   }
@@ -267,7 +329,7 @@ class MinimalistTemplate extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 params.clientName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -285,17 +347,14 @@ class MinimalistTemplate extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   params.clientEmail,
-                  style: TextStyle(
-                    fontSize: 9,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 9, color: Colors.grey.shade600),
                 ),
               ],
               if (params.gstEnabled && params.clientGst.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(
                   'GSTIN: ${params.clientGst}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 8,
                     fontWeight: FontWeight.bold,
                   ),
@@ -322,7 +381,8 @@ class MinimalistTemplate extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              if (params.bankDetails.isNotEmpty && params.bankDetails['accountNumber'] != null) ...[
+              if (params.bankDetails.isNotEmpty &&
+                  params.bankDetails['accountNumber'] != null) ...[
                 if ((params.bankDetails['accountName'] ?? '').isNotEmpty)
                   _buildPaymentRow('NAME', params.bankDetails['accountName']),
                 _buildPaymentRow('BANK', params.bankDetails['bankName']),
@@ -354,17 +414,11 @@ class MinimalistTemplate extends StatelessWidget {
         children: [
           Text(
             '$label: ',
-            style: TextStyle(
-              fontSize: 8,
-              color: Colors.grey.shade400,
-            ),
+            style: TextStyle(fontSize: 8, color: Colors.grey.shade400),
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 9,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -372,7 +426,9 @@ class MinimalistTemplate extends StatelessWidget {
   }
 
   Widget _buildItemsTable(List<Map<String, dynamic>> items) {
-    final bool showHsn = items.any((item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty);
+    final bool showHsn = items.any(
+      (item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty,
+    );
 
     Map<int, TableColumnWidth> colWidths = showHsn
         ? const {
@@ -394,7 +450,7 @@ class MinimalistTemplate extends StatelessWidget {
       children: [
         // HEADER
         TableRow(
-          decoration: const BoxDecoration(color: Colors.black),
+          decoration: BoxDecoration(color: Colors.black),
           children: [
             _buildTableHeaderCell('ITEM DESCRIPTION', TextAlign.left),
             if (showHsn) _buildTableHeaderCell('HSN/SAC', TextAlign.center),
@@ -411,39 +467,61 @@ class MinimalistTemplate extends StatelessWidget {
 
           return TableRow(
             decoration: BoxDecoration(
-              border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1)),
+              border: Border(
+                bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+              ),
             ),
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 12,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       item['description']?.toString() ?? '',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if ((item['additionalDetails']?.toString() ?? '').trim().isNotEmpty) ...[
+                    if ((item['additionalDetails']?.toString() ?? '')
+                        .trim()
+                        .isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         item['additionalDetails'].toString(),
-                          style: TextStyle(
-                            fontSize: 8,
-                            color: Colors.grey.shade500,
-                            height: 1.3,
-                          ),
+                        style: TextStyle(
+                          fontSize: 8,
+                          color: Colors.grey.shade500,
+                          height: 1.3,
+                        ),
                       ),
                     ],
                   ],
                 ),
               ),
-              if (showHsn) _buildTableCell(item['hsnCode']?.toString() ?? '-', TextAlign.center, color: Colors.grey.shade600),
-              _buildTableCell(qty.toStringAsFixed(qty.truncateToDouble() == qty ? 0 : 2), TextAlign.center),
-              _buildTableCell(params.formatCurrency.format(rate), TextAlign.right),
-              _buildTableCell(params.formatCurrency.format(amount), TextAlign.right, isBold: true),
+              if (showHsn)
+                _buildTableCell(
+                  item['hsnCode']?.toString() ?? '-',
+                  TextAlign.center,
+                  color: Colors.grey.shade600,
+                ),
+              _buildTableCell(
+                qty.toStringAsFixed(qty.truncateToDouble() == qty ? 0 : 2),
+                TextAlign.center,
+              ),
+              _buildTableCell(
+                params.formatCurrency.format(rate),
+                TextAlign.right,
+              ),
+              _buildTableCell(
+                params.formatCurrency.format(amount),
+                TextAlign.right,
+                isBold: true,
+              ),
             ],
           );
         }),
@@ -457,7 +535,7 @@ class MinimalistTemplate extends StatelessWidget {
       child: Text(
         text,
         textAlign: align,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 8,
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -467,7 +545,12 @@ class MinimalistTemplate extends StatelessWidget {
     );
   }
 
-  Widget _buildTableCell(String text, TextAlign align, {bool isBold = false, Color? color}) {
+  Widget _buildTableCell(
+    String text,
+    TextAlign align, {
+    bool isBold = false,
+    Color? color,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
       child: Text(
@@ -506,7 +589,7 @@ class MinimalistTemplate extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 convertNumberToWords(params.total),
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
                   height: 1.3,
@@ -522,8 +605,10 @@ class MinimalistTemplate extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.black, width: 2)),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.black, width: 2),
+                  ),
                 ),
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Column(
@@ -572,12 +657,15 @@ class MinimalistTemplate extends StatelessWidget {
               ],
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
+                ),
                 color: Colors.black,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Balance Due',
                       style: TextStyle(
                         fontSize: 12,
@@ -587,7 +675,7 @@ class MinimalistTemplate extends StatelessWidget {
                     ),
                     Text(
                       params.formatCurrency.format(balanceDue),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -605,7 +693,9 @@ class MinimalistTemplate extends StatelessWidget {
 
   List<Widget> _buildGstRows() {
     String place = params.placeOfSupply.toLowerCase();
-    String tenantState = (params.tenant['state'] ?? '').toString().toLowerCase();
+    String tenantState = (params.tenant['state'] ?? '')
+        .toString()
+        .toLowerCase();
     bool isOutstate = false;
     if (place.isNotEmpty && tenantState.isNotEmpty) {
       isOutstate = !place.contains(tenantState) && !tenantState.contains(place);
@@ -615,18 +705,40 @@ class MinimalistTemplate extends StatelessWidget {
 
     if (isOutstate) {
       return [
-        _buildTotalRow('IGST', params.taxAmount, isBold: false, color: Colors.grey.shade500),
+        _buildTotalRow(
+          'IGST',
+          params.taxAmount,
+          isBold: false,
+          color: Colors.grey.shade500,
+        ),
       ];
     } else {
       return [
-        _buildTotalRow('CGST', params.taxAmount / 2, isBold: false, color: Colors.grey.shade500),
+        _buildTotalRow(
+          'CGST',
+          params.taxAmount / 2,
+          isBold: false,
+          color: Colors.grey.shade500,
+        ),
         const SizedBox(height: 6),
-        _buildTotalRow('SGST', params.taxAmount / 2, isBold: false, color: Colors.grey.shade500),
+        _buildTotalRow(
+          'SGST',
+          params.taxAmount / 2,
+          isBold: false,
+          color: Colors.grey.shade500,
+        ),
       ];
     }
   }
 
-  Widget _buildTotalRow(String label, double amount, {bool isBold = false, bool isMinus = false, double fontSize = 9, Color? color}) {
+  Widget _buildTotalRow(
+    String label,
+    double amount, {
+    bool isBold = false,
+    bool isMinus = false,
+    double fontSize = 9,
+    Color? color,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -651,68 +763,102 @@ class MinimalistTemplate extends StatelessWidget {
   }
 
   Widget _buildSignatorySection() {
-    return GetBuilder<AuthController>(builder: (authController) {
-      final String authSignature = authController.userSignature.value;
-      final String displayName = authController.userName.value.isNotEmpty ? authController.userName.value : (params.tenant['name'] ?? '');
+    return GetBuilder<AuthController>(
+      builder: (authController) {
+        final String authSignature = authController.userSignature.value;
+        final String displayName = authController.userName.value.isNotEmpty
+            ? authController.userName.value
+            : (params.tenant['name'] ?? '');
 
-      return Row(
-        children: [
-          const Expanded(flex: 55, child: SizedBox.shrink()),
-          const SizedBox(width: 24),
-          Expanded(
-            flex: 40,
-            child: Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: 140,
-          child: Column(
-            children: [
-              if (authSignature.isNotEmpty)
-                _buildLogoWidget(authSignature, height: 40, width: 140, fit: BoxFit.contain)
-              else if ((params.tenant['signatureImage']?.toString() ?? '').isNotEmpty)
-                _buildLogoWidget(params.tenant['signatureImage'], height: 40, width: 140, fit: BoxFit.contain)
-              else
-                Container(
-                  height: 40,
+        return Row(
+          children: [
+            const Expanded(flex: 55, child: SizedBox.shrink()),
+            const SizedBox(width: 24),
+            Expanded(
+              flex: 40,
+              child: Align(
+                alignment: Alignment.center,
+                child: SizedBox(
                   width: 140,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                  child: Column(
+                    children: [
+                      if (authSignature.isNotEmpty)
+                        _buildLogoWidget(
+                          authSignature,
+                          height: 40,
+                          width: 140,
+                          fit: BoxFit.contain,
+                        )
+                      else if ((params.tenant['signatureImage']?.toString() ??
+                              '')
+                          .isNotEmpty)
+                        _buildLogoWidget(
+                          params.tenant['signatureImage'],
+                          height: 40,
+                          width: 140,
+                          fit: BoxFit.contain,
+                        )
+                      else
+                        Container(
+                          height: 40,
+                          width: 140,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey.shade300,
+                              style: BorderStyle.solid,
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'sign_here'.tr,
+                            style: TextStyle(
+                              fontSize: 8,
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 4),
+                      Text(
+                        displayName.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'AUTHORIZED SIGNATORY',
+                        style: TextStyle(
+                          fontSize: 6,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                          color: Colors.grey.shade400,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
-                  alignment: Alignment.center,
-                  child: Text('Sign Here', style: TextStyle(fontSize: 8, color: Colors.grey.shade400)),
                 ),
-              const SizedBox(height: 4),
-              Text(
-                displayName.toUpperCase(),
-                style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 2),
-              Text(
-                'AUTHORIZED SIGNATORY',
-                style: TextStyle(fontSize: 6, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade400),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
             ),
-          ),
-        ],
-      );
-    });
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildTermsSection() {
-    final terms = params.tenant['defaultTerms'] ?? 'Payment is due upon receipt.';
+    final terms =
+        params.tenant['defaultTerms'] ?? 'Payment is due upon receipt.';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Divider(color: Colors.black12, thickness: 1),
+        Divider(color: Colors.black12, thickness: 1),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           'TERMS & CONDITIONS',
           style: TextStyle(
             fontSize: 7,

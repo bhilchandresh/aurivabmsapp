@@ -116,7 +116,7 @@ class InventoryController extends GetxController {
         futures.add(ApiService.delete('${ApiConstants.inventory}/$id'));
       }
       await Future.wait(futures);
-      
+
       clearSelection();
       await fetchItems();
       return true;
@@ -131,16 +131,17 @@ class InventoryController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
+
     // Sync subscription plan from AuthController
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
-    
+
     if (authController.tenantInfo.value != null) {
-      subscriptionPlan.value = authController.tenantInfo.value?['subscriptionPlan'] ?? 'premium';
+      subscriptionPlan.value =
+          authController.tenantInfo.value?['subscriptionPlan'] ?? 'premium';
     }
-    
+
     // Listen to changes in tenantInfo
     ever(authController.tenantInfo, (tenant) {
       if (tenant != null) {
@@ -172,12 +173,16 @@ class InventoryController extends GetxController {
   Future<void> fetchTransactions(String itemId) async {
     try {
       transactions[itemId] = null; // Set to null to indicate loading state
-      final response = await ApiService.get('${ApiConstants.inventory}/$itemId/transactions');
+      final response = await ApiService.get(
+        '${ApiConstants.inventory}/$itemId/transactions',
+      );
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
-          transactions[itemId] = data.map((t) => InventoryTransaction.fromJson(t)).toList();
+          transactions[itemId] = data
+              .map((t) => InventoryTransaction.fromJson(t))
+              .toList();
         } else {
           transactions[itemId] = [];
         }
@@ -214,7 +219,13 @@ class InventoryController extends GetxController {
     return (items.length / maxItems).clamp(0.0, 1.0);
   }
 
-  Future<bool> addItem(String name, String sku, double price, int stock, String description) async {
+  Future<bool> addItem(
+    String name,
+    String sku,
+    double price,
+    int stock,
+    String description,
+  ) async {
     if (isAtLimit) return false;
     try {
       isLoading.value = true;
@@ -238,7 +249,13 @@ class InventoryController extends GetxController {
     }
   }
 
-  Future<bool> updateItem(String id, String name, String sku, double price, String description) async {
+  Future<bool> updateItem(
+    String id,
+    String name,
+    String sku,
+    double price,
+    String description,
+  ) async {
     try {
       isLoading.value = true;
       final response = await ApiService.put('${ApiConstants.inventory}/$id', {
@@ -301,4 +318,3 @@ class InventoryController extends GetxController {
     }
   }
 }
-

@@ -111,7 +111,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     if (tenant == null) {
       _mockTenant = {
         'name': 'Auriva Tech Solutions Pvt Ltd',
-        'address': 'Plot 42, Cyber Gateway, Hitech City, Hyderabad, TS - 500081',
+        'address':
+            'Plot 42, Cyber Gateway, Hitech City, Hyderabad, TS - 500081',
         'email': 'billing@aurivatech.com',
         'phone': '+91 98765 43210',
         'website': 'www.aurivatech.com',
@@ -145,10 +146,14 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
       final bank = tenant['bankDetails'];
       if (bank is Map) {
         _mockBankDetails = {
-          'accountName': bank['accountName']?.toString() ?? bank['accountHolderName']?.toString() ?? '',
+          'accountName':
+              bank['accountName']?.toString() ??
+              bank['accountHolderName']?.toString() ??
+              '',
           'bankName': bank['bankName']?.toString() ?? '',
           'accountNumber': bank['accountNumber']?.toString() ?? '',
-          'ifscCode': bank['ifscCode']?.toString() ?? bank['ifsc']?.toString() ?? '',
+          'ifscCode':
+              bank['ifscCode']?.toString() ?? bank['ifsc']?.toString() ?? '',
         };
       } else {
         _mockBankDetails = {
@@ -183,7 +188,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     _taxType = widget.taxType ?? 'exclusive';
     _clientEmail = widget.clientEmail ?? 'billing@client.com';
     _clientPhone = widget.clientPhone ?? '';
-    _clientAddress = widget.clientAddress ?? 'Cyber Towers, Madhapur, Hyderabad';
+    _clientAddress =
+        widget.clientAddress ?? 'Cyber Towers, Madhapur, Hyderabad';
     _clientGst = widget.clientGst ?? '36BBBBB2222B2Z2';
 
     // Custom mock items based on the invoice clicked
@@ -231,27 +237,34 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
-    
-    final String initialTemplate = authController.tenantInfo.value?['templatePreference'] ?? 
-                                   authController.tenantInfo.value?['selectedTemplate'] ?? 'standard';
+
+    final String initialTemplate =
+        authController.tenantInfo.value?['templatePreference'] ??
+        authController.tenantInfo.value?['selectedTemplate'] ??
+        'standard';
     controller.selectedTemplate.value = initialTemplate;
 
-    authController.fetchTenantSettings().then((_) {
-      if (mounted) {
-        setState(() {
-          _updateTenantInfo();
-          final String updatedTemplate = authController.tenantInfo.value?['templatePreference'] ?? 
-                                         authController.tenantInfo.value?['selectedTemplate'] ?? 'standard';
-          controller.selectedTemplate.value = updatedTemplate;
+    authController
+        .fetchTenantSettings()
+        .then((_) {
+          if (mounted) {
+            setState(() {
+              _updateTenantInfo();
+              final String updatedTemplate =
+                  authController.tenantInfo.value?['templatePreference'] ??
+                  authController.tenantInfo.value?['selectedTemplate'] ??
+                  'standard';
+              controller.selectedTemplate.value = updatedTemplate;
+            });
+          }
+        })
+        .whenComplete(() {
+          if (mounted) {
+            setState(() {
+              _isLoadingSettings = false;
+            });
+          }
         });
-      }
-    }).whenComplete(() {
-      if (mounted) {
-        setState(() {
-          _isLoadingSettings = false;
-        });
-      }
-    });
   }
 
   String _sanitizePdfText(String text) {
@@ -619,7 +632,9 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                   vertical: 8,
                 ),
                 child: pw.Text(
-                  qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(2),
+                  qty % 1 == 0
+                      ? qty.toStringAsFixed(0)
+                      : qty.toStringAsFixed(2),
                   style: pw.TextStyle(
                     font: fontNormal,
                     fontSize: 9,
@@ -2426,7 +2441,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
         } else {
           // The item and totals fit on this page!
           // But do signature + terms fit?
-          if (currentHeight + requiredHeight + totalsHeight + signatureHeight > pageCap) {
+          if (currentHeight + requiredHeight + totalsHeight + signatureHeight >
+              pageCap) {
             // No! Push signature to next page!
             currentPageItems.add(item);
             pages.add(currentPageItems);
@@ -2489,12 +2505,12 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
   Widget _buildBottomFooter(int currentPage, int totalPages) {
     return Column(
       children: [
-        const Divider(height: 1, color: Colors.black12),
+        Divider(height: 1, color: Colors.black12),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Thank you for your business! Generated via Auriva BMS.',
               style: TextStyle(
                 fontSize: 8,
@@ -2504,7 +2520,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
             ),
             Text(
               'Page $currentPage of $totalPages',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 8,
                 color: Colors.grey,
                 fontWeight: FontWeight.bold,
@@ -2523,7 +2539,9 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AnimatedDocumentLoader(message: 'Compiling premium invoice document...'),
+      builder: (context) => AnimatedDocumentLoader(
+        message: 'Compiling premium invoice document...',
+      ),
     );
 
     try {
@@ -2535,7 +2553,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
       const double tableHeaderHeight = 45.0;
       double totalsHeight = 220.0;
       double signatureHeight = 0.0;
-      
+
       final currentTemplate = controller.selectedTemplate.value;
       if (currentTemplate == 'vibrant') {
         headerHeight = 360.0;
@@ -2624,13 +2642,17 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
         );
       } else {
         final tempDir = await getTemporaryDirectory();
-        final safeId = widget.invoiceId.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_');
+        final safeId = widget.invoiceId.replaceAll(
+          RegExp(r'[^a-zA-Z0-9]'),
+          '_',
+        );
         final file = File('${tempDir.path}/Invoice_$safeId.pdf');
         await file.writeAsBytes(pdfBytes);
         navigator.pop(); // Dismiss compilation dialog
-        await Share.shareXFiles([XFile(file.path)], text: 'Here is your invoice from Auriva.');
+        await Share.shareXFiles([
+          XFile(file.path),
+        ], text: 'Here is your invoice from Auriva.');
       }
-
     } catch (e) {
       navigator.pop(); // Dismiss compilation dialog
       scaffoldMessenger.showSnackBar(
@@ -2648,8 +2670,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
       String phone = _clientPhone.replaceAll(RegExp(r'[^0-9+]'), '');
       if (phone.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Client phone number is missing.'),
+          SnackBar(
+            content: Text('client_phone_number_is_missing'.tr),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -2661,13 +2683,19 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
       } else if (phone.length == 10) {
         phone = '91$phone'; // Default to India if 10 digits
       }
-      
-      final String link = '${ApiConstants.publicWebUrl}/public/invoice/${widget.dbId}';
-      final String message = 'Hello ${widget.clientName},\n\nHere is your invoice *${widget.invoiceId}* for the amount of *Rs ${widget.amount}*.\n\nYou can view and download it here:\n$link\n\nThank you!';
-      
-      final String url = 'https://wa.me/$phone?text=${Uri.encodeComponent(message)}';
-      
-      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication).catchError((e) {
+
+      final String link =
+          '${ApiConstants.publicWebUrl}/public/invoice/${widget.dbId}';
+      final String message =
+          'Hello ${widget.clientName},\n\nHere is your invoice *${widget.invoiceId}* for the amount of *Rs ${widget.amount}*.\n\nYou can view and download it here:\n$link\n\nThank you!';
+
+      final String url =
+          'https://wa.me/$phone?text=${Uri.encodeComponent(message)}';
+
+      launchUrl(
+        Uri.parse(url),
+        mode: LaunchMode.externalApplication,
+      ).catchError((e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Could not open WhatsApp: $e'),
@@ -2711,8 +2739,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     String email = _clientEmail;
     if (email.isEmpty || email == 'billing@client.com') {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Client email address is missing.'),
+        SnackBar(
+          content: Text('client_email_address_is_missing'.tr),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
@@ -2723,22 +2751,23 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const AnimatedDocumentLoader(message: 'Sending invoice via email...'),
+      builder: (context) =>
+          const AnimatedDocumentLoader(message: 'Sending invoice via email...'),
     );
 
     final clientsController = Get.isRegistered<ClientsController>()
         ? Get.find<ClientsController>()
         : Get.put(ClientsController());
     final errorMsg = await clientsController.sendInvoiceEmail(widget.dbId);
-    
+
     if (mounted) {
       Navigator.pop(context); // Dismiss loader
     }
 
     if (errorMsg == null) {
       scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Invoice sent successfully via email.'),
+        SnackBar(
+          content: Text('invoice_sent_successfully_via_email'.tr),
           backgroundColor: AppColors.success,
           behavior: SnackBarBehavior.floating,
         ),
@@ -2756,10 +2785,11 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         leadingWidth: 48,
         titleSpacing: 4,
@@ -2772,11 +2802,15 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
               child: Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF8FAFC),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF1E293B) : const Color(0xFFF8FAFC),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(LucideIcons.arrowLeft, color: Color(0xFF0F172A), size: 18),
+                child: Icon(
+                  LucideIcons.arrowLeft,
+                  color: Theme.of(context).textTheme.displayLarge?.color,
+                  size: 18,
+                ),
               ),
             ),
           ),
@@ -2786,20 +2820,16 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
           children: [
             Text(
               widget.invoiceId,
-              style: const TextStyle(
-                color: Color(0xFF0F172A),
+              style: TextStyle(
+                color: Theme.of(context).textTheme.displayLarge?.color,
                 fontWeight: FontWeight.w900,
                 fontSize: 18,
               ),
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(
-                  LucideIcons.hexagon,
-                  size: 10,
-                  color: Color(0xFF6366F1),
-                ),
+              children: [
+                Icon(LucideIcons.hexagon, size: 10, color: Color(0xFF6366F1)),
                 SizedBox(width: 4),
                 Text(
                   'AURIVA INVOICE',
@@ -2822,20 +2852,27 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
               onTap: () => _triggerAction('Print Invoice'),
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline),
                 ),
                 child: Row(
-                  children: const [
-                    Icon(LucideIcons.printer, size: 14, color: Color(0xFF0F172A)),
-                    SizedBox(width: 6),
+                  children: [
+                    Icon(
+                      LucideIcons.printer,
+                      size: 14,
+                      color: Theme.of(context).textTheme.displayLarge?.color,
+                    ),
+                    const SizedBox(width: 6),
                     Text(
                       'Print',
                       style: TextStyle(
-                        color: Color(0xFF0F172A),
+                        color: Theme.of(context).textTheme.displayLarge?.color,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -2849,112 +2886,109 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
         ],
       ),
       body: Column(
-                children: [
-                  // Top Template Selection Bar
-                  _buildTemplateSelector(),
+        children: [
+          // Top Template Selection Bar
+          _buildTemplateSelector(),
 
-                  // Bottom Quick Action Buttons
-                  _buildActionBar(),
+          // Bottom Quick Action Buttons
+          _buildActionBar(),
 
-                  // Live Preview Container
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Container(
-                              constraints: const BoxConstraints(maxWidth: 800),
-                              margin: const EdgeInsets.only(bottom: 12),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withValues(
-                                  alpha: 0.04,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.1,
-                                  ),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  const Icon(
-                                    LucideIcons.monitor,
-                                    size: 14,
-                                    color: AppColors.primary,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'A4 LIVE PREVIEW CANVAS',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.primary,
-                                      letterSpacing: 1.0,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  const Text(
-                                    'Interactive Scaling',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              constraints: const BoxConstraints(maxWidth: 800),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: AppColors.border),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.04),
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: _buildResponsiveTemplateWrapper(),
-                              ),
-                            ),
-                          ],
+          // Live Preview Container
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: Column(
+                  children: [
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.primary.withValues(alpha: 0.1),
                         ),
                       ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            LucideIcons.monitor,
+                            size: 14,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'A4 LIVE PREVIEW CANVAS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                          const Spacer(),
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Interactive Scaling',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardTheme.color,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Theme.of(context).colorScheme.outline),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.04),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: _buildResponsiveTemplateWrapper(),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   // --- ACTIONS HEADER PANEL ---
   Widget _buildActionBar() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outline)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -2964,10 +2998,10 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
               onTap: () => _triggerAction('WhatsApp'),
               icon: LucideIcons.messageCircle,
               label: 'WhatsApp',
-              iconColor: const Color(0xFF059669),
-              textColor: const Color(0xFF059669),
-              backgroundColor: const Color(0xFFECFDF5),
-              borderColor: const Color(0xFFD1FAE5),
+              iconColor: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+              textColor: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
+              backgroundColor: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
+              borderColor: isDark ? const Color(0xFF065F46) : const Color(0xFFD1FAE5),
             ),
           ),
           const SizedBox(width: 6),
@@ -2976,24 +3010,28 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
               onTap: () => _triggerAction('Email'),
               icon: LucideIcons.mail,
               label: 'Email',
-              iconColor: const Color(0xFF2563EB),
-              textColor: const Color(0xFF2563EB),
-              backgroundColor: const Color(0xFFEFF6FF),
-              borderColor: const Color(0xFFDBEAFE),
+              iconColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+              textColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+              backgroundColor: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+              borderColor: isDark ? const Color(0xFF1E40AF) : const Color(0xFFDBEAFE),
             ),
           ),
           const SizedBox(width: 8),
-          Container(width: 1, height: 24, color: const Color(0xFFE2E8F0)), // Divider
+          Container(
+            width: 1,
+            height: 24,
+            color: Theme.of(context).colorScheme.outline,
+          ), // Divider
           const SizedBox(width: 8),
           Expanded(
             child: DynamicActionButton(
               onTap: () => _triggerAction('Share'),
               icon: LucideIcons.share2,
               label: 'Share',
-              iconColor: const Color(0xFF475569),
-              textColor: const Color(0xFF0F172A),
-              backgroundColor: Colors.white,
-              borderColor: const Color(0xFFE2E8F0),
+              iconColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+              textColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              borderColor: Theme.of(context).colorScheme.outline,
             ),
           ),
           const SizedBox(width: 6),
@@ -3006,6 +3044,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
               iconColor: Colors.white,
               textColor: Colors.white,
               backgroundColor: const Color(0xFF0F172A),
+
             ),
           ),
         ],
@@ -3150,7 +3189,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
             totalsHeight = 310.0;
             signatureHeight = 170.0;
           }
-          
+
           final pages = _paginateInvoiceItems(
             items: widget.items ?? _mockItems,
             itemHeight: 70.0,
@@ -3164,11 +3203,14 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
           // Single continuous scrollable page for the live preview!
           Widget templateWidget = Container(
             width: targetWidth,
-            constraints: BoxConstraints(minHeight: targetWidth * 1.414), // MINIMUM A4 size, but grows if content is larger!
+            constraints: BoxConstraints(
+              minHeight: targetWidth * 1.414,
+            ), // MINIMUM A4 size, but grows if content is larger!
             child: IntrinsicHeight(
               child: _buildSelectedTemplateRenderer(
-                currentTemplate, 
-                pageItems: widget.items ?? _mockItems, // Render ALL items at once
+                currentTemplate,
+                pageItems:
+                    widget.items ?? _mockItems, // Render ALL items at once
                 isOffline: false,
                 isFirstPage: true,
                 isLastPage: true,
@@ -3185,7 +3227,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
             // Scales the wide desktop template proportionally down to the mobile screen size WIDTH,
             // while allowing the HEIGHT to stretch downwards without shrinking the aspect ratio!
             childWidget = FittedBox(
-              fit: BoxFit.fitWidth, 
+              fit: BoxFit.fitWidth,
               alignment: Alignment.topCenter,
               child: templateWidget,
             );
@@ -3328,8 +3370,6 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
         );
     }
   }
-
-
 }
 
 // --- PREMIUM CUSTOM ANIMATION AND UI COMPONENT CLASSES ---
@@ -3570,7 +3610,7 @@ class _DynamicActionButtonState extends State<DynamicActionButton>
                 child: Text(
                   widget.label,
                   style: TextStyle(
-                    color: widget.textColor ?? AppColors.textPrimary,
+                    color: widget.textColor ?? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),

@@ -10,7 +10,8 @@ class AnimatedDocumentLoader extends StatefulWidget {
   State<AnimatedDocumentLoader> createState() => _AnimatedDocumentLoaderState();
 }
 
-class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader> with SingleTickerProviderStateMixin {
+class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
@@ -23,13 +24,15 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader> with Si
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
 
-    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.9,
+      end: 1.1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _opacityAnimation = Tween<double>(begin: 0.4, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.4,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -49,11 +52,11 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader> with Si
           width: 300,
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: isDark ? const Color(0xFF1E293B) : Colors.white,
+            color: Theme.of(context).cardTheme.color ?? Colors.white,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(isDark ? 0.2 : 0.1),
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
                 blurRadius: 40,
                 offset: const Offset(0, 10),
               ),
@@ -74,9 +77,13 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader> with Si
                         height: 80,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.primary.withOpacity(0.1 * _opacityAnimation.value),
+                          color: AppColors.primary.withOpacity(
+                            0.1 * _opacityAnimation.value,
+                          ),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3 * _opacityAnimation.value),
+                            color: AppColors.primary.withOpacity(
+                              0.3 * _opacityAnimation.value,
+                            ),
                             width: 2,
                           ),
                         ),
@@ -95,7 +102,7 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader> with Si
                             shape: BoxShape.circle,
                             color: AppColors.primary.withOpacity(0.15),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             LucideIcons.fileText,
                             color: AppColors.primary,
                             size: 28,
@@ -113,7 +120,7 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader> with Si
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
-                  color: isDark ? Colors.white : const Color(0xFF1E293B),
+                  color: Theme.of(context).textTheme.displayLarge?.color,
                   letterSpacing: -0.3,
                 ),
               ),
@@ -124,7 +131,7 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader> with Si
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                   height: 1.4,
                 ),
               ),
@@ -137,7 +144,9 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader> with Si
                   width: 140,
                   child: LinearProgressIndicator(
                     backgroundColor: AppColors.primary.withOpacity(0.1),
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                      AppColors.primary,
+                    ),
                   ),
                 ),
               ),

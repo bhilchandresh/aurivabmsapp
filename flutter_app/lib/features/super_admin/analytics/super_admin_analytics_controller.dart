@@ -5,12 +5,12 @@ import '../../../core/utils/api_service.dart';
 class SuperAdminAnalyticsController extends GetxController {
   var isLoading = true.obs;
   var isFirstLoad = true.obs;
-  
+
   // Dashboard Metrics
   var platformGMV = 0.0.obs;
   var invoicesProcessed = 0.obs;
   var endClientsManaged = 0.obs;
-  
+
   // Chart Data
   var growthData = <dynamic>[].obs;
   var planDistribution = <dynamic>[].obs;
@@ -31,7 +31,7 @@ class SuperAdminAnalyticsController extends GetxController {
         final data = jsonDecode(response.body);
         if (data['success'] == true && data['data'] != null) {
           final stats = data['data'];
-          
+
           platformGMV.value = (stats['platformGMV'] ?? 0).toDouble();
           invoicesProcessed.value = stats['platformInvoicesCount'] ?? 0;
           endClientsManaged.value = stats['platformClientsCount'] ?? 0;

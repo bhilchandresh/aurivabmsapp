@@ -6,6 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../../shared/widgets/app_input_field.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'clients_controller.dart';
 import 'client_details_screen.dart';
 
@@ -17,7 +18,11 @@ class ClientsScreen extends StatefulWidget {
 }
 
 class _ClientsScreenState extends State<ClientsScreen> {
-  final formatCurrency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+  final formatCurrency = NumberFormat.currency(
+    locale: 'en_IN',
+    symbol: '₹',
+    decimalDigits: 0,
+  );
 
   // Initialize or find controller
   final ClientsController _clientsController = Get.put(ClientsController());
@@ -61,9 +66,20 @@ class _ClientsScreenState extends State<ClientsScreen> {
     "Telangana",
     "Tripura",
     "Uttar Pradesh",
-    "Uttarakhand",
-    "West Bengal"
+    "West Bengal",
   ];
+
+  String _capitalizeName(String name) {
+    if (name.trim().isEmpty) return name;
+    return name
+        .trim()
+        .split(' ')
+        .map((word) {
+          if (word.isEmpty) return '';
+          return word[0].toUpperCase() + word.substring(1);
+        })
+        .join(' ');
+  }
 
   // Helper to filter and sort clients reactively
   List<Client> _getFilteredAndSortedClients(List<Client> allClients) {
@@ -92,7 +108,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
         return dateA.compareTo(dateB);
       });
     } else if (_sortBy == 'alpha_asc') {
-      filtered.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      filtered.sort(
+        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      );
     } else if (_sortBy == 'dues_high') {
       filtered.sort((a, b) => b.balance.compareTo(a.balance));
     }
@@ -105,7 +123,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F172A) : AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'clients'.tr,
         subtitle: 'manage_customers'.tr,
@@ -113,61 +131,85 @@ class _ClientsScreenState extends State<ClientsScreen> {
         showBadge: false,
       ),
       body: Obx(() {
-        final listItems = _getFilteredAndSortedClients(_clientsController.clients);
+        final listItems = _getFilteredAndSortedClients(
+          _clientsController.clients,
+        );
 
         final isMobile = MediaQuery.of(context).size.width < 700;
         final double headerHeight = isMobile ? 130.0 : 80.0;
+        final isLoading = _clientsController.isLoading.value && listItems.isEmpty;
 
-        return CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-          slivers: [
-            SliverAppBar(
-              floating: true,
-              snap: true,
-              automaticallyImplyLeading: false,
-              backgroundColor: isDark ? const Color(0xFF0F172A) : AppColors.background,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              toolbarHeight: headerHeight,
-              flexibleSpace: FlexibleSpaceBar(
-                background: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                  child: _buildFilterHeader(context),
+        return Skeletonizer(
+          enabled: isLoading,
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            slivers: [
+              SliverAppBar(
+                floating: true,
+                snap: true,
+                automaticallyImplyLeading: false,
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+                toolbarHeight: headerHeight,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: _buildFilterHeader(context),
+                  ),
                 ),
               ),
-            ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Register Label
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Customer Registers (${listItems.length})',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : AppColors.textPrimary,
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Register Label
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${'clients'.tr} (${listItems.length})',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.displayLarge?.color,
+                            ),
                           ),
-                        ),
-                        const Icon(LucideIcons.slidersHorizontal, size: 16, color: Colors.grey),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    // Client Cards Grid/List
-                    if (listItems.isEmpty)
-                      _buildEmptyState()
-                    else
-                      _buildClientsList(listItems),
-                  ],
+                          Icon(
+                            LucideIcons.slidersHorizontal,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      // Client Cards Grid/List
+                      if (isLoading)
+                        _buildClientsList(List.generate(5, (index) => Client(
+                          id: 'loading_$index',
+                          name: 'Loading Client Name',
+                          email: 'loading@email.com',
+                          phone: '9876543210',
+                          address: '',
+                          state: '',
+                          gstin: '',
+                          totalBilled: 0.0,
+                          balance: 0.0,
+                        )))
+                      else if (listItems.isEmpty)
+                        _buildEmptyState()
+                      else
+                        _buildClientsList(listItems),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         );
       }),
     );
@@ -183,25 +225,33 @@ class _ClientsScreenState extends State<ClientsScreen> {
           _searchQuery = val;
         });
       },
-      style: TextStyle(color: isDark ? Colors.white : AppColors.textPrimary),
+      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
       decoration: InputDecoration(
         hintText: 'search_clients'.tr,
-        hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-        prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 18),
+        hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
+        prefixIcon: Icon(
+          LucideIcons.search,
+          color: Colors.grey,
+          size: 18,
+        ),
         filled: true,
-        fillColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         contentPadding: const EdgeInsets.symmetric(vertical: 10),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : AppColors.border),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : AppColors.border),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
         ),
       ),
     );
@@ -209,21 +259,63 @@ class _ClientsScreenState extends State<ClientsScreen> {
     Widget sortDropdown = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? const Color(0xFF334155) : AppColors.border),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+        ),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: _sortBy,
-          dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-          icon: const Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey),
-          style: TextStyle(color: isDark ? const Color(0xFF94A3B8) : Colors.grey, fontSize: 13, fontWeight: FontWeight.bold),
+          dropdownColor: Theme.of(context).cardTheme.color,
+          icon: Icon(
+            LucideIcons.chevronDown,
+            size: 14,
+            color: Colors.grey,
+          ),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
           items: [
-            DropdownMenuItem(value: 'newest', child: Text('Newest First', style: TextStyle(color: isDark ? Colors.white : Colors.black))),
-            DropdownMenuItem(value: 'oldest', child: Text('Oldest First', style: TextStyle(color: isDark ? Colors.white : Colors.black))),
-            DropdownMenuItem(value: 'alpha_asc', child: Text('A-Z Name', style: TextStyle(color: isDark ? Colors.white : Colors.black))),
-            DropdownMenuItem(value: 'dues_high', child: Text('Highest Dues ⚠️', style: TextStyle(color: isDark ? Colors.white : Colors.black))),
+            DropdownMenuItem(
+              value: 'newest',
+              child: Text(
+                'newest_first'.tr,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'oldest',
+              child: Text(
+                'oldest_first'.tr,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'alpha_asc',
+              child: Text(
+                'a_z_name'.tr,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+            ),
+            DropdownMenuItem(
+              value: 'dues_high',
+              child: Text(
+                'highest_dues'.tr,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+            ),
           ],
           onChanged: (val) {
             if (val != null) {
@@ -238,8 +330,11 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
     Widget addButton = ElevatedButton.icon(
       onPressed: _showAddClientDialog,
-      icon: const Icon(LucideIcons.plus, size: 16),
-      label: Text('add_client'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
+      icon: Icon(LucideIcons.plus, size: 16),
+      label: Text(
+        'add_client'.tr,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -282,18 +377,27 @@ class _ClientsScreenState extends State<ClientsScreen> {
       height: 200,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? const Color(0xFF334155) : AppColors.border),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+        ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(LucideIcons.users, size: 40, color: isDark ? const Color(0xFF475569) : Colors.grey),
+          Icon(
+            LucideIcons.users,
+            size: 40,
+            color: isDark ? Color(0xFF475569) : Colors.grey,
+          ),
           const SizedBox(height: 12),
           Text(
-            'No clients matching search',
-            style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? const Color(0xFF94A3B8) : Colors.grey),
+            'no_clients_matching_search'.tr,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            ),
           ),
         ],
       ),
@@ -308,7 +412,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
     if (crossAxisCount > 1) {
       // Desktop Grid layout
       const double cardHeight = 270.0;
-      final double cardWidth = (screenWidth - 32.0 - (crossAxisCount - 1) * 16.0) / crossAxisCount;
+      final double cardWidth =
+          (screenWidth - 32.0 - (crossAxisCount - 1) * 16.0) / crossAxisCount;
       final double computedAspectRatio = cardWidth / cardHeight;
 
       return GridView.builder(
@@ -350,14 +455,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
     final hasGstin = client.gstin.trim().isNotEmpty;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final cardBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final cardBorderColor = isHovered 
-        ? AppColors.primary.withOpacity(0.5) 
-        : (isDark ? const Color(0xFF334155) : AppColors.border);
-    final cardTextColor = isDark ? Colors.white : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? const Color(0xFF94A3B8) : Colors.grey;
-    final panelBgColor = isDark ? const Color(0xFF0F172A) : AppColors.background.withOpacity(0.5);
-    final panelBorderColor = isDark ? const Color(0xFF334155) : AppColors.border;
+    final cardBgColor = Theme.of(context).cardTheme.color;
+    final cardBorderColor = isHovered
+        ? AppColors.primary.withOpacity(0.5)
+        : Theme.of(context).colorScheme.outline;
+    final cardTextColor = Theme.of(context).textTheme.displayLarge?.color;
+    final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final panelBgColor = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final panelBorderColor = Theme.of(context).colorScheme.outline;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hoveredIndex = index),
@@ -372,10 +477,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
           decoration: BoxDecoration(
             color: cardBgColor,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: cardBorderColor,
-              width: 1,
-            ),
+            border: Border.all(color: cardBorderColor, width: 1),
             boxShadow: [
               BoxShadow(
                 color: isHovered
@@ -383,7 +485,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     : Colors.black.withOpacity(0.01),
                 blurRadius: isHovered ? 12 : 6,
                 offset: const Offset(0, 4),
-              )
+              ),
             ],
           ),
           child: Column(
@@ -406,8 +508,10 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              client.name.substring(0, 1).toUpperCase(),
-                              style: const TextStyle(
+                              client.name.trim().isNotEmpty
+                                  ? client.name.trim()[0].toUpperCase()
+                                  : 'C',
+                              style: TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w900,
@@ -421,7 +525,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                client.name,
+                                _capitalizeName(client.name),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -434,16 +538,31 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               if (hasGstin) ...[
                                 const SizedBox(height: 4),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: isDark ? Colors.purple.shade900.withOpacity(0.15) : Colors.purple.shade50,
+                                    color: isDark
+                                        ? Colors.purple.shade900.withOpacity(
+                                            0.15,
+                                          )
+                                        : Colors.purple.shade50,
                                     borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: isDark ? Colors.purple.shade900.withOpacity(0.3) : Colors.purple.shade100),
+                                    border: Border.all(
+                                      color: isDark
+                                          ? Colors.purple.shade900.withOpacity(
+                                              0.3,
+                                            )
+                                          : Colors.purple.shade100,
+                                    ),
                                   ),
                                   child: Text(
-                                    'GST REG',
+                                    'gst_reg'.tr.toUpperCase(),
                                     style: TextStyle(
-                                      color: isDark ? Colors.purple.shade300 : Colors.purple.shade700,
+                                      color: isDark
+                                          ? Colors.purple.shade300
+                                          : Colors.purple.shade700,
                                       fontSize: 8,
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 0.5,
@@ -459,14 +578,24 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        Icon(LucideIcons.mail, size: 12, color: secondaryTextColor),
+                        Icon(
+                          LucideIcons.mail,
+                          size: 12,
+                          color: secondaryTextColor,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            client.email.isNotEmpty ? client.email : 'No email added',
+                            client.email.isNotEmpty
+                                ? client.email
+                                : 'no_email_added'.tr,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 12, color: secondaryTextColor, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ],
@@ -474,14 +603,24 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        Icon(LucideIcons.phone, size: 12, color: secondaryTextColor),
+                        Icon(
+                          LucideIcons.phone,
+                          size: 12,
+                          color: secondaryTextColor,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            client.phone.isNotEmpty ? client.phone : 'No phone added',
+                            client.phone.isNotEmpty
+                                ? client.phone
+                                : 'no_phone_added'.tr,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 12, color: secondaryTextColor, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: secondaryTextColor,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ],
@@ -489,10 +628,13 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   ],
                 ),
               ),
-              
+
               // Financial Quick View Panel
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: panelBgColor,
                   border: Border(
@@ -506,8 +648,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'TOTAL BILLED',
+                        Text(
+                          'total_billed'.tr.toUpperCase(),
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w900,
@@ -530,8 +672,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          isAdvance ? 'ADVANCE (JAMA)' : isClear ? 'STATUS' : 'PENDING DUE',
-                          style: const TextStyle(
+                          isAdvance
+                              ? 'advance_jama'.tr.toUpperCase()
+                              : isClear
+                              ? 'status'.tr.toUpperCase()
+                              : 'balance_due'.tr,
+                          style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w900,
                             color: Colors.grey,
@@ -543,14 +689,22 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(LucideIcons.checkCircle, size: 12, color: isDark ? Colors.green.shade400 : AppColors.success),
+                              Icon(
+                                LucideIcons.checkCircle,
+                                size: 12,
+                                color: isDark
+                                    ? Colors.green.shade400
+                                    : AppColors.success,
+                              ),
                               const SizedBox(width: 4),
                               Text(
-                                'Settled',
+                                'settled'.tr,
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
-                                  color: isDark ? Colors.green.shade400 : AppColors.success,
+                                  color: isDark
+                                      ? Colors.green.shade400
+                                      : AppColors.success,
                                 ),
                               ),
                             ],
@@ -561,9 +715,13 @@ class _ClientsScreenState extends State<ClientsScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.w900,
                               fontSize: 13,
-                              color: isAdvance 
-                                  ? (isDark ? Colors.blue.shade400 : Colors.blue) 
-                                  : (isDark ? Colors.red.shade400 : AppColors.error),
+                              color: isAdvance
+                                  ? (isDark
+                                        ? Colors.blue.shade400
+                                        : Colors.blue)
+                                  : (isDark
+                                        ? Colors.red.shade400
+                                        : AppColors.error),
                             ),
                           ),
                       ],
@@ -577,9 +735,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
                 padding: const EdgeInsets.all(12.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text(
-                      'View Customer Ledger',
+                      'view_customer_ledger'.tr,
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
@@ -587,7 +745,11 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       ),
                     ),
                     SizedBox(width: 6),
-                    Icon(LucideIcons.arrowRight, size: 14, color: AppColors.primary),
+                    Icon(
+                      LucideIcons.arrowRight,
+                      size: 14,
+                      color: AppColors.primary,
+                    ),
                   ],
                 ),
               ),
@@ -614,14 +776,16 @@ class _ClientsScreenState extends State<ClientsScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               title: Text(
                 'add_client'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: isDark ? Colors.white : Colors.black,
+                  color: Theme.of(context).textTheme.displayLarge?.color,
                 ),
               ),
               content: SizedBox(
@@ -633,33 +797,33 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       AppInputField(
-                        label: 'Business Name *',
-                        hintText: 'e.g. Acme Corp',
+                        label: 'business_name_star'.tr,
+                        hintText: 'e_g_acme_corp'.tr,
                         controller: nameController,
-                        prefixIcon: const Icon(LucideIcons.briefcase, size: 18),
+                        prefixIcon: Icon(LucideIcons.briefcase, size: 18),
                       ),
                       const SizedBox(height: 16),
                       AppInputField(
-                        label: 'Email Address',
-                        hintText: 'name@company.com',
+                        label: 'email_address'.tr,
+                        hintText: 'name_company_com'.tr,
                         keyboardType: TextInputType.emailAddress,
                         controller: emailController,
-                        prefixIcon: const Icon(LucideIcons.mail, size: 18),
+                        prefixIcon: Icon(LucideIcons.mail, size: 18),
                       ),
                       const SizedBox(height: 16),
                       AppInputField(
-                        label: 'Phone',
+                        label: 'phone'.tr,
                         hintText: '+91...',
                         keyboardType: TextInputType.phone,
                         controller: phoneController,
-                        prefixIcon: const Icon(LucideIcons.phone, size: 18),
+                        prefixIcon: Icon(LucideIcons.phone, size: 18),
                       ),
                       const SizedBox(height: 16),
                       AppInputField(
-                        label: 'GSTIN (GST Number)',
-                        hintText: 'e.g. 22AAAAA0000A1Z5',
+                        label: 'gstin'.tr,
+                        hintText: 'e_g_22aaaaa0000a1z5'.tr,
                         controller: gstinController,
-                        prefixIcon: const Icon(LucideIcons.percent, size: 18),
+                        prefixIcon: Icon(LucideIcons.percent, size: 18),
                       ),
                       const SizedBox(height: 16),
                       Column(
@@ -668,34 +832,62 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           Padding(
                             padding: const EdgeInsets.only(left: 4, bottom: 4),
                             child: Text(
-                              'STATE / UT',
+                              'state_ut'.tr.toUpperCase(),
                               style: AppTextStyles.caption.copyWith(
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? const Color(0xFF94A3B8) : AppColors.textSecondary,
+                                color: Theme.of(context).textTheme.bodyMedium?.color,
                                 letterSpacing: 0.5,
                               ),
                             ),
                           ),
                           DropdownButtonFormField<String>(
+                            isExpanded: true,
+                            hint: Text(
+                              'select_state'.tr,
+                              style: TextStyle(
+                                color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                                fontSize: 13,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                             decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 14,
+                              ),
                               filled: true,
-                              fillColor: isDark ? const Color(0xFF0F172A) : Colors.grey[50],
+                              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : Colors.grey[300]!),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: isDark ? const Color(0xFF334155) : Colors.grey[300]!),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline,
+                                ),
                               ),
                             ),
-                            dropdownColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-                            style: TextStyle(color: isDark ? Colors.white : AppColors.textPrimary, fontSize: 14),
+                            dropdownColor: Theme.of(context).cardTheme.color,
+                            style: TextStyle(
+                              color: Theme.of(context).textTheme.displayLarge?.color,
+                              fontSize: 14,
+                            ),
                             items: _indianStates.map((state) {
                               return DropdownMenuItem<String>(
                                 value: state,
-                                child: Text(state, style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 13)),
+                                child: Text(
+                                  state,
+                                  style: TextStyle(
+                                    color: Theme.of(context).textTheme.displayLarge?.color,
+                                    fontSize: 13,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
                               );
                             }).toList(),
                             onChanged: (val) {
@@ -710,10 +902,10 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       ),
                       const SizedBox(height: 16),
                       AppInputField(
-                        label: 'Billing Address',
-                        hintText: 'Full billing address...',
+                        label: 'billing_address'.tr,
+                        hintText: 'full_billing_address'.tr,
                         controller: addressController,
-                        prefixIcon: const Icon(LucideIcons.mapPin, size: 18),
+                        prefixIcon: Icon(LucideIcons.mapPin, size: 18),
                       ),
                     ],
                   ),
@@ -722,13 +914,19 @@ class _ClientsScreenState extends State<ClientsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'cancel'.tr,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     final name = nameController.text.trim();
                     if (name.isEmpty) {
-                      Get.snackbar('Error', 'Business Name is required');
+                      Get.snackbar('error'.tr, 'business_name_required'.tr);
                       return;
                     }
                     _clientsController.addClient(
@@ -741,8 +939,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     );
                     Navigator.pop(context);
                     Get.snackbar(
-                      'Client Saved',
-                      'Client has been added successfully!',
+                      'client_saved'.tr,
+                      'client_added_successfully'.tr,
                       snackPosition: SnackPosition.BOTTOM,
                       backgroundColor: AppColors.success.withOpacity(0.1),
                       colorText: AppColors.success,
@@ -751,9 +949,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                  child: Text('save_client'.tr, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'save_client'.tr,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             );

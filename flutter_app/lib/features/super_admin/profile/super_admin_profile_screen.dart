@@ -13,7 +13,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Color(0xFFF8FAFC),
       body: SafeArea(
         child: Column(
           children: [
@@ -21,7 +21,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 40),
-              color: const Color(0xFF1E293B), // Dark background from screenshot
+              color: Color(0xFF1E293B), // Dark background from screenshot
               child: Column(
                 children: [
                   // App Icon (White square, blue hexagon)
@@ -47,7 +47,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.baseline,
                     textBaseline: TextBaseline.alphabetic,
                     children: [
-                      const Text(
+                      Text(
                         'Auriva',
                         style: TextStyle(
                           fontSize: 32,
@@ -68,7 +68,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'BUSINESS MANAGEMENT SYSTEM',
                     style: TextStyle(
                       fontSize: 10,
@@ -80,7 +80,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -113,9 +113,9 @@ class SuperAdminProfileScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          
+
                           const SizedBox(height: 24),
-                          
+
                           // Notifications & Settings
                           Container(
                             decoration: BoxDecoration(
@@ -129,39 +129,51 @@ class SuperAdminProfileScreen extends StatelessWidget {
                                   icon: LucideIcons.bellRing,
                                   title: 'Notifications',
                                   showBorder: true,
-                                  onTap: () => Get.to(() => const SuperAdminNotificationsScreen()),
+                                  onTap: () => Get.to(
+                                    () => const SuperAdminNotificationsScreen(),
+                                  ),
                                 ),
                                 _buildSettingAction(
                                   icon: LucideIcons.history,
                                   title: 'System Logs',
                                   showBorder: true,
-                                  onTap: () => Get.to(() => const SuperAdminLogsScreen()),
+                                  onTap: () => Get.to(
+                                    () => const SuperAdminLogsScreen(),
+                                  ),
                                 ),
                                 _buildSettingAction(
                                   icon: LucideIcons.mail,
                                   title: 'Email Config (SMTP)',
                                   showBorder: false,
-                                  onTap: () => Get.to(() => const SuperAdminBroadcastScreen(initialIndex: 1)),
+                                  onTap: () => Get.to(
+                                    () => const SuperAdminBroadcastScreen(
+                                      initialIndex: 1,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          
+
                           const SizedBox(height: 32),
-                          
+
                           // Logout Button
                           SizedBox(
                             width: double.infinity,
                             height: 56,
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                final authController = Get.find<AuthController>();
+                                final authController =
+                                    Get.find<AuthController>();
                                 authController.logout();
                               },
-                              icon: const Icon(LucideIcons.logOut, size: 20),
-                              label: const Text(
+                              icon: Icon(LucideIcons.logOut, size: 20),
+                              label: Text(
                                 'Secure Logout',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red.shade50,
@@ -188,11 +200,18 @@ class SuperAdminProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileItem({required IconData icon, required String title, required String value, required bool showBorder}) {
+  Widget _buildProfileItem({
+    required IconData icon,
+    required String title,
+    required String value,
+    required bool showBorder,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        border: showBorder ? Border(bottom: BorderSide(color: Colors.grey.shade100)) : null,
+        border: showBorder
+            ? Border(bottom: BorderSide(color: Colors.grey.shade100))
+            : null,
       ),
       child: Row(
         children: [
@@ -209,9 +228,23 @@ class SuperAdminProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(fontSize: 12, color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 2),
-                Text(value, style: const TextStyle(fontSize: 15, color: Color(0xFF1E293B), fontWeight: FontWeight.w600)),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF1E293B),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
           ),
@@ -220,14 +253,21 @@ class SuperAdminProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSettingAction({required IconData icon, required String title, required bool showBorder, VoidCallback? onTap}) {
+  Widget _buildSettingAction({
+    required IconData icon,
+    required String title,
+    required bool showBorder,
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: showBorder ? Border(bottom: BorderSide(color: Colors.grey.shade100)) : null,
+          border: showBorder
+              ? Border(bottom: BorderSide(color: Colors.grey.shade100))
+              : null,
         ),
         child: Row(
           children: [
@@ -241,9 +281,20 @@ class SuperAdminProfileScreen extends StatelessWidget {
             ),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(title, style: const TextStyle(fontSize: 15, color: Color(0xFF1E293B), fontWeight: FontWeight.w600)),
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Color(0xFF1E293B),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
-            Icon(LucideIcons.chevronRight, color: Colors.grey.shade400, size: 20),
+            Icon(
+              LucideIcons.chevronRight,
+              color: Colors.grey.shade400,
+              size: 20,
+            ),
           ],
         ),
       ),

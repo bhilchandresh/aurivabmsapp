@@ -10,22 +10,24 @@ import '../inventory/inventory_controller.dart';
 class SupplierDetailsScreen extends StatefulWidget {
   final String supplierId;
 
-  const SupplierDetailsScreen({
-    super.key,
-    required this.supplierId,
-  });
+  const SupplierDetailsScreen({super.key, required this.supplierId});
 
   @override
   State<SupplierDetailsScreen> createState() => _SupplierDetailsScreenState();
 }
 
-class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with SingleTickerProviderStateMixin {
-  final formatCurrency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
+    with SingleTickerProviderStateMixin {
+  final formatCurrency = NumberFormat.currency(
+    locale: 'en_IN',
+    symbol: '₹',
+    decimalDigits: 0,
+  );
   final DateFormat _displayDateFormat = DateFormat('dd MMM yyyy');
-  
+
   final _suppliersController = Get.find<SuppliersController>();
-  final _inventoryController = Get.isRegistered<InventoryController>() 
-      ? Get.find<InventoryController>() 
+  final _inventoryController = Get.isRegistered<InventoryController>()
+      ? Get.find<InventoryController>()
       : Get.put(InventoryController());
 
   String _activeTab = 'bills'; // 'bills', 'payments'
@@ -64,13 +66,17 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Obx(() {
-      final supplierIndex = _suppliersController.suppliers.indexWhere((s) => s.id == widget.supplierId);
+      final supplierIndex = _suppliersController.suppliers.indexWhere(
+        (s) => s.id == widget.supplierId,
+      );
       if (supplierIndex == -1) {
         return Scaffold(
           body: Center(
             child: Text(
               'Supplier not found',
-              style: TextStyle(color: isDark ? Colors.white : AppColors.textPrimary),
+              style: TextStyle(
+                color: Theme.of(context).textTheme.displayLarge?.color,
+              ),
             ),
           ),
         );
@@ -80,21 +86,26 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
       final bills = _suppliersController.supplierBills[widget.supplierId];
       final payments = _suppliersController.supplierPayments[widget.supplierId];
 
-      final showSpinner = _suppliersController.isLoading.value && (bills == null || payments == null);
+      final showSpinner =
+          _suppliersController.isLoading.value &&
+          (bills == null || payments == null);
 
       return Scaffold(
-        backgroundColor: isDark ? const Color(0xFF0F172A) : AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+          backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
           elevation: 0.5,
           leading: IconButton(
-            icon: Icon(LucideIcons.arrowLeft, color: isDark ? Colors.white : AppColors.textPrimary),
+            icon: Icon(
+              LucideIcons.arrowLeft,
+              color: Theme.of(context).textTheme.displayLarge?.color,
+            ),
             onPressed: () => Navigator.of(context).pop(),
           ),
           title: Text(
             'Supplier Ledger',
             style: TextStyle(
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: Theme.of(context).textTheme.displayLarge?.color,
               fontWeight: FontWeight.bold,
               fontSize: 18,
             ),
@@ -107,10 +118,14 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                   child: CircularProgressIndicator(color: AppColors.primary),
                 )
               : RefreshIndicator(
-                  onRefresh: () => _suppliersController.fetchSupplierDetails(widget.supplierId),
+                  onRefresh: () => _suppliersController.fetchSupplierDetails(
+                    widget.supplierId,
+                  ),
                   color: AppColors.primary,
                   child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,7 +135,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                         const SizedBox(height: 16),
 
                         // Stats Cards Section
-                        _buildStatsGrid(supplier, bills ?? [], payments ?? [], isDark),
+                        _buildStatsGrid(
+                          supplier,
+                          bills ?? [],
+                          payments ?? [],
+                          isDark,
+                        ),
                         const SizedBox(height: 20),
 
                         // Action Buttons Row
@@ -128,7 +148,11 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                         const SizedBox(height: 24),
 
                         // Tabs Header
-                        _buildTabHeader(isDark, (bills ?? []).length, (payments ?? []).length),
+                        _buildTabHeader(
+                          isDark,
+                          (bills ?? []).length,
+                          (payments ?? []).length,
+                        ),
                         const SizedBox(height: 16),
 
                         // Tab Content with Animated Switcher
@@ -152,15 +176,17 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? const Color(0xFF334155) : AppColors.border),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -176,7 +202,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
             child: Center(
               child: Text(
                 supplier.name.substring(0, 1).toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.primary,
                   fontWeight: FontWeight.w800,
                   fontSize: 24,
@@ -194,18 +220,30 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.displayLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 8),
                 if (supplier.phone.isNotEmpty)
-                  _buildHeaderMetaRow(LucideIcons.phone, supplier.phone, isDark),
+                  _buildHeaderMetaRow(
+                    LucideIcons.phone,
+                    supplier.phone,
+                    isDark,
+                  ),
                 if (supplier.email.isNotEmpty)
                   _buildHeaderMetaRow(LucideIcons.mail, supplier.email, isDark),
                 if (supplier.gstNumber.isNotEmpty)
-                  _buildHeaderMetaRow(LucideIcons.hash, 'GST: ${supplier.gstNumber}', isDark),
+                  _buildHeaderMetaRow(
+                    LucideIcons.hash,
+                    'GST: ${supplier.gstNumber}',
+                    isDark,
+                  ),
                 if (supplier.address.isNotEmpty)
-                  _buildHeaderMetaRow(LucideIcons.mapPin, supplier.address, isDark),
+                  _buildHeaderMetaRow(
+                    LucideIcons.mapPin,
+                    supplier.address,
+                    isDark,
+                  ),
               ],
             ),
           ),
@@ -220,14 +258,18 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 14, color: isDark ? const Color(0xFF94A3B8) : Colors.grey),
+          Icon(
+            icon,
+            size: 14,
+            color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               label,
               style: TextStyle(
                 fontSize: 12.5,
-                color: isDark ? const Color(0xFFCBD5E1) : Colors.grey.shade700,
+                color: isDark ? Color(0xFFCBD5E1) : Colors.grey.shade700,
               ),
             ),
           ),
@@ -236,7 +278,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
     );
   }
 
-  Widget _buildStatsGrid(Supplier supplier, List<SupplierPurchaseBill> bills, List<SupplierPayment> payments, bool isDark) {
+  Widget _buildStatsGrid(
+    Supplier supplier,
+    List<SupplierPurchaseBill> bills,
+    List<SupplierPayment> payments,
+    bool isDark,
+  ) {
     final pending = supplier.pendingBalance;
     final hasPending = pending > 0;
 
@@ -268,28 +315,40 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
             icon: hasPending ? LucideIcons.clock : LucideIcons.thumbsUp,
             color: hasPending ? Colors.red : Colors.teal,
             isDark: isDark,
-            bgColor: hasPending 
-                ? (isDark ? Colors.red.shade900.withOpacity(0.3) : Colors.red.shade50)
-                : (isDark ? Colors.teal.shade900.withOpacity(0.3) : Colors.teal.shade50),
+            bgColor: hasPending
+                ? (isDark
+                      ? Colors.red.shade900.withOpacity(0.3)
+                      : Colors.red.shade50)
+                : (isDark
+                      ? Colors.teal.shade900.withOpacity(0.3)
+                      : Colors.teal.shade50),
           ),
         ];
 
         if (isSmallScreen) {
           return Column(
-            children: statsCards.map((card) => Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: SizedBox(width: double.infinity, child: card),
-            )).toList(),
+            children: statsCards
+                .map(
+                  (card) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: SizedBox(width: double.infinity, child: card),
+                  ),
+                )
+                .toList(),
           );
         } else {
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: statsCards.map((card) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: card,
-              ),
-            )).toList(),
+            children: statsCards
+                .map(
+                  (card) => Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: card,
+                    ),
+                  ),
+                )
+                .toList(),
           );
         }
       },
@@ -308,12 +367,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bgColor ?? (isDark ? const Color(0xFF1E293B) : Colors.white),
+        color: bgColor ?? ((Theme.of(context).cardTheme.color ?? Colors.white)),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: bgColor != null 
-              ? Colors.transparent 
-              : (isDark ? const Color(0xFF334155) : AppColors.border),
+          color: bgColor != null
+              ? Colors.transparent
+              : (Theme.of(context).colorScheme.outline),
         ),
       ),
       child: Column(
@@ -327,7 +386,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? const Color(0xFF94A3B8) : Colors.grey,
+                  color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                   letterSpacing: 0.5,
                 ),
               ),
@@ -342,7 +401,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
-                color: isDark ? Colors.white : AppColors.textPrimary,
+                color: Theme.of(context).textTheme.displayLarge?.color,
               ),
             ),
           ),
@@ -351,7 +410,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
             subtitle,
             style: TextStyle(
               fontSize: 11,
-              color: isDark ? const Color(0xFF64748B) : Colors.grey.shade500,
+              color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
           ),
         ],
@@ -359,20 +418,26 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
     );
   }
 
-  Widget _buildActionsRow(BuildContext context, String supplierId, bool isDark) {
+  Widget _buildActionsRow(
+    BuildContext context,
+    String supplierId,
+    bool isDark,
+  ) {
     return Row(
       children: [
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () => _showAddBillDialog(context, supplierId),
-            icon: const Icon(LucideIcons.plus, size: 16),
-            label: const Text('Add Purchase Bill'),
+            icon: Icon(LucideIcons.plus, size: 16),
+            label: Text('add_purchase_bill'.tr),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
@@ -380,14 +445,16 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () => _showRecordPaymentDialog(context, supplierId),
-            icon: const Icon(LucideIcons.creditCard, size: 16),
-            label: const Text('Record Payment'),
+            icon: Icon(LucideIcons.creditCard, size: 16),
+            label: Text('record_payment'.tr),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
@@ -418,7 +485,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive 
+          color: isActive
               ? AppColors.primary.withOpacity(isDark ? 0.2 : 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
@@ -432,9 +499,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
           style: TextStyle(
             fontSize: 13.0,
             fontWeight: FontWeight.bold,
-            color: isActive 
-                ? AppColors.primary 
-                : (isDark ? const Color(0xFF94A3B8) : Colors.grey.shade600),
+            color: isActive
+                ? AppColors.primary
+                : ((Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
           ),
         ),
       ),
@@ -448,19 +515,25 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
         width: double.infinity,
         padding: const EdgeInsets.all(40),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isDark ? const Color(0xFF334155) : AppColors.border),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
         child: Column(
           children: [
-            Icon(LucideIcons.package, size: 40, color: isDark ? const Color(0xFF475569) : Colors.grey.shade300),
+            Icon(
+              LucideIcons.package,
+              size: 40,
+              color: isDark ? Color(0xFF475569) : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+            ),
             const SizedBox(height: 12),
             Text(
               'No purchase bills yet',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isDark ? const Color(0xFF94A3B8) : Colors.grey.shade500,
+                color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
               ),
             ),
           ],
@@ -486,15 +559,17 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? const Color(0xFF334155) : AppColors.border),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+        ),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          iconColor: isDark ? Colors.white : AppColors.textPrimary,
-          collapsedIconColor: isDark ? const Color(0xFF94A3B8) : Colors.grey,
+          iconColor: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+          collapsedIconColor: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
           title: Row(
             children: [
               Expanded(
@@ -507,7 +582,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                         fontFamily: 'monospace',
                         fontWeight: FontWeight.bold,
                         fontSize: 14.5,
-                        color: isDark ? Colors.white : AppColors.textPrimary,
+                        color: Theme.of(context).textTheme.displayLarge?.color,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -515,7 +590,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                       _safeFormatDate(bill.date),
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? const Color(0xFF94A3B8) : Colors.grey,
+                        color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                       ),
                     ),
                   ],
@@ -529,12 +604,15 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                     style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 15,
-                      color: isDark ? Colors.white : AppColors.textPrimary,
+                      color: Theme.of(context).textTheme.displayLarge?.color,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: statusColor.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(12),
@@ -556,7 +634,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF0F172A) : Colors.grey.shade50,
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(16),
                   bottomRight: Radius.circular(16),
@@ -570,7 +648,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: isDark ? const Color(0xFF94A3B8) : Colors.grey.shade700,
+                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -587,31 +665,70 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                         decoration: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                              color: isDark ? const Color(0xFF334155) : Colors.grey.shade300,
+                              color: Theme.of(context).colorScheme.outline,
                               width: 1,
                             ),
                           ),
                         ),
                         children: [
-                          _buildTableCell('Item', isHeader: true, isDark: isDark),
-                          _buildTableCell('Qty', isHeader: true, isRightAlign: true, isDark: isDark),
-                          _buildTableCell('Rate', isHeader: true, isRightAlign: true, isDark: isDark),
-                          _buildTableCell('Amount', isHeader: true, isRightAlign: true, isDark: isDark),
+                          _buildTableCell(
+                            'Item',
+                            isHeader: true,
+                            isDark: isDark,
+                          ),
+                          _buildTableCell(
+                            'Qty',
+                            isHeader: true,
+                            isRightAlign: true,
+                            isDark: isDark,
+                          ),
+                          _buildTableCell(
+                            'Rate',
+                            isHeader: true,
+                            isRightAlign: true,
+                            isDark: isDark,
+                          ),
+                          _buildTableCell(
+                            'Amount',
+                            isHeader: true,
+                            isRightAlign: true,
+                            isDark: isDark,
+                          ),
                         ],
                       ),
-                      ...bill.items.map((item) => TableRow(
-                        children: [
-                          _buildTableCell(item.description.isNotEmpty ? item.description : 'Item', isDark: isDark),
-                          _buildTableCell(item.quantity.toString(), isRightAlign: true, isDark: isDark),
-                          _buildTableCell(formatCurrency.format(item.rate), isRightAlign: true, isDark: isDark),
-                          _buildTableCell(formatCurrency.format(item.amount), isRightAlign: true, isBold: true, isDark: isDark),
-                        ],
-                      )),
+                      ...bill.items.map(
+                        (item) => TableRow(
+                          children: [
+                            _buildTableCell(
+                              item.description.isNotEmpty
+                                  ? item.description
+                                  : 'Item',
+                              isDark: isDark,
+                            ),
+                            _buildTableCell(
+                              item.quantity.toString(),
+                              isRightAlign: true,
+                              isDark: isDark,
+                            ),
+                            _buildTableCell(
+                              formatCurrency.format(item.rate),
+                              isRightAlign: true,
+                              isDark: isDark,
+                            ),
+                            _buildTableCell(
+                              formatCurrency.format(item.amount),
+                              isRightAlign: true,
+                              isBold: true,
+                              isDark: isDark,
+                            ),
+                          ],
+                        ),
+                      ),
                       TableRow(
                         decoration: BoxDecoration(
                           border: Border(
                             top: BorderSide(
-                              color: isDark ? const Color(0xFF334155) : Colors.grey.shade300,
+                              color: Theme.of(context).colorScheme.outline,
                               width: 1,
                             ),
                           ),
@@ -619,8 +736,18 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                         children: [
                           const SizedBox(),
                           const SizedBox(),
-                          _buildTableCell('Total Bill:', isHeader: true, isRightAlign: true, isDark: isDark),
-                          _buildTableCell(formatCurrency.format(bill.totalAmount), isRightAlign: true, isBold: true, isDark: isDark),
+                          _buildTableCell(
+                            'Total Bill:',
+                            isHeader: true,
+                            isRightAlign: true,
+                            isDark: isDark,
+                          ),
+                          _buildTableCell(
+                            formatCurrency.format(bill.totalAmount),
+                            isRightAlign: true,
+                            isBold: true,
+                            isDark: isDark,
+                          ),
                         ],
                       ),
                     ],
@@ -632,7 +759,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? const Color(0xFF64748B) : Colors.grey,
+                        color: Theme.of(context).textTheme.bodyMedium?.color,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -640,7 +767,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                       bill.notes,
                       style: TextStyle(
                         fontSize: 11.5,
-                        color: isDark ? const Color(0xFF94A3B8) : Colors.grey.shade700,
+                        color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                       ),
                     ),
                   ],
@@ -657,12 +784,19 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                         ),
                       ),
                       IconButton(
-                        onPressed: () => _confirmDeleteBill(bill.id, bill.billNumber),
-                        icon: const Icon(LucideIcons.trash2, size: 16, color: Colors.red),
+                        onPressed: () =>
+                            _confirmDeleteBill(bill.id, bill.billNumber),
+                        icon: Icon(
+                          LucideIcons.trash2,
+                          size: 16,
+                          color: Colors.red,
+                        ),
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.red.withOpacity(0.1),
                           padding: const EdgeInsets.all(8),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ],
@@ -676,7 +810,13 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
     );
   }
 
-  Widget _buildTableCell(String text, {bool isHeader = false, bool isRightAlign = false, bool isBold = false, required bool isDark}) {
+  Widget _buildTableCell(
+    String text, {
+    bool isHeader = false,
+    bool isRightAlign = false,
+    bool isBold = false,
+    required bool isDark,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(
@@ -684,12 +824,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
         textAlign: isRightAlign ? TextAlign.right : TextAlign.left,
         style: TextStyle(
           fontSize: isHeader ? 11.5 : 12,
-          fontWeight: isHeader 
-              ? FontWeight.bold 
+          fontWeight: isHeader
+              ? FontWeight.bold
               : (isBold ? FontWeight.bold : FontWeight.normal),
-          color: isHeader 
-              ? (isDark ? const Color(0xFF64748B) : Colors.grey)
-              : (isDark ? Colors.white : AppColors.textPrimary),
+          color: isHeader
+              ? ((Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey))
+              : ((Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)),
         ),
       ),
     );
@@ -702,19 +842,25 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
         width: double.infinity,
         padding: const EdgeInsets.all(40),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isDark ? const Color(0xFF334155) : AppColors.border),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline,
+          ),
         ),
         child: Column(
           children: [
-            Icon(LucideIcons.indianRupee, size: 40, color: isDark ? const Color(0xFF475569) : Colors.grey.shade300),
+            Icon(
+              LucideIcons.indianRupee,
+              size: 40,
+              color: isDark ? Color(0xFF475569) : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+            ),
             const SizedBox(height: 12),
             Text(
               'No payments recorded yet',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: isDark ? const Color(0xFF94A3B8) : Colors.grey.shade500,
+                color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
               ),
             ),
           ],
@@ -739,9 +885,11 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E293B) : Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? const Color(0xFF334155) : AppColors.border),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -756,19 +904,22 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                     _safeFormatDate(payment.paymentDate),
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark ? const Color(0xFF94A3B8) : Colors.grey,
+                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withOpacity(0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       payment.paymentMode,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
@@ -779,7 +930,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
               ),
               Text(
                 formatCurrency.format(payment.amount),
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.w900,
                   fontSize: 17,
                   color: Colors.green,
@@ -797,7 +948,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? const Color(0xFF64748B) : Colors.grey,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
                   ),
                 ),
                 Text(
@@ -805,7 +956,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                   style: TextStyle(
                     fontFamily: 'monospace',
                     fontSize: 11.5,
-                    color: isDark ? Colors.white : AppColors.textPrimary,
+                    color: Theme.of(context).textTheme.displayLarge?.color,
                   ),
                 ),
               ],
@@ -817,25 +968,31 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
               payment.notes,
               style: TextStyle(
                 fontSize: 12,
-                color: isDark ? const Color(0xFF94A3B8) : Colors.grey.shade700,
+                color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                 fontStyle: FontStyle.italic,
               ),
             ),
           ],
-          const Divider(height: 24),
+          Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton.icon(
-                onPressed: () => _confirmDeletePayment(payment.id, payment.amount),
-                icon: const Icon(LucideIcons.trash2, size: 12),
-                label: const Text('Delete'),
+                onPressed: () =>
+                    _confirmDeletePayment(payment.id, payment.amount),
+                icon: Icon(LucideIcons.trash2, size: 12),
+                label: Text('delete'.tr),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red.withOpacity(0.1),
                   foregroundColor: Colors.red,
                   elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ],
@@ -861,33 +1018,53 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
   void _confirmDeleteBill(String billId, String billNo) {
     Get.dialog(
       AlertDialog(
-        title: const Text('Delete Bill'),
-        content: Text('Are you sure you want to delete purchase bill "$billNo"? This will update the supplier ledger status.'),
+        title: Text('delete_bill'.tr),
+        content: Text(
+          'Are you sure you want to delete purchase bill "$billNo"? This will update the supplier ledger status.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: TextStyle(color: Colors.grey)),
           ),
           Obx(() {
             final isDeleting = _suppliersController.isLoading.value;
             return ElevatedButton(
-              onPressed: isDeleting ? null : () async {
-                final success = await _suppliersController.deletePurchaseBill(widget.supplierId, billId);
-                Get.back();
-                if (success) {
-                  Get.snackbar('Success', 'Bill deleted successfully', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-                } else {
-                  Get.snackbar('Error', 'Failed to delete bill', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                }
-              },
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                      final success = await _suppliersController
+                          .deletePurchaseBill(widget.supplierId, billId);
+                      Get.back();
+                      if (success) {
+                        Get.snackbar(
+                          'Success',
+                          'Bill deleted successfully',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.green,
+                          colorText: Colors.white,
+                        );
+                      } else {
+                        Get.snackbar(
+                          'Error',
+                          'Failed to delete bill',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: isDeleting
                   ? const SizedBox(
                       height: 16,
                       width: 16,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
-                  : const Text('Delete', style: TextStyle(color: Colors.white)),
+                  : Text('delete'.tr, style: TextStyle(color: Colors.white)),
             );
           }),
         ],
@@ -898,60 +1075,84 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
   void _confirmDeletePayment(String paymentId, double amount) {
     Get.dialog(
       AlertDialog(
-        title: const Text('Delete Payment'),
-        content: Text('Are you sure you want to delete this payment of ${formatCurrency.format(amount)}?'),
+        title: Text('delete_payment'.tr),
+        content: Text(
+          'Are you sure you want to delete this payment of ${formatCurrency.format(amount)}?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: TextStyle(color: Colors.grey)),
           ),
           Obx(() {
             final isDeleting = _suppliersController.isLoading.value;
             return ElevatedButton(
-              onPressed: isDeleting ? null : () async {
-                final success = await _suppliersController.deletePayment(widget.supplierId, paymentId);
-                Get.back();
-                if (success) {
-                  Get.snackbar('Success', 'Payment deleted successfully', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-                } else {
-                  Get.snackbar('Error', 'Failed to delete payment', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                }
-              },
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                      final success = await _suppliersController.deletePayment(
+                        widget.supplierId,
+                        paymentId,
+                      );
+                      Get.back();
+                      if (success) {
+                        Get.snackbar(
+                          'Success',
+                          'Payment deleted successfully',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.green,
+                          colorText: Colors.white,
+                        );
+                      } else {
+                        Get.snackbar(
+                          'Error',
+                          'Failed to delete payment',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.red,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: isDeleting
                   ? const SizedBox(
                       height: 16,
                       width: 16,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
-                  : const Text('Delete', style: TextStyle(color: Colors.white)),
+                  : Text('delete'.tr, style: TextStyle(color: Colors.white)),
             );
           }),
         ],
       ),
     );
-  }  // --- Purchase Bill Form Modal ---
+  } // --- Purchase Bill Form Modal ---
+
   void _showAddBillDialog(BuildContext context, String supplierId) {
     final billNoController = TextEditingController();
     final notesController = TextEditingController();
     final overrideAmountController = TextEditingController();
-    
+
     DateTime billDate = DateTime.now();
     DateTime? dueDate;
 
     // Dynamic items state
     List<Map<String, dynamic>> selectedItems = [
-      {'desc': '', 'qty': 1, 'rate': 0.0, 'inventoryId': null}
+      {'desc': '', 'qty': 1, 'rate': 0.0, 'inventoryId': null},
     ];
 
     Get.dialog(
       Dialog(
         insetPadding: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).cardTheme.color,
         surfaceTintColor: Colors.transparent, // Prevents material 3 tint
         child: SizedBox(
-          width: 500, // On mobile, this will constrain to available width minus insetPadding
+          width:
+              500, // On mobile, this will constrain to available width minus insetPadding
           child: StatefulBuilder(
             builder: (context, setState) {
               final double subTotal = selectedItems.fold(0.0, (sum, item) {
@@ -965,20 +1166,40 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                 children: [
                   // HEADER
                   Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 12, top: 16, bottom: 16),
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 12,
+                      top: 16,
+                      bottom: 16,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            const Icon(LucideIcons.package, color: AppColors.primary, size: 20),
+                            Icon(
+                              LucideIcons.package,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
-                            const Text('Add Purchase Bill', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                            Text(
+                              'add_purchase_bill'.tr,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                              ),
+                            ),
                           ],
                         ),
                         IconButton(
                           onPressed: () => Get.back(),
-                          icon: const Icon(LucideIcons.x, size: 20, color: Colors.grey),
+                          icon: Icon(
+                            LucideIcons.x,
+                            size: 20,
+                            color: Colors.grey,
+                          ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           splashRadius: 20,
@@ -986,8 +1207,8 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                       ],
                     ),
                   ),
-                  const Divider(height: 1, color: AppColors.border),
-                  
+                  Divider(height: 1, color: Theme.of(context).colorScheme.outline),
+
                   // CONTENT
                   Flexible(
                     child: SingleChildScrollView(
@@ -1017,14 +1238,15 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                       firstDate: DateTime(2000),
                                       lastDate: DateTime(2101),
                                     );
-                                    if (picked != null) setState(() => billDate = picked);
+                                    if (picked != null)
+                                      setState(() => billDate = picked);
                                   },
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // ROW 2
                           Row(
                             children: [
@@ -1040,7 +1262,8 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                       firstDate: DateTime(2000),
                                       lastDate: DateTime(2101),
                                     );
-                                    if (picked != null) setState(() => dueDate = picked);
+                                    if (picked != null)
+                                      setState(() => dueDate = picked);
                                   },
                                 ),
                               ),
@@ -1049,21 +1272,37 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('TOTAL AMOUNT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                    Text(
+                                      'total_amount'.tr,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
                                     const SizedBox(height: 6),
                                     Container(
                                       height: 40,
                                       width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: Colors.grey.shade100,
+                                        color: Theme.of(context).scaffoldBackgroundColor,
                                         borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(color: Colors.grey.shade300),
+                                        border: Border.all(
+                                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                        ),
                                       ),
                                       alignment: Alignment.centerLeft,
                                       child: Text(
                                         '₹${subTotal.toStringAsFixed(2)}',
-                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey.shade600),
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.white),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -1072,11 +1311,18 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                             ],
                           ),
                           const SizedBox(height: 24),
-                          
+
                           // ITEMS HEADER
-                          const Text('ITEMS / MATERIALS PURCHASED', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                          Text(
+                            'items_materials_purchased'.tr,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
                           const SizedBox(height: 12),
-                          
+
                           // ITEMS LIST
                           ...List.generate(selectedItems.length, (index) {
                             final item = selectedItems[index];
@@ -1084,79 +1330,190 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                               margin: const EdgeInsets.only(bottom: 12),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
+                                color: Theme.of(context).scaffoldBackgroundColor,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.grey.shade200),
+                                border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Text('ITEM NAME *', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                            Text(
+                                              'item_name'.tr,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                             const SizedBox(height: 6),
                                             Autocomplete<InventoryItem>(
-                                              optionsBuilder: (TextEditingValue textEditingValue) {
-                                                if (textEditingValue.text == '') return const Iterable<InventoryItem>.empty();
-                                                return _inventoryController.items.where((option) => option.itemName.toLowerCase().contains(textEditingValue.text.toLowerCase()));
-                                              },
-                                              displayStringForOption: (option) => option.itemName,
+                                              optionsBuilder:
+                                                  (
+                                                    TextEditingValue
+                                                    textEditingValue,
+                                                  ) {
+                                                    if (textEditingValue.text ==
+                                                        '')
+                                                      return const Iterable<
+                                                        InventoryItem
+                                                      >.empty();
+                                                    return _inventoryController
+                                                        .items
+                                                        .where(
+                                                          (option) => option
+                                                              .itemName
+                                                              .toLowerCase()
+                                                              .contains(
+                                                                textEditingValue
+                                                                    .text
+                                                                    .toLowerCase(),
+                                                              ),
+                                                        );
+                                                  },
+                                              displayStringForOption:
+                                                  (option) => option.itemName,
                                               onSelected: (selection) {
                                                 setState(() {
-                                                  item['desc'] = selection.itemName;
-                                                  item['rate'] = selection.unitPrice;
-                                                  item['inventoryId'] = selection.id;
+                                                  item['desc'] =
+                                                      selection.itemName;
+                                                  item['rate'] =
+                                                      selection.unitPrice;
+                                                  item['inventoryId'] =
+                                                      selection.id;
                                                 });
                                               },
-                                              fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                                                if (controller.text.isEmpty && item['desc'] != '') controller.text = item['desc'];
-                                                return SizedBox(
-                                                  height: 40,
-                                                  child: TextFormField(
-                                                    controller: controller,
-                                                    focusNode: focusNode,
-                                                    decoration: InputDecoration(
-                                                      hintText: 'e.g. Cement Bags',
-                                                      hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-                                                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                                                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary)),
-                                                      fillColor: Colors.white,
-                                                      filled: true,
-                                                    ),
-                                                    style: const TextStyle(fontSize: 13),
-                                                    onChanged: (val) {
-                                                      item['desc'] = val;
-                                                      item['inventoryId'] = null;
-                                                    },
-                                                  ),
-                                                );
-                                              },
+                                              fieldViewBuilder:
+                                                  (
+                                                    context,
+                                                    controller,
+                                                    focusNode,
+                                                    onFieldSubmitted,
+                                                  ) {
+                                                    if (controller
+                                                            .text
+                                                            .isEmpty &&
+                                                        item['desc'] != '')
+                                                      controller.text =
+                                                          item['desc'];
+                                                    return SizedBox(
+                                                      height: 40,
+                                                      child: TextFormField(
+                                                        controller: controller,
+                                                        focusNode: focusNode,
+                                                        decoration: InputDecoration(
+                                                          hintText:
+                                                              'e_g_cement_bags'
+                                                                  .tr,
+                                                          hintStyle: TextStyle(
+                                                            color: Colors
+                                                                .grey
+                                                                .shade400,
+                                                            fontSize: 13,
+                                                          ),
+                                                          contentPadding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 12,
+                                                                vertical: 8,
+                                                              ),
+                                                          border: OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
+                                                            borderSide:
+                                                                BorderSide(
+                                                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                                                ),
+                                                          ),
+                                                          enabledBorder: OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
+                                                            borderSide:
+                                                                BorderSide(
+                                                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                                                ),
+                                                          ),
+                                                          focusedBorder: OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  8,
+                                                                ),
+                                                            borderSide:
+                                                                BorderSide(
+                                                                  color: AppColors
+                                                                      .primary,
+                                                                ),
+                                                          ),
+                                                          fillColor:
+                                                              Theme.of(context).scaffoldBackgroundColor,
+                                                          filled: true,
+                                                        ),
+                                                        style: TextStyle(
+                                                          fontSize: 13,
+                                                        ),
+                                                        onChanged: (val) {
+                                                          item['desc'] = val;
+                                                          item['inventoryId'] =
+                                                              null;
+                                                        },
+                                                      ),
+                                                    );
+                                                  },
                                               optionsViewBuilder: (context, onSelected, options) {
                                                 return Align(
                                                   alignment: Alignment.topLeft,
                                                   child: Material(
                                                     elevation: 4,
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
                                                     child: SizedBox(
                                                       height: 200,
-                                                      width: MediaQuery.of(context).size.width * 0.7,
+                                                      width:
+                                                          MediaQuery.of(
+                                                            context,
+                                                          ).size.width *
+                                                          0.7,
                                                       child: ListView.builder(
-                                                        padding: const EdgeInsets.all(8),
-                                                        itemCount: options.length,
+                                                        padding:
+                                                            const EdgeInsets.all(
+                                                              8,
+                                                            ),
+                                                        itemCount:
+                                                            options.length,
                                                         itemBuilder: (context, index) {
-                                                          final option = options.elementAt(index);
+                                                          final option = options
+                                                              .elementAt(index);
                                                           return InkWell(
-                                                            onTap: () => onSelected(option),
+                                                            onTap: () =>
+                                                                onSelected(
+                                                                  option,
+                                                                ),
                                                             child: Padding(
-                                                              padding: const EdgeInsets.all(12),
-                                                              child: Text('${option.itemName} (${option.sku})', style: const TextStyle(fontSize: 13)),
+                                                              padding:
+                                                                  const EdgeInsets.all(
+                                                                    12,
+                                                                  ),
+                                                              child: Text(
+                                                                '${option.itemName} (${option.sku})',
+                                                                style:
+                                                                    TextStyle(
+                                                                      fontSize:
+                                                                          13,
+                                                                    ),
+                                                              ),
                                                             ),
                                                           );
                                                         },
@@ -1173,10 +1530,17 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                       IconButton(
                                         onPressed: () {
                                           if (selectedItems.length > 1) {
-                                            setState(() => selectedItems.removeAt(index));
+                                            setState(
+                                              () =>
+                                                  selectedItems.removeAt(index),
+                                            );
                                           }
                                         },
-                                        icon: const Icon(LucideIcons.trash2, size: 18, color: Colors.redAccent),
+                                        icon: Icon(
+                                          LucideIcons.trash2,
+                                          size: 18,
+                                          color: Colors.redAccent,
+                                        ),
                                         padding: const EdgeInsets.only(top: 16),
                                         constraints: const BoxConstraints(),
                                         splashRadius: 20,
@@ -1190,26 +1554,74 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                       Expanded(
                                         flex: 2,
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Text('QTY', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                            Text(
+                                              'qty'.tr,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                             const SizedBox(height: 6),
                                             SizedBox(
                                               height: 36,
                                               child: TextFormField(
-                                                initialValue: item['qty'].toString(),
+                                                initialValue: item['qty']
+                                                    .toString(),
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
-                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary)),
-                                                  fillColor: Colors.white,
+                                                  contentPadding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 8,
+                                                      ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                                    ),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
+                                                        borderSide: BorderSide(
+                                                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                                        ),
+                                                      ),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
+                                                        borderSide:
+                                                            BorderSide(
+                                                              color: AppColors
+                                                                  .primary,
+                                                            ),
+                                                      ),
+                                                  fillColor: Theme.of(context).scaffoldBackgroundColor,
                                                   filled: true,
                                                 ),
-                                                style: const TextStyle(fontSize: 13),
-                                                keyboardType: TextInputType.number,
-                                                onChanged: (val) => setState(() => item['qty'] = int.tryParse(val) ?? 1),
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                ),
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                onChanged: (val) => setState(
+                                                  () => item['qty'] =
+                                                      int.tryParse(val) ?? 1,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -1219,27 +1631,81 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                       Expanded(
                                         flex: 3,
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Text('RATE (₹)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                            Text(
+                                              'rate_1'.tr,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                             const SizedBox(height: 6),
                                             SizedBox(
                                               height: 36,
                                               child: TextFormField(
-                                                key: ValueKey('rate_${index}_${item['rate']}'),
-                                                initialValue: item['rate'] > 0 ? item['rate'].toString() : '0',
+                                                key: ValueKey(
+                                                  'rate_${index}_${item['rate']}',
+                                                ),
+                                                initialValue: item['rate'] > 0
+                                                    ? item['rate'].toString()
+                                                    : '0',
                                                 textAlign: TextAlign.center,
                                                 decoration: InputDecoration(
-                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                                                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                                                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary)),
-                                                  fillColor: Colors.white,
+                                                  contentPadding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 8,
+                                                      ),
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                                    ),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
+                                                        borderSide: BorderSide(
+                                                          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                                        ),
+                                                      ),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              8,
+                                                            ),
+                                                        borderSide:
+                                                            BorderSide(
+                                                              color: AppColors
+                                                                  .primary,
+                                                            ),
+                                                      ),
+                                                  fillColor: Theme.of(context).scaffoldBackgroundColor,
                                                   filled: true,
                                                 ),
-                                                style: const TextStyle(fontSize: 13),
-                                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                                onChanged: (val) => setState(() => item['rate'] = double.tryParse(val) ?? 0.0),
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                ),
+                                                keyboardType:
+                                                    const TextInputType.numberWithOptions(
+                                                      decimal: true,
+                                                    ),
+                                                onChanged: (val) => setState(
+                                                  () => item['rate'] =
+                                                      double.tryParse(val) ??
+                                                      0.0,
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -1249,17 +1715,30 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                       Expanded(
                                         flex: 3,
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
-                                            const Text('TOTAL', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                                            Text(
+                                              'total_1'.tr,
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
                                             const SizedBox(height: 6),
                                             Container(
                                               height: 36,
                                               alignment: Alignment.centerRight,
                                               child: Text(
                                                 '₹${((item['qty'] as int) * (item['rate'] as double)).toStringAsFixed(2)}',
-                                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -1271,150 +1750,309 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                               ),
                             );
                           }),
-                          
+
                           // ADD ITEM BUTTON
                           InkWell(
-                            onTap: () => setState(() => selectedItems.add({'desc': '', 'qty': 1, 'rate': 0.0, 'inventoryId': null})),
+                            onTap: () => setState(
+                              () => selectedItems.add({
+                                'desc': '',
+                                'qty': 1,
+                                'rate': 0.0,
+                                'inventoryId': null,
+                              }),
+                            ),
                             borderRadius: BorderRadius.circular(8),
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 4,
+                              ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
-                                    child: const Icon(LucideIcons.plus, size: 14, color: AppColors.primary),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    child: Icon(
+                                      LucideIcons.plus,
+                                      size: 14,
+                                      color: AppColors.primary,
+                                    ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Text('Add Item', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 13)),
+                                  Text(
+                                    'add_item'.tr,
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          
+
                           // SUBTOTAL
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withOpacity(0.05),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+                              border: Border.all(
+                                color: AppColors.primary.withOpacity(0.1),
+                              ),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Text('Subtotal:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primary)),
-                                Text('₹${subTotal.toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.primary)),
+                                Text(
+                                  'subtotal_1'.tr,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                                Text(
+                                  '₹${subTotal.toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 16,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                           const SizedBox(height: 24),
-                          
+
                           // NOTES
-                          const Text('NOTES', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey)),
+                          Text(
+                            'notes_1'.tr,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
                           const SizedBox(height: 8),
                           TextFormField(
                             controller: notesController,
                             maxLines: 3,
                             decoration: InputDecoration(
-                              hintText: 'Delivery details, conditions etc.',
-                              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary)),
+                              hintText: 'delivery_details_conditions_etc'.tr,
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontSize: 13,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                              ),
                             ),
-                            style: const TextStyle(fontSize: 13),
+                            style: TextStyle(fontSize: 13),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  
+
                   // FOOTER
-                  const Divider(height: 1, color: AppColors.border),
+                  Divider(height: 1, color: Theme.of(context).colorScheme.outline),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
                           onPressed: () => Get.back(),
-                          child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
+                          child: Text(
+                            'cancel'.tr,
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Obx(() {
                           final isSaving = _suppliersController.isLoading.value;
                           return ElevatedButton(
-                            onPressed: isSaving ? null : () async {
-                              if (billNoController.text.trim().isEmpty) {
-                                Get.snackbar('Error', 'Bill number / Invoice number is required', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                                return;
-                              }
-                              if (selectedItems.isEmpty) {
-                                Get.snackbar('Error', 'Please add at least one item', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                                return;
-                              }
-                              if (selectedItems.any((item) => item['desc'].toString().trim().isEmpty)) {
-                                Get.snackbar('Error', 'Item name is required for all items', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                                return;
-                              }
-                              if (selectedItems.any((item) => (item['qty'] as int) <= 0)) {
-                                Get.snackbar('Error', 'Quantity must be greater than 0 for all items', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                                return;
-                              }
-                              if (selectedItems.any((item) => (item['rate'] as double) <= 0)) {
-                                Get.snackbar('Error', 'Rate must be greater than 0 for all items', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                                return;
-                              }
+                            onPressed: isSaving
+                                ? null
+                                : () async {
+                                    if (billNoController.text.trim().isEmpty) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Bill number / Invoice number is required',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+                                    if (selectedItems.isEmpty) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Please add at least one item',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+                                    if (selectedItems.any(
+                                      (item) => item['desc']
+                                          .toString()
+                                          .trim()
+                                          .isEmpty,
+                                    )) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Item name is required for all items',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+                                    if (selectedItems.any(
+                                      (item) => (item['qty'] as int) <= 0,
+                                    )) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Quantity must be greater than 0 for all items',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+                                    if (selectedItems.any(
+                                      (item) => (item['rate'] as double) <= 0,
+                                    )) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Rate must be greater than 0 for all items',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
 
-                              List<PurchaseBillItem> billItems = selectedItems.map((item) {
-                                double rate = item['rate'] ?? 0.0;
-                                int qty = item['qty'] ?? 1;
-                                return PurchaseBillItem(
-                                  description: item['desc'],
-                                  quantity: qty,
-                                  rate: rate,
-                                  amount: rate * qty,
-                                  inventoryId: item['inventoryId'],
-                                );
-                              }).toList();
+                                    List<PurchaseBillItem> billItems =
+                                        selectedItems.map((item) {
+                                          double rate = item['rate'] ?? 0.0;
+                                          int qty = item['qty'] ?? 1;
+                                          return PurchaseBillItem(
+                                            description: item['desc'],
+                                            quantity: qty,
+                                            rate: rate,
+                                            amount: rate * qty,
+                                            inventoryId: item['inventoryId'],
+                                          );
+                                        }).toList();
 
-                              String dueDateStr = dueDate != null ? DateFormat('yyyy-MM-dd').format(dueDate!) : '';
+                                    String dueDateStr = dueDate != null
+                                        ? DateFormat(
+                                            'yyyy-MM-dd',
+                                          ).format(dueDate!)
+                                        : '';
 
-                              final success = await _suppliersController.addPurchaseBill(
-                                supplierId,
-                                billNoController.text.trim(),
-                                DateFormat('yyyy-MM-dd').format(billDate),
-                                dueDateStr,
-                                notesController.text.trim(),
-                                0.0, // No longer passing override amount
-                                billItems,
-                              );
+                                    final success = await _suppliersController
+                                        .addPurchaseBill(
+                                          supplierId,
+                                          billNoController.text.trim(),
+                                          DateFormat(
+                                            'yyyy-MM-dd',
+                                          ).format(billDate),
+                                          dueDateStr,
+                                          notesController.text.trim(),
+                                          0.0, // No longer passing override amount
+                                          billItems,
+                                        );
 
-                              if (success) {
-                                for (var item in billItems) {
-                                  if (item.inventoryId != null) {
-                                    _inventoryController.restockItem(item.inventoryId!, item.quantity);
-                                  }
-                                }
-                                Get.back();
-                                Get.snackbar('Success', 'Purchase bill added!', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-                              } else {
-                                Get.snackbar('Error', 'Failed to add purchase bill.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                              }
-                            },
+                                    if (success) {
+                                      for (var item in billItems) {
+                                        if (item.inventoryId != null) {
+                                          _inventoryController.restockItem(
+                                            item.inventoryId!,
+                                            item.quantity,
+                                          );
+                                        }
+                                      }
+                                      Get.back();
+                                      Get.snackbar(
+                                        'Success',
+                                        'Purchase bill added!',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.green,
+                                        colorText: Colors.white,
+                                      );
+                                    } else {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Failed to add purchase bill.',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                    }
+                                  },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                               elevation: 0,
                             ),
                             child: isSaving
-                                ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                : const Text('Save Bill', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                ? const SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    'save_bill'.tr,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           );
                         }),
                       ],
@@ -1429,11 +2067,23 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
     );
   }
 
-  Widget _buildCustomTextField({required String label, required String hint, TextEditingController? controller, TextInputType? keyboardType}) {
+  Widget _buildCustomTextField({
+    required String label,
+    required String hint,
+    TextEditingController? controller,
+    TextInputType? keyboardType,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
         const SizedBox(height: 6),
         SizedBox(
           height: 40,
@@ -1443,23 +2093,49 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary)),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              filled: true,
+              fillColor: Theme.of(context).scaffoldBackgroundColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.primary),
+              ),
             ),
-            style: const TextStyle(fontSize: 13),
+            style: TextStyle(fontSize: 13),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildCustomDateField({required String label, DateTime? date, String? hint, required VoidCallback onTap}) {
+  Widget _buildCustomDateField({
+    required String label,
+    DateTime? date,
+    String? hint,
+    required VoidCallback onTap,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
         const SizedBox(height: 6),
         InkWell(
           onTap: onTap,
@@ -1467,18 +2143,29 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
               borderRadius: BorderRadius.circular(8),
-              color: Colors.white,
+              color: Theme.of(context).scaffoldBackgroundColor,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  date != null ? DateFormat('dd-MM-yyyy').format(date) : (hint ?? 'dd-mm-yyyy'),
-                  style: TextStyle(fontSize: 13, color: date != null ? AppColors.textPrimary : Colors.grey.shade400),
+                  date != null
+                      ? DateFormat('dd-MM-yyyy').format(date)
+                      : (hint ?? 'dd-mm-yyyy'),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: date != null
+                        ? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)
+                        : Colors.grey.shade400,
+                  ),
                 ),
-                Icon(LucideIcons.calendar, size: 16, color: Colors.grey.shade800),
+                Icon(
+                  LucideIcons.calendar,
+                  size: 16,
+                  color: Colors.grey.shade800,
+                ),
               ],
             ),
           ),
@@ -1487,34 +2174,65 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
     );
   }
 
-
-  Widget _buildCustomDropdownField({required String label, required String value, required List<String> items, required ValueChanged<String?> onChanged}) {
+  Widget _buildCustomDropdownField({
+    required String label,
+    required String value,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.bold,
+            color: Colors.grey,
+          ),
+        ),
         const SizedBox(height: 6),
         SizedBox(
           height: 40,
           child: DropdownButtonFormField<String>(
             value: value,
             decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary)),
-              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.primary),
+              ),
+              fillColor: Theme.of(context).scaffoldBackgroundColor,
               filled: true,
             ),
-            style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              fontSize: 13,
+              color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+            ),
             items: items.map((String val) {
               return DropdownMenuItem<String>(
                 value: val,
-                child: Text(val, style: const TextStyle(fontSize: 13)),
+                child: Text(
+                  val,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(fontSize: 13),
+                ),
               );
             }).toList(),
             onChanged: onChanged,
-            icon: const Icon(LucideIcons.chevronDown, size: 16),
+            icon: Icon(LucideIcons.chevronDown, size: 16),
           ),
         ),
       ],
@@ -1534,7 +2252,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
       Dialog(
         insetPadding: const EdgeInsets.all(16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).cardTheme.color,
         surfaceTintColor: Colors.transparent,
         child: SizedBox(
           width: 500,
@@ -1545,20 +2263,40 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                 children: [
                   // HEADER
                   Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 12, top: 16, bottom: 16),
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 12,
+                      top: 16,
+                      bottom: 16,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
-                            const Icon(LucideIcons.creditCard, color: Colors.green, size: 20),
+                            Icon(
+                              LucideIcons.creditCard,
+                              color: Colors.green,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
-                            const Text('Record Payment to Supplier', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                            Text(
+                              'record_payment_to_supplier'.tr,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                              ),
+                            ),
                           ],
                         ),
                         IconButton(
                           onPressed: () => Get.back(),
-                          icon: const Icon(LucideIcons.x, size: 20, color: Colors.grey),
+                          icon: Icon(
+                            LucideIcons.x,
+                            size: 20,
+                            color: Colors.grey,
+                          ),
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                           splashRadius: 20,
@@ -1566,7 +2304,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                       ],
                     ),
                   ),
-                  const Divider(height: 1, color: AppColors.border),
+                  Divider(height: 1, color: Theme.of(context).colorScheme.outline),
 
                   // CONTENT
                   Flexible(
@@ -1579,7 +2317,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                             label: 'AMOUNT PAID *',
                             hint: '₹ 0.00',
                             controller: amountController,
-                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                           ),
                           const SizedBox(height: 16),
                           Row(
@@ -1606,9 +2346,16 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                                 child: _buildCustomDropdownField(
                                   label: 'MODE',
                                   value: paymentMode,
-                                  items: ['Cash', 'Bank Transfer', 'UPI', 'Cheque', 'Other'],
+                                  items: [
+                                    'Cash',
+                                    'Bank Transfer',
+                                    'UPI',
+                                    'Cheque',
+                                    'Other',
+                                  ],
                                   onChanged: (val) {
-                                    if (val != null) setState(() => paymentMode = val);
+                                    if (val != null)
+                                      setState(() => paymentMode = val);
                                   },
                                 ),
                               ),
@@ -1621,22 +2368,50 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                             controller: referenceController,
                           ),
                           const SizedBox(height: 16),
-                          const Text('NOTES', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.grey)),
+                          Text(
+                            'notes_1'.tr,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
                           const SizedBox(height: 6),
                           TextFormField(
                             controller: notesController,
                             maxLines: 3,
                             decoration: InputDecoration(
-                              hintText: 'Enter internal notes (Optional)',
-                              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey.shade300)),
-                              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.primary)),
-                              fillColor: Colors.white,
+                              hintText: 'enter_internal_notes_optional'.tr,
+                              hintStyle: TextStyle(
+                                color: Colors.grey.shade400,
+                                fontSize: 13,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              fillColor: Theme.of(context).scaffoldBackgroundColor,
                               filled: true,
                             ),
-                            style: const TextStyle(fontSize: 13),
+                            style: TextStyle(fontSize: 13),
                           ),
                         ],
                       ),
@@ -1644,52 +2419,106 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen> with Sing
                   ),
 
                   // FOOTER
-                  const Divider(height: 1, color: AppColors.border),
+                  Divider(height: 1, color: Theme.of(context).colorScheme.outline),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
                           onPressed: () => Get.back(),
-                          child: const Text('Cancel', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600)),
+                          child: Text(
+                            'cancel'.tr,
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Obx(() {
                           final isSaving = _suppliersController.isLoading.value;
                           return ElevatedButton(
-                            onPressed: isSaving ? null : () async {
-                              double amount = double.tryParse(amountController.text) ?? 0.0;
-                              if (amount <= 0) {
-                                Get.snackbar('Error', 'Please enter a valid amount', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                                return;
-                              }
+                            onPressed: isSaving
+                                ? null
+                                : () async {
+                                    double amount =
+                                        double.tryParse(
+                                          amountController.text,
+                                        ) ??
+                                        0.0;
+                                    if (amount <= 0) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Please enter a valid amount',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
 
-                              final success = await _suppliersController.recordPayment(
-                                supplierId,
-                                amount,
-                                DateFormat('yyyy-MM-dd').format(paymentDate),
-                                paymentMode,
-                                referenceController.text.trim(),
-                                notesController.text.trim(),
-                              );
+                                    final success = await _suppliersController
+                                        .recordPayment(
+                                          supplierId,
+                                          amount,
+                                          DateFormat(
+                                            'yyyy-MM-dd',
+                                          ).format(paymentDate),
+                                          paymentMode,
+                                          referenceController.text.trim(),
+                                          notesController.text.trim(),
+                                        );
 
-                              if (success) {
-                                Get.back();
-                                Get.snackbar('Success', 'Payment recorded successfully', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
-                              } else {
-                                Get.snackbar('Error', 'Failed to record payment. Please try again.', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red, colorText: Colors.white);
-                              }
-                            },
+                                    if (success) {
+                                      Get.back();
+                                      Get.snackbar(
+                                        'Success',
+                                        'Payment recorded successfully',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.green,
+                                        colorText: Colors.white,
+                                      );
+                                    } else {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Failed to record payment. Please try again.',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                    }
+                                  },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
-                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                               elevation: 0,
                             ),
                             child: isSaving
-                                ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                : const Text('Record Payment', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                ? const SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    'record_payment'.tr,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           );
                         }),
                       ],

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="splash_bg">#FFFFFF</color>
+    <color name="notif_title">#111827</color>
+    <color name="notif_body">#6B7280</color>
+    <color name="notif_app_name">#111827</color>
+    <color name="notif_time">#6B7280</color>
+    <color name="notif_divider">#00000000</color>
 </resources>

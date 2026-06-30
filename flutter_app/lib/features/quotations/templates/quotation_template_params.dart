@@ -22,11 +22,11 @@ class QuotationTemplateParams {
   final double total;
   final double advancePayment;
   final NumberFormat formatCurrency;
-  
+
   // Custom labels to support both Invoices and Quotations
   final String documentTitle; // e.g., 'INVOICE', 'QUOTATION'
-  final String numberLabel;   // e.g., 'Invoice No', 'Quotation No'
-  final String dateLabel;     // e.g., 'Invoice Date', 'Quotation Date'
+  final String numberLabel; // e.g., 'Invoice No', 'Quotation No'
+  final String dateLabel; // e.g., 'Invoice Date', 'Quotation Date'
 
   QuotationTemplateParams({
     required this.tenant,

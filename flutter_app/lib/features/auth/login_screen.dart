@@ -9,7 +9,6 @@ import '../../shared/widgets/app_input_field.dart';
 import 'auth_controller.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -17,7 +16,8 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin {
+class _LoginScreenState extends State<LoginScreen>
+    with TickerProviderStateMixin {
   final _authController = Get.put(AuthController(), permanent: true);
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    
+
     // Ambient background drift animation
     _bgAnimationController = AnimationController(
       vsync: this,
@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   void _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     setState(() {
       _errorMessage = null;
     });
@@ -98,14 +98,14 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Dynamic theme colors
-    final baseBgColor = isDark ? const Color(0xFF090D1A) : const Color(0xFFF1F5F9);
-    final cardBgColor = isDark ? const Color(0xFF1E293B).withOpacity(0.65) : Colors.white.withOpacity(0.8);
-    final cardBorderColor = isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06);
-    final textColor = isDark ? Colors.white : AppColors.textPrimary;
-    final subtextColor = isDark ? const Color(0xFF94A3B8) : AppColors.textSecondary;
-    final logoBgColor = isDark ? const Color(0xFF334155) : const Color(0xFFEFF6FF);
+    final baseBgColor = Theme.of(context).scaffoldBackgroundColor;
+    final cardBgColor = Theme.of(context).cardTheme.color?.withOpacity(0.65) ?? Colors.white.withOpacity(0.8);
+    final cardBorderColor = Theme.of(context).colorScheme.outline;
+    final textColor = Theme.of(context).textTheme.displayLarge?.color;
+    final subtextColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final logoBgColor = Theme.of(context).colorScheme.surfaceContainerHighest;
 
     return Scaffold(
       backgroundColor: baseBgColor,
@@ -126,8 +126,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       height: 350,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFBFDBFE))
-                            .withOpacity(isDark ? 0.35 : 0.45),
+                        color:
+                            (isDark
+                                    ? Color(0xFF1E3A8A)
+                                    : Color(0xFFBFDBFE))
+                                .withOpacity(isDark ? 0.35 : 0.45),
                       ),
                     ),
                   ),
@@ -139,8 +142,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       height: 400,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: (isDark ? const Color(0xFF4C1D95) : const Color(0xFFE9D5FF))
-                            .withOpacity(isDark ? 0.3 : 0.4),
+                        color:
+                            (isDark
+                                    ? Color(0xFF4C1D95)
+                                    : Color(0xFFE9D5FF))
+                                .withOpacity(isDark ? 0.3 : 0.4),
                       ),
                     ),
                   ),
@@ -148,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
               );
             },
           ),
-          
+
           // 2. High-blur backdrop for background glow
           Positioned.fill(
             child: BackdropFilter(
@@ -173,7 +179,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         border: Border.all(color: cardBorderColor, width: 1.5),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(isDark ? 0.25 : 0.05),
+                            color: Colors.black.withOpacity(
+                              isDark ? 0.25 : 0.05,
+                            ),
                             blurRadius: 30,
                             offset: const Offset(0, 15),
                           ),
@@ -185,14 +193,17 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           // Top accent line
                           Container(
                             height: 4,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
                               ),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 36),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 36,
+                            ),
                             child: Column(
                               children: [
                                 // Brand Header with staggered entry
@@ -206,10 +217,15 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                         height: 56,
                                         decoration: BoxDecoration(
                                           color: logoBgColor,
-                                          borderRadius: BorderRadius.circular(16),
+                                          borderRadius: BorderRadius.circular(
+                                            16,
+                                          ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: AppColors.primary.withOpacity(isDark ? 0.3 : 0.1),
+                                              color: AppColors.primary
+                                                  .withOpacity(
+                                                    isDark ? 0.3 : 0.1,
+                                                  ),
                                               blurRadius: 12,
                                               offset: const Offset(0, 4),
                                             ),
@@ -226,16 +242,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       const SizedBox(height: 20),
                                       RichText(
                                         text: TextSpan(
-                                          style: AppTextStyles.heading1.copyWith(
-                                            color: textColor,
-                                            fontWeight: FontWeight.w800,
-                                            letterSpacing: -0.5,
-                                          ),
+                                          style: AppTextStyles.heading1
+                                              .copyWith(
+                                                color: textColor,
+                                                fontWeight: FontWeight.w800,
+                                                letterSpacing: -0.5,
+                                              ),
                                           children: const [
                                             TextSpan(text: 'Auriva'),
                                             TextSpan(
                                               text: 'BMS',
-                                              style: TextStyle(color: AppColors.primary),
+                                              style: TextStyle(
+                                                color: AppColors.primary,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -263,7 +282,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       padding: const EdgeInsets.all(14),
                                       decoration: BoxDecoration(
                                         color: isDark
-                                            ? Colors.red.shade900.withOpacity(0.3)
+                                            ? Colors.red.shade900.withOpacity(
+                                                0.3,
+                                              )
                                             : Colors.red.shade50,
                                         border: Border(
                                           left: BorderSide(
@@ -285,7 +306,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                             child: Text(
                                               _errorMessage!,
                                               style: TextStyle(
-                                                color: isDark ? Colors.red.shade200 : Colors.red.shade800,
+                                                color: isDark
+                                                    ? Colors.red.shade200
+                                                    : Colors.red.shade800,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                             ),
@@ -305,11 +328,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                         delay: 0.15,
                                         child: AppInputField(
                                           label: 'work_email'.tr,
-                                          hintText: 'name@company.com',
+                                          hintText: 'name_company_com'.tr,
                                           controller: _emailController,
-                                          keyboardType: TextInputType.emailAddress,
-                                          prefixIcon: const Icon(LucideIcons.mail, size: 20),
-                                          validator: (val) => val == null || val.isEmpty
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                          prefixIcon: Icon(
+                                            LucideIcons.mail,
+                                            size: 20,
+                                          ),
+                                          validator: (val) =>
+                                              val == null || val.isEmpty
                                               ? 'email_req'.tr
                                               : null,
                                         ),
@@ -323,16 +351,24 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                           hintText: '••••••••',
                                           controller: _passwordController,
                                           obscureText: !_showPassword,
-                                          prefixIcon: const Icon(LucideIcons.lock, size: 20),
+                                          prefixIcon: Icon(
+                                            LucideIcons.lock,
+                                            size: 20,
+                                          ),
                                           suffixIcon: IconButton(
                                             icon: Icon(
-                                              _showPassword ? LucideIcons.eyeOff : LucideIcons.eye,
+                                              _showPassword
+                                                  ? LucideIcons.eyeOff
+                                                  : LucideIcons.eye,
                                               size: 20,
                                             ),
-                                            onPressed: () =>
-                                                setState(() => _showPassword = !_showPassword),
+                                            onPressed: () => setState(
+                                              () => _showPassword =
+                                                  !_showPassword,
+                                            ),
                                           ),
-                                          validator: (val) => val == null || val.isEmpty
+                                          validator: (val) =>
+                                              val == null || val.isEmpty
                                               ? 'password_req'.tr
                                               : null,
                                         ),
@@ -341,12 +377,18 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       StaggeredFadeSlide(
                                         controller: _introController,
                                         delay: 0.35,
-                                        child: Obx(() => AppButton(
-                                          text: 'sign_in_btn'.tr,
-                                          isLoading: _authController.isLoading.value,
-                                          onPressed: _handleLogin,
-                                          icon: const Icon(LucideIcons.arrowRight, size: 16),
-                                        )),
+                                        child: Obx(
+                                          () => AppButton(
+                                            text: 'sign_in_btn'.tr,
+                                            isLoading:
+                                                _authController.isLoading.value,
+                                            onPressed: _handleLogin,
+                                            icon: Icon(
+                                              LucideIcons.arrowRight,
+                                              size: 16,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -418,10 +460,7 @@ class StaggeredFadeSlide extends StatelessWidget {
 
     return FadeTransition(
       opacity: animation,
-      child: SlideTransition(
-        position: slide,
-        child: child,
-      ),
+      child: SlideTransition(position: slide, child: child),
     );
   }
 }

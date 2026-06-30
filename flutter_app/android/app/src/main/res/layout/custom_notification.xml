@@ -2,41 +2,134 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="16dp"
-    android:background="#1E1E2C">
+    android:background="#FFFFFF"
+    android:gravity="center_vertical">
 
+    <!-- Left Logo Block (White Box + Blue Hexagon) -->
+    <FrameLayout
+        android:id="@+id/custom_notif_logo_container"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/white_logo_bg"
+        android:elevation="2dp"
+        android:layout_marginEnd="16dp">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_hexagon_blue" />
+    </FrameLayout>
+
+    <!-- Center Content Section -->
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Top Header: Blue Dot + App name + now -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_alignParentStart="true">
+                
+                <ImageView
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:layout_marginEnd="6dp"
+                    android:src="@drawable/ic_blue_dot" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AurivaBMS"
+                    android:textColor="#111827"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="now"
+                android:textColor="#6B7280"
+                android:textSize="12sp"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+
+        <!-- Notification Title + Green Check Badge -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:id="@+id/custom_notif_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#111827"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:ellipsize="end"
+                android:maxLines="1" />
+
+            <!-- Using the existing verified green check or a standard one -->
+            <ImageView
+                android:id="@+id/custom_notif_title_badge"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="6dp"
+                android:src="@drawable/ic_check_green" />
+        </LinearLayout>
+
+        <!-- Notification Body Message -->
+        <TextView
+            android:id="@+id/custom_notif_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#6B7280"
+            android:textSize="13sp"
+            android:lineSpacingExtra="2dp"
+            android:ellipsize="end"
+            android:maxLines="3" />
+            
+        <!-- We will hide the chip since the new design puts invoice number in the message text -->
+        <LinearLayout
+            android:id="@+id/custom_notif_chip"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone">
+            <TextView
+                android:id="@+id/custom_notif_chip_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
         
         <ImageView
             android:id="@+id/custom_notif_icon"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/launcher_icon"
-            android:scaleType="centerCrop"/>
-            
-        <TextView
-            android:id="@+id/custom_notif_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="AurivaBMS"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:textSize="16sp"/>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/custom_notif_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Your notification message here..."
-        android:textColor="#A0A0B0"
-        android:textSize="14sp"/>
+    <!-- Right Illustration (The 64x64 icon generated by Flutter) -->
+    <ImageView
+        android:id="@+id/custom_notif_illustration"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="12dp"
+        android:scaleType="fitCenter" />
 
 </LinearLayout>

@@ -85,7 +85,9 @@ class PurchaseBillItem {
       quantity: (json['quantity'] ?? 0).toInt(),
       rate: (json['rate'] ?? 0.0).toDouble(),
       amount: (json['amount'] ?? 0.0).toDouble(),
-      inventoryId: json['inventoryId'] is Map ? json['inventoryId']['_id'] : json['inventoryId'],
+      inventoryId: json['inventoryId'] is Map
+          ? json['inventoryId']['_id']
+          : json['inventoryId'],
     );
   }
 
@@ -125,8 +127,10 @@ class SupplierPurchaseBill {
 
   factory SupplierPurchaseBill.fromJson(Map<String, dynamic> json) {
     var list = json['items'] as List? ?? [];
-    List<PurchaseBillItem> itemsList = list.map((i) => PurchaseBillItem.fromJson(i)).toList();
-    
+    List<PurchaseBillItem> itemsList = list
+        .map((i) => PurchaseBillItem.fromJson(i))
+        .toList();
+
     return SupplierPurchaseBill(
       id: json['_id'] ?? json['id'] ?? '',
       billNumber: json['billNumber'] ?? '',
@@ -162,7 +166,9 @@ class SupplierPayment {
     return SupplierPayment(
       id: json['_id'] ?? json['id'] ?? '',
       amount: (json['amount'] ?? 0.0).toDouble(),
-      paymentDate: json['paymentDate'] != null ? json['paymentDate'].toString() : '',
+      paymentDate: json['paymentDate'] != null
+          ? json['paymentDate'].toString()
+          : '',
       paymentMode: json['paymentMode'] ?? 'Bank Transfer',
       referenceNumber: json['referenceNumber'] ?? '',
       notes: json['notes'] ?? '',
@@ -179,12 +185,12 @@ class SuppliersController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
+
     // Ensure AuthController is permanent and fetch settings
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
-        
+
     authController.fetchTenantSettings();
     fetchSuppliers();
   }
@@ -192,39 +198,45 @@ class SuppliersController extends GetxController {
   Future<void> fetchSuppliers() async {
     try {
       isLoading.value = true;
-      
+
       // Fetch both suppliers and all purchase bills in parallel
       final responses = await Future.wait([
         ApiService.get(ApiConstants.suppliers),
         ApiService.get('${ApiConstants.suppliers}/purchases/all'),
       ]);
-      
+
       final suppliersRes = responses[0];
       final purchasesRes = responses[1];
-      
+
       if (suppliersRes.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(suppliersRes.body);
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
           final tempSuppliers = data.map((s) => Supplier.fromJson(s)).toList();
-          
+
           final Map<String, double> purchasedMap = {};
           final Map<String, double> paidMap = {};
           final Map<String, List<SupplierPurchaseBill>> tempBillsMap = {};
-          
+
           if (purchasesRes.statusCode == 200) {
-            final Map<String, dynamic> purchasesBody = jsonDecode(purchasesRes.body);
+            final Map<String, dynamic> purchasesBody = jsonDecode(
+              purchasesRes.body,
+            );
             if (purchasesBody['success'] == true) {
               final List<dynamic> purchasesData = purchasesBody['data'] ?? [];
-              
+
               for (var p in purchasesData) {
                 final bill = SupplierPurchaseBill.fromJson(p);
-                final sId = p['supplierId'] is Map ? p['supplierId']['_id'] : p['supplierId'];
+                final sId = p['supplierId'] is Map
+                    ? p['supplierId']['_id']
+                    : p['supplierId'];
                 if (sId != null) {
                   final String supplierId = sId.toString();
-                  purchasedMap[supplierId] = (purchasedMap[supplierId] ?? 0.0) + bill.totalAmount;
-                  paidMap[supplierId] = (paidMap[supplierId] ?? 0.0) + bill.amountPaid;
-                  
+                  purchasedMap[supplierId] =
+                      (purchasedMap[supplierId] ?? 0.0) + bill.totalAmount;
+                  paidMap[supplierId] =
+                      (paidMap[supplierId] ?? 0.0) + bill.amountPaid;
+
                   if (!tempBillsMap.containsKey(supplierId)) {
                     tempBillsMap[supplierId] = [];
                   }
@@ -233,7 +245,7 @@ class SuppliersController extends GetxController {
               }
             }
           }
-          
+
           // Recompute final suppliers with correct aggregated stats
           final finalSuppliers = tempSuppliers.map((s) {
             return s.copyWith(
@@ -241,7 +253,7 @@ class SuppliersController extends GetxController {
               totalPaid: paidMap[s.id] ?? 0.0,
             );
           }).toList();
-          
+
           suppliers.assignAll(finalSuppliers);
           supplierBills.assignAll(tempBillsMap);
         }
@@ -256,31 +268,37 @@ class SuppliersController extends GetxController {
   Future<void> fetchSupplierDetails(String supplierId) async {
     try {
       isLoading.value = true;
-      
+
       final responses = await Future.wait([
-        ApiService.get('${ApiConstants.suppliers}/purchases/all?supplierId=$supplierId'),
+        ApiService.get(
+          '${ApiConstants.suppliers}/purchases/all?supplierId=$supplierId',
+        ),
         ApiService.get('${ApiConstants.suppliers}/$supplierId/payments'),
       ]);
-      
+
       final billsRes = responses[0];
       final paymentsRes = responses[1];
-      
+
       if (billsRes.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(billsRes.body);
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
-          supplierBills[supplierId] = data.map((b) => SupplierPurchaseBill.fromJson(b)).toList();
+          supplierBills[supplierId] = data
+              .map((b) => SupplierPurchaseBill.fromJson(b))
+              .toList();
         }
       }
-      
+
       if (paymentsRes.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(paymentsRes.body);
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
-          supplierPayments[supplierId] = data.map((p) => SupplierPayment.fromJson(p)).toList();
+          supplierPayments[supplierId] = data
+              .map((p) => SupplierPayment.fromJson(p))
+              .toList();
         }
       }
-      
+
       _recomputeSupplierStats(supplierId);
     } catch (e) {
       debugPrint('Error fetching supplier details for $supplierId: $e');
@@ -289,7 +307,13 @@ class SuppliersController extends GetxController {
     }
   }
 
-  Future<bool> addSupplier(String name, String email, String phone, String gstNumber, String address) async {
+  Future<bool> addSupplier(
+    String name,
+    String email,
+    String phone,
+    String gstNumber,
+    String address,
+  ) async {
     try {
       isLoading.value = true;
       final response = await ApiService.post(ApiConstants.suppliers, {
@@ -299,7 +323,7 @@ class SuppliersController extends GetxController {
         'gstNumber': gstNumber,
         'address': address,
       });
-      
+
       if (response.statusCode == 201 || response.statusCode == 200) {
         await fetchSuppliers();
         return true;
@@ -317,7 +341,7 @@ class SuppliersController extends GetxController {
     try {
       isLoading.value = true;
       final response = await ApiService.delete('${ApiConstants.suppliers}/$id');
-      
+
       if (response.statusCode == 200) {
         suppliers.removeWhere((s) => s.id == id);
         supplierBills.remove(id);
@@ -333,23 +357,35 @@ class SuppliersController extends GetxController {
     }
   }
 
-  Future<bool> addPurchaseBill(String supplierId, String billNo, String date, String dueDate, String notes, double totalOverride, List<PurchaseBillItem> items) async {
+  Future<bool> addPurchaseBill(
+    String supplierId,
+    String billNo,
+    String date,
+    String dueDate,
+    String notes,
+    double totalOverride,
+    List<PurchaseBillItem> items,
+  ) async {
     try {
       isLoading.value = true;
-      
-      double computedSubtotal = items.fold(0.0, (sum, item) => sum + item.amount);
+
+      double computedSubtotal = items.fold(
+        0.0,
+        (sum, item) => sum + item.amount,
+      );
       double finalAmount = totalOverride > 0 ? totalOverride : computedSubtotal;
-      
-      final response = await ApiService.post('${ApiConstants.suppliers}/purchases/all', {
-        'supplierId': supplierId,
-        'billNumber': billNo,
-        'date': date,
-        'dueDate': dueDate,
-        'totalAmount': finalAmount,
-        'notes': notes,
-        'items': items.map((i) => i.toJson()).toList(),
-      });
-      
+
+      final response =
+          await ApiService.post('${ApiConstants.suppliers}/purchases/all', {
+            'supplierId': supplierId,
+            'billNumber': billNo,
+            'date': date,
+            'dueDate': dueDate,
+            'totalAmount': finalAmount,
+            'notes': notes,
+            'items': items.map((i) => i.toJson()).toList(),
+          });
+
       if (response.statusCode == 201 || response.statusCode == 200) {
         await fetchSupplierDetails(supplierId);
         return true;
@@ -366,8 +402,10 @@ class SuppliersController extends GetxController {
   Future<bool> deletePurchaseBill(String supplierId, String billId) async {
     try {
       isLoading.value = true;
-      final response = await ApiService.delete('${ApiConstants.suppliers}/purchases/$billId');
-      
+      final response = await ApiService.delete(
+        '${ApiConstants.suppliers}/purchases/$billId',
+      );
+
       if (response.statusCode == 200) {
         await fetchSupplierDetails(supplierId);
         return true;
@@ -381,17 +419,27 @@ class SuppliersController extends GetxController {
     }
   }
 
-  Future<bool> recordPayment(String supplierId, double amount, String paymentDate, String paymentMode, String referenceNumber, String notes) async {
+  Future<bool> recordPayment(
+    String supplierId,
+    double amount,
+    String paymentDate,
+    String paymentMode,
+    String referenceNumber,
+    String notes,
+  ) async {
     try {
       isLoading.value = true;
-      final response = await ApiService.post('${ApiConstants.suppliers}/$supplierId/payments', {
-        'amount': amount,
-        'paymentDate': paymentDate,
-        'paymentMode': paymentMode,
-        'referenceNumber': referenceNumber,
-        'notes': notes,
-      });
-      
+      final response = await ApiService.post(
+        '${ApiConstants.suppliers}/$supplierId/payments',
+        {
+          'amount': amount,
+          'paymentDate': paymentDate,
+          'paymentMode': paymentMode,
+          'referenceNumber': referenceNumber,
+          'notes': notes,
+        },
+      );
+
       if (response.statusCode == 201 || response.statusCode == 200) {
         await fetchSupplierDetails(supplierId);
         return true;
@@ -408,8 +456,10 @@ class SuppliersController extends GetxController {
   Future<bool> deletePayment(String supplierId, String paymentId) async {
     try {
       isLoading.value = true;
-      final response = await ApiService.delete('${ApiConstants.suppliers}/payments/$paymentId');
-      
+      final response = await ApiService.delete(
+        '${ApiConstants.suppliers}/payments/$paymentId',
+      );
+
       if (response.statusCode == 200) {
         await fetchSupplierDetails(supplierId);
         return true;
@@ -430,8 +480,14 @@ class SuppliersController extends GetxController {
       final billsList = supplierBills[supplierId] ?? [];
       final paymentsList = supplierPayments[supplierId] ?? [];
 
-      final totalPurchased = billsList.fold<double>(0.0, (sum, b) => sum + b.totalAmount);
-      final totalPaid = paymentsList.fold<double>(0.0, (sum, p) => sum + p.amount);
+      final totalPurchased = billsList.fold<double>(
+        0.0,
+        (sum, b) => sum + b.totalAmount,
+      );
+      final totalPaid = paymentsList.fold<double>(
+        0.0,
+        (sum, p) => sum + p.amount,
+      );
 
       suppliers[index] = supplier.copyWith(
         totalPurchased: totalPurchased,
@@ -440,4 +496,3 @@ class SuppliersController extends GetxController {
     }
   }
 }
-

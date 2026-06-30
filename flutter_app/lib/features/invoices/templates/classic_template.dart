@@ -50,22 +50,22 @@ class ClassicTemplate extends StatelessWidget {
         children: [
           if (isFirstPage) _buildHeader(),
           if (!isFirstPage) _buildCompactHeader(),
-          
+
           if (isFirstPage) ...[
             const SizedBox(height: 24),
             _buildClientAndPaymentInfo(),
             const SizedBox(height: 24),
           ],
-          
+
           _buildItemsTable(itemsList),
-          
+
           if (isLastPage) ...[
             const SizedBox(height: 24),
             _buildTotalsSection(),
             const SizedBox(height: 32),
             _buildSignatorySection(),
           ],
-          
+
           const Spacer(),
           if (isLastPage) _buildTermsSection(),
         ],
@@ -96,7 +96,12 @@ class ClassicTemplate extends StatelessWidget {
                             Colors.grey,
                             BlendMode.saturation,
                           ),
-                          child: _buildLogoWidget(tenant['logoImage'], height: 80, width: 80, fit: BoxFit.cover),
+                          child: _buildLogoWidget(
+                            tenant['logoImage'],
+                            height: 80,
+                            width: 80,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     )
@@ -104,7 +109,7 @@ class ClassicTemplate extends StatelessWidget {
                     const SizedBox(height: 48),
                   Text(
                     (tenant['name'] ?? '').toUpperCase(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Times New Roman',
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -115,7 +120,7 @@ class ClassicTemplate extends StatelessWidget {
                   if ((tenant['address'] ?? '').isNotEmpty)
                     Text(
                       tenant['address']!,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Times New Roman',
                         fontSize: 11,
                         color: Colors.black87,
@@ -124,17 +129,18 @@ class ClassicTemplate extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     _buildContactString(),
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'Times New Roman',
                       fontSize: 11,
                       color: Colors.black87,
                     ),
                   ),
-                  if (params.gstEnabled && (tenant['gstNumber'] ?? '').isNotEmpty) ...[
+                  if (params.gstEnabled &&
+                      (tenant['gstNumber'] ?? '').isNotEmpty) ...[
                     const SizedBox(height: 2),
                     Text(
                       'GSTIN: ${tenant['gstNumber']}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Times New Roman',
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -144,7 +150,7 @@ class ClassicTemplate extends StatelessWidget {
                 ],
               ),
             ),
-            
+
             // Right: Invoice Info
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -162,7 +168,7 @@ class ClassicTemplate extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   params.invoiceId,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Times New Roman',
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -170,13 +176,18 @@ class ClassicTemplate extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 _buildDateRow('Date', params.date),
-                _buildDateRow(params.documentTitle == 'QUOTATION' ? 'Valid Until' : 'Due Date', params.dueDate),
+                _buildDateRow(
+                  params.documentTitle == 'QUOTATION'
+                      ? 'Valid Until'
+                      : 'Due Date',
+                  params.dueDate,
+                ),
               ],
             ),
           ],
         ),
         const SizedBox(height: 16),
-        const Divider(thickness: 1, color: Colors.black),
+        Divider(thickness: 1, color: Colors.black),
       ],
     );
   }
@@ -190,7 +201,7 @@ class ClassicTemplate extends StatelessWidget {
           children: [
             Text(
               '${params.numberLabel} Ref: ${params.invoiceId}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Times New Roman',
@@ -198,28 +209,39 @@ class ClassicTemplate extends StatelessWidget {
             ),
             Text(
               'Date: ${_formatDate(params.date)}',
-              style: const TextStyle(fontSize: 10, fontFamily: 'Times New Roman'),
+              style: TextStyle(
+                fontSize: 10,
+                fontFamily: 'Times New Roman',
+              ),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        const Divider(thickness: 1, color: Colors.black),
+        Divider(thickness: 1, color: Colors.black),
         const SizedBox(height: 16),
       ],
     );
   }
 
-  Widget _buildLogoWidget(String? logoImage, {double height = 50, double? width, BoxFit fit = BoxFit.contain}) {
+  Widget _buildLogoWidget(
+    String? logoImage, {
+    double height = 50,
+    double? width,
+    BoxFit fit = BoxFit.contain,
+  }) {
     if (logoImage == null || logoImage.isEmpty) return const SizedBox.shrink();
     if (logoImage.startsWith('data:image') || !logoImage.startsWith('http')) {
       try {
-        final base64Str = logoImage.contains(',') ? logoImage.split(',')[1] : logoImage;
+        final base64Str = logoImage.contains(',')
+            ? logoImage.split(',')[1]
+            : logoImage;
         return Image.memory(
           base64Decode(base64Str),
           height: height,
           width: width,
           fit: fit,
-          errorBuilder: (context, error, stackTrace) => SizedBox(height: height, width: width),
+          errorBuilder: (context, error, stackTrace) =>
+              SizedBox(height: height, width: width),
         );
       } catch (e) {
         return SizedBox(height: height, width: width);
@@ -230,7 +252,8 @@ class ClassicTemplate extends StatelessWidget {
         height: height,
         width: width,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) => SizedBox(height: height, width: width),
+        errorBuilder: (context, error, stackTrace) =>
+            SizedBox(height: height, width: width),
       );
     }
   }
@@ -240,7 +263,8 @@ class ClassicTemplate extends StatelessWidget {
     List<String> parts = [];
     if ((t['email'] ?? '').isNotEmpty) parts.add(t['email']!);
     if ((t['phone'] ?? '').isNotEmpty) parts.add(t['phone']!);
-    if ((t['website'] ?? '').isNotEmpty) parts.add(t['website']!.replaceAll(RegExp(r'^https?://'), ''));
+    if ((t['website'] ?? '').isNotEmpty)
+      parts.add(t['website']!.replaceAll(RegExp(r'^https?://'), ''));
     return parts.join(' | ');
   }
 
@@ -252,7 +276,7 @@ class ClassicTemplate extends StatelessWidget {
         children: [
           Text(
             '$label: ',
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Times New Roman',
               fontSize: 11,
               color: Colors.black87,
@@ -260,7 +284,7 @@ class ClassicTemplate extends StatelessWidget {
           ),
           Text(
             _formatDate(date),
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Times New Roman',
               fontSize: 11,
               fontWeight: FontWeight.bold,
@@ -281,13 +305,15 @@ class ClassicTemplate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.black, width: 1),
+                  ),
                 ),
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Text(
                   params.documentTitle == 'QUOTATION' ? 'QUOTE TO' : 'BILL TO',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Times New Roman',
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -297,7 +323,7 @@ class ClassicTemplate extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 params.clientName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Times New Roman',
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -306,7 +332,7 @@ class ClassicTemplate extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 params.clientAddress,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Times New Roman',
                   fontSize: 11,
                   height: 1.4,
@@ -316,7 +342,7 @@ class ClassicTemplate extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'GSTIN: ${params.clientGst}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Times New Roman',
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -333,11 +359,13 @@ class ClassicTemplate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                decoration: const BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.black, width: 1),
+                  ),
                 ),
                 padding: const EdgeInsets.only(bottom: 2),
-                child: const Text(
+                child: Text(
                   'PAYMENT DETAILS',
                   style: TextStyle(
                     fontFamily: 'Times New Roman',
@@ -351,10 +379,13 @@ class ClassicTemplate extends StatelessWidget {
                 if ((params.bankDetails['accountName'] ?? '').isNotEmpty)
                   _buildBankRow('Name: ', params.bankDetails['accountName']!),
                 _buildBankRow('Bank: ', params.bankDetails['bankName'] ?? ''),
-                _buildBankRow('Account: ', params.bankDetails['accountNumber']!),
+                _buildBankRow(
+                  'Account: ',
+                  params.bankDetails['accountNumber']!,
+                ),
                 _buildBankRow('IFSC: ', params.bankDetails['ifscCode'] ?? ''),
               ] else
-                const Text(
+                Text(
                   'No bank details available.',
                   style: TextStyle(
                     fontFamily: 'Times New Roman',
@@ -378,7 +409,7 @@ class ClassicTemplate extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Times New Roman',
               fontSize: 11,
               color: Colors.black54,
@@ -387,7 +418,7 @@ class ClassicTemplate extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Times New Roman',
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
@@ -400,7 +431,9 @@ class ClassicTemplate extends StatelessWidget {
   }
 
   Widget _buildItemsTable(List<Map<String, dynamic>> items) {
-    final bool showHsn = items.any((item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty);
+    final bool showHsn = items.any(
+      (item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty,
+    );
 
     Map<int, TableColumnWidth> colWidths = showHsn
         ? const {
@@ -450,43 +483,72 @@ class ClassicTemplate extends StatelessWidget {
 
             return TableRow(
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey.shade300, width: 1)),
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey.shade300, width: 1),
+                ),
               ),
               children: [
-                _buildTableCell((index + 1).toString(), TextAlign.center, isBold: false),
+                _buildTableCell(
+                  (index + 1).toString(),
+                  TextAlign.center,
+                  isBold: false,
+                ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 12,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         item['description']?.toString() ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'Times New Roman',
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      if ((item['additionalDetails']?.toString() ?? '').trim().isNotEmpty) ...[
+                      if ((item['additionalDetails']?.toString() ?? '')
+                          .trim()
+                          .isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
                           item['additionalDetails'].toString(),
-                            style: TextStyle(
-                              fontFamily: 'Times New Roman',
-                              fontSize: 10,
-                              color: Colors.grey.shade700,
-                              height: 1.3,
-                            ),
+                          style: TextStyle(
+                            fontFamily: 'Times New Roman',
+                            fontSize: 10,
+                            color: Colors.grey.shade700,
+                            height: 1.3,
+                          ),
                         ),
                       ],
                     ],
                   ),
                 ),
                 if (showHsn)
-                  _buildTableCell(item['hsnCode']?.toString() ?? '-', TextAlign.center, isBold: false),
-                _buildTableCell(qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(2), TextAlign.center, isBold: false),
-                _buildTableCell(params.formatCurrency.format(rate), TextAlign.right, isBold: false),
-                _buildTableCell(params.formatCurrency.format(amount), TextAlign.right, isBold: true),
+                  _buildTableCell(
+                    item['hsnCode']?.toString() ?? '-',
+                    TextAlign.center,
+                    isBold: false,
+                  ),
+                _buildTableCell(
+                  qty % 1 == 0
+                      ? qty.toStringAsFixed(0)
+                      : qty.toStringAsFixed(2),
+                  TextAlign.center,
+                  isBold: false,
+                ),
+                _buildTableCell(
+                  params.formatCurrency.format(rate),
+                  TextAlign.right,
+                  isBold: false,
+                ),
+                _buildTableCell(
+                  params.formatCurrency.format(amount),
+                  TextAlign.right,
+                  isBold: true,
+                ),
               ],
             );
           }),
@@ -497,7 +559,7 @@ class ClassicTemplate extends StatelessWidget {
 
   Widget _buildTableHeaderCell(String text, TextAlign align) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: Color(0xFFF3F4F6),
         border: Border(bottom: BorderSide(color: Colors.black, width: 1.5)),
       ),
@@ -505,7 +567,7 @@ class ClassicTemplate extends StatelessWidget {
       child: Text(
         text,
         textAlign: align,
-        style: const TextStyle(
+        style: TextStyle(
           fontFamily: 'Times New Roman',
           fontSize: 9,
           fontWeight: FontWeight.bold,
@@ -547,11 +609,13 @@ class ClassicTemplate extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  decoration: const BoxDecoration(
-                    border: Border(bottom: BorderSide(color: Colors.black, width: 1)),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.black, width: 1),
+                    ),
                   ),
                   padding: const EdgeInsets.only(bottom: 2),
-                  child: const Text(
+                  child: Text(
                     'TOTAL AMOUNT (IN WORDS)',
                     style: TextStyle(
                       fontFamily: 'Times New Roman',
@@ -563,7 +627,7 @@ class ClassicTemplate extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   convertNumberToWords(params.total),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'Times New Roman',
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -603,15 +667,20 @@ class ClassicTemplate extends StatelessWidget {
                       ..._buildGstRows(),
                     ],
                     const SizedBox(height: 8),
-                    const Divider(thickness: 1.5, color: Colors.black),
+                    Divider(thickness: 1.5, color: Colors.black),
                     const SizedBox(height: 8),
-                    _buildTotalRow('Total', params.total, isBold: true, fontSize: 13),
+                    _buildTotalRow(
+                      'Total',
+                      params.total,
+                      isBold: true,
+                      fontSize: 13,
+                    ),
                     if (params.advancePayment > 0) ...[
                       const SizedBox(height: 6),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Advance Paid',
                             style: TextStyle(
                               fontFamily: 'Times New Roman',
@@ -622,7 +691,7 @@ class ClassicTemplate extends StatelessWidget {
                           ),
                           Text(
                             '- ${params.formatCurrency.format(params.advancePayment)}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Times New Roman',
                               fontSize: 11,
                               fontStyle: FontStyle.italic,
@@ -637,12 +706,15 @@ class ClassicTemplate extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
                 color: Colors.black,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Balance Due',
                       style: TextStyle(
                         fontFamily: 'Times New Roman',
@@ -653,7 +725,7 @@ class ClassicTemplate extends StatelessWidget {
                     ),
                     Text(
                       params.formatCurrency.format(balanceDue),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'Times New Roman',
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -672,7 +744,9 @@ class ClassicTemplate extends StatelessWidget {
 
   List<Widget> _buildGstRows() {
     String place = params.placeOfSupply.toLowerCase();
-    String tenantState = (params.tenant['state'] ?? '').toString().toLowerCase();
+    String tenantState = (params.tenant['state'] ?? '')
+        .toString()
+        .toLowerCase();
     bool isOutstate = false;
     if (place.isNotEmpty && tenantState.isNotEmpty) {
       isOutstate = !place.contains(tenantState) && !tenantState.contains(place);
@@ -682,18 +756,40 @@ class ClassicTemplate extends StatelessWidget {
 
     if (isOutstate) {
       return [
-        _buildTotalRow('IGST', params.taxAmount, isBold: false, color: Colors.black54),
+        _buildTotalRow(
+          'IGST',
+          params.taxAmount,
+          isBold: false,
+          color: Colors.black54,
+        ),
       ];
     } else {
       return [
-        _buildTotalRow('CGST', params.taxAmount / 2, isBold: false, color: Colors.black54),
+        _buildTotalRow(
+          'CGST',
+          params.taxAmount / 2,
+          isBold: false,
+          color: Colors.black54,
+        ),
         const SizedBox(height: 6),
-        _buildTotalRow('SGST', params.taxAmount / 2, isBold: false, color: Colors.black54),
+        _buildTotalRow(
+          'SGST',
+          params.taxAmount / 2,
+          isBold: false,
+          color: Colors.black54,
+        ),
       ];
     }
   }
 
-  Widget _buildTotalRow(String label, double amount, {bool isBold = false, bool isMinus = false, Color color = Colors.black, double fontSize = 11}) {
+  Widget _buildTotalRow(
+    String label,
+    double amount, {
+    bool isBold = false,
+    bool isMinus = false,
+    Color color = Colors.black,
+    double fontSize = 11,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -723,24 +819,35 @@ class ClassicTemplate extends StatelessWidget {
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
-        
+
     final TeamController teamController = Get.isRegistered<TeamController>()
         ? Get.find<TeamController>()
         : Get.put(TeamController());
 
     return Obx(() {
       final currentUserMember = teamController.teamMembers.firstWhereOrNull(
-        (m) => m.email.trim().toLowerCase() == authController.userEmail.value.trim().toLowerCase()
+        (m) =>
+            m.email.trim().toLowerCase() ==
+            authController.userEmail.value.trim().toLowerCase(),
       );
-      final userSignature = (currentUserMember?.signatureImage != null && currentUserMember!.signatureImage!.isNotEmpty)
+      final userSignature =
+          (currentUserMember?.signatureImage != null &&
+              currentUserMember!.signatureImage!.isNotEmpty)
           ? currentUserMember.signatureImage
-          : (authController.userSignature.value.isNotEmpty ? authController.userSignature.value : null);
-      
+          : (authController.userSignature.value.isNotEmpty
+                ? authController.userSignature.value
+                : null);
+
       final String displayName;
-      if (userSignature != null && userSignature.isNotEmpty && currentUserMember != null) {
+      if (userSignature != null &&
+          userSignature.isNotEmpty &&
+          currentUserMember != null) {
         displayName = currentUserMember.name;
       } else {
-        displayName = params.tenant['authorizedSignatoryName'] ?? params.tenant['name'] ?? '';
+        displayName =
+            params.tenant['authorizedSignatoryName'] ??
+            params.tenant['name'] ??
+            '';
       }
 
       final signatureWidget = _buildLogoWidget(
@@ -765,18 +872,25 @@ class ClassicTemplate extends StatelessWidget {
                   width: 120,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, style: BorderStyle.solid),
+                    border: Border.all(
+                      color: Colors.grey,
+                      style: BorderStyle.solid,
+                    ),
                   ),
-                  child: const Text(
+                  child: Text(
                     'Sign Here',
-                    style: TextStyle(fontSize: 10, color: Colors.grey, fontFamily: 'Times New Roman'),
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: Colors.grey,
+                      fontFamily: 'Times New Roman',
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
               ],
               Text(
                 displayName.toUpperCase(),
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'Times New Roman',
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -784,7 +898,7 @@ class ClassicTemplate extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
+              Text(
                 'AUTHORIZED SIGNATORY',
                 style: TextStyle(
                   fontFamily: 'Times New Roman',
@@ -804,18 +918,18 @@ class ClassicTemplate extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 16),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         border: Border(top: BorderSide(color: Colors.black, width: 1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: Colors.grey, width: 1)),
             ),
             padding: const EdgeInsets.only(bottom: 2),
-            child: const Text(
+            child: Text(
               'TERMS & CONDITIONS',
               style: TextStyle(
                 fontFamily: 'Times New Roman',
@@ -827,7 +941,7 @@ class ClassicTemplate extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             params.tenant['defaultTerms'] ?? 'Payment is due upon receipt.',
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Times New Roman',
               fontSize: 9,
               height: 1.4,
@@ -840,7 +954,7 @@ class ClassicTemplate extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Place of Supply: ${params.placeOfSupply}  |  Dispatch State: ${params.tenant['state'] ?? 'Not set'}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontFamily: 'Times New Roman',
                 fontSize: 9,
                 fontWeight: FontWeight.bold,

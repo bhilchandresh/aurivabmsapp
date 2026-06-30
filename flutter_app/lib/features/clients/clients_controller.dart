@@ -13,7 +13,8 @@ class Client {
   final String state;
   final String address;
   final double totalBilled;
-  final double balance; // positive = pending due, negative = advance jama, 0 = settled
+  final double
+  balance; // positive = pending due, negative = advance jama, 0 = settled
   final DateTime? createdAt;
 
   Client({
@@ -66,7 +67,9 @@ class Client {
       address: json['address'] ?? '',
       totalBilled: (json['totalBilled'] ?? 0.0).toDouble(),
       balance: (json['balance'] ?? 0.0).toDouble(),
-      createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt']) : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'])
+          : null,
     );
   }
 }
@@ -192,9 +195,9 @@ class ClientsController extends GetxController {
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
           allInvoices.assignAll(data);
-          
+
           final Map<String, List<ClientInvoice>> groupedInvoices = {};
-          
+
           for (var item in data) {
             final inv = ClientInvoice.fromJson(item);
             final clientObj = item['client'];
@@ -220,7 +223,9 @@ class ClientsController extends GetxController {
 
   Future<bool> updateInvoiceStatus(String id, String newStatus) async {
     try {
-      final response = await ApiService.put('${ApiConstants.invoices}/$id', {'status': newStatus});
+      final response = await ApiService.put('${ApiConstants.invoices}/$id', {
+        'status': newStatus,
+      });
       if (response.statusCode == 200) {
         fetchClients();
         return true;
@@ -246,7 +251,9 @@ class ClientsController extends GetxController {
 
   Future<bool> updateQuotationStatus(String id, String newStatus) async {
     try {
-      final response = await ApiService.put('${ApiConstants.quotations}/$id', {'status': newStatus});
+      final response = await ApiService.put('${ApiConstants.quotations}/$id', {
+        'status': newStatus,
+      });
       if (response.statusCode == 200) {
         fetchClients();
         return true;
@@ -259,7 +266,9 @@ class ClientsController extends GetxController {
 
   Future<bool> deleteQuotation(String id) async {
     try {
-      final response = await ApiService.delete('${ApiConstants.quotations}/$id');
+      final response = await ApiService.delete(
+        '${ApiConstants.quotations}/$id',
+      );
       if (response.statusCode == 200) {
         fetchClients();
         return true;
@@ -272,7 +281,10 @@ class ClientsController extends GetxController {
 
   Future<String?> convertQuotationToInvoice(String id) async {
     try {
-      final response = await ApiService.post('${ApiConstants.quotations}/$id/convert', {});
+      final response = await ApiService.post(
+        '${ApiConstants.quotations}/$id/convert',
+        {},
+      );
       if (response.statusCode == 201 || response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
@@ -295,7 +307,7 @@ class ClientsController extends GetxController {
           final List<dynamic> data = body['data'] ?? [];
           allQuotations.assignAll(data);
           final Map<String, List<ClientQuotation>> groupedQuotes = {};
-          
+
           for (var item in data) {
             final quote = ClientQuotation.fromJson(item);
             final clientObj = item['client'];
@@ -319,12 +331,16 @@ class ClientsController extends GetxController {
 
   Future<void> fetchPayments(String clientId) async {
     try {
-      final response = await ApiService.get('${ApiConstants.clients}/$clientId/payments');
+      final response = await ApiService.get(
+        '${ApiConstants.clients}/$clientId/payments',
+      );
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
-          clientPayments[clientId] = data.map((p) => ClientPayment.fromJson(p)).toList();
+          clientPayments[clientId] = data
+              .map((p) => ClientPayment.fromJson(p))
+              .toList();
         }
       }
     } catch (e) {
@@ -332,7 +348,14 @@ class ClientsController extends GetxController {
     }
   }
 
-  Future<bool> addClient(String name, String email, String phone, String gstin, String state, String address) async {
+  Future<bool> addClient(
+    String name,
+    String email,
+    String phone,
+    String gstin,
+    String state,
+    String address,
+  ) async {
     try {
       final response = await ApiService.post(ApiConstants.clients, {
         'name': name,
@@ -352,7 +375,15 @@ class ClientsController extends GetxController {
     return false;
   }
 
-  Future<bool> updateClient(String id, String name, String email, String phone, String gstin, String state, String address) async {
+  Future<bool> updateClient(
+    String id,
+    String name,
+    String email,
+    String phone,
+    String gstin,
+    String state,
+    String address,
+  ) async {
     try {
       final response = await ApiService.put('${ApiConstants.clients}/$id', {
         'name': name,
@@ -385,14 +416,23 @@ class ClientsController extends GetxController {
     return false;
   }
 
-  Future<bool> collectPayment(String clientId, double amount, String date, String mode, String note) async {
+  Future<bool> collectPayment(
+    String clientId,
+    double amount,
+    String date,
+    String mode,
+    String note,
+  ) async {
     try {
-      final response = await ApiService.post('${ApiConstants.clients}/$clientId/payments', {
-        'amount': amount,
-        'date': date,
-        'paymentMode': mode,
-        'referenceNote': note,
-      });
+      final response = await ApiService.post(
+        '${ApiConstants.clients}/$clientId/payments',
+        {
+          'amount': amount,
+          'date': date,
+          'paymentMode': mode,
+          'referenceNote': note,
+        },
+      );
       if (response.statusCode == 201) {
         await fetchClients();
         await fetchPayments(clientId);
@@ -406,7 +446,10 @@ class ClientsController extends GetxController {
 
   Future<bool> syncLedger(String clientId) async {
     try {
-      final response = await ApiService.post('${ApiConstants.clients}/$clientId/sync-ledger', {});
+      final response = await ApiService.post(
+        '${ApiConstants.clients}/$clientId/sync-ledger',
+        {},
+      );
       if (response.statusCode == 200 || response.statusCode == 201) {
         await fetchClients();
         await fetchPayments(clientId);
@@ -420,7 +463,10 @@ class ClientsController extends GetxController {
 
   Future<bool> sendAccountSummary(String clientId) async {
     try {
-      final response = await ApiService.post('${ApiConstants.clients}/$clientId/send-summary', {});
+      final response = await ApiService.post(
+        '${ApiConstants.clients}/$clientId/send-summary',
+        {},
+      );
       if (response.statusCode == 200) {
         return true;
       }
@@ -432,7 +478,10 @@ class ClientsController extends GetxController {
 
   Future<String?> sendInvoiceEmail(String id) async {
     try {
-      final response = await ApiService.post('${ApiConstants.invoices}/$id/email', {});
+      final response = await ApiService.post(
+        '${ApiConstants.invoices}/$id/email',
+        {},
+      );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return null;
       }
@@ -443,10 +492,12 @@ class ClientsController extends GetxController {
     }
   }
 
-
   Future<String?> sendQuotationEmail(String id) async {
     try {
-      final response = await ApiService.post('${ApiConstants.quotations}/$id/email', {});
+      final response = await ApiService.post(
+        '${ApiConstants.quotations}/$id/email',
+        {},
+      );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return null;
       }
@@ -457,4 +508,3 @@ class ClientsController extends GetxController {
     }
   }
 }
-

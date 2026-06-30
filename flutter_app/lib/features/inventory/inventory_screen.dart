@@ -17,7 +17,11 @@ class InventoryScreen extends StatefulWidget {
 }
 
 class _InventoryScreenState extends State<InventoryScreen> {
-  final formatCurrency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
+  final formatCurrency = NumberFormat.currency(
+    locale: 'en_IN',
+    symbol: '₹',
+    decimalDigits: 0,
+  );
   final InventoryController _controller = Get.put(InventoryController());
 
   String _searchQuery = '';
@@ -25,7 +29,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'inventory_management'.tr,
         subtitle: 'manage_products'.tr,
@@ -74,10 +78,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
             Text(
               'inventory_pro'.tr,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
-                color: AppColors.textPrimary,
+                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                 letterSpacing: -0.5,
               ),
             ),
@@ -85,16 +89,24 @@ class _InventoryScreenState extends State<InventoryScreen> {
             Text(
               'inventory_pro_desc'.tr,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                 height: 1.5,
               ),
             ),
             const SizedBox(height: 32),
-            _buildUpgradePlanCard('pro_plan'.tr, 'pro_plan_desc'.tr, 'pro_plan_price'.tr),
+            _buildUpgradePlanCard(
+              'pro_plan'.tr,
+              'pro_plan_desc'.tr,
+              'pro_plan_price'.tr,
+            ),
             const SizedBox(height: 12),
-            _buildUpgradePlanCard('business_plan'.tr, 'business_plan_desc'.tr, 'business_plan_price'.tr),
+            _buildUpgradePlanCard(
+              'business_plan'.tr,
+              'business_plan_desc'.tr,
+              'business_plan_price'.tr,
+            ),
             ElevatedButton.icon(
               onPressed: () {
                 Get.snackbar(
@@ -105,12 +117,23 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   colorText: Colors.white,
                 );
               },
-              icon: const Icon(LucideIcons.lock, size: 16, color: Colors.white),
-              label: Text('contact_admin_btn'.tr, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              icon: Icon(LucideIcons.lock, size: 16, color: Colors.white),
+              label: Text(
+                'contact_admin_btn'.tr,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
             ),
           ],
@@ -143,18 +166,29 @@ class _InventoryScreenState extends State<InventoryScreen> {
             children: [
               Text(
                 name,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.textPrimary),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 desc,
-                style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                ),
               ),
             ],
           ),
           Text(
             price,
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppColors.primary),
+            style: TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
+              color: AppColors.primary,
+            ),
           ),
         ],
       ),
@@ -169,7 +203,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
       child: Skeletonizer(
         enabled: _controller.isLoading.value && _controller.items.isEmpty,
         child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          physics: const AlwaysScrollableScrollPhysics(
+            parent: BouncingScrollPhysics(),
+          ),
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -198,31 +234,38 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: AppColors.border),
+                            border: Border.all(color: Theme.of(context).colorScheme.outline),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.01),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
-                              )
+                              ),
                             ],
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     'sku_usage'.tr,
-                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                    ),
                                   ),
                                   Text(
                                     '$used / $max',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w900,
                                       fontSize: 13,
-                                      color: limitReached ? Colors.red : AppColors.textPrimary,
+                                      color: limitReached
+                                          ? Colors.red
+                                          : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                                     ),
                                   ),
                                 ],
@@ -234,19 +277,29 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   value: pct,
                                   minHeight: 8,
                                   backgroundColor: Colors.grey.shade100,
-                                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    progressColor,
+                                  ),
                                 ),
                               ),
                               if (limitReached) ...[
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    const Icon(LucideIcons.alertTriangle, size: 12, color: Colors.red),
+                                    Icon(
+                                      LucideIcons.alertTriangle,
+                                      size: 12,
+                                      color: Colors.red,
+                                    ),
                                     const SizedBox(width: 4),
                                     Expanded(
                                       child: Text(
                                         'inventory_limit_reached'.tr,
-                                        style: TextStyle(color: Colors.red.shade600, fontSize: 11, fontWeight: FontWeight.bold),
+                                        style: TextStyle(
+                                          color: Colors.red.shade600,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -264,11 +317,16 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       if (_controller.isSelectionMode.value) {
                         return Container(
                           margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                            ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -276,28 +334,50 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               Row(
                                 children: [
                                   IconButton(
-                                    icon: const Icon(LucideIcons.x, color: AppColors.textPrimary),
+                                    icon: Icon(
+                                      LucideIcons.x,
+                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                    ),
                                     onPressed: _controller.clearSelection,
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
                                   ),
                                   const SizedBox(width: 12),
                                   Text(
-                                    '${_controller.selectedItems.length}' + 'selected'.tr,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                    '${_controller.selectedItems.length}' +
+                                        'selected'.tr,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
                                 ],
                               ),
                               ElevatedButton.icon(
                                 onPressed: _showBulkDeleteConfirmation,
-                                icon: const Icon(LucideIcons.trash2, size: 16, color: Colors.white),
-                                label: Text('delete'.tr, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                icon: Icon(
+                                  LucideIcons.trash2,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                label: Text(
+                                  'delete'.tr,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.red,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         );
@@ -314,7 +394,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
               floating: true,
               snap: true,
               elevation: 0,
-              backgroundColor: AppColors.background,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               automaticallyImplyLeading: false,
               titleSpacing: 16,
               toolbarHeight: 65,
@@ -329,22 +409,34 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: 'search_products'.tr,
-                        hintStyle: const TextStyle(color: Colors.grey, fontSize: 12),
-                        prefixIcon: const Icon(LucideIcons.search, color: Colors.grey, size: 16),
+                        hintStyle: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                        prefixIcon: Icon(
+                          LucideIcons.search,
+                          color: Colors.grey,
+                          size: 16,
+                        ),
                         filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                        fillColor: Theme.of(context).cardTheme.color,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 10,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                          borderSide: BorderSide(
+                            color: AppColors.primary,
+                            width: 1.5,
+                          ),
                         ),
                       ),
                     ),
@@ -353,16 +445,29 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   Obx(() {
                     final atLimit = _controller.isAtLimit;
                     return ElevatedButton.icon(
-                      onPressed: atLimit ? null : () => _showAddEditItemDialog(),
-                      icon: const Icon(LucideIcons.plus, size: 14),
-                      label: Text('add_item'.tr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      onPressed: atLimit
+                          ? null
+                          : () => _showAddEditItemDialog(),
+                      icon: Icon(LucideIcons.plus, size: 14),
+                      label: Text(
+                        'add_item'.tr,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         disabledBackgroundColor: Colors.grey.shade200,
                         disabledForegroundColor: Colors.grey.shade400,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
                       ),
                     );
@@ -383,9 +488,17 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       children: [
                         Text(
                           'warehouse_registry'.tr,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                          ),
                         ),
-                        const Icon(LucideIcons.package, size: 16, color: Colors.grey),
+                        Icon(
+                          LucideIcons.package,
+                          size: 16,
+                          color: Colors.grey,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -402,17 +515,21 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   // --- PRODUCT LIST ---
   Widget _buildProductList() {
-    final showSkeleton = _controller.isLoading.value && _controller.items.isEmpty;
+    final showSkeleton =
+        _controller.isLoading.value && _controller.items.isEmpty;
 
     final list = showSkeleton
-        ? List.generate(5, (index) => InventoryItem(
-            id: 'loading_$index',
-            itemName: 'Loading Product Name',
-            sku: 'SKU-000',
-            unitPrice: 1000.0,
-            currentStock: 10,
-            description: 'Loading description details...',
-          ))
+        ? List.generate(
+            5,
+            (index) => InventoryItem(
+              id: 'loading_$index',
+              itemName: 'Loading Product Name',
+              sku: 'SKU-000',
+              unitPrice: 1000.0,
+              currentStock: 10,
+              description: 'Loading description details...',
+            ),
+          )
         : _controller.items.where((item) {
             final query = _searchQuery.toLowerCase();
             return item.itemName.toLowerCase().contains(query) ||
@@ -424,14 +541,18 @@ class _InventoryScreenState extends State<InventoryScreen> {
         height: 180,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(LucideIcons.packageOpen, size: 36, color: Colors.grey.shade300),
+            Icon(
+              LucideIcons.packageOpen,
+              size: 36,
+              color: Colors.grey.shade300,
+            ),
             const SizedBox(height: 12),
             Text(
               'no_inventory_found'.tr,
@@ -451,203 +572,218 @@ class _InventoryScreenState extends State<InventoryScreen> {
       child: ListView.separated(
         shrinkWrap: true,
         padding: EdgeInsets.zero,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: list.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 10),
-      itemBuilder: (context, index) {
-        final item = list[index];
-        final lowStock = item.currentStock <= 5;
-        final badgeBg = lowStock ? Colors.red.shade50 : Colors.green.shade50;
-        final badgeText = lowStock ? Colors.red.shade700 : Colors.green.shade700;
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: list.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 10),
+        itemBuilder: (context, index) {
+          final item = list[index];
+          final lowStock = item.currentStock <= 5;
+          final badgeBg = lowStock
+              ? Colors.red.withValues(alpha: 0.1)
+              : Colors.green.withValues(alpha: 0.1);
+          final badgeText = lowStock
+              ? Colors.red.shade400
+              : Colors.green.shade400;
 
-        return TweenAnimationBuilder<double>(
-          duration: Duration(milliseconds: 200 + (index * 40)),
-          tween: Tween<double>(begin: 0.0, end: 1.0),
-          builder: (context, value, child) {
-            return Transform.translate(
-              offset: Offset(0, 12 * (1.0 - value)),
-              child: Opacity(opacity: value, child: child),
-            );
-          },
-          child: Obx(() {
-            final isSelected = _controller.selectedItems.contains(item.id);
-            final isSelectionMode = _controller.isSelectionMode.value;
+          return TweenAnimationBuilder<double>(
+            duration: Duration(milliseconds: 200 + (index * 40)),
+            tween: Tween<double>(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return Transform.translate(
+                offset: Offset(0, 12 * (1.0 - value)),
+                child: Opacity(opacity: value, child: child),
+              );
+            },
+            child: Obx(() {
+              final isSelected = _controller.selectedItems.contains(item.id);
+              final isSelectionMode = _controller.isSelectionMode.value;
 
-            return GestureDetector(
-              onLongPress: () => _controller.toggleSelection(item.id),
-              onTap: () {
-                if (isSelectionMode) {
-                  _controller.toggleSelection(item.id);
-                } else {
-                  _showAddEditItemDialog(item: item);
-                }
-              },
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isSelected ? AppColors.primary : AppColors.border,
-                    width: isSelected ? 2 : 1,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.01),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+              return GestureDetector(
+                onLongPress: () => _controller.toggleSelection(item.id),
+                onTap: () {
+                  if (isSelectionMode) {
+                    _controller.toggleSelection(item.id);
+                  } else {
+                    _showAddEditItemDialog(item: item);
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primary.withValues(alpha: 0.05)
+                        : Theme.of(context).cardTheme.color,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                      width: isSelected ? 2 : 1,
                     ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (isSelectionMode) ...[
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2, right: 12),
-                        child: Icon(
-                          isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                          color: isSelected ? AppColors.primary : Colors.grey.shade400,
-                          size: 22,
-                        ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.01),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ],
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // SKU & Stock badge
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                item.sku.toUpperCase(),
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                  color: Colors.grey.shade500,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: badgeBg,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  '${item.currentStock}' + 'units'.tr,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (isSelectionMode) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2, right: 12),
+                          child: Icon(
+                            isSelected
+                                ? Icons.check_circle
+                                : Icons.radio_button_unchecked,
+                            color: isSelected
+                                ? AppColors.primary
+                                : Colors.grey.shade400,
+                            size: 22,
+                          ),
+                        ),
+                      ],
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // SKU & Stock badge
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  item.sku.toUpperCase(),
                                   style: TextStyle(
-                                    fontSize: 9,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w900,
-                                    color: badgeText,
+                                    color: Colors.grey.shade500,
                                     letterSpacing: 0.5,
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-
-                          // Name & Price
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.itemName,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.textPrimary,
-                                      ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: badgeBg,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    '${item.currentStock}' + 'units'.tr,
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w900,
+                                      color: badgeText,
+                                      letterSpacing: 0.5,
                                     ),
-                                    if (item.description.isNotEmpty) ...[
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        item.description,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey.shade500,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                formatCurrency.format(item.unitPrice),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-
-                          // Action panel
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              // Restock Button
-                              _buildCompactAction(
-                                icon: LucideIcons.arrowUpRight,
-                                label: 'restock'.tr,
-                                color: Colors.indigo,
-                                onTap: () => _showRestockDialog(item),
-                              ),
-                              const SizedBox(width: 8),
-
-                              // History Button
-                              _buildCompactAction(
-                                icon: LucideIcons.history,
-                                label: 'history'.tr,
-                                color: Colors.green,
-                                onTap: () => _showHistoryDialog(item),
-                              ),
-                              const SizedBox(width: 8),
-
-                              // Edit Button
-                              _buildCompactAction(
-                                icon: LucideIcons.edit,
-                                label: 'edit'.tr,
-                                color: Colors.blue,
-                                onTap: () => _showAddEditItemDialog(item: item),
-                              ),
-                              if (!isSelectionMode) ...[
-                                const SizedBox(width: 8),
-                                // Delete Button
-                                _buildCompactAction(
-                                  icon: LucideIcons.trash2,
-                                  label: 'delete'.tr,
-                                  color: Colors.red,
-                                  onTap: () => _showDeleteConfirmation(item),
+                                  ),
                                 ),
                               ],
-                            ],
-                          ),
-                        ],
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Name & Price
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item.itemName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                        ),
+                                      ),
+                                      if (item.description.isNotEmpty) ...[
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          item.description,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade500,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  formatCurrency.format(item.unitPrice),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w900,
+                                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+
+                            // Action panel
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                // Restock Button
+                                _buildCompactAction(
+                                  icon: LucideIcons.arrowUpRight,
+                                  label: 'restock'.tr,
+                                  color: Colors.indigo,
+                                  onTap: () => _showRestockDialog(item),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // History Button
+                                _buildCompactAction(
+                                  icon: LucideIcons.history,
+                                  label: 'history'.tr,
+                                  color: Colors.green,
+                                  onTap: () => _showHistoryDialog(item),
+                                ),
+                                const SizedBox(width: 8),
+
+                                // Edit Button
+                                _buildCompactAction(
+                                  icon: LucideIcons.edit,
+                                  label: 'edit'.tr,
+                                  color: Colors.blue,
+                                  onTap: () =>
+                                      _showAddEditItemDialog(item: item),
+                                ),
+                                if (!isSelectionMode) ...[
+                                  const SizedBox(width: 8),
+                                  // Delete Button
+                                  _buildCompactAction(
+                                    icon: LucideIcons.trash2,
+                                    label: 'delete'.tr,
+                                    color: Colors.red,
+                                    onTap: () => _showDeleteConfirmation(item),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }),
-        );
-      },
-    ),
+              );
+            }),
+          );
+        },
+      ),
     );
   }
 
@@ -688,16 +824,20 @@ class _InventoryScreenState extends State<InventoryScreen> {
   void _showAddEditItemDialog({InventoryItem? item}) {
     final nameCtrl = TextEditingController(text: item?.itemName ?? '');
     final skuCtrl = TextEditingController(text: item?.sku ?? '');
-    final priceCtrl = TextEditingController(text: item != null ? item.unitPrice.toStringAsFixed(0) : '');
-    final stockCtrl = TextEditingController(text: item != null ? item.currentStock.toString() : '');
+    final priceCtrl = TextEditingController(
+      text: item != null ? item.unitPrice.toStringAsFixed(0) : '',
+    );
+    final stockCtrl = TextEditingController(
+      text: item != null ? item.currentStock.toString() : '',
+    );
     final descCtrl = TextEditingController(text: item?.description ?? '');
 
     final formKey = GlobalKey<FormState>();
 
     Get.bottomSheet(
       Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.all(20),
@@ -714,19 +854,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   children: [
                     Text(
                       item != null ? 'edit_product'.tr : 'add_new_sku'.tr,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(LucideIcons.x, size: 18),
+                      icon: Icon(LucideIcons.x, size: 18),
                       onPressed: () => Get.back(),
                     ),
                   ],
                 ),
-                const Divider(),
+                Divider(),
                 const SizedBox(height: 12),
 
                 // Item Name
@@ -735,7 +875,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   hintText: 'eg_mouse'.tr,
                   controller: nameCtrl,
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Please enter product name';
+                    if (val == null || val.trim().isEmpty)
+                      return 'please_enter_product_name'.tr;
                     return null;
                   },
                 ),
@@ -760,8 +901,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           controller: stockCtrl,
                           keyboardType: TextInputType.number,
                           validator: (val) {
-                            if (val == null || val.trim().isEmpty) return 'Required';
-                            if (int.tryParse(val) == null || int.parse(val) < 0) return 'Invalid';
+                            if (val == null || val.trim().isEmpty)
+                              return 'required'.tr;
+                            if (int.tryParse(val) == null || int.parse(val) < 0)
+                              return 'invalid'.tr;
                             return null;
                           },
                         ),
@@ -778,8 +921,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   controller: priceCtrl,
                   keyboardType: TextInputType.number,
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty) return 'Please enter price';
-                    if (double.tryParse(val) == null || double.parse(val) < 0) return 'Invalid price';
+                    if (val == null || val.trim().isEmpty)
+                      return 'please_enter_price'.tr;
+                    if (double.tryParse(val) == null || double.parse(val) < 0)
+                      return 'invalid_price'.tr;
                     return null;
                   },
                 ),
@@ -800,62 +945,80 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   child: Obx(() {
                     final isSaving = _controller.isLoading.value;
                     return ElevatedButton(
-                      onPressed: isSaving ? null : () async {
-                        if (formKey.currentState!.validate()) {
-                          final price = double.parse(priceCtrl.text.trim());
-                          bool success;
-                          if (item == null) {
-                            final stock = int.parse(stockCtrl.text.trim());
-                            success = await _controller.addItem(
-                              nameCtrl.text.trim(),
-                              skuCtrl.text.trim(),
-                              price,
-                              stock,
-                              descCtrl.text.trim(),
-                            );
-                          } else {
-                            success = await _controller.updateItem(
-                              item.id,
-                              nameCtrl.text.trim(),
-                              skuCtrl.text.trim(),
-                              price,
-                              descCtrl.text.trim(),
-                            );
-                          }
+                      onPressed: isSaving
+                          ? null
+                          : () async {
+                              if (formKey.currentState!.validate()) {
+                                final price = double.parse(
+                                  priceCtrl.text.trim(),
+                                );
+                                bool success;
+                                if (item == null) {
+                                  final stock = int.parse(
+                                    stockCtrl.text.trim(),
+                                  );
+                                  success = await _controller.addItem(
+                                    nameCtrl.text.trim(),
+                                    skuCtrl.text.trim(),
+                                    price,
+                                    stock,
+                                    descCtrl.text.trim(),
+                                  );
+                                } else {
+                                  success = await _controller.updateItem(
+                                    item.id,
+                                    nameCtrl.text.trim(),
+                                    skuCtrl.text.trim(),
+                                    price,
+                                    descCtrl.text.trim(),
+                                  );
+                                }
 
-                          if (success) {
-                            Get.back();
-                            Get.snackbar(
-                              'Success',
-                              item != null ? 'Item updated successfully!' : 'Item added successfully!',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: AppColors.success,
-                              colorText: Colors.white,
-                            );
-                          } else {
-                            Get.snackbar(
-                              'Error',
-                              'Failed to save product details. Please try again.',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: AppColors.error,
-                              colorText: Colors.white,
-                            );
-                          }
-                        }
-                      },
+                                if (success) {
+                                  Get.back();
+                                  Get.snackbar(
+                                    'success'.tr,
+                                    item != null
+                                        ? 'item_updated_success'.tr
+                                        : 'item_added_success'.tr,
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: AppColors.success,
+                                    colorText: Colors.white,
+                                  );
+                                } else {
+                                  Get.snackbar(
+                                    'error'.tr,
+                                    'item_save_failed'.tr,
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: AppColors.error,
+                                    colorText: Colors.white,
+                                  );
+                                }
+                              }
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       child: isSaving
                           ? const SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
                             )
                           : Text(
-                              item != null ? 'Save Changes' : 'Add Product SKU',
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                              item != null
+                                  ? 'save_changes'.tr
+                                  : 'add_product_sku'.tr,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                     );
                   }),
@@ -876,8 +1039,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
     Get.bottomSheet(
       Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.all(20),
@@ -890,42 +1053,54 @@ class _InventoryScreenState extends State<InventoryScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Restock Inventory SKU',
+                  Text(
+                    'restock_inventory_sku'.tr,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
+                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(LucideIcons.x, size: 18),
+                    icon: Icon(LucideIcons.x, size: 18),
                     onPressed: () => Get.back(),
                   ),
                 ],
               ),
-              const Divider(),
+              Divider(),
               const SizedBox(height: 8),
 
               Text(
                 item.itemName,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.textPrimary),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                ),
               ),
               const SizedBox(height: 4),
               Text(
-                'Current Available Stock: ${item.currentStock} Units',
-                style: TextStyle(fontSize: 11, color: Colors.grey.shade500, fontWeight: FontWeight.bold),
+                'current_available_stock'.trParams({
+                  'stock': '${item.currentStock}',
+                }),
+                style: TextStyle(
+                  fontSize: 11,
+                  color: Colors.grey.shade500,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
 
               AppInputField(
-                label: 'Quantity to Add *',
-                hintText: 'e.g. 25',
+                label: 'quantity_to_add_star'.tr,
+                hintText: 'e_g_25'.tr,
                 controller: qtyCtrl,
                 keyboardType: TextInputType.number,
                 validator: (val) {
-                  if (val == null || val.trim().isEmpty) return 'Please enter quantity';
-                  if (int.tryParse(val) == null || int.parse(val) <= 0) return 'Must be greater than 0';
+                  if (val == null || val.trim().isEmpty)
+                    return 'please_enter_qty'.tr;
+                  if (int.tryParse(val) == null || int.parse(val) <= 0)
+                    return 'must_be_greater_than_0'.tr;
                   return null;
                 },
               ),
@@ -937,41 +1112,60 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 child: Obx(() {
                   final isSaving = _controller.isLoading.value;
                   return ElevatedButton(
-                    onPressed: isSaving ? null : () async {
-                      if (formKey.currentState!.validate()) {
-                        final qty = int.parse(qtyCtrl.text.trim());
-                        final success = await _controller.restockItem(item.id, qty);
-                        if (success) {
-                          Get.back();
-                          Get.snackbar(
-                            'Restocked SKU',
-                            'Successfully added $qty units of ${item.itemName}!',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: AppColors.success,
-                            colorText: Colors.white,
-                          );
-                        } else {
-                          Get.snackbar(
-                            'Error',
-                            'Failed to restock item. Please try again.',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: AppColors.error,
-                            colorText: Colors.white,
-                          );
-                        }
-                      }
-                    },
+                    onPressed: isSaving
+                        ? null
+                        : () async {
+                            if (formKey.currentState!.validate()) {
+                              final qty = int.parse(qtyCtrl.text.trim());
+                              final success = await _controller.restockItem(
+                                item.id,
+                                qty,
+                              );
+                              if (success) {
+                                Get.back();
+                                Get.snackbar(
+                                  'restocked_sku'.tr,
+                                  'restock_success'.trParams({
+                                    'qty': '$qty',
+                                    'name': item.itemName,
+                                  }),
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  backgroundColor: AppColors.success,
+                                  colorText: Colors.white,
+                                );
+                              } else {
+                                Get.snackbar(
+                                  'error'.tr,
+                                  'restock_failed'.tr,
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  backgroundColor: AppColors.error,
+                                  colorText: Colors.white,
+                                );
+                              }
+                            }
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.indigo,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     child: isSaving
                         ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
                           )
-                        : const Text('Confirm Restock', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        : Text(
+                            'confirm_restock'.tr,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   );
                 }),
               ),
@@ -988,8 +1182,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
     Get.bottomSheet(
       Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.all(20),
@@ -1003,28 +1197,32 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Stock Ledger History',
+                    Text(
+                      'stock_ledger_history'.tr,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.textPrimary,
+                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       item.itemName,
-                      style: TextStyle(fontSize: 11, color: Colors.grey.shade500, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: Colors.grey.shade500,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ],
                 ),
                 IconButton(
-                  icon: const Icon(LucideIcons.x, size: 18),
+                  icon: Icon(LucideIcons.x, size: 18),
                   onPressed: () => Get.back(),
                 ),
               ],
             ),
-            const Divider(),
+            Divider(),
             const SizedBox(height: 10),
 
             Flexible(
@@ -1034,7 +1232,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   return Container(
                     height: 150,
                     alignment: Alignment.center,
-                    child: const CircularProgressIndicator(color: AppColors.primary),
+                    child: const CircularProgressIndicator(
+                      color: AppColors.primary,
+                    ),
                   );
                 }
 
@@ -1043,8 +1243,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     height: 150,
                     alignment: Alignment.center,
                     child: Text(
-                      'No ledger history found.',
-                      style: TextStyle(color: Colors.grey.shade400, fontStyle: FontStyle.italic, fontSize: 12),
+                      'no_ledger_history'.tr,
+                      style: TextStyle(
+                        color: Colors.grey.shade400,
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12,
+                      ),
                     ),
                   );
                 }
@@ -1053,7 +1257,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   shrinkWrap: true,
                   physics: const BouncingScrollPhysics(),
                   itemCount: txList.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1),
+                  separatorBuilder: (context, index) =>
+                      Divider(height: 1),
                   itemBuilder: (context, index) {
                     final tx = txList[index];
                     final isSale = tx.type == 'Sale';
@@ -1063,7 +1268,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     String formattedDate = tx.date;
                     try {
                       final dt = DateTime.parse(tx.date);
-                      formattedDate = DateFormat('dd MMM yyyy, hh:mm a').format(dt);
+                      formattedDate = DateFormat(
+                        'dd MMM yyyy, hh:mm a',
+                      ).format(dt);
                     } catch (e) {
                       // ignore
                     }
@@ -1076,12 +1283,19 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             flex: 3,
                             child: Text(
                               formattedDate,
-                              style: TextStyle(fontSize: 11, color: Colors.grey.shade500, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey.shade500,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: badgeColor.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(4),
@@ -1102,7 +1316,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               tx.description,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 12, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -1111,7 +1329,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w900,
-                              color: tx.quantity > 0 ? Colors.green : Colors.red,
+                              color: tx.quantity > 0
+                                  ? Colors.green
+                                  : Colors.red,
                             ),
                           ),
                         ],
@@ -1132,45 +1352,52 @@ class _InventoryScreenState extends State<InventoryScreen> {
   void _showDeleteConfirmation(InventoryItem item) {
     Get.dialog(
       AlertDialog(
-        title: const Text('Delete Stock Item?'),
-        content: Text('This will remove "${item.itemName}" from your warehouse catalog. Are you sure you want to proceed?'),
+        title: Text('delete_stock_item'.tr),
+        content: Text(
+          'delete_item_confirm_desc'.trParams({'name': item.itemName}),
+        ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: TextStyle(color: Colors.grey)),
           ),
           Obx(() {
             final isSaving = _controller.isLoading.value;
             return ElevatedButton(
-              onPressed: isSaving ? null : () async {
-                final success = await _controller.deleteItem(item.id);
-                Get.back(); // close dialog
-                if (success) {
-                  Get.snackbar(
-                    'Removed Item',
-                    'Product SKU removed successfully.',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppColors.error,
-                    colorText: Colors.white,
-                  );
-                } else {
-                  Get.snackbar(
-                    'Error',
-                    'Failed to delete item. Please try again.',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppColors.error,
-                    colorText: Colors.white,
-                  );
-                }
-              },
+              onPressed: isSaving
+                  ? null
+                  : () async {
+                      final success = await _controller.deleteItem(item.id);
+                      Get.back(); // close dialog
+                      if (success) {
+                        Get.snackbar(
+                          'removed_item'.tr,
+                          'sku_removed_success'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: AppColors.error,
+                          colorText: Colors.white,
+                        );
+                      } else {
+                        Get.snackbar(
+                          'error'.tr,
+                          'sku_remove_failed'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: AppColors.error,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: isSaving
                   ? const SizedBox(
                       height: 16,
                       width: 16,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
-                  : const Text('Delete', style: TextStyle(color: Colors.white)),
+                  : Text('delete'.tr, style: TextStyle(color: Colors.white)),
             );
           }),
         ],
@@ -1182,45 +1409,57 @@ class _InventoryScreenState extends State<InventoryScreen> {
   void _showBulkDeleteConfirmation() {
     Get.dialog(
       AlertDialog(
-        title: const Text('Delete Selected Items?'),
-        content: Text('This will remove ${_controller.selectedItems.length} items from your warehouse catalog. Are you sure you want to proceed?'),
+        title: Text('delete_selected_items'.tr),
+        content: Text(
+          'delete_items_confirm_desc'.trParams({
+            'count': '${_controller.selectedItems.length}',
+          }),
+        ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: TextStyle(color: Colors.grey)),
           ),
           Obx(() {
             final isSaving = _controller.isLoading.value;
             return ElevatedButton(
-              onPressed: isSaving ? null : () async {
-                final success = await _controller.deleteSelectedItems();
-                Get.back(); // close dialog
-                if (success) {
-                  Get.snackbar(
-                    'Removed Items',
-                    'Selected products removed successfully.',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppColors.error,
-                    colorText: Colors.white,
-                  );
-                } else {
-                  Get.snackbar(
-                    'Error',
-                    'Failed to delete some or all items. Please try again.',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: AppColors.error,
-                    colorText: Colors.white,
-                  );
-                }
-              },
+              onPressed: isSaving
+                  ? null
+                  : () async {
+                      final success = await _controller.deleteSelectedItems();
+                      Get.back(); // close dialog
+                      if (success) {
+                        Get.snackbar(
+                          'removed_items'.tr,
+                          'skus_removed_success'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: AppColors.error,
+                          colorText: Colors.white,
+                        );
+                      } else {
+                        Get.snackbar(
+                          'error'.tr,
+                          'skus_remove_failed'.tr,
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: AppColors.error,
+                          colorText: Colors.white,
+                        );
+                      }
+                    },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: isSaving
                   ? const SizedBox(
                       height: 16,
                       width: 16,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
                     )
-                  : const Text('Delete All', style: TextStyle(color: Colors.white)),
+                  : Text(
+                      'delete_all'.tr,
+                      style: TextStyle(color: Colors.white),
+                    ),
             );
           }),
         ],

@@ -40,7 +40,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseBgColor = isDark ? const Color(0xFF090D1A) : const Color(0xFFF1F5F9);
+    final baseBgColor = isDark
+        ? Color(0xFF090D1A)
+        : Color(0xFFF1F5F9);
 
     return Scaffold(
       backgroundColor: baseBgColor,
@@ -48,7 +50,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         children: [
           // Background blobs
           _buildBackgroundBlobs(isDark),
-          
+
           // Blur layer
           Positioned.fill(
             child: BackdropFilter(
@@ -56,13 +58,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Container(color: Colors.transparent),
             ),
           ),
-          
+
           SafeArea(
             child: Column(
               children: [
                 // Top header: Skip button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -72,7 +77,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           child: Text(
                             'skip'.tr,
                             style: TextStyle(
-                              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                              color: isDark
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -80,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ],
                   ),
                 ),
-                
+
                 // Page View
                 Expanded(
                   child: PageView(
@@ -91,14 +98,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       });
                     },
                     physics: const BouncingScrollPhysics(),
-                    children: const [
-                      _Slide1(),
-                      _Slide2(),
-                      _Slide3(),
-                    ],
+                    children: const [_Slide1(), _Slide2(), _Slide3()],
                   ),
                 ),
-                
+
                 // Bottom controls
                 Padding(
                   padding: const EdgeInsets.all(32.0),
@@ -123,7 +126,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         ),
                       ),
-                      
+
                       // Next / Get Started Button
                       GestureDetector(
                         onTap: _onNext,
@@ -152,7 +155,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   padding: const EdgeInsets.only(right: 8),
                                   child: Text(
                                     'get_started'.tr,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -160,7 +163,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   ),
                                 ),
                               Icon(
-                                _currentPage == 2 ? LucideIcons.check : LucideIcons.arrowRight,
+                                _currentPage == 2
+                                    ? LucideIcons.check
+                                    : LucideIcons.arrowRight,
                                 color: Colors.white,
                                 size: 20,
                               ),
@@ -190,7 +195,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: 350,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFBFDBFE)).withOpacity(0.4),
+              color:
+                  (isDark ? Color(0xFF1E3A8A) : Color(0xFFBFDBFE))
+                      .withOpacity(0.4),
             ),
           ),
         ),
@@ -202,7 +209,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             height: 400,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: (isDark ? const Color(0xFF4C1D95) : const Color(0xFFE9D5FF)).withOpacity(0.3),
+              color:
+                  (isDark ? Color(0xFF4C1D95) : Color(0xFFE9D5FF))
+                      .withOpacity(0.3),
             ),
           ),
         ),
@@ -227,7 +236,10 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
     _ctrl.forward();
   }
 
@@ -240,7 +252,7 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
@@ -257,14 +269,20 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
                   animation: _ctrl,
                   builder: (context, child) {
                     final scale = Tween<double>(begin: 0.5, end: 1.0)
-                        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutBack)).value;
+                        .animate(
+                          CurvedAnimation(
+                            parent: _ctrl,
+                            curve: Curves.easeOutBack,
+                          ),
+                        )
+                        .value;
                     return Transform.scale(
                       scale: scale,
                       child: Container(
                         width: 200,
                         height: 220,
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                          color: Theme.of(context).cardTheme.color,
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
@@ -281,9 +299,21 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                _buildBar(100, AppColors.primary.withOpacity(0.5), 0.2),
-                                _buildBar(140, AppColors.primary.withOpacity(0.7), 0.4),
-                                _buildBar(80, AppColors.primary.withOpacity(0.4), 0.6),
+                                _buildBar(
+                                  100,
+                                  AppColors.primary.withOpacity(0.5),
+                                  0.2,
+                                ),
+                                _buildBar(
+                                  140,
+                                  AppColors.primary.withOpacity(0.7),
+                                  0.4,
+                                ),
+                                _buildBar(
+                                  80,
+                                  AppColors.primary.withOpacity(0.4),
+                                  0.6,
+                                ),
                                 _buildBar(180, AppColors.primary, 0.8),
                               ],
                             ),
@@ -298,11 +328,31 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
                 AnimatedBuilder(
                   animation: _ctrl,
                   builder: (context, child) {
-                    final slide = Tween<double>(begin: 50, end: 0).animate(CurvedAnimation(
-                      parent: _ctrl, curve: const Interval(0.4, 1.0, curve: Curves.easeOutBack))).value;
-                    final fade = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
-                      parent: _ctrl, curve: const Interval(0.4, 1.0, curve: Curves.easeIn))).value;
-                      
+                    final slide = Tween<double>(begin: 50, end: 0)
+                        .animate(
+                          CurvedAnimation(
+                            parent: _ctrl,
+                            curve: const Interval(
+                              0.4,
+                              1.0,
+                              curve: Curves.easeOutBack,
+                            ),
+                          ),
+                        )
+                        .value;
+                    final fade = Tween<double>(begin: 0, end: 1)
+                        .animate(
+                          CurvedAnimation(
+                            parent: _ctrl,
+                            curve: const Interval(
+                              0.4,
+                              1.0,
+                              curve: Curves.easeIn,
+                            ),
+                          ),
+                        )
+                        .value;
+
                     return Positioned(
                       top: 40,
                       right: 10,
@@ -313,13 +363,23 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981), // Success green
+                              color: Color(0xFF10B981), // Success green
                               shape: BoxShape.circle,
                               boxShadow: [
-                                BoxShadow(color: const Color(0xFF10B981).withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 5)),
+                                BoxShadow(
+                                  color: Color(
+                                    0xFF10B981,
+                                  ).withOpacity(0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
                               ],
                             ),
-                            child: const Icon(LucideIcons.trendingUp, color: Colors.white, size: 24),
+                            child: Icon(
+                              LucideIcons.trendingUp,
+                              color: Colors.white,
+                              size: 24,
+                            ),
                           ),
                         ),
                       ),
@@ -335,7 +395,7 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: Theme.of(context).textTheme.displayLarge?.color,
               letterSpacing: -0.5,
             ),
             textAlign: TextAlign.center,
@@ -346,7 +406,7 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
-              color: isDark ? Colors.grey.shade400 : AppColors.textSecondary,
+              color: isDark ? Colors.grey.shade400 : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
             ),
             textAlign: TextAlign.center,
           ),
@@ -359,10 +419,14 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, child) {
-        final val = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
-          parent: _ctrl,
-          curve: Interval(delay, 1.0, curve: Curves.easeOutBack),
-        )).value;
+        final val = Tween<double>(begin: 0, end: 1)
+            .animate(
+              CurvedAnimation(
+                parent: _ctrl,
+                curve: Interval(delay, 1.0, curve: Curves.easeOutBack),
+              ),
+            )
+            .value;
         return Container(
           width: 24,
           height: height * val,
@@ -392,7 +456,10 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
     _ctrl.forward();
   }
 
@@ -405,7 +472,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
@@ -418,7 +485,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
               children: [
                 _buildFloatingBox(
                   icon: LucideIcons.packageSearch,
-                  color: const Color(0xFFF59E0B),
+                  color: Color(0xFFF59E0B),
                   x: -60,
                   y: -40,
                   delay: 0.1,
@@ -427,7 +494,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
                 ),
                 _buildFloatingBox(
                   icon: LucideIcons.truck,
-                  color: const Color(0xFF3B82F6),
+                  color: Color(0xFF3B82F6),
                   x: 60,
                   y: 0,
                   delay: 0.3,
@@ -436,7 +503,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
                 ),
                 _buildFloatingBox(
                   icon: LucideIcons.boxes,
-                  color: const Color(0xFF8B5CF6),
+                  color: Color(0xFF8B5CF6),
                   x: -30,
                   y: 60,
                   delay: 0.5,
@@ -452,7 +519,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: Theme.of(context).textTheme.displayLarge?.color,
               letterSpacing: -0.5,
             ),
             textAlign: TextAlign.center,
@@ -463,7 +530,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
-              color: isDark ? Colors.grey.shade400 : AppColors.textSecondary,
+              color: isDark ? Colors.grey.shade400 : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
             ),
             textAlign: TextAlign.center,
           ),
@@ -484,9 +551,15 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _ctrl,
       builder: (context, child) {
-        final scale = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
-          parent: _ctrl, curve: Interval(delay, 1.0, curve: Curves.elasticOut))).value;
-          
+        final scale = Tween<double>(begin: 0, end: 1)
+            .animate(
+              CurvedAnimation(
+                parent: _ctrl,
+                curve: Interval(delay, 1.0, curve: Curves.elasticOut),
+              ),
+            )
+            .value;
+
         return Transform.translate(
           offset: Offset(x, y),
           child: Transform.scale(
@@ -495,10 +568,14 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
               width: size,
               height: size,
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                color: Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
-                  BoxShadow(color: color.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10)),
+                  BoxShadow(
+                    color: color.withOpacity(0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
                 ],
               ),
               child: Center(
@@ -528,7 +605,10 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _ctrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 1500));
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    );
     _ctrl.forward();
   }
 
@@ -541,7 +621,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
@@ -556,8 +636,18 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                 AnimatedBuilder(
                   animation: _ctrl,
                   builder: (context, child) {
-                    final slide = Tween<double>(begin: 100, end: 0).animate(CurvedAnimation(
-                      parent: _ctrl, curve: const Interval(0.1, 0.7, curve: Curves.easeOutBack))).value;
+                    final slide = Tween<double>(begin: 100, end: 0)
+                        .animate(
+                          CurvedAnimation(
+                            parent: _ctrl,
+                            curve: const Interval(
+                              0.1,
+                              0.7,
+                              curve: Curves.easeOutBack,
+                            ),
+                          ),
+                        )
+                        .value;
                     return Transform.translate(
                       offset: Offset(0, slide),
                       child: Container(
@@ -565,10 +655,14 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                         height: 240,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                          color: Theme.of(context).cardTheme.color,
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10)),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 20,
+                              offset: const Offset(0, 10),
+                            ),
                           ],
                         ),
                         child: Column(
@@ -580,39 +674,107 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                               children: [
                                 // Logo Placeholder
                                 Container(
-                                  width: 36, 
-                                  height: 36, 
+                                  width: 36,
+                                  height: 36,
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary.withOpacity(0.15), 
+                                    color: AppColors.primary.withOpacity(0.15),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: const Icon(LucideIcons.fileText, size: 18, color: AppColors.primary),
+                                  child: Icon(
+                                    LucideIcons.fileText,
+                                    size: 18,
+                                    color: AppColors.primary,
+                                  ),
                                 ),
                                 // Invoice Text & Date
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text('invoice_caps'.tr, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12, color: isDark ? Colors.grey.shade300 : Colors.grey.shade800, letterSpacing: 1.0)),
+                                    Text(
+                                      'invoice_caps'.tr,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 12,
+                                        color: isDark
+                                            ? Colors.grey.shade300
+                                            : Colors.grey.shade800,
+                                        letterSpacing: 1.0,
+                                      ),
+                                    ),
                                     const SizedBox(height: 4),
-                                    Container(width: 40, height: 4, decoration: BoxDecoration(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
+                                    Container(
+                                      width: 40,
+                                      height: 4,
+                                      decoration: BoxDecoration(
+                                        color: isDark
+                                            ? Colors.grey.shade700
+                                            : Colors.grey.shade300,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
                             ),
                             const SizedBox(height: 24),
                             // Bill To Block
-                            Container(width: 30, height: 4, decoration: BoxDecoration(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
+                            Container(
+                              width: 30,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.grey.shade700
+                                    : Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
                             const SizedBox(height: 6),
-                            Container(width: 80, height: 6, decoration: BoxDecoration(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, borderRadius: BorderRadius.circular(3))),
+                            Container(
+                              width: 80,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.grey.shade600
+                                    : Colors.grey.shade400,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            Container(width: 50, height: 4, decoration: BoxDecoration(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
+                            Container(
+                              width: 50,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? Colors.grey.shade700
+                                    : Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
                             const SizedBox(height: 20),
                             // Table Header
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(width: 60, height: 4, decoration: BoxDecoration(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
-                                Container(width: 20, height: 4, decoration: BoxDecoration(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
+                                Container(
+                                  width: 60,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.grey.shade700
+                                        : Colors.grey.shade300,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                Container(
+                                  width: 20,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.grey.shade700
+                                        : Colors.grey.shade300,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 8),
@@ -620,8 +782,26 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(width: 90, height: 6, decoration: BoxDecoration(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, borderRadius: BorderRadius.circular(3))),
-                                Container(width: 30, height: 6, decoration: BoxDecoration(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, borderRadius: BorderRadius.circular(3))),
+                                Container(
+                                  width: 90,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.grey.shade600
+                                        : Colors.grey.shade400,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
+                                Container(
+                                  width: 30,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.grey.shade600
+                                        : Colors.grey.shade400,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 8),
@@ -629,19 +809,58 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Container(width: 60, height: 6, decoration: BoxDecoration(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, borderRadius: BorderRadius.circular(3))),
-                                Container(width: 30, height: 6, decoration: BoxDecoration(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400, borderRadius: BorderRadius.circular(3))),
+                                Container(
+                                  width: 60,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.grey.shade600
+                                        : Colors.grey.shade400,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
+                                Container(
+                                  width: 30,
+                                  height: 6,
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.grey.shade600
+                                        : Colors.grey.shade400,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
                               ],
                             ),
                             const Spacer(),
                             // Divider
-                            Divider(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200, height: 16),
+                            Divider(
+                              color: isDark
+                                  ? Colors.grey.shade800
+                                  : Colors.grey.shade200,
+                              height: 16,
+                            ),
                             // Total
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('total'.tr, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600)),
-                                const Text('₹24,500', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.primary)),
+                                Text(
+                                  'total'.tr,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                    color: isDark
+                                        ? Colors.grey.shade400
+                                        : Colors.grey.shade600,
+                                  ),
+                                ),
+                                Text(
+                                  '₹24,500',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 15,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
                               ],
                             ),
                           ],
@@ -654,8 +873,18 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                 AnimatedBuilder(
                   animation: _ctrl,
                   builder: (context, child) {
-                    final scale = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
-                      parent: _ctrl, curve: const Interval(0.6, 1.0, curve: Curves.elasticOut))).value;
+                    final scale = Tween<double>(begin: 0, end: 1)
+                        .animate(
+                          CurvedAnimation(
+                            parent: _ctrl,
+                            curve: const Interval(
+                              0.6,
+                              1.0,
+                              curve: Curves.elasticOut,
+                            ),
+                          ),
+                        )
+                        .value;
                     return Positioned(
                       bottom: 10,
                       child: Transform.scale(
@@ -663,13 +892,21 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF10B981),
+                            color: Color(0xFF10B981),
                             shape: BoxShape.circle,
                             boxShadow: [
-                              BoxShadow(color: const Color(0xFF10B981).withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 10)),
+                              BoxShadow(
+                                color: Color(0xFF10B981).withOpacity(0.4),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
+                              ),
                             ],
                           ),
-                          child: const Icon(LucideIcons.checkCheck, color: Colors.white, size: 32),
+                          child: Icon(
+                            LucideIcons.checkCheck,
+                            color: Colors.white,
+                            size: 32,
+                          ),
                         ),
                       ),
                     );
@@ -684,7 +921,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,
-              color: isDark ? Colors.white : AppColors.textPrimary,
+              color: Theme.of(context).textTheme.displayLarge?.color,
               letterSpacing: -0.5,
             ),
             textAlign: TextAlign.center,
@@ -695,7 +932,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
             style: TextStyle(
               fontSize: 15,
               height: 1.5,
-              color: isDark ? Colors.grey.shade400 : AppColors.textSecondary,
+              color: isDark ? Colors.grey.shade400 : (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
             ),
             textAlign: TextAlign.center,
           ),

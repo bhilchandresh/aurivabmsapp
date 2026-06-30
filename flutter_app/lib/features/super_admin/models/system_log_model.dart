@@ -16,10 +16,14 @@ class SystemLogModel {
   factory SystemLogModel.fromJson(Map<String, dynamic> json) {
     return SystemLogModel(
       id: json['_id'] ?? '',
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : DateTime.now(),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
       action: json['action'] ?? 'UNKNOWN',
       details: json['details'] ?? '',
-      userName: json['tenantId'] != null ? (json['tenantId']['name'] ?? 'System') : 'System',
+      userName: json['tenantId'] != null
+          ? (json['tenantId']['name'] ?? 'System')
+          : 'System',
     );
   }
 }

@@ -33,8 +33,6 @@ dependencies:
 
   cupertino_icons: ^1.0.8
 
-  # Navigation
-  go_router: ^13.0.0
 
   # Fonts
   google_fonts: ^6.0.0
@@ -54,11 +52,7 @@ dependencies:
   intl: ^0.19.0
   cached_network_image: ^3.3.0
 
-  # State Management
-  flutter_riverpod: ^2.5.0
-
   # HTTP Client
-  dio: ^5.0.0
   flutter_secure_storage: ^9.0.0
   get: ^4.7.3
   pdf: ^3.12.0
@@ -79,6 +73,11 @@ dependencies:
   onesignal_flutter: ^5.6.2
   flutter_local_notifications: ^20.1.0
   shared_preferences: ^2.5.5
+  translator: ^1.0.4+1
+  sqflite: ^2.3.0
+  connectivity_plus: ^5.0.0
+  flutter_animate: ^4.5.0
+  get_storage: ^2.1.1
 
 dev_dependencies:
   flutter_test:
@@ -91,11 +90,21 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.2
+  flutter_native_splash: ^2.4.1
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
   image_path: "logo.png"
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: "logo.png"
+  android: true
+  ios: true
+  android_12:
+    image: "logo.png"
+    icon_background_color: "#ffffff"
 
 
 # For information on the generic Dart part of this file, see the

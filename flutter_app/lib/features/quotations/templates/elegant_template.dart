@@ -45,28 +45,31 @@ class ElegantTemplate extends StatelessWidget {
       color: Colors.white,
       padding: EdgeInsets.all(paddingValue),
       child: DefaultTextStyle(
-        style: const TextStyle(fontFamily: 'Times New Roman', color: Colors.black87),
+        style: TextStyle(
+          fontFamily: 'Times New Roman',
+          color: Colors.black87,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (isFirstPage) _buildHeader(),
             if (!isFirstPage) _buildCompactHeader(),
-            
+
             if (isFirstPage) ...[
               const SizedBox(height: 24),
               _buildClientAndPaymentInfo(),
               const SizedBox(height: 24),
             ],
-            
+
             _buildItemsTable(itemsList),
-            
+
             if (isLastPage) ...[
               const SizedBox(height: 24),
               _buildTotalsSection(),
               const SizedBox(height: 16),
               _buildSignatorySection(),
             ],
-            
+
             const Spacer(),
             if (isLastPage) _buildTermsSection(),
           ],
@@ -84,11 +87,15 @@ class ElegantTemplate extends StatelessWidget {
         if ((tenant['logoImage'] ?? '').isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(bottom: 12.0),
-            child: _buildLogoWidget(tenant['logoImage'], height: 56, fit: BoxFit.contain),
+            child: _buildLogoWidget(
+              tenant['logoImage'],
+              height: 56,
+              fit: BoxFit.contain,
+            ),
           ),
         Text(
           (tenant['name'] ?? '').toUpperCase(),
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             letterSpacing: 2.0,
@@ -115,11 +122,33 @@ class ElegantTemplate extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if ((tenant['email'] ?? '').isNotEmpty)
-              Text((tenant['email'] ?? '').toUpperCase(), style: TextStyle(fontSize: 8, color: Colors.grey.shade600, fontFamily: 'Times New Roman', letterSpacing: 0.5, fontWeight: FontWeight.w500)),
-            if ((tenant['email'] ?? '').isNotEmpty && (tenant['phone'] ?? '').isNotEmpty)
-              Text(' • ', style: TextStyle(fontSize: 8, color: Colors.grey.shade600)),
+              Text(
+                (tenant['email'] ?? '').toUpperCase(),
+                style: TextStyle(
+                  fontSize: 8,
+                  color: Colors.grey.shade600,
+                  fontFamily: 'Times New Roman',
+                  letterSpacing: 0.5,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            if ((tenant['email'] ?? '').isNotEmpty &&
+                (tenant['phone'] ?? '').isNotEmpty)
+              Text(
+                ' • ',
+                style: TextStyle(fontSize: 8, color: Colors.grey.shade600),
+              ),
             if ((tenant['phone'] ?? '').isNotEmpty)
-              Text((tenant['phone'] ?? '').toUpperCase(), style: TextStyle(fontSize: 8, color: Colors.grey.shade600, fontFamily: 'Times New Roman', letterSpacing: 0.5, fontWeight: FontWeight.w500)),
+              Text(
+                (tenant['phone'] ?? '').toUpperCase(),
+                style: TextStyle(
+                  fontSize: 8,
+                  color: Colors.grey.shade600,
+                  fontFamily: 'Times New Roman',
+                  letterSpacing: 0.5,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
           ],
         ),
         if (params.gstEnabled && (tenant['gstNumber'] ?? '').isNotEmpty)
@@ -127,14 +156,18 @@ class ElegantTemplate extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4.0),
             child: Text(
               'GSTIN: ${tenant['gstNumber']}',
-              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, fontFamily: 'Times New Roman'),
+              style: TextStyle(
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Times New Roman',
+              ),
               textAlign: TextAlign.center,
             ),
           ),
         const SizedBox(height: 16),
         Container(height: 2, color: Colors.grey.shade800),
         const SizedBox(height: 16),
-        
+
         // Invoice Meta
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -155,7 +188,7 @@ class ElegantTemplate extends StatelessWidget {
               children: [
                 Text(
                   '#${params.quotationId}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Times New Roman',
@@ -165,15 +198,43 @@ class ElegantTemplate extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('Date: ', style: TextStyle(fontSize: 9, color: Colors.grey.shade600, fontFamily: 'Times New Roman')),
-                    Text(_formatDate(params.date), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, fontFamily: 'Times New Roman')),
+                    Text(
+                      'date_2'.tr,
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: Colors.grey.shade600,
+                        fontFamily: 'Times New Roman',
+                      ),
+                    ),
+                    Text(
+                      _formatDate(params.date),
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Times New Roman',
+                      ),
+                    ),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text('${params.documentTitle == "QUOTATION" ? "Valid Until" : "Due Date"}: ', style: TextStyle(fontSize: 9, color: Colors.grey.shade600, fontFamily: 'Times New Roman')),
-                    Text(_formatDate(params.dueDate), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, fontFamily: 'Times New Roman')),
+                    Text(
+                      '${params.documentTitle == "QUOTATION" ? "Valid Until" : "Due Date"}: ',
+                      style: TextStyle(
+                        fontSize: 9,
+                        color: Colors.grey.shade600,
+                        fontFamily: 'Times New Roman',
+                      ),
+                    ),
+                    Text(
+                      _formatDate(params.dueDate),
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Times New Roman',
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -193,11 +254,18 @@ class ElegantTemplate extends StatelessWidget {
           children: [
             Text(
               '${params.numberLabel} Ref: ${params.quotationId}',
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, fontFamily: 'Times New Roman'),
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Times New Roman',
+              ),
             ),
             Text(
               'Date: ${_formatDate(params.date)}',
-              style: const TextStyle(fontSize: 10, fontFamily: 'Times New Roman'),
+              style: TextStyle(
+                fontSize: 10,
+                fontFamily: 'Times New Roman',
+              ),
             ),
           ],
         ),
@@ -208,17 +276,25 @@ class ElegantTemplate extends StatelessWidget {
     );
   }
 
-  Widget _buildLogoWidget(String? logoImage, {double height = 50, double? width, BoxFit fit = BoxFit.contain}) {
+  Widget _buildLogoWidget(
+    String? logoImage, {
+    double height = 50,
+    double? width,
+    BoxFit fit = BoxFit.contain,
+  }) {
     if (logoImage == null || logoImage.isEmpty) return const SizedBox.shrink();
     if (logoImage.startsWith('data:image') || !logoImage.startsWith('http')) {
       try {
-        final base64Str = logoImage.contains(',') ? logoImage.split(',')[1] : logoImage;
+        final base64Str = logoImage.contains(',')
+            ? logoImage.split(',')[1]
+            : logoImage;
         return Image.memory(
           base64Decode(base64Str),
           height: height,
           width: width,
           fit: fit,
-          errorBuilder: (context, error, stackTrace) => SizedBox(height: height, width: width),
+          errorBuilder: (context, error, stackTrace) =>
+              SizedBox(height: height, width: width),
         );
       } catch (e) {
         return SizedBox(height: height, width: width);
@@ -229,7 +305,8 @@ class ElegantTemplate extends StatelessWidget {
         height: height,
         width: width,
         fit: fit,
-        errorBuilder: (context, error, stackTrace) => SizedBox(height: height, width: width),
+        errorBuilder: (context, error, stackTrace) =>
+            SizedBox(height: height, width: width),
       );
     }
   }
@@ -245,7 +322,11 @@ class ElegantTemplate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade300))),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade300),
+                  ),
+                ),
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Text(
                   params.documentTitle == 'QUOTATION' ? 'QUOTE TO' : 'TO',
@@ -261,7 +342,7 @@ class ElegantTemplate extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 params.clientName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Times New Roman',
@@ -302,8 +383,13 @@ class ElegantTemplate extends StatelessWidget {
               if (params.gstEnabled && params.clientGst.isNotEmpty) ...[
                 const SizedBox(height: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(border: Border.all(color: Colors.grey.shade300)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
                   child: Text(
                     'GSTIN: ${params.clientGst}',
                     style: TextStyle(
@@ -326,7 +412,11 @@ class ElegantTemplate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Container(
-                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade300))),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade300),
+                  ),
+                ),
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Text(
                   'PAY TO',
@@ -340,12 +430,21 @@ class ElegantTemplate extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              if (params.bankDetails.isNotEmpty && params.bankDetails['accountNumber'] != null) ...[
+              if (params.bankDetails.isNotEmpty &&
+                  params.bankDetails['accountNumber'] != null) ...[
                 if ((params.bankDetails['accountName'] ?? '').isNotEmpty)
                   _buildPaymentRow('Name', params.bankDetails['accountName']),
                 _buildPaymentRow('Bank', params.bankDetails['bankName']),
-                _buildPaymentRow('A/C', params.bankDetails['accountNumber'], isMono: true),
-                _buildPaymentRow('IFSC', params.bankDetails['ifscCode'], isMono: true),
+                _buildPaymentRow(
+                  'A/C',
+                  params.bankDetails['accountNumber'],
+                  isMono: true,
+                ),
+                _buildPaymentRow(
+                  'IFSC',
+                  params.bankDetails['ifscCode'],
+                  isMono: true,
+                ),
               ] else ...[
                 Text(
                   'Payment details not provided.',
@@ -393,7 +492,9 @@ class ElegantTemplate extends StatelessWidget {
   }
 
   Widget _buildItemsTable(List<Map<String, dynamic>> items) {
-    final bool showHsn = items.any((item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty);
+    final bool showHsn = items.any(
+      (item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty,
+    );
 
     Map<int, TableColumnWidth> colWidths = showHsn
         ? const {
@@ -443,12 +544,21 @@ class ElegantTemplate extends StatelessWidget {
 
             return TableRow(
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: Colors.grey.shade100, width: 1)),
+                border: Border(
+                  bottom: BorderSide(color: Colors.grey.shade100, width: 1),
+                ),
               ),
               children: [
-                _buildTableCell('0${index + 1}', TextAlign.left, color: Colors.grey.shade400),
+                _buildTableCell(
+                  '0${index + 1}',
+                  TextAlign.left,
+                  color: Colors.grey.shade400,
+                ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 12,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -461,7 +571,9 @@ class ElegantTemplate extends StatelessWidget {
                           fontFamily: 'Times New Roman',
                         ),
                       ),
-                      if ((item['additionalDetails']?.toString() ?? '').trim().isNotEmpty) ...[
+                      if ((item['additionalDetails']?.toString() ?? '')
+                          .trim()
+                          .isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Text(
                           item['additionalDetails'].toString(),
@@ -477,10 +589,28 @@ class ElegantTemplate extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (showHsn) _buildTableCell(item['hsnCode']?.toString() ?? '-', TextAlign.center, color: Colors.grey.shade600),
-                _buildTableCell(qty.toStringAsFixed(qty.truncateToDouble() == qty ? 0 : 2), TextAlign.center, color: Colors.grey.shade600),
-                _buildTableCell(params.formatCurrency.format(rate), TextAlign.right, color: Colors.grey.shade600),
-                _buildTableCell(params.formatCurrency.format(amount), TextAlign.right, isBold: true, color: Colors.grey.shade900),
+                if (showHsn)
+                  _buildTableCell(
+                    item['hsnCode']?.toString() ?? '-',
+                    TextAlign.center,
+                    color: Colors.grey.shade600,
+                  ),
+                _buildTableCell(
+                  qty.toStringAsFixed(qty.truncateToDouble() == qty ? 0 : 2),
+                  TextAlign.center,
+                  color: Colors.grey.shade600,
+                ),
+                _buildTableCell(
+                  params.formatCurrency.format(rate),
+                  TextAlign.right,
+                  color: Colors.grey.shade600,
+                ),
+                _buildTableCell(
+                  params.formatCurrency.format(amount),
+                  TextAlign.right,
+                  isBold: true,
+                  color: Colors.grey.shade900,
+                ),
               ],
             );
           }),
@@ -491,7 +621,11 @@ class ElegantTemplate extends StatelessWidget {
 
   Widget _buildTableHeaderCell(String text, TextAlign align) {
     return Container(
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1))),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+        ),
+      ),
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       child: Text(
         text,
@@ -506,7 +640,12 @@ class ElegantTemplate extends StatelessWidget {
     );
   }
 
-  Widget _buildTableCell(String text, TextAlign align, {bool isBold = false, Color? color}) {
+  Widget _buildTableCell(
+    String text,
+    TextAlign align, {
+    bool isBold = false,
+    Color? color,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       child: Text(
@@ -535,7 +674,11 @@ class ElegantTemplate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade200))),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade200),
+                  ),
+                ),
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Text(
                   'AMOUNT IN WORDS',
@@ -571,7 +714,9 @@ class ElegantTemplate extends StatelessWidget {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.grey.shade200, width: 1)),
+                  border: Border(
+                    bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+                  ),
                 ),
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Column(
@@ -592,7 +737,12 @@ class ElegantTemplate extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.only(top: 4),
                         decoration: BoxDecoration(
-                          border: Border(top: BorderSide(color: Colors.grey.shade200, style: BorderStyle.solid)),
+                          border: Border(
+                            top: BorderSide(
+                              color: Colors.grey.shade200,
+                              style: BorderStyle.solid,
+                            ),
+                          ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -607,7 +757,14 @@ class ElegantTemplate extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              params.formatCurrency.format(params.subtotal - params.discountAmount),
+                              params.formatCurrency.format(
+                                (params.taxType == 'inclusive' &&
+                                        params.gstEnabled)
+                                    ? (params.subtotal -
+                                          params.discountAmount -
+                                          params.taxAmount)
+                                    : (params.subtotal - params.discountAmount),
+                              ),
                               style: TextStyle(
                                 fontSize: 9,
                                 color: Colors.grey.shade400,
@@ -626,11 +783,21 @@ class ElegantTemplate extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
-              _buildTotalRow('TOTAL', params.total, isBold: true, fontSize: 13, isUppercase: true),
+              _buildTotalRow(
+                'TOTAL',
+                params.total,
+                isBold: true,
+                fontSize: 13,
+                isUppercase: true,
+              ),
               if (params.advancePayment > 0) ...[
                 const SizedBox(height: 6),
                 Container(
-                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey.shade200))),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: Colors.grey.shade200),
+                    ),
+                  ),
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -658,12 +825,15 @@ class ElegantTemplate extends StatelessWidget {
               ],
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
+                ),
                 color: Colors.grey.shade900,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Balance Due',
                       style: TextStyle(
                         fontSize: 12,
@@ -674,7 +844,7 @@ class ElegantTemplate extends StatelessWidget {
                     ),
                     Text(
                       params.formatCurrency.format(balanceDue),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -693,7 +863,9 @@ class ElegantTemplate extends StatelessWidget {
 
   List<Widget> _buildGstRows() {
     String place = params.placeOfSupply.toLowerCase();
-    String tenantState = (params.tenant['state'] ?? '').toString().toLowerCase();
+    String tenantState = (params.tenant['state'] ?? '')
+        .toString()
+        .toLowerCase();
     bool isOutstate = false;
     if (place.isNotEmpty && tenantState.isNotEmpty) {
       isOutstate = !place.contains(tenantState) && !tenantState.contains(place);
@@ -703,18 +875,41 @@ class ElegantTemplate extends StatelessWidget {
 
     if (isOutstate) {
       return [
-        _buildTotalRow('IGST', params.taxAmount, isBold: false, color: Colors.grey.shade600),
+        _buildTotalRow(
+          'IGST',
+          params.taxAmount,
+          isBold: false,
+          color: Colors.grey.shade600,
+        ),
       ];
     } else {
       return [
-        _buildTotalRow('CGST', params.taxAmount / 2, isBold: false, color: Colors.grey.shade600),
+        _buildTotalRow(
+          'CGST',
+          params.taxAmount / 2,
+          isBold: false,
+          color: Colors.grey.shade600,
+        ),
         const SizedBox(height: 6),
-        _buildTotalRow('SGST', params.taxAmount / 2, isBold: false, color: Colors.grey.shade600),
+        _buildTotalRow(
+          'SGST',
+          params.taxAmount / 2,
+          isBold: false,
+          color: Colors.grey.shade600,
+        ),
       ];
     }
   }
 
-  Widget _buildTotalRow(String label, double amount, {bool isBold = false, bool isMinus = false, double fontSize = 9, Color? color, bool isUppercase = false}) {
+  Widget _buildTotalRow(
+    String label,
+    double amount, {
+    bool isBold = false,
+    bool isMinus = false,
+    double fontSize = 9,
+    Color? color,
+    bool isUppercase = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -742,64 +937,101 @@ class ElegantTemplate extends StatelessWidget {
   }
 
   Widget _buildSignatorySection() {
-    return GetBuilder<AuthController>(builder: (authController) {
-      final String authSignature = authController.userSignature.value;
-      final String displayName = authController.userName.value.isNotEmpty ? authController.userName.value : (params.tenant['name'] ?? '');
+    return GetBuilder<AuthController>(
+      builder: (authController) {
+        final String authSignature = authController.userSignature.value;
+        final String displayName = authController.userName.value.isNotEmpty
+            ? authController.userName.value
+            : (params.tenant['name'] ?? '');
 
-      return Row(
-        children: [
-          const Expanded(flex: 55, child: SizedBox.shrink()),
-          const SizedBox(width: 24),
-          Expanded(
-            flex: 40,
-            child: Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: 140,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    if (authSignature.isNotEmpty)
-                      _buildLogoWidget(authSignature, height: 40, width: 140, fit: BoxFit.contain)
-                    else if ((params.tenant['signatureImage']?.toString() ?? '').isNotEmpty)
-                      _buildLogoWidget(params.tenant['signatureImage'], height: 40, width: 140, fit: BoxFit.contain)
-                    else
-                      Container(
-                        height: 40,
-                        width: 140,
-                        decoration: BoxDecoration(
-                          border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+        return Row(
+          children: [
+            const Expanded(flex: 55, child: SizedBox.shrink()),
+            const SizedBox(width: 24),
+            Expanded(
+              flex: 40,
+              child: Align(
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: 140,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (authSignature.isNotEmpty)
+                        _buildLogoWidget(
+                          authSignature,
+                          height: 40,
+                          width: 140,
+                          fit: BoxFit.contain,
+                        )
+                      else if ((params.tenant['signatureImage']?.toString() ??
+                              '')
+                          .isNotEmpty)
+                        _buildLogoWidget(
+                          params.tenant['signatureImage'],
+                          height: 40,
+                          width: 140,
+                          fit: BoxFit.contain,
+                        )
+                      else
+                        Container(
+                          height: 40,
+                          width: 140,
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(color: Colors.grey.shade300),
+                            ),
+                          ),
+                          alignment: Alignment.bottomCenter,
+                          padding: const EdgeInsets.only(bottom: 2),
+                          child: Text(
+                            'sign_here'.tr,
+                            style: TextStyle(
+                              fontSize: 7,
+                              color: Colors.grey.shade400,
+                              fontStyle: FontStyle.italic,
+                              fontFamily: 'Times New Roman',
+                            ),
+                          ),
                         ),
-                        alignment: Alignment.bottomCenter,
-                        padding: const EdgeInsets.only(bottom: 2),
-                        child: Text('Sign Here', style: TextStyle(fontSize: 7, color: Colors.grey.shade400, fontStyle: FontStyle.italic, fontFamily: 'Times New Roman')),
+                      const SizedBox(height: 4),
+                      Text(
+                        displayName.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Times New Roman',
+                          letterSpacing: 0.5,
+                        ),
+                        textAlign: TextAlign.center,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                    const SizedBox(height: 4),
-                    Text(
-                      displayName.toUpperCase(),
-                      style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, fontFamily: 'Times New Roman', letterSpacing: 0.5),
-                      textAlign: TextAlign.center,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'AUTHORIZED SIGNATORY',
-                      style: TextStyle(fontSize: 7, color: Colors.grey.shade500, fontFamily: 'Times New Roman', letterSpacing: 1.0),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      Text(
+                        'AUTHORIZED SIGNATORY',
+                        style: TextStyle(
+                          fontSize: 7,
+                          color: Colors.grey.shade500,
+                          fontFamily: 'Times New Roman',
+                          letterSpacing: 1.0,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      );
-    });
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildTermsSection() {
-    final terms = params.tenant['defaultTerms'] ?? 'Payment is due within 15 days.';
+    final terms =
+        params.tenant['defaultTerms'] ?? 'Payment is due within 15 days.';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -812,7 +1044,8 @@ class ElegantTemplate extends StatelessWidget {
             ),
           ),
           margin: const EdgeInsets.only(bottom: 12),
-          height: 4, // creates a double line effect if we pad it, but a single thick line is okay
+          height:
+              4, // creates a double line effect if we pad it, but a single thick line is okay
         ),
         Text(
           'TERMS & CONDITIONS',

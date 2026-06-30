@@ -9,10 +9,10 @@ class ApiConstants {
     if (useLiveServer) {
       return 'https://api.aurivabms.in/api/v1';
     }
-    
+
     // For local testing in Chrome (localhost) or Android Emulator (10.0.2.2)
     if (kIsWeb) {
-      return 'http://localhost:5000/api/v1'; 
+      return 'http://localhost:5000/api/v1';
     }
     return 'http://10.0.2.2:5000/api/v1';
   }
@@ -24,7 +24,8 @@ class ApiConstants {
     }
     if (kIsWeb) {
       final currentUrl = Uri.base.toString();
-      if (currentUrl.contains('app.aurivabms.in') || !currentUrl.contains('localhost')) {
+      if (currentUrl.contains('app.aurivabms.in') ||
+          !currentUrl.contains('localhost')) {
         return 'https://app.aurivabms.in';
       }
       return 'http://localhost:5173'; // Default local Vite frontend port

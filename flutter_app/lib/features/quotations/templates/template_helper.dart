@@ -133,19 +133,15 @@ Widget buildItemTable({
                   ),
                 ),
                 buildTableCell(
-                  qty % 1 == 0 ? qty.toStringAsFixed(0) : qty.toStringAsFixed(2),
-                  TextStyle(
-                    fontSize: 10,
-                    fontFamily: isSerif ? 'serif' : null,
-                  ),
+                  qty % 1 == 0
+                      ? qty.toStringAsFixed(0)
+                      : qty.toStringAsFixed(2),
+                  TextStyle(fontSize: 10, fontFamily: isSerif ? 'serif' : null),
                   align: TextAlign.center,
                 ),
                 buildTableCell(
                   params.formatCurrency.format(rate),
-                  TextStyle(
-                    fontSize: 10,
-                    fontFamily: isSerif ? 'serif' : null,
-                  ),
+                  TextStyle(fontSize: 10, fontFamily: isSerif ? 'serif' : null),
                   align: TextAlign.right,
                 ),
                 buildTableCell(
@@ -176,7 +172,9 @@ Widget buildDynamicScreenSummarySection({
   String place = params.placeOfSupply.toLowerCase();
   bool isOutstate =
       place.isNotEmpty &&
-      (params.tenant['state'] != null ? (!place.contains(params.tenant['state']!.toString().toLowerCase())) : (!place.contains("telangana") && !place.contains("36")));
+      (params.tenant['state'] != null
+          ? (!place.contains(params.tenant['state']!.toString().toLowerCase()))
+          : (!place.contains("telangana") && !place.contains("36")));
   final activeColor = primaryColor ?? AppColors.primary;
 
   Widget buildRow(String label, String amount, {bool isGrandTotal = false}) {
@@ -190,9 +188,7 @@ Widget buildDynamicScreenSummarySection({
               label,
               style: TextStyle(
                 fontSize: isGrandTotal ? 12 : 11,
-                fontWeight: isGrandTotal
-                    ? FontWeight.bold
-                    : FontWeight.normal,
+                fontWeight: isGrandTotal ? FontWeight.bold : FontWeight.normal,
                 color: Colors.white70,
               ),
             ),
@@ -209,31 +205,33 @@ Widget buildDynamicScreenSummarySection({
       );
     }
 
-    final labelStyle = TextStyle(
-      fontSize: isGrandTotal ? 12 : 11,
-      fontWeight: isGrandTotal ? FontWeight.bold : FontWeight.normal,
-      color: isGrandTotal ? AppColors.textPrimary : Colors.grey,
-      fontFamily: useSerif ? 'serif' : null,
-    );
-    final valueStyle = TextStyle(
-      fontSize: isGrandTotal ? 14 : 11,
-      fontWeight: isGrandTotal ? FontWeight.w900 : FontWeight.bold,
-      color: isGrandTotal
-          ? (isMinimalist ? Colors.black : activeColor)
-          : AppColors.textPrimary,
-      fontFamily: useSerif ? 'serif' : null,
-    );
+    return Builder(builder: (context) {
+      final labelStyle = TextStyle(
+        fontSize: isGrandTotal ? 12 : 11,
+        fontWeight: isGrandTotal ? FontWeight.bold : FontWeight.normal,
+        color: isGrandTotal ? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black) : Colors.grey,
+        fontFamily: useSerif ? 'serif' : null,
+      );
+      final valueStyle = TextStyle(
+        fontSize: isGrandTotal ? 14 : 11,
+        fontWeight: isGrandTotal ? FontWeight.w900 : FontWeight.bold,
+        color: isGrandTotal
+            ? (isMinimalist ? Colors.black : activeColor)
+            : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+        fontFamily: useSerif ? 'serif' : null,
+      );
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(label, style: labelStyle),
-          Text(amount, style: valueStyle),
-        ],
-      ),
-    );
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 6.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: labelStyle),
+            Text(amount, style: valueStyle),
+          ],
+        ),
+      );
+    });
   }
 
   return Column(
@@ -273,9 +271,9 @@ Widget buildFooterSection(QuotationTemplateParams params) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Divider(),
+      Divider(),
       const SizedBox(height: 6),
-      const Text(
+      Text(
         'TERMS & CONDITIONS',
         style: TextStyle(
           fontSize: 8,
@@ -287,7 +285,7 @@ Widget buildFooterSection(QuotationTemplateParams params) {
       const SizedBox(height: 4),
       Text(
         params.tenant['defaultTerms'] ?? '',
-        style: const TextStyle(fontSize: 8, color: Colors.grey, height: 1.3),
+        style: TextStyle(fontSize: 8, color: Colors.grey, height: 1.3),
       ),
     ],
   );
@@ -362,12 +360,12 @@ String convertNumberToWords(double amount) {
 Widget buildBottomFooter(int currentPage, int totalPages) {
   return Column(
     children: [
-      const Divider(height: 1, color: Colors.black12),
+      Divider(height: 1, color: Colors.black12),
       const SizedBox(height: 8),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
+          Text(
             'Thank you for your business! Generated via Auriva BMS.',
             style: TextStyle(
               fontSize: 8,
@@ -377,7 +375,7 @@ Widget buildBottomFooter(int currentPage, int totalPages) {
           ),
           Text(
             'Page $currentPage of $totalPages',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 8,
               color: Colors.grey,
               fontWeight: FontWeight.bold,
@@ -404,18 +402,29 @@ String formatCleanDate(String dateStr) {
     List<String> parts = cleaned.split(' ').where((s) => s.isNotEmpty).toList();
 
     const Map<String, int> monthMap = {
-      'jan': 1, 'january': 1,
-      'feb': 2, 'february': 2,
-      'mar': 3, 'march': 3,
-      'apr': 4, 'april': 4,
+      'jan': 1,
+      'january': 1,
+      'feb': 2,
+      'february': 2,
+      'mar': 3,
+      'march': 3,
+      'apr': 4,
+      'april': 4,
       'may': 5,
-      'jun': 6, 'june': 6,
-      'jul': 7, 'july': 7,
-      'aug': 8, 'august': 8,
-      'sep': 9, 'september': 9,
-      'oct': 10, 'october': 10,
-      'nov': 11, 'november': 11,
-      'dec': 12, 'december': 12,
+      'jun': 6,
+      'june': 6,
+      'jul': 7,
+      'july': 7,
+      'aug': 8,
+      'august': 8,
+      'sep': 9,
+      'september': 9,
+      'oct': 10,
+      'october': 10,
+      'nov': 11,
+      'november': 11,
+      'dec': 12,
+      'december': 12,
     };
 
     int? month;

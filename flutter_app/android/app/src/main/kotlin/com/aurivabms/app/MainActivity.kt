@@ -28,20 +28,77 @@ class MainActivity : FlutterActivity() {
             if (call.method == "showCustomNotification") {
                 val title = call.argument<String>("title") ?: "AurivaBMS"
                 val body = call.argument<String>("body") ?: ""
+                val chipText = call.argument<String>("chipText")
+                val illustrationPath = call.argument<String>("illustrationPath")
                 val id = call.argument<Int>("id") ?: System.currentTimeMillis().toInt()
                 
-                showCustomNotification(title, body, id)
+                showCustomNotification(title, body, chipText, illustrationPath, id)
                 result.success(null)
             } else {
                 result.notImplemented()
             }
         }
+
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.aurivabms.app/communications").setMethodCallHandler { call, result ->
+            when (call.method) {
+                "sendSMS" -> {
+                    val phone = call.argument<String>("phone")
+                    val message = call.argument<String>("message")
+                    if (phone != null && message != null) {
+                        try {
+                            val smsManager = android.telephony.SmsManager.getDefault()
+                            smsManager.sendTextMessage(phone, null, message, null, null)
+                            result.success(true)
+                        } catch (e: Exception) {
+                            result.error("SMS_FAILED", e.message, null)
+                        }
+                    } else {
+                        result.error("INVALID_ARGS", "Phone or message is null", null)
+                    }
+                }
+                "makeCall" -> {
+                    val phone = call.argument<String>("phone")
+                    if (phone != null) {
+                        try {
+                            val intent = android.content.Intent(android.content.Intent.ACTION_CALL)
+                            intent.data = android.net.Uri.parse("tel:$phone")
+                            startActivity(intent)
+                            result.success(true)
+                        } catch (e: Exception) {
+                            result.error("CALL_FAILED", e.message, null)
+                        }
+                    } else {
+                        result.error("INVALID_ARGS", "Phone is null", null)
+                    }
+                }
+                else -> result.notImplemented()
+            }
+        }
     }
 
-    private fun showCustomNotification(title: String, body: String, notificationId: Int) {
+    private fun showCustomNotification(title: String, body: String, chipText: String?, illustrationPath: String?, notificationId: Int) {
         val customView = RemoteViews(packageName, R.layout.custom_notification)
         customView.setTextViewText(R.id.custom_notif_title, title)
         customView.setTextViewText(R.id.custom_notif_message, body)
+        
+        if (chipText != null && chipText.isNotEmpty()) {
+            customView.setViewVisibility(R.id.custom_notif_chip, android.view.View.VISIBLE)
+            customView.setTextViewText(R.id.custom_notif_chip_text, chipText)
+        } else {
+            customView.setViewVisibility(R.id.custom_notif_chip, android.view.View.GONE)
+        }
+        
+        if (illustrationPath != null && illustrationPath.isNotEmpty()) {
+            val bitmap = BitmapFactory.decodeFile(illustrationPath)
+            if (bitmap != null) {
+                customView.setViewVisibility(R.id.custom_notif_illustration, android.view.View.VISIBLE)
+                customView.setImageViewBitmap(R.id.custom_notif_illustration, bitmap)
+            } else {
+                customView.setViewVisibility(R.id.custom_notif_illustration, android.view.View.GONE)
+            }
+        } else {
+            customView.setViewVisibility(R.id.custom_notif_illustration, android.view.View.GONE)
+        }
         
         val originalBitmap = BitmapFactory.decodeResource(resources, R.mipmap.launcher_icon)
         if (originalBitmap != null) {

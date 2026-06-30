@@ -21,7 +21,7 @@ class SuperAdminAddCompanyController extends GetxController {
 
   var isLoading = false.obs;
   bool _isSlugManuallyEdited = false;
-  
+
   var selectedDuration = 12.obs;
 
   @override
@@ -63,7 +63,12 @@ class SuperAdminAddCompanyController extends GetxController {
     if (!formKey.currentState!.validate()) return;
 
     if (passwordController.text.length < 6) {
-      Get.snackbar('Error', 'Password must be at least 6 characters.', backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.snackbar(
+        'Error',
+        'Password must be at least 6 characters.',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
       return;
     }
 
@@ -86,7 +91,12 @@ class SuperAdminAddCompanyController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
         if (data['success'] == true) {
-          Get.snackbar('Success', 'Company Created Successfully!', backgroundColor: Colors.green, colorText: Colors.white);
+          Get.snackbar(
+            'Success',
+            'Company Created Successfully!',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
           if (Get.isRegistered<SuperAdminDashboardController>()) {
             Get.find<SuperAdminDashboardController>().fetchDashboardData();
           }
@@ -98,7 +108,12 @@ class SuperAdminAddCompanyController extends GetxController {
         throw Exception('Server error: ${response.statusCode}');
       }
     } catch (e) {
-      Get.snackbar('Error', e.toString().replaceAll('Exception: ', ''), backgroundColor: Colors.redAccent, colorText: Colors.white);
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
     } finally {
       isLoading.value = false;
     }

@@ -6,7 +6,7 @@ import 'super_admin_edit_company_controller.dart';
 
 class SuperAdminEditCompanyScreen extends StatelessWidget {
   final TenantModel tenant;
-  
+
   const SuperAdminEditCompanyScreen({super.key, required this.tenant});
 
   @override
@@ -14,15 +14,22 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
     // Inject the controller when screen builds
     final controller = Get.put(SuperAdminEditCompanyController(tenant: tenant));
     final activeThemeTab = 'Invoice'.obs;
-    
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: const Text('Manage / Edit', style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18)),
+        title: Text(
+          'manage_edit'.tr,
+          style: TextStyle(
+            color: Color(0xFF1E293B),
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
         leading: IconButton(
-          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF1E293B)),
+          icon: Icon(LucideIcons.arrowLeft, color: Color(0xFF1E293B)),
           onPressed: () => Get.back(),
         ),
         bottom: PreferredSize(
@@ -45,7 +52,7 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                     Expanded(
                       child: Text(
                         tenant.name,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w900,
                           color: Color(0xFF0F172A),
@@ -57,7 +64,10 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.blue.shade50,
                         borderRadius: BorderRadius.circular(20),
@@ -77,21 +87,29 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    Icon(LucideIcons.mail, size: 14, color: Colors.grey.shade400),
+                    Icon(
+                      LucideIcons.mail,
+                      size: 14,
+                      color: Colors.grey.shade400,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         tenant.email,
-                        style: TextStyle(fontSize: 14, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // 1. COMPANY DETAILS
                 _buildCardSection(
                   icon: LucideIcons.building,
@@ -105,13 +123,29 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                           if (isMobile) {
                             return Column(
                               children: [
-                                _buildModernTextField(controller.companyNameController, 'COMPANY NAME', LucideIcons.building2),
+                                _buildModernTextField(
+                                  controller.companyNameController,
+                                  'COMPANY NAME',
+                                  LucideIcons.building2,
+                                ),
                                 const SizedBox(height: 16),
-                                _buildModernTextField(controller.adminEmailController, 'ADMIN EMAIL', LucideIcons.mail),
+                                _buildModernTextField(
+                                  controller.adminEmailController,
+                                  'ADMIN EMAIL',
+                                  LucideIcons.mail,
+                                ),
                                 const SizedBox(height: 16),
-                                _buildModernTextField(controller.phoneController, 'PHONE NUMBER', LucideIcons.phone),
+                                _buildModernTextField(
+                                  controller.phoneController,
+                                  'PHONE NUMBER',
+                                  LucideIcons.phone,
+                                ),
                                 const SizedBox(height: 16),
-                                _buildModernTextField(controller.websiteController, 'WEBSITE', LucideIcons.globe),
+                                _buildModernTextField(
+                                  controller.websiteController,
+                                  'WEBSITE',
+                                  LucideIcons.globe,
+                                ),
                               ],
                             );
                           }
@@ -119,28 +153,57 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  Expanded(child: _buildModernTextField(controller.companyNameController, 'COMPANY NAME', LucideIcons.building2)),
+                                  Expanded(
+                                    child: _buildModernTextField(
+                                      controller.companyNameController,
+                                      'COMPANY NAME',
+                                      LucideIcons.building2,
+                                    ),
+                                  ),
                                   const SizedBox(width: 16),
-                                  Expanded(child: _buildModernTextField(controller.adminEmailController, 'ADMIN EMAIL', LucideIcons.mail)),
+                                  Expanded(
+                                    child: _buildModernTextField(
+                                      controller.adminEmailController,
+                                      'ADMIN EMAIL',
+                                      LucideIcons.mail,
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 16),
                               Row(
                                 children: [
-                                  Expanded(child: _buildModernTextField(controller.phoneController, 'PHONE NUMBER', LucideIcons.phone)),
+                                  Expanded(
+                                    child: _buildModernTextField(
+                                      controller.phoneController,
+                                      'PHONE NUMBER',
+                                      LucideIcons.phone,
+                                    ),
+                                  ),
                                   const SizedBox(width: 16),
-                                  Expanded(child: _buildModernTextField(controller.websiteController, 'WEBSITE', LucideIcons.globe)),
+                                  Expanded(
+                                    child: _buildModernTextField(
+                                      controller.websiteController,
+                                      'WEBSITE',
+                                      LucideIcons.globe,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
                           );
-                        }
+                        },
                       ),
                       const SizedBox(height: 16),
-                      _buildModernTextField(controller.addressController, 'FULL ADDRESS', LucideIcons.mapPin, maxLines: 3),
-                      
+                      _buildModernTextField(
+                        controller.addressController,
+                        'FULL ADDRESS',
+                        LucideIcons.mapPin,
+                        maxLines: 3,
+                      ),
+
                       const SizedBox(height: 32),
-                      
+
                       // Beautiful GST Section
                       Container(
                         padding: const EdgeInsets.all(20),
@@ -159,46 +222,98 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: Colors.blue.shade200),
+                                    border: Border.all(
+                                      color: Colors.blue.shade200,
+                                    ),
                                   ),
-                                  child: Icon(LucideIcons.fileText, size: 16, color: Colors.blue.shade700),
+                                  child: Icon(
+                                    LucideIcons.fileText,
+                                    size: 16,
+                                    color: Colors.blue.shade700,
+                                  ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text('TAX & BILLING', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Colors.blue.shade900)),
-                                      Text('Configure GST settings for this company', style: TextStyle(fontSize: 11, color: Colors.blue.shade700)),
+                                      Text(
+                                        'tax_billing'.tr,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.blue.shade900,
+                                        ),
+                                      ),
+                                      Text(
+                                        'configure_gst_settings_for_this_company'
+                                            .tr,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Colors.blue.shade700,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
-                                Obx(() => Switch(
-                                  value: controller.gstEnabled.value,
-                                  onChanged: (val) => controller.gstEnabled.value = val,
-                                  activeColor: Colors.blue.shade600,
-                                )),
+                                Obx(
+                                  () => Switch(
+                                    value: controller.gstEnabled.value,
+                                    onChanged: (val) =>
+                                        controller.gstEnabled.value = val,
+                                    activeColor: Colors.blue.shade600,
+                                  ),
+                                ),
                               ],
                             ),
                             Obx(() {
-                              if (!controller.gstEnabled.value) return const SizedBox.shrink();
+                              if (!controller.gstEnabled.value)
+                                return const SizedBox.shrink();
                               return Column(
                                 children: [
                                   const SizedBox(height: 20),
                                   TextFormField(
                                     controller: controller.gstinController,
                                     decoration: InputDecoration(
-                                      hintText: 'Enter 15-digit GSTIN...',
-                                      labelText: 'GSTIN NUMBER',
-                                      labelStyle: TextStyle(color: Colors.blue.shade700, fontWeight: FontWeight.bold, fontSize: 12),
+                                      hintText: 'enter_15_digit_gstin'.tr,
+                                      labelText: 'gstin_number'.tr,
+                                      labelStyle: TextStyle(
+                                        color: Colors.blue.shade700,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
                                       filled: true,
                                       fillColor: Colors.white,
-                                      prefixIcon: Icon(LucideIcons.hash, color: Colors.blue.shade400, size: 18),
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.blue.shade200)),
-                                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.blue.shade200)),
-                                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.blue.shade600, width: 2)),
+                                      prefixIcon: Icon(
+                                        LucideIcons.hash,
+                                        color: Colors.blue.shade400,
+                                        size: 18,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                          color: Colors.blue.shade200,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                          color: Colors.blue.shade200,
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide(
+                                          color: Colors.blue.shade600,
+                                          width: 2,
+                                        ),
+                                      ),
                                     ),
-                                    style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF1E293B),
+                                    ),
                                   ),
                                 ],
                               );
@@ -209,9 +324,9 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // 2. SECURITY
                 Container(
                   padding: const EdgeInsets.all(24),
@@ -225,10 +340,23 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Icon(LucideIcons.lock, size: 18, color: Colors.orange.shade800),
+                          Icon(
+                            LucideIcons.lock,
+                            size: 18,
+                            color: Colors.orange.shade800,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
-                            child: Text('SECURITY', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.orange.shade800, letterSpacing: 0.5), overflow: TextOverflow.ellipsis),
+                            child: Text(
+                              'security'.tr,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.orange.shade800,
+                                letterSpacing: 0.5,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                         ],
                       ),
@@ -238,26 +366,43 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                         height: 48,
                         child: OutlinedButton.icon(
                           onPressed: controller.resetAdminPassword,
-                          icon: Icon(LucideIcons.rotateCcw, color: Colors.orange.shade800, size: 18),
-                          label: Text('Reset Admin Password', style: TextStyle(color: Colors.orange.shade800, fontWeight: FontWeight.bold, fontSize: 16)),
+                          icon: Icon(
+                            LucideIcons.rotateCcw,
+                            color: Colors.orange.shade800,
+                            size: 18,
+                          ),
+                          label: Text(
+                            'reset_admin_password'.tr,
+                            style: TextStyle(
+                              color: Colors.orange.shade800,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
                             side: BorderSide(color: Colors.orange.shade200),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(height: 12),
                       Text(
                         'This will override the current admin\'s password.',
-                        style: TextStyle(fontSize: 11, color: Colors.orange.shade800, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.orange.shade800,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // 3. ACCOUNT STATUS
                 _buildCardSection(
                   icon: LucideIcons.checkCircle2,
@@ -271,16 +416,27 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                           children: [
                             _buildInputLabel('STATUS'),
                             const SizedBox(height: 8),
-                            Obx(() => DropdownButtonFormField<String>(
-                              value: controller.accountStatus.value,
-                              decoration: _inputDecoration(),
-                              icon: const Icon(LucideIcons.chevronDown, size: 16),
-                              items: const [
-                                DropdownMenuItem(value: 'Active', child: Text('Active')),
-                                DropdownMenuItem(value: 'Inactive', child: Text('Inactive')),
-                              ],
-                              onChanged: (val) { if (val != null) controller.accountStatus.value = val; },
-                            )),
+                            Obx(
+                              () => DropdownButtonFormField<String>(
+                                value: controller.accountStatus.value,
+                                decoration: _inputDecoration(),
+                                icon: Icon(LucideIcons.chevronDown, size: 16),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'Active',
+                                    child: Text('active'.tr),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Inactive',
+                                    child: Text('inactive'.tr),
+                                  ),
+                                ],
+                                onChanged: (val) {
+                                  if (val != null)
+                                    controller.accountStatus.value = val;
+                                },
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -291,26 +447,40 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                           children: [
                             _buildInputLabel('PLAN'),
                             const SizedBox(height: 8),
-                            Obx(() => DropdownButtonFormField<String>(
-                              value: controller.subscriptionPlan.value,
-                              decoration: _inputDecoration(),
-                              icon: const Icon(LucideIcons.chevronDown, size: 16),
-                              items: const [
-                                DropdownMenuItem(value: 'Starter', child: Text('Starter')),
-                                DropdownMenuItem(value: 'Pro', child: Text('Pro')),
-                                DropdownMenuItem(value: 'Business', child: Text('Business')),
-                              ],
-                              onChanged: (val) { if (val != null) controller.subscriptionPlan.value = val; },
-                            )),
+                            Obx(
+                              () => DropdownButtonFormField<String>(
+                                value: controller.subscriptionPlan.value,
+                                decoration: _inputDecoration(),
+                                icon: Icon(LucideIcons.chevronDown, size: 16),
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'Starter',
+                                    child: Text('starter'.tr),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Pro',
+                                    child: Text('pro'.tr),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Business',
+                                    child: Text('business'.tr),
+                                  ),
+                                ],
+                                onChanged: (val) {
+                                  if (val != null)
+                                    controller.subscriptionPlan.value = val;
+                                },
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // 4. SUBSCRIPTION VALIDITY
                 _buildCardSection(
                   icon: LucideIcons.calendar,
@@ -318,8 +488,18 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                   title: 'SUBSCRIPTION VALIDITY',
                   headerAction: TextButton.icon(
                     onPressed: controller.resetDefaultValidity,
-                    icon: Icon(LucideIcons.rotateCcw, size: 14, color: Colors.grey.shade400),
-                    label: Text('Reset Default', style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+                    icon: Icon(
+                      LucideIcons.rotateCcw,
+                      size: 14,
+                      color: Colors.grey.shade400,
+                    ),
+                    label: Text(
+                      'reset_default'.tr,
+                      style: TextStyle(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                   borderColor: Colors.blue.shade200,
                   child: Column(
@@ -327,45 +507,65 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                     children: [
                       _buildInputLabel('VALID UNTIL'),
                       const SizedBox(height: 8),
-                      Obx(() => InkWell(
-                        onTap: () async {
-                          final date = await showDatePicker(
-                            context: context,
-                            initialDate: controller.validUntil.value ?? DateTime.now(),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2050),
-                          );
-                          if (date != null) {
-                            controller.validUntil.value = date;
-                            controller.selectedDuration.value = 0;
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.grey.shade200),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                controller.validityDateString,
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1F2937)),
-                              ),
-                              Icon(LucideIcons.calendarDays, size: 20, color: Colors.black),
-                            ],
+                      Obx(
+                        () => InkWell(
+                          onTap: () async {
+                            final date = await showDatePicker(
+                              context: context,
+                              initialDate:
+                                  controller.validUntil.value ?? DateTime.now(),
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2050),
+                            );
+                            if (date != null) {
+                              controller.validUntil.value = date;
+                              controller.selectedDuration.value = 0;
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 16,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: Colors.grey.shade200),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  controller.validityDateString,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1F2937),
+                                  ),
+                                ),
+                                Icon(
+                                  LucideIcons.calendarDays,
+                                  size: 20,
+                                  color: Colors.black,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      )),
+                      ),
                       const SizedBox(height: 8),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: Obx(() => Text(
-                          controller.daysRemainingString,
-                          style: TextStyle(color: Colors.blue.shade600, fontWeight: FontWeight.bold, fontSize: 12),
-                        )),
+                        child: Obx(
+                          () => Text(
+                            controller.daysRemainingString,
+                            style: TextStyle(
+                              color: Colors.blue.shade600,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 16),
                       Container(
@@ -377,17 +577,31 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(4),
                         child: Row(
                           children: [
-                            Obx(() => _buildSegmentedBtn('1 Month', () => controller.setSubscriptionDuration(1), isPrimary: controller.selectedDuration.value == 1)),
-                            Obx(() => _buildSegmentedBtn('1 Year', () => controller.setSubscriptionDuration(12), isPrimary: controller.selectedDuration.value == 12)),
+                            Obx(
+                              () => _buildSegmentedBtn(
+                                '1 Month',
+                                () => controller.setSubscriptionDuration(1),
+                                isPrimary:
+                                    controller.selectedDuration.value == 1,
+                              ),
+                            ),
+                            Obx(
+                              () => _buildSegmentedBtn(
+                                '1 Year',
+                                () => controller.setSubscriptionDuration(12),
+                                isPrimary:
+                                    controller.selectedDuration.value == 12,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // 5. THEME DESIGNER
                 _buildCardSection(
                   icon: LucideIcons.palette,
@@ -403,47 +617,93 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Obx(() => Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => activeThemeTab.value = 'Invoice',
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  decoration: BoxDecoration(
-                                    color: activeThemeTab.value == 'Invoice' ? Colors.white : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(8),
-                                    boxShadow: activeThemeTab.value == 'Invoice' 
-                                        ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))] 
-                                        : null,
+                        child: Obx(
+                          () => Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => activeThemeTab.value = 'Invoice',
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: activeThemeTab.value == 'Invoice'
+                                          ? Colors.white
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow:
+                                          activeThemeTab.value == 'Invoice'
+                                          ? [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.05,
+                                                ),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'invoice_layout'.tr,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: activeThemeTab.value == 'Invoice'
+                                            ? Colors.blue.shade700
+                                            : Colors.grey.shade600,
+                                      ),
+                                    ),
                                   ),
-                                  alignment: Alignment.center,
-                                  child: Text('Invoice Layout', style: TextStyle(fontWeight: FontWeight.bold, color: activeThemeTab.value == 'Invoice' ? Colors.blue.shade700 : Colors.grey.shade600)),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () => activeThemeTab.value = 'Quotation',
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
-                                  decoration: BoxDecoration(
-                                    color: activeThemeTab.value == 'Quotation' ? Colors.white : Colors.transparent,
-                                    borderRadius: BorderRadius.circular(8),
-                                    boxShadow: activeThemeTab.value == 'Quotation' 
-                                        ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))] 
-                                        : null,
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () =>
+                                      activeThemeTab.value = 'Quotation',
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: activeThemeTab.value == 'Quotation'
+                                          ? Colors.white
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow:
+                                          activeThemeTab.value == 'Quotation'
+                                          ? [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(
+                                                  0.05,
+                                                ),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'quotation_layout'.tr,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color:
+                                            activeThemeTab.value == 'Quotation'
+                                            ? Colors.purple.shade700
+                                            : Colors.grey.shade600,
+                                      ),
+                                    ),
                                   ),
-                                  alignment: Alignment.center,
-                                  child: Text('Quotation Layout', style: TextStyle(fontWeight: FontWeight.bold, color: activeThemeTab.value == 'Quotation' ? Colors.purple.shade700 : Colors.grey.shade600)),
                                 ),
                               ),
-                            ),
-                          ],
-                        )),
+                            ],
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // 2nd Row & 3rd Row inside a container
                       Container(
                         padding: const EdgeInsets.all(20),
@@ -454,27 +714,55 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                         ),
                         child: Obx(() {
                           final isInvoice = activeThemeTab.value == 'Invoice';
-                          final selectedValue = isInvoice ? controller.invoiceTemplate : controller.quotationTemplate;
+                          final selectedValue = isInvoice
+                              ? controller.invoiceTemplate
+                              : controller.quotationTemplate;
                           final color = isInvoice ? Colors.blue : Colors.purple;
-                          
+
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text('CURRENT TEMPLATE', style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.bold)),
+                                      Text(
+                                        'current_template'.tr,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          color: Colors.grey.shade500,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                       const SizedBox(height: 4),
-                                      Text(selectedValue.value.toUpperCase(), style: TextStyle(fontSize: 18, color: color.shade700, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+                                      Text(
+                                        selectedValue.value.toUpperCase(),
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: color.shade700,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                   Container(
                                     padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(color: color.shade50, shape: BoxShape.circle),
-                                    child: Icon(isInvoice ? LucideIcons.fileText : LucideIcons.fileSpreadsheet, color: color.shade600, size: 24),
+                                    decoration: BoxDecoration(
+                                      color: color.shade50,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      isInvoice
+                                          ? LucideIcons.fileText
+                                          : LucideIcons.fileSpreadsheet,
+                                      color: color.shade600,
+                                      size: 24,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -482,14 +770,27 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton.icon(
-                                  onPressed: () => _showDesignPicker(context, selectedValue),
-                                  icon: const Icon(LucideIcons.palette, size: 16),
-                                  label: const Text('Change Layout', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  onPressed: () =>
+                                      _showDesignPicker(context, selectedValue),
+                                  icon: Icon(
+                                    LucideIcons.palette,
+                                    size: 16,
+                                  ),
+                                  label: Text(
+                                    'change_layout'.tr,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: color.shade600,
                                     foregroundColor: Colors.white,
-                                    padding: const EdgeInsets.symmetric(vertical: 16),
-                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                     elevation: 0,
                                   ),
                                 ),
@@ -517,18 +818,33 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                                 color: Colors.white.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: const Icon(LucideIcons.globe, color: Colors.white, size: 24),
+                              child: Icon(
+                                LucideIcons.globe,
+                                color: Colors.white,
+                                size: 24,
+                              ),
                             ),
                             const SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('INSTANT CLOUD SYNC', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 0.5)),
+                                  Text(
+                                    'instant_cloud_sync'.tr,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 12,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Your design selections are synchronized across all device nodes and client-facing portals in real-time.',
-                                    style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 11),
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.9),
+                                      fontSize: 11,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -539,9 +855,9 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 // Footer Actions
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -549,33 +865,62 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                     OutlinedButton(
                       onPressed: () => Get.back(),
                       style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 20,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         side: BorderSide(color: Colors.grey.shade300),
                       ),
-                      child: Text('Cancel', style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        'cancel'.tr,
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 16),
-                    Obx(() => ElevatedButton.icon(
-                      onPressed: controller.isLoading.value ? null : controller.applySystemChanges,
-                      icon: controller.isLoading.value 
-                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : const Icon(LucideIcons.save, size: 18),
-                      label: Text(
-                        controller.isLoading.value ? 'Saving...' : 'Apply System Changes', 
-                        style: const TextStyle(fontWeight: FontWeight.bold)
+                    Obx(
+                      () => ElevatedButton.icon(
+                        onPressed: controller.isLoading.value
+                            ? null
+                            : controller.applySystemChanges,
+                        icon: controller.isLoading.value
+                            ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Icon(LucideIcons.save, size: 18),
+                        label: Text(
+                          controller.isLoading.value
+                              ? 'Saving...'
+                              : 'Apply System Changes',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF2563EB),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 20,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2563EB),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                    )),
+                    ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 40),
               ],
             ),
@@ -585,28 +930,52 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCardSection({required IconData icon, Color? iconColor, required String title, Widget? headerAction, Color? borderColor, required Widget child}) {
+  Widget _buildCardSection({
+    required IconData icon,
+    Color? iconColor,
+    required String title,
+    Widget? headerAction,
+    Color? borderColor,
+    required Widget child,
+  }) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: borderColor ?? Colors.grey.shade200),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 18, color: iconColor ?? const Color(0xFF0F172A)),
+              Icon(icon, size: 18, color: iconColor ?? Color(0xFF0F172A)),
               const SizedBox(width: 8),
-              Expanded(child: Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: iconColor ?? const Color(0xFF0F172A), letterSpacing: 0.5), overflow: TextOverflow.ellipsis)),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: iconColor ?? Color(0xFF0F172A),
+                    letterSpacing: 0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               if (headerAction != null) headerAction,
             ],
           ),
           const SizedBox(height: 16),
-          const Divider(height: 1),
+          Divider(height: 1),
           const SizedBox(height: 24),
           child,
         ],
@@ -615,10 +984,23 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
   }
 
   Widget _buildInputLabel(String text) {
-    return Text(text, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey.shade500, letterSpacing: 0.5));
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.bold,
+        color: Colors.grey.shade500,
+        letterSpacing: 0.5,
+      ),
+    );
   }
 
-  Widget _buildModernTextField(TextEditingController controller, String label, IconData icon, {int maxLines = 1}) {
+  Widget _buildModernTextField(
+    TextEditingController controller,
+    String label,
+    IconData icon, {
+    int maxLines = 1,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -644,11 +1026,17 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: Color(0xFF2563EB)),
+              borderSide: BorderSide(color: Color(0xFF2563EB)),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
           ),
-          style: const TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Color(0xFF1E293B),
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ],
     );
@@ -668,23 +1056,70 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Color(0xFF2563EB)),
+        borderSide: BorderSide(color: Color(0xFF2563EB)),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
 
-
-
   void _showDesignPicker(BuildContext context, RxString targetValue) {
     final themes = [
-      {'value': 'standard', 'title': 'STANDARD', 'subtitle': 'Professional B&W', 'header': const Color(0xFF1E293B), 'bg': Colors.grey.shade100, 'accent': Colors.grey.shade300},
-      {'value': 'modern', 'title': 'MODERN', 'subtitle': 'Clean Gray & Blue', 'header': const Color(0xFF475569), 'bg': Colors.blueGrey.shade50, 'accent': Colors.blueGrey.shade200},
-      {'value': 'modern_blue', 'title': 'MODERN BLUE', 'subtitle': 'Deep Blue Theme', 'header': Colors.blue.shade700, 'bg': Colors.blue.shade50, 'accent': Colors.blue.shade300},
-      {'value': 'classic', 'title': 'CLASSIC', 'subtitle': 'Warm Serif', 'header': const Color(0xFF92400E), 'bg': Colors.amber.shade50, 'accent': Colors.amber.shade200},
-      {'value': 'minimalist', 'title': 'MINIMALIST', 'subtitle': 'Simple & Clean', 'header': Colors.white, 'bg': Colors.white, 'accent': Colors.grey.shade200},
-      {'value': 'elegant', 'title': 'ELEGANT', 'subtitle': 'Premium Gold & Dark', 'header': const Color(0xFF1C1917), 'bg': const Color(0xFFFAFAF9), 'accent': Colors.orange.shade700},
-      {'value': 'vibrant', 'title': 'VIBRANT', 'subtitle': 'Colorful Gradient UI', 'header': Colors.purple.shade500, 'bg': Colors.purple.shade50, 'accent': Colors.purple.shade200},
+      {
+        'value': 'standard',
+        'title': 'STANDARD',
+        'subtitle': 'Professional B&W',
+        'header': Color(0xFF1E293B),
+        'bg': Colors.grey.shade100,
+        'accent': Colors.grey.shade300,
+      },
+      {
+        'value': 'modern',
+        'title': 'MODERN',
+        'subtitle': 'Clean Gray & Blue',
+        'header': Color(0xFF475569),
+        'bg': Colors.blueGrey.shade50,
+        'accent': Colors.blueGrey.shade200,
+      },
+      {
+        'value': 'modern_blue',
+        'title': 'MODERN BLUE',
+        'subtitle': 'Deep Blue Theme',
+        'header': Colors.blue.shade700,
+        'bg': Colors.blue.shade50,
+        'accent': Colors.blue.shade300,
+      },
+      {
+        'value': 'classic',
+        'title': 'CLASSIC',
+        'subtitle': 'Warm Serif',
+        'header': Color(0xFF92400E),
+        'bg': Colors.amber.shade50,
+        'accent': Colors.amber.shade200,
+      },
+      {
+        'value': 'minimalist',
+        'title': 'MINIMALIST',
+        'subtitle': 'Simple & Clean',
+        'header': Colors.white,
+        'bg': Colors.white,
+        'accent': Colors.grey.shade200,
+      },
+      {
+        'value': 'elegant',
+        'title': 'ELEGANT',
+        'subtitle': 'Premium Gold & Dark',
+        'header': Color(0xFF1C1917),
+        'bg': Color(0xFFFAFAF9),
+        'accent': Colors.orange.shade700,
+      },
+      {
+        'value': 'vibrant',
+        'title': 'VIBRANT',
+        'subtitle': 'Colorful Gradient UI',
+        'header': Colors.purple.shade500,
+        'bg': Colors.purple.shade50,
+        'accent': Colors.purple.shade200,
+      },
     ];
 
     showModalBottomSheet(
@@ -693,7 +1128,7 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
@@ -709,23 +1144,42 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Select Theme Layout', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
+                          Text(
+                            'select_theme_layout'.tr,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF111827),
+                            ),
+                          ),
                           const SizedBox(height: 4),
-                          Text('Choose a professional design for your documents.', style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
+                          Text(
+                            'choose_a_professional_design_for_your_do'.tr,
+                            style: TextStyle(
+                              color: Colors.grey.shade500,
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: Icon(LucideIcons.x, color: Colors.grey.shade400),
-                      style: IconButton.styleFrom(backgroundColor: Colors.grey.shade50, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey.shade200))),
-                    )
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.grey.shade50,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: Colors.grey.shade200),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
               Container(height: 1, color: Colors.grey.shade100),
               Container(
-                color: const Color(0xFFF8FAFC),
+                color: Color(0xFFF8FAFC),
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: SizedBox(
                   height: 240,
@@ -735,23 +1189,36 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                     itemCount: themes.length,
                     separatorBuilder: (_, __) => const SizedBox(width: 16),
                     itemBuilder: (context, index) {
-                       final t = themes[index];
-                       return SizedBox(
-                         width: 170, 
-                         child: _buildThemeCard(t['value'] as String, t['title'] as String, t['subtitle'] as String, targetValue, context, t['header'] as Color, t['bg'] as Color, t['accent'] as Color)
-                       );
-                    }
+                      final t = themes[index];
+                      return SizedBox(
+                        width: 170,
+                        child: _buildThemeCard(
+                          t['value'] as String,
+                          t['title'] as String,
+                          t['subtitle'] as String,
+                          targetValue,
+                          context,
+                          t['header'] as Color,
+                          t['bg'] as Color,
+                          t['accent'] as Color,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
             ],
           ),
         );
-      }
+      },
     );
   }
 
-  Widget _buildSegmentedBtn(String text, VoidCallback onTap, {bool isPrimary = false}) {
+  Widget _buildSegmentedBtn(
+    String text,
+    VoidCallback onTap, {
+    bool isPrimary = false,
+  }) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -760,8 +1227,18 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: isPrimary ? Colors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
-            boxShadow: isPrimary ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))] : [],
-            border: Border.all(color: isPrimary ? Colors.grey.shade200 : Colors.transparent),
+            boxShadow: isPrimary
+                ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                : [],
+            border: Border.all(
+              color: isPrimary ? Colors.grey.shade200 : Colors.transparent,
+            ),
           ),
           alignment: Alignment.center,
           child: Text(
@@ -769,7 +1246,7 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: isPrimary ? const Color(0xFF2563EB) : Colors.grey.shade600,
+              color: isPrimary ? Color(0xFF2563EB) : Colors.grey.shade600,
             ),
           ),
         ),
@@ -777,7 +1254,16 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeCard(String value, String title, String subtitle, RxString targetValue, BuildContext context, Color headerColor, Color bgColor, Color accentColor) {
+  Widget _buildThemeCard(
+    String value,
+    String title,
+    String subtitle,
+    RxString targetValue,
+    BuildContext context,
+    Color headerColor,
+    Color bgColor,
+    Color accentColor,
+  ) {
     return Obx(() {
       final isSelected = targetValue.value == value;
       return GestureDetector(
@@ -796,7 +1282,11 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                   width: 2,
                 ),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
                 ],
               ),
               child: ClipRRect(
@@ -812,11 +1302,21 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                           children: [
                             Container(
                               height: 18,
-                              decoration: BoxDecoration(color: headerColor, borderRadius: BorderRadius.circular(4)),
+                              decoration: BoxDecoration(
+                                color: headerColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
                               child: Row(
                                 children: [
-                                   const SizedBox(width: 8),
-                                   Container(width: 6, height: 6, decoration: BoxDecoration(color: Colors.white.withOpacity(0.5), shape: BoxShape.circle)),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    width: 6,
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.5),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -824,17 +1324,37 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(width: 36, height: 44, decoration: BoxDecoration(color: accentColor, borderRadius: BorderRadius.circular(6))),
+                                Container(
+                                  width: 36,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: accentColor,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Container(height: 6, width: 40, color: accentColor.withOpacity(0.5)),
+                                      Container(
+                                        height: 6,
+                                        width: 40,
+                                        color: accentColor.withOpacity(0.5),
+                                      ),
                                       const SizedBox(height: 6),
-                                      Container(height: 4, width: double.infinity, color: accentColor.withOpacity(0.3)),
+                                      Container(
+                                        height: 4,
+                                        width: double.infinity,
+                                        color: accentColor.withOpacity(0.3),
+                                      ),
                                       const SizedBox(height: 4),
-                                      Container(height: 4, width: 60, color: accentColor.withOpacity(0.3)),
+                                      Container(
+                                        height: 4,
+                                        width: 60,
+                                        color: accentColor.withOpacity(0.3),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -854,9 +1374,23 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Color(0xFF0F172A))),
+                            Text(
+                              title,
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 13,
+                                color: Color(0xFF0F172A),
+                              ),
+                            ),
                             const SizedBox(height: 2),
-                            Text(subtitle, style: TextStyle(fontSize: 10, color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
+                            Text(
+                              subtitle,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Colors.grey.shade500,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -871,8 +1405,15 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                 right: 12,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(color: Colors.blue.shade500, shape: BoxShape.circle),
-                  child: const Icon(LucideIcons.check, color: Colors.white, size: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade500,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    LucideIcons.check,
+                    color: Colors.white,
+                    size: 12,
+                  ),
                 ),
               ),
           ],

@@ -30,17 +30,72 @@ class _LanguageScreenState extends State<LanguageScreen> {
   late String _selectedLangCode;
 
   final List<LanguageModel> _languages = [
-    LanguageModel(name: 'English (US)', code: 'en', countryCode: 'US', flag: 'US'),
-    LanguageModel(name: 'हिंदी (Hindi)', code: 'hi', countryCode: 'IN', flag: 'IN'),
-    LanguageModel(name: 'ગુજરાતી (Gujarati)', code: 'gu', countryCode: 'IN', flag: 'GJ'),
-    LanguageModel(name: 'मराठी (Marathi)', code: 'mr', countryCode: 'IN', flag: 'MH'),
-    LanguageModel(name: 'বাংলা (Bengali)', code: 'bn', countryCode: 'IN', flag: 'WB'),
-    LanguageModel(name: 'తెలుగు (Telugu)', code: 'te', countryCode: 'IN', flag: 'AP'),
-    LanguageModel(name: 'தமிழ் (Tamil)', code: 'ta', countryCode: 'IN', flag: 'TN'),
-    LanguageModel(name: 'اردو (Urdu)', code: 'ur', countryCode: 'IN', flag: 'UP'),
-    LanguageModel(name: 'ಕನ್ನಡ (Kannada)', code: 'kn', countryCode: 'IN', flag: 'KA'),
-    LanguageModel(name: 'ଓଡ଼ିଆ (Odia)', code: 'or', countryCode: 'IN', flag: 'OD'),
-    LanguageModel(name: 'മലയാളം (Malayalam)', code: 'ml', countryCode: 'IN', flag: 'KL'),
+    LanguageModel(
+      name: 'English (US)',
+      code: 'en',
+      countryCode: 'US',
+      flag: 'US',
+    ),
+    LanguageModel(
+      name: 'हिंदी (Hindi)',
+      code: 'hi',
+      countryCode: 'IN',
+      flag: 'IN',
+    ),
+    LanguageModel(
+      name: 'ગુજરાતી (Gujarati)',
+      code: 'gu',
+      countryCode: 'IN',
+      flag: 'GJ',
+    ),
+    LanguageModel(
+      name: 'मराठी (Marathi)',
+      code: 'mr',
+      countryCode: 'IN',
+      flag: 'MH',
+    ),
+    LanguageModel(
+      name: 'বাংলা (Bengali)',
+      code: 'bn',
+      countryCode: 'IN',
+      flag: 'WB',
+    ),
+    LanguageModel(
+      name: 'తెలుగు (Telugu)',
+      code: 'te',
+      countryCode: 'IN',
+      flag: 'AP',
+    ),
+    LanguageModel(
+      name: 'தமிழ் (Tamil)',
+      code: 'ta',
+      countryCode: 'IN',
+      flag: 'TN',
+    ),
+    LanguageModel(
+      name: 'اردو (Urdu)',
+      code: 'ur',
+      countryCode: 'IN',
+      flag: 'UP',
+    ),
+    LanguageModel(
+      name: 'ಕನ್ನಡ (Kannada)',
+      code: 'kn',
+      countryCode: 'IN',
+      flag: 'KA',
+    ),
+    LanguageModel(
+      name: 'ଓଡ଼ିଆ (Odia)',
+      code: 'or',
+      countryCode: 'IN',
+      flag: 'OD',
+    ),
+    LanguageModel(
+      name: 'മലയാളം (Malayalam)',
+      code: 'ml',
+      countryCode: 'IN',
+      flag: 'KL',
+    ),
   ];
 
   @override
@@ -50,39 +105,44 @@ class _LanguageScreenState extends State<LanguageScreen> {
   }
 
   void _saveLanguage() async {
-    final selectedLang = _languages.firstWhere((l) => l.code == _selectedLangCode, orElse: () => _languages.first);
-    
+    final selectedLang = _languages.firstWhere(
+      (l) => l.code == _selectedLangCode,
+      orElse: () => _languages.first,
+    );
+
     const storage = FlutterSecureStorage();
     await storage.write(key: 'app_lang_code', value: selectedLang.code);
-    await storage.write(key: 'app_country_code', value: selectedLang.countryCode);
+    await storage.write(
+      key: 'app_country_code',
+      value: selectedLang.countryCode,
+    );
 
-    Get.updateLocale(Locale(selectedLang.code, selectedLang.countryCode));
-    
+    final newLocale = Locale(selectedLang.code, selectedLang.countryCode);
+    AppTheme.currentLocale = newLocale;
+    Get.updateLocale(newLocale);
+
     // Also change theme to re-evaluate the global fontFamily based on the new locale
     // We import AppTheme to access the theme configurations
     Get.changeTheme(Get.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme);
-    
+
     Get.back();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Language',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black87,
+        foregroundColor: Theme.of(context).textTheme.displayLarge?.color,
         elevation: 0,
         centerTitle: false,
         leading: IconButton(
-          icon: const Icon(LucideIcons.chevronLeft, size: 28),
+          icon: Icon(LucideIcons.chevronLeft, size: 28),
           onPressed: () => Get.back(),
         ),
       ),
@@ -102,10 +162,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 ),
                 elevation: 4,
               ),
-              icon: const Icon(LucideIcons.save),
+              icon: Icon(LucideIcons.save),
               label: Text(
                 'save_and_exit'.tr,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -133,10 +193,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
               margin: const EdgeInsets.only(bottom: 12),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : Colors.grey.shade200,
+                  color: isSelected ? AppColors.primary : Theme.of(context).colorScheme.outline,
                   width: isSelected ? 1.5 : 1.0,
                 ),
                 boxShadow: [
@@ -145,7 +205,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                       color: Colors.black.withOpacity(0.02),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
-                    )
+                    ),
                 ],
               ),
               child: Row(
@@ -155,7 +215,9 @@ class _LanguageScreenState extends State<LanguageScreen> {
                     height: 36,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isSelected ? AppColors.primary : AppColors.primary.withOpacity(0.1),
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.primary.withOpacity(0.1),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Center(
@@ -174,8 +236,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
                     lang.name,
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                      color: Colors.black87,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                 ],

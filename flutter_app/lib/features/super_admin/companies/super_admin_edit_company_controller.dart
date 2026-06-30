@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 
 class SuperAdminEditCompanyController extends GetxController {
   final TenantModel tenant;
-  
+
   SuperAdminEditCompanyController({required this.tenant});
 
   // Form Controllers
@@ -22,7 +22,7 @@ class SuperAdminEditCompanyController extends GetxController {
   var gstEnabled = false.obs;
   var accountStatus = 'Active'.obs;
   var subscriptionPlan = 'Starter'.obs;
-  
+
   var validUntil = Rx<DateTime?>(null);
   var selectedDuration = 0.obs;
   final RxString invoiceTemplate = 'standard'.obs;
@@ -33,7 +33,7 @@ class SuperAdminEditCompanyController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    
+
     // Initialize with existing data
     companyNameController = TextEditingController(text: tenant.name);
     adminEmailController = TextEditingController(text: tenant.email);
@@ -41,13 +41,13 @@ class SuperAdminEditCompanyController extends GetxController {
     websiteController = TextEditingController(text: tenant.website ?? '');
     addressController = TextEditingController(text: tenant.address ?? '');
     gstinController = TextEditingController(text: tenant.gstNumber ?? '');
-    
+
     invoiceTemplate.value = tenant.templatePreference;
     quotationTemplate.value = tenant.quotationTemplate;
-    
+
     gstEnabled.value = tenant.gstEnabled;
     accountStatus.value = tenant.status == 'active' ? 'Active' : 'Inactive';
-    
+
     String planLabel = 'Starter';
     if (tenant.subscriptionPlan == 'premium') planLabel = 'Pro';
     if (tenant.subscriptionPlan == 'enterprise') planLabel = 'Business';
@@ -85,24 +85,24 @@ class SuperAdminEditCompanyController extends GetxController {
     final passwordController = TextEditingController();
     Get.dialog(
       AlertDialog(
-        title: const Text('Reset Admin Password'),
+        title: Text('reset_admin_password'.tr),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter a new password for this company\'s admin account.'),
-            const SizedBox(height: 16),
+            Text('enter_a_new_password_for_this_company'.tr),
+            SizedBox(height: 16),
             TextField(
               controller: passwordController,
-              decoration: const InputDecoration(
-                labelText: 'New Password',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: 'new_password'.tr,
+                border: const OutlineInputBorder(),
               ),
               obscureText: true,
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
+          TextButton(onPressed: () => Get.back(), child: Text('cancel'.tr)),
           ElevatedButton(
             onPressed: () async {
               if (passwordController.text.length < 6) {
@@ -111,19 +111,28 @@ class SuperAdminEditCompanyController extends GetxController {
               }
               Get.back();
               try {
-                final response = await ApiService.put('/auth/tenants/${tenant.id}/password', {
-                  'password': passwordController.text
-                });
+                final response = await ApiService.put(
+                  '/auth/tenants/${tenant.id}/password',
+                  {'password': passwordController.text},
+                );
                 if (response.statusCode == 200) {
-                  Get.snackbar('Success', 'Password reset successfully', backgroundColor: Colors.green.shade100);
+                  Get.snackbar(
+                    'Success',
+                    'Password reset successfully',
+                    backgroundColor: Colors.green.shade100,
+                  );
                 } else {
                   throw Exception('Failed to reset password');
                 }
               } catch (e) {
-                Get.snackbar('Error', e.toString(), backgroundColor: Colors.red.shade100);
+                Get.snackbar(
+                  'Error',
+                  e.toString(),
+                  backgroundColor: Colors.red.shade100,
+                );
               }
             },
-            child: const Text('Reset'),
+            child: Text('reset'.tr),
           ),
         ],
       ),
@@ -142,7 +151,7 @@ class SuperAdminEditCompanyController extends GetxController {
 
   void applySystemChanges() async {
     isLoading.value = true;
-    
+
     try {
       final payload = {
         'name': companyNameController.text.trim(),
@@ -153,18 +162,25 @@ class SuperAdminEditCompanyController extends GetxController {
         'gstEnabled': gstEnabled.value,
         'gstNumber': gstinController.text.trim(),
         'status': accountStatus.value == 'Active' ? 'active' : 'inactive',
-        'subscriptionPlan': subscriptionPlan.value.toLowerCase(), // basic, premium, enterprise... wait, web uses dropdown options.
+        'subscriptionPlan': subscriptionPlan.value
+            .toLowerCase(), // basic, premium, enterprise... wait, web uses dropdown options.
         'subscriptionEnd': validUntil.value?.toIso8601String(),
         'templatePreference': invoiceTemplate.value,
         'quotationTemplate': quotationTemplate.value,
       };
 
       // backend might map 'starter' to 'basic', etc. let's just send what we have and let backend handle or send exact string.
-      if (subscriptionPlan.value == 'Starter') payload['subscriptionPlan'] = 'basic';
-      if (subscriptionPlan.value == 'Pro') payload['subscriptionPlan'] = 'premium';
-      if (subscriptionPlan.value == 'Business') payload['subscriptionPlan'] = 'enterprise';
+      if (subscriptionPlan.value == 'Starter')
+        payload['subscriptionPlan'] = 'basic';
+      if (subscriptionPlan.value == 'Pro')
+        payload['subscriptionPlan'] = 'premium';
+      if (subscriptionPlan.value == 'Business')
+        payload['subscriptionPlan'] = 'enterprise';
 
-      final response = await ApiService.put('/auth/tenants/${tenant.id}', payload);
+      final response = await ApiService.put(
+        '/auth/tenants/${tenant.id}',
+        payload,
+      );
 
       if (response.statusCode == 200) {
         // Refresh dashboard
@@ -174,7 +190,7 @@ class SuperAdminEditCompanyController extends GetxController {
 
         Get.back();
         Get.snackbar(
-          'Success', 
+          'Success',
           'Company details updated successfully.',
           snackPosition: SnackPosition.TOP,
           backgroundColor: Colors.green.shade100,
@@ -186,7 +202,7 @@ class SuperAdminEditCompanyController extends GetxController {
       }
     } catch (e) {
       Get.snackbar(
-        'Error', 
+        'Error',
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.shade100,
