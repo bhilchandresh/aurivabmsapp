@@ -432,7 +432,7 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       dialogContent: AppTypography.bodyMedium.copyWith(color: AppColors.lightTextPrimary),
       bottomSheetTitle: AppTypography.titleLarge.copyWith(color: AppColors.lightTextPrimary),
       
-      buttonText: AppTypography.labelLarge.copyWith(color: Colors.white),
+      buttonText: AppTypography.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
       inputLabel: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w600, color: AppColors.lightTextPrimary),
       inputText: AppTypography.bodyMedium.copyWith(color: AppColors.lightTextPrimary),
       searchHint: AppTypography.bodyMedium.copyWith(color: Colors.grey),
@@ -500,7 +500,7 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       dialogContent: AppTypography.bodyMedium.copyWith(color: AppColors.darkTextPrimary),
       bottomSheetTitle: AppTypography.titleLarge.copyWith(color: AppColors.darkTextPrimary),
       
-      buttonText: AppTypography.labelLarge.copyWith(color: Colors.white),
+      buttonText: AppTypography.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
       inputLabel: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.w600, color: AppColors.darkTextPrimary),
       inputText: AppTypography.bodyMedium.copyWith(color: AppColors.darkTextPrimary),
       searchHint: AppTypography.bodyMedium.copyWith(color: Colors.grey),
