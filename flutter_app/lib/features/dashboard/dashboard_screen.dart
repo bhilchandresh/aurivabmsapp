@@ -891,7 +891,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               title,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
+                              style: context.typography.statisticLabel.copyWith(
                                 fontSize: isSmall ? 9 : 10,
                                 fontWeight: FontWeight.w900,
                                 color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
@@ -906,7 +906,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         value,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: context.typography.statisticValue.copyWith(
                           fontSize: isSmall ? 15 : 18,
                           fontWeight: FontWeight.w900,
                           color: isFeatured
@@ -919,7 +919,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         subtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: context.typography.trendText.copyWith(
                           fontSize: isSmall ? 9 : 10,
                           fontWeight: FontWeight.bold,
                           color: color,
