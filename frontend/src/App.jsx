@@ -46,7 +46,7 @@ function App() {
     <>
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
-      {/* --- ROOT PATH CONTROL --- */}
+   r  {/* --- ROOT PATH CONTROL --- */}
       <Route path="/" element={
         (!token || !user) ? (
           <Navigate to="/login" replace />
