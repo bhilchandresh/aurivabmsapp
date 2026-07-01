@@ -145,6 +145,33 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
   final TextStyle trendText;
 
   // ---------------------------------------------------------------------------
+  // NAVIGATION & APP BAR TYPOGRAPHY
+  // ---------------------------------------------------------------------------
+  /// Use for: Main app bar title (size 20, bold, letterSpacing -0.5).
+  /// Do NOT use for: Screen titles or section titles.
+  final TextStyle topBarTitle;
+
+  /// Use for: Subtitle inside app bar (size 11, w500).
+  /// Do NOT use for: Badge labels.
+  final TextStyle topBarSubtitle;
+
+  /// Use for: Tiny status indicators, like "SYSTEM LIVE" (size 10, bold, letterSpacing -0.5).
+  /// Do NOT use for: Main status badges.
+  final TextStyle liveIndicator;
+
+  /// Use for: Tiny role badge texts (size 10, w900).
+  /// Do NOT use for: Button labels.
+  final TextStyle roleBadgeText;
+
+  /// Use for: Notification count badge text inside app bar (size 8, bold).
+  /// Do NOT use for: Card subtitles.
+  final TextStyle badgeCountText;
+
+  /// Use for: Profile avatar fallback letters (size 16, w900).
+  /// Do NOT use for: General titles.
+  final TextStyle avatarLetter;
+
+  // ---------------------------------------------------------------------------
   // DASHBOARD & ANALYTICS
   // ---------------------------------------------------------------------------
   /// Use for: Hero-sized total numbers on the Dashboard.
@@ -385,6 +412,12 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
     required this.cardCaption,
     required this.cardFooter,
     required this.trendText,
+    required this.topBarTitle,
+    required this.topBarSubtitle,
+    required this.liveIndicator,
+    required this.roleBadgeText,
+    required this.badgeCountText,
+    required this.avatarLetter,
     required this.dashboardValue,
     required this.dashboardLabel,
     required this.revenueValue,
@@ -453,6 +486,12 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       cardCaption: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
       cardFooter: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500, color: AppColors.lightTextSecondary),
       trendText: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+      topBarTitle: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.bold, fontSize: 20, letterSpacing: -0.5, color: AppColors.lightTextPrimary),
+      topBarSubtitle: AppTypography.labelSmall.copyWith(color: AppColors.lightTextSecondary),
+      liveIndicator: AppTypography.labelSmall.copyWith(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: -0.5, color: AppColors.lightTextSecondary),
+      roleBadgeText: AppTypography.labelSmall.copyWith(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.primary),
+      badgeCountText: AppTypography.labelSmall.copyWith(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white),
+      avatarLetter: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w900, color: Colors.white),
       
       dashboardValue: AppTypography.headlineMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.lightTextPrimary),
       dashboardLabel: AppTypography.labelMedium.copyWith(color: AppColors.lightTextSecondary),
@@ -530,6 +569,12 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       cardCaption: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
       cardFooter: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500, color: AppColors.darkTextSecondary),
       trendText: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+      topBarTitle: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.bold, fontSize: 20, letterSpacing: -0.5, color: AppColors.darkTextPrimary),
+      topBarSubtitle: AppTypography.labelSmall.copyWith(color: AppColors.darkTextSecondary),
+      liveIndicator: AppTypography.labelSmall.copyWith(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: -0.5, color: AppColors.darkTextSecondary),
+      roleBadgeText: AppTypography.labelSmall.copyWith(fontSize: 10, fontWeight: FontWeight.w900, color: AppColors.primary),
+      badgeCountText: AppTypography.labelSmall.copyWith(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white),
+      avatarLetter: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w900, color: Colors.white),
       
       dashboardValue: AppTypography.headlineMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.darkTextPrimary),
       dashboardLabel: AppTypography.labelMedium.copyWith(color: AppColors.darkTextSecondary),
@@ -613,6 +658,12 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       cardCaption: TextStyle.lerp(cardCaption, other.cardCaption, t)!,
       cardFooter: TextStyle.lerp(cardFooter, other.cardFooter, t)!,
       trendText: TextStyle.lerp(trendText, other.trendText, t)!,
+      topBarTitle: TextStyle.lerp(topBarTitle, other.topBarTitle, t)!,
+      topBarSubtitle: TextStyle.lerp(topBarSubtitle, other.topBarSubtitle, t)!,
+      liveIndicator: TextStyle.lerp(liveIndicator, other.liveIndicator, t)!,
+      roleBadgeText: TextStyle.lerp(roleBadgeText, other.roleBadgeText, t)!,
+      badgeCountText: TextStyle.lerp(badgeCountText, other.badgeCountText, t)!,
+      avatarLetter: TextStyle.lerp(avatarLetter, other.avatarLetter, t)!,
       dashboardValue: TextStyle.lerp(dashboardValue, other.dashboardValue, t)!,
       dashboardLabel: TextStyle.lerp(dashboardLabel, other.dashboardLabel, t)!,
       revenueValue: TextStyle.lerp(revenueValue, other.revenueValue, t)!,

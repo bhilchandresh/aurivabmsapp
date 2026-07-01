@@ -4,7 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_extensions.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/notifications/notification_controller.dart';
 import '../../features/notifications/notification_screen.dart';
@@ -80,10 +80,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                     children: [
                       Text(
                         title,
-                        style: AppTextStyles.heading3.copyWith(
-                          fontWeight: FontWeight.bold,
+                        style: context.typography.topBarTitle.copyWith(
                           color: titleColor,
-                          letterSpacing: -0.5,
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -92,9 +90,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                           subtitle!,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
+                          style: context.typography.topBarSubtitle.copyWith(
                             color: subtitleColor,
                           ),
                         )
@@ -112,11 +108,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                             const SizedBox(width: 6),
                             Text(
                               'SYSTEM LIVE',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
+                              style: context.typography.liveIndicator.copyWith(
                                 color: subtitleColor,
-                                letterSpacing: -0.5,
                               ),
                             ),
                           ],
@@ -158,10 +151,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                           }
                           return Text(
                             displayRole,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                              color: Theme.of(context).colorScheme.primary,
+                            style: context.typography.roleBadgeText.copyWith(
+                              color: context.colorScheme.primary,
                             ),
                           );
                         }),
@@ -198,11 +189,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                                 ),
                                 child: Text(
                                   '${controller.unreadCount.value}',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  style: context.typography.badgeCountText,
                                 ),
                               );
                             }
@@ -258,11 +245,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
                         return Text(
                           letter,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 16,
-                          ),
+                          style: context.typography.avatarLetter,
                         );
                       }),
                     ),
