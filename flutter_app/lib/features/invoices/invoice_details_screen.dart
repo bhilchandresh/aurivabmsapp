@@ -23,6 +23,7 @@ import 'templates/minimalist_template.dart';
 import 'templates/elegant_template.dart';
 import 'templates/vibrant_template.dart';
 import '../../shared/widgets/animated_document_loader.dart';
+import '../../core/theme/app_extensions.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
@@ -2820,7 +2821,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
           children: [
             Text(
               widget.invoiceId,
-              style: TextStyle(
+              style: context.typography.invoiceNumber.copyWith(
                 color: Theme.of(context).textTheme.displayLarge?.color,
                 fontWeight: FontWeight.w900,
                 fontSize: 18,
@@ -2833,8 +2834,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                 SizedBox(width: 4),
                 Text(
                   'AURIVA INVOICE',
-                  style: TextStyle(
-                    color: Color(0xFF64748B),
+                  style: context.typography.cardSubtitle.copyWith(
+                    color: const Color(0xFF64748B),
                     fontWeight: FontWeight.w700,
                     fontSize: 10,
                     letterSpacing: 1.2,
@@ -2871,7 +2872,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                     const SizedBox(width: 6),
                     Text(
                       'Print',
-                      style: TextStyle(
+                      style: context.typography.buttonText.copyWith(
                         color: Theme.of(context).textTheme.displayLarge?.color,
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
@@ -2924,7 +2925,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                           const SizedBox(width: 8),
                           Text(
                             'A4 LIVE PREVIEW CANVAS',
-                            style: TextStyle(
+                            style: context.typography.categoryHeader.copyWith(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: AppColors.primary,
@@ -2943,7 +2944,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                           const SizedBox(width: 6),
                           Text(
                             'Interactive Scaling',
-                            style: TextStyle(
+                            style: context.typography.cardDescription.copyWith(
                               fontSize: 10,
                               color: Colors.grey,
                               fontWeight: FontWeight.bold,
@@ -3502,7 +3503,7 @@ class _PulsingStatusBadgeState extends State<PulsingStatusBadge>
               const SizedBox(width: 6),
               Text(
                 text,
-                style: TextStyle(
+                style: context.typography.liveIndicator.copyWith(
                   color: baseColor,
                   fontSize: 10,
                   fontWeight: FontWeight.w900,
@@ -3609,7 +3610,7 @@ class _DynamicActionButtonState extends State<DynamicActionButton>
               Flexible(
                 child: Text(
                   widget.label,
-                  style: TextStyle(
+                  style: context.typography.buttonText.copyWith(
                     color: widget.textColor ?? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
