@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app_text_styles.dart';
+import 'app_typography.dart';
 import '../constants/app_colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
@@ -8,21 +8,6 @@ import 'package:flutter/services.dart';
 class AppTheme {
   static Locale? currentLocale;
 
-  static String? get _fontFamily {
-    if (Get.locale?.languageCode == 'hi' || Get.locale?.languageCode == 'mr') {
-      return GoogleFonts.hind().fontFamily;
-    } else if (Get.locale?.languageCode == 'gu') {
-      return GoogleFonts.hindVadodara().fontFamily;
-    } else if (Get.locale?.languageCode == 'bn') {
-      return GoogleFonts.hindSiliguri().fontFamily;
-    } else if (Get.locale?.languageCode == 'te') {
-      return GoogleFonts.hindGuntur().fontFamily;
-    } else if (Get.locale?.languageCode == 'ta') {
-      return GoogleFonts.hindMadurai().fontFamily;
-    }
-    return GoogleFonts.inter().fontFamily;
-  }
-
   static ThemeData get lightTheme {
     return ThemeData(
       appBarTheme: const AppBarTheme(
@@ -30,7 +15,7 @@ class AppTheme {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      fontFamily: _fontFamily,
+      fontFamily: AppTypography.fontFamily,
       brightness: Brightness.light,
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: AppColors.background,
@@ -57,13 +42,7 @@ class AppTheme {
       iconTheme: const IconThemeData(
         color: Color(0xFF0F172A),
       ),
-      textTheme: TextTheme(
-        displayLarge: AppTextStyles.heading1,
-        displayMedium: AppTextStyles.heading2,
-        bodyLarge: AppTextStyles.body,
-        bodyMedium: TextStyle(color: Color(0xFF64748B)),
-        bodySmall: AppTextStyles.caption,
-      ),
+      textTheme: AppTypography.lightTextTheme,
       useMaterial3: true,
     );
   }
@@ -75,7 +54,7 @@ class AppTheme {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
-      fontFamily: _fontFamily,
+      fontFamily: AppTypography.fontFamily,
       brightness: Brightness.dark,
       primaryColor: AppColors.primary,
       scaffoldBackgroundColor: const Color(0xFF0F172A),
@@ -103,13 +82,7 @@ class AppTheme {
       iconTheme: const IconThemeData(
         color: Colors.white,
       ),
-      textTheme: TextTheme(
-        displayLarge: AppTextStyles.heading1.copyWith(color: Colors.white),
-        displayMedium: AppTextStyles.heading2.copyWith(color: Colors.white),
-        bodyLarge: AppTextStyles.body.copyWith(color: const Color(0xFFE2E8F0)),
-        bodyMedium: const TextStyle(color: Color(0xFF94A3B8)),
-        bodySmall: AppTextStyles.caption.copyWith(color: const Color(0xFF94A3B8)),
-      ),
+      textTheme: AppTypography.darkTextTheme,
       useMaterial3: true,
     );
   }
