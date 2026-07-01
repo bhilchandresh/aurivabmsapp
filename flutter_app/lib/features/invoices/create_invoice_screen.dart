@@ -2715,7 +2715,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         children: [
           Text(
             'terms_conditions_1'.tr,
-            style: TextStyle(
+            style: context.typography.categoryHeader.copyWith(
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
@@ -2968,11 +2968,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             children: [
               Text(
                 'subtotal'.tr,
-                style: TextStyle(fontSize: 12, color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+                style: context.typography.tableCell.copyWith(fontSize: 12, color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
               ),
               Text(
                 formatCurrency.format(_subtotal),
-                style: TextStyle(
+                style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -2988,7 +2988,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 children: [
                   Text(
                     'discount'.tr,
-                    style: TextStyle(
+                    style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
@@ -3001,7 +3001,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       controller: _discountPercentageController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: context.typography.inputText.copyWith(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -3048,7 +3048,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
               Text(
                 '- ${formatCurrency.format(_discountAmount)}',
-                style: TextStyle(
+                style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: AppColors.error,
@@ -3076,7 +3076,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             children: [
               Text(
                 'taxable_amount'.tr,
-                style: TextStyle(
+                style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                 ),
@@ -3087,7 +3087,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       ? (_subtotal - _discountAmount - _taxAmount)
                       : (_subtotal - _discountAmount),
                 ),
-                style: TextStyle(
+                style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -3103,14 +3103,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 children: [
                   Text(
                     'igst'.tr,
-                    style: TextStyle(
+                    style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
                   ),
                   Text(
                     formatCurrency.format(_taxAmount),
-                    style: TextStyle(
+                    style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -3124,14 +3124,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 children: [
                   Text(
                     'cgst'.tr,
-                    style: TextStyle(
+                    style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
                   ),
                   Text(
                     formatCurrency.format(_taxAmount / 2),
-                    style: TextStyle(
+                    style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -3145,14 +3145,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 children: [
                   Text(
                     'sgst'.tr,
-                    style: TextStyle(
+                    style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
                   ),
                   Text(
                     formatCurrency.format(_taxAmount / 2),
-                    style: TextStyle(
+                    style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -3170,7 +3170,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 children: [
                   Text(
                     'advance_paid'.tr,
-                    style: TextStyle(
+                    style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
@@ -3183,7 +3183,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       controller: _advancePaidController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: context.typography.inputText.copyWith(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -3228,7 +3228,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
               Text(
                 '- ${formatCurrency.format(double.tryParse(_advancePaidController.text) ?? 0.0)}',
-                style: TextStyle(
+                style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.success,
@@ -3246,7 +3246,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               children: [
                 Text(
                   'balance_due'.tr,
-                  style: TextStyle(
+                  style: context.typography.categoryHeader.copyWith(
                     fontSize: 10,
                     color: Colors.grey,
                     fontWeight: FontWeight.bold,
@@ -3259,7 +3259,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   children: [
                     Text(
                       '₹',
-                      style: TextStyle(
+                      style: context.typography.currencyText.copyWith(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
                         color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
@@ -3267,7 +3267,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     ),
                     Text(
                       formatCurrency.format(_balanceDue).replaceAll('₹', ''),
-                      style: TextStyle(
+                      style: context.typography.invoiceAmount.copyWith(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                         color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
@@ -3278,7 +3278,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 const SizedBox(height: 4),
                 Text(
                   '${'total_amount'.tr}: ${formatCurrency.format(_total)}',
-                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                  style: context.typography.cardDescription.copyWith(fontSize: 11, color: Colors.grey),
                 ),
               ],
             ),
@@ -3321,7 +3321,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ],
                 Text(
                   title,
-                  style: TextStyle(
+                  style: context.typography.cardTitle.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: iconColor ?? (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
@@ -3389,7 +3389,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 size: 16,
                 color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
               ),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              style: context.typography.inputText.copyWith(
                 color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -3424,11 +3424,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 13, color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+          style: context.typography.tableCell.copyWith(fontSize: 13, color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
         ),
         Text(
           amount,
-          style: TextStyle(
+          style: context.typography.tableCell.copyWith(
             fontWeight: FontWeight.bold,
             color: isDiscount ? AppColors.error : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
           ),
@@ -3481,7 +3481,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           keyboardType: keyboardType,
           readOnly: readOnly,
           onTap: onTap,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          style: context.typography.inputText.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
