@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
-import '../core/theme/app_text_styles.dart';
+import '../core/theme/app_extensions.dart';
 import '../core/utils/responsive_layout.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/invoices/invoice_list_screen.dart';
@@ -138,8 +138,13 @@ class MainLayout extends StatelessWidget {
           labelType: NavigationRailLabelType.all,
           selectedIconTheme: IconThemeData(color: theme.primaryColor),
           unselectedIconTheme: IconThemeData(color: theme.colorScheme.onSurface.withOpacity(0.5)),
-          selectedLabelTextStyle: TextStyle(color: theme.primaryColor, fontWeight: FontWeight.bold, fontSize: 11),
-          unselectedLabelTextStyle: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.5), fontSize: 11),
+          selectedLabelTextStyle: context.typography.navigationLabel.copyWith(
+            color: theme.primaryColor,
+            fontWeight: FontWeight.bold,
+          ),
+          unselectedLabelTextStyle: context.typography.navigationLabel.copyWith(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+          ),
           destinations: const [
             NavigationRailDestination(icon: Icon(LucideIcons.layoutDashboard), label: Text('Home')),
             NavigationRailDestination(icon: Icon(LucideIcons.fileText), label: Text('Invoices')),
