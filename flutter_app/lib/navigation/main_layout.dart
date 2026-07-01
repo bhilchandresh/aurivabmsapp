@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
+import '../core/theme/app_text_styles.dart';
 import '../core/theme/app_extensions.dart';
 import '../core/utils/responsive_layout.dart';
 import '../features/dashboard/dashboard_screen.dart';
@@ -115,11 +116,11 @@ class MainLayout extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildBottomNavItem(0, LucideIcons.layoutDashboard, 'Home', controller, barHeight),
-              _buildBottomNavItem(1, LucideIcons.fileText, 'Invoices', controller, barHeight),
-              _buildBottomNavItem(2, LucideIcons.file, 'Quotes', controller, barHeight),
-              _buildBottomNavItem(3, LucideIcons.users, 'Clients', controller, barHeight),
-              _buildBottomNavItem(4, LucideIcons.user, 'Profile', controller, barHeight),
+              _buildBottomNavItem(context, 0, LucideIcons.layoutDashboard, 'Home', controller, barHeight),
+              _buildBottomNavItem(context, 1, LucideIcons.fileText, 'Invoices', controller, barHeight),
+              _buildBottomNavItem(context, 2, LucideIcons.file, 'Quotes', controller, barHeight),
+              _buildBottomNavItem(context, 3, LucideIcons.users, 'Clients', controller, barHeight),
+              _buildBottomNavItem(context, 4, LucideIcons.user, 'Profile', controller, barHeight),
             ],
           ),
         ),
@@ -170,6 +171,7 @@ class MainLayout extends StatelessWidget {
 
   // Floating Bottom Navigation Nav Item (Mobile view)
   Widget _buildBottomNavItem(
+    BuildContext context,
     int index,
     IconData icon,
     String label,
@@ -229,7 +231,7 @@ class MainLayout extends StatelessWidget {
                             duration: const Duration(milliseconds: 200),
                             child: Text(
                               label,
-                              style: TextStyle(
+                              style: context.typography.navigationLabel.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
                                 fontSize: fontSize,
