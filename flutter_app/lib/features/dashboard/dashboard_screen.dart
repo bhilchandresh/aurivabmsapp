@@ -1818,11 +1818,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Text(
               'quick_actions'.tr,
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w900,
-                color: Colors.grey.shade400,
+              style: context.typography.categoryHeader.copyWith(
                 letterSpacing: 1.0,
+                color: Colors.grey.shade400,
               ),
             ),
             const SizedBox(height: 16),
@@ -1858,9 +1856,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const SizedBox(width: 8),
                           Text(
                             'add_client'.tr,
-                            style: TextStyle(
+                            style: context.typography.buttonText.copyWith(
                               fontSize: 12,
-                              fontWeight: FontWeight.bold,
                               color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                             ),
                           ),
@@ -1900,9 +1897,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const SizedBox(width: 8),
                           Text(
                             'all_invoices'.tr,
-                            style: TextStyle(
+                            style: context.typography.buttonText.copyWith(
                               fontSize: 12,
-                              fontWeight: FontWeight.bold,
                               color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                             ),
                           ),
