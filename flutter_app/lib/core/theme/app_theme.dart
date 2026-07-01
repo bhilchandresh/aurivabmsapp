@@ -43,6 +43,9 @@ class AppTheme {
         color: Color(0xFF0F172A),
       ),
       textTheme: AppTypography.lightTextTheme,
+      extensions: <ThemeExtension<dynamic>>[
+        AppTypographyExtension.light(),
+      ],
       useMaterial3: true,
     );
   }
@@ -83,6 +86,9 @@ class AppTheme {
         color: Colors.white,
       ),
       textTheme: AppTypography.darkTextTheme,
+      extensions: <ThemeExtension<dynamic>>[
+        AppTypographyExtension.dark(),
+      ],
       useMaterial3: true,
     );
   }
