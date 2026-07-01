@@ -19,6 +19,7 @@ import 'invoice_details_screen.dart';
 import '../../shared/widgets/app_loader.dart';
 import '../../core/constants/app_typography.dart';
 import '../../shared/widgets/custom_notification_overlay.dart';
+import '../../core/theme/app_extensions.dart';
 
 class _ItemControllers {
   final nameController = TextEditingController();
@@ -1770,7 +1771,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   const SizedBox(width: 8),
                   Text(
                     'invoice_completeness'.tr,
-                    style: TextStyle(
+                    style: context.typography.categoryHeader.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -1780,7 +1781,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
               Text(
                 '$percentage%',
-                style: TextStyle(
+                style: context.typography.percentageText.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                   color: percentage == 100
@@ -1830,7 +1831,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         elevation: 0,
         title: Text(
           'new_invoice'.tr,
-          style: TextStyle(
+          style: context.typography.invoiceTitle.copyWith(
             color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
             fontWeight: FontWeight.bold,
             fontSize: 18,
@@ -1866,7 +1867,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   SizedBox(width: 6),
                   Text(
                     'Save',
-                    style: TextStyle(
+                    style: context.typography.buttonText.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 11,
@@ -1956,7 +1957,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         const SizedBox(width: 8),
         Text(
           title.toUpperCase(),
-          style: TextStyle(
+          style: context.typography.categoryHeader.copyWith(
             fontSize: 13,
             fontWeight: FontWeight.bold,
             color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
@@ -2024,7 +2025,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     dense: true,
                     title: Text(
                       client.name,
-                      style: TextStyle(
+                      style: context.typography.clientName.copyWith(
                         fontWeight: FontWeight.bold,
                         color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                       ),
@@ -2033,7 +2034,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       client.email.isNotEmpty
                           ? client.email
                           : 'No email address',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
+                      style: context.typography.clientCompany.copyWith(fontSize: 11, color: Colors.grey),
                     ),
                     trailing: Icon(
                       LucideIcons.arrowUpLeft,
@@ -2216,7 +2217,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         const SizedBox(width: 10),
                         Text(
                           'enable_gst'.tr,
-                          style: TextStyle(
+                          style: context.typography.categoryHeader.copyWith(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                             color: AppColors.primary,
@@ -2271,7 +2272,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                             alignment: Alignment.center,
                             child: Text(
                               'exclusive'.tr,
-                              style: TextStyle(
+                              style: context.typography.buttonText.copyWith(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: _taxType == 'exclusive'
@@ -2305,7 +2306,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                             alignment: Alignment.center,
                             child: Text(
                               'inclusive'.tr,
-                              style: TextStyle(
+                              style: context.typography.buttonText.copyWith(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: _taxType == 'inclusive'
