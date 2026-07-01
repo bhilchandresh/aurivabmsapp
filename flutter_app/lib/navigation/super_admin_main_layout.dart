@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
+import '../core/theme/app_extensions.dart';
 import '../features/super_admin/dashboard/super_admin_dashboard_screen.dart';
 import '../features/super_admin/broadcast/super_admin_broadcast_screen.dart';
 import '../features/super_admin/logs/super_admin_logs_screen.dart';
@@ -96,30 +97,35 @@ class SuperAdminMainLayout extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildBottomNavItem(
+                          context,
                           0,
                           LucideIcons.layoutDashboard,
                           'Dashboard',
                           controller,
                         ),
                         _buildBottomNavItem(
+                          context,
                           1,
                           LucideIcons.radio,
                           'Broadcast',
                           controller,
                         ),
                         _buildBottomNavItem(
+                          context,
                           2,
                           LucideIcons.barChart2,
                           'Analytics',
                           controller,
                         ),
                         _buildBottomNavItem(
+                          context,
                           3,
                           LucideIcons.plusCircle,
                           'New Company',
                           controller,
                         ),
                         _buildBottomNavItem(
+                          context,
                           4,
                           LucideIcons.user,
                           'Profile',
@@ -139,6 +145,7 @@ class SuperAdminMainLayout extends StatelessWidget {
 
   // Floating Bottom Navigation Nav Item
   Widget _buildBottomNavItem(
+    BuildContext context,
     int index,
     IconData icon,
     String label,
@@ -175,7 +182,7 @@ class SuperAdminMainLayout extends StatelessWidget {
               if (isSelected)
                 Text(
                   label,
-                  style: TextStyle(
+                  style: context.typography.navigationLabel.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
