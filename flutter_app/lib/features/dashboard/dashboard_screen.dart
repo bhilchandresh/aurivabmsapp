@@ -501,7 +501,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     style: context.typography.screenTitle.copyWith(
                                       fontSize: 18,
                                       fontWeight: FontWeight.normal,
-                                      color: context.textTheme.bodyMedium?.color,
+                                      color: Theme.of(context).textTheme.bodyMedium?.color,
                                     ),
                                   ),
                                   Text(
