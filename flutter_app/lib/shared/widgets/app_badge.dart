@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_extensions.dart';
 
 class AppBadge extends StatelessWidget {
   final String text;
@@ -14,7 +15,14 @@ class AppBadge extends StatelessWidget {
         color: color.withOpacity(0.2),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(text, style: TextStyle(color: color, fontSize: 10)),
+      child: Text(
+        text,
+        style: context.typography.statusLabel.copyWith(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.normal,
+        ),
+      ),
     );
   }
 }
