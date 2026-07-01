@@ -977,7 +977,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     Text(
                       'revenue_overview'.tr,
-                      style: TextStyle(
+                      style: context.typography.cardTitle.copyWith(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
                         color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -986,7 +986,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 2),
                     Text(
                       'income_expense_comparison'.tr,
-                      style: TextStyle(
+                      style: context.typography.cardSubtitle.copyWith(
                         fontSize: 11,
                         color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                       ),
@@ -1098,7 +1098,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               axisSide: meta.axisSide,
                               child: Text(
                                 chartData[idx]['name'] as String,
-                                style: TextStyle(
+                                style: context.typography.chartLabel.copyWith(
                                   color: Colors.grey.shade500,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 10,
@@ -1127,7 +1127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             axisSide: meta.axisSide,
                             child: Text(
                               label,
-                              style: TextStyle(
+                              style: context.typography.chartLabel.copyWith(
                                 color: Colors.grey.shade400,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 9,
@@ -1156,7 +1156,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             : 'expense'.tr;
                         return BarTooltipItem(
                           '$title\n${formatCurrency.format(rod.toY)}',
-                          TextStyle(
+                          context.typography.chartValue.copyWith(
                             color: rodIndex == 0
                                 ? Colors.blue.shade200
                                 : Colors.red.shade200,
@@ -1188,7 +1188,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(width: 6),
         Text(
           name,
-          style: TextStyle(
+          style: context.typography.chartLabel.copyWith(
             fontSize: 11,
             fontWeight: FontWeight.bold,
             color: Colors.grey.shade600,
@@ -1229,7 +1229,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   children: [
                     Text(
                       'recent_invoices'.tr,
-                      style: TextStyle(
+                      style: context.typography.cardTitle.copyWith(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,
                         color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -1238,7 +1238,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 2),
                     Text(
                       'latest_billing_activities'.tr,
-                      style: TextStyle(
+                      style: context.typography.cardSubtitle.copyWith(
                         fontSize: 11,
                         color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                       ),
@@ -1258,7 +1258,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   },
                   child: Text(
                     'view_all'.tr,
-                    style: TextStyle(
+                    style: context.typography.buttonText.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
                       color: AppColors.primary,
@@ -1274,7 +1274,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Center(
                   child: Text(
                     'no_invoices_yet'.tr,
-                    style: TextStyle(
+                    style: context.typography.emptyStateDescription.copyWith(
                       fontSize: 13,
                       color: Colors.grey.shade400,
                       fontStyle: FontStyle.italic,
@@ -1402,16 +1402,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   client.name,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
+                                  style: context.typography.clientName.copyWith(
                                     fontSize: 13,
-                                    fontWeight: FontWeight.bold,
                                     color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                                   ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
                                   '${inv.invoiceNumber} • $displayDate',
-                                  style: TextStyle(
+                                  style: context.typography.invoiceNumber.copyWith(
                                     fontSize: 10,
                                     color: Colors.grey.shade400,
                                     fontWeight: FontWeight.w600,
@@ -1426,7 +1425,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             children: [
                               Text(
                                 formatCurrency.format(inv.totalAmount),
-                                style: TextStyle(
+                                style: context.typography.invoiceAmount.copyWith(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w900,
                                   color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -1446,7 +1445,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 child: Text(
                                   inv.status,
-                                  style: TextStyle(
+                                  style: context.typography.invoiceStatus.copyWith(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w900,
                                     color: isPaid
