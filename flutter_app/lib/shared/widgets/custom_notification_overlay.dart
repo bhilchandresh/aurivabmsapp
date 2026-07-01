@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../core/theme/app_extensions.dart';
 
 class AurivaNotificationIcon extends StatelessWidget {
   final String type;
@@ -292,19 +293,15 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                         const SizedBox(width: 8),
                         Text(
                           'AurivaBMS',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                          style: context.typography.clientName.copyWith(
                             color: _textDark,
                           ),
                         ),
                         const Spacer(),
                         Text(
                           'now',
-                          style: TextStyle(
-                            fontSize: 13,
+                          style: context.typography.notificationTime.copyWith(
                             color: _textGrey,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -317,9 +314,7 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                         Flexible(
                           child: Text(
                             widget.title,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                            style: context.typography.notificationTitle.copyWith(
                               color: _textDark,
                             ),
                             maxLines: 1,
@@ -338,10 +333,8 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                     // Body Text
                     Text(
                       widget.message,
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: context.typography.notificationSubtitle.copyWith(
                         color: _textGrey,
-                        height: 1.4,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -349,10 +342,8 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                     if (widget.invoiceNumber != null && widget.invoiceNumber!.isNotEmpty)
                       Text(
                         widget.invoiceNumber!,
-                        style: TextStyle(
-                          fontSize: 14,
+                        style: context.typography.notificationSubtitle.copyWith(
                           color: _textGrey,
-                          height: 1.4,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
