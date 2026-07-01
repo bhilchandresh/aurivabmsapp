@@ -6,6 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../clients/clients_controller.dart';
 import '../expenses/expenses_controller.dart';
@@ -497,17 +498,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 children: [
                                   Text(
                                     'welcome_back'.tr,
-                                    style: TextStyle(
+                                    style: context.typography.screenTitle.copyWith(
                                       fontSize: 18,
                                       fontWeight: FontWeight.normal,
-                                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                                      color: context.textTheme.bodyMedium?.color,
                                     ),
                                   ),
                                   Text(
                                     authController.userName.value.isNotEmpty
                                         ? authController.userName.value
                                         : 'Admin',
-                                    style: TextStyle(
+                                    style: context.typography.screenTitle.copyWith(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.primary,
@@ -515,7 +516,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                   Text(
                                     ' 👋',
-                                    style: TextStyle(fontSize: 18),
+                                    style: context.typography.screenTitle.copyWith(
+                                      fontSize: 18,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -560,12 +563,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     children: [
                                       Text(
                                         planName.toUpperCase(),
-                                        style: TextStyle(
+                                        style: context.typography.roleBadgeText.copyWith(
                                           fontSize: 9,
-                                          fontWeight: FontWeight.w900,
                                           color: isWarning
                                               ? Colors.red
-                                              : Color(0xFF0369A1),
+                                              : const Color(0xFF0369A1),
                                           letterSpacing: 0.5,
                                         ),
                                       ),
@@ -585,12 +587,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         daysLeft > 0
                                             ? '$daysLeft ${'days_left'.tr}'
                                             : 'expired'.tr,
-                                        style: TextStyle(
+                                        style: context.typography.statusLabel.copyWith(
                                           fontSize: 9,
-                                          fontWeight: FontWeight.bold,
                                           color: isWarning
                                               ? Colors.red
-                                              : Color(0xFF0284C7),
+                                              : const Color(0xFF0284C7),
                                         ),
                                       ),
                                     ],
@@ -648,9 +649,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   const SizedBox(width: 8),
                                   Text(
                                     'new_invoice'.tr,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                                    style: context.typography.buttonText.copyWith(
                                       fontSize: 13,
                                     ),
                                   ),
