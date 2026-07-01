@@ -13,6 +13,7 @@ import '../clients/clients_controller.dart';
 import 'create_invoice_screen.dart';
 import 'invoice_details_screen.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import '../../core/theme/app_extensions.dart';
 
 class Invoice {
   final String dbId;
@@ -221,7 +222,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                 );
               }
             },
-            child: Text('delete'.tr, style: TextStyle(color: Colors.red)),
+            child: Text('delete'.tr, style: context.typography.buttonText.copyWith(color: Colors.red)),
           ),
         ],
       ),
@@ -770,7 +771,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                   },
                                   decoration: InputDecoration(
                                     hintText: 'search_invoices'.tr,
-                                    hintStyle: TextStyle(
+                                    hintStyle: context.typography.searchHint.copyWith(
                                       color: Colors.grey,
                                       fontSize: 13,
                                     ),
@@ -829,7 +830,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                               size: 14,
                                               color: Colors.grey,
                                             ),
-                                            style: TextStyle(
+                                            style: context.typography.inputText.copyWith(
                                               color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
@@ -895,7 +896,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                               size: 14,
                                               color: Colors.grey,
                                             ),
-                                            style: TextStyle(
+                                            style: context.typography.inputText.copyWith(
                                               color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                                               fontSize: 13,
                                               fontWeight: FontWeight.w600,
@@ -951,7 +952,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                           children: [
                             Text(
                               'Invoice Register',
-                              style: TextStyle(
+                              style: context.typography.cardTitle.copyWith(
                                 fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -987,7 +988,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                 const SizedBox(height: 12),
                                 Text(
                                   'no_invoices_found'.tr,
-                                  style: TextStyle(
+                                  style: context.typography.emptyStateDescription.copyWith(
                                     fontWeight: FontWeight.w600,
                                     color: Colors.grey,
                                   ),
@@ -1126,7 +1127,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                               children: [
                                                 Text(
                                                   inv.id,
-                                                  style: TextStyle(
+                                                  style: context.typography.invoiceNumber.copyWith(
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 13,
                                                     color: AppColors.primary,
@@ -1244,7 +1245,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         Text(
                                                           inv.status
                                                               .toUpperCase(),
-                                                          style: TextStyle(
+                                                          style: context.typography.invoiceStatus.copyWith(
                                                             fontSize: 8,
                                                             fontWeight:
                                                                 FontWeight.bold,
@@ -1275,7 +1276,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                 formatCurrency.format(
                                                   inv.amount,
                                                 ),
-                                                style: TextStyle(
+                                                style: context.typography.invoiceAmount.copyWith(
                                                   fontWeight: FontWeight.w900,
                                                   fontSize: 16,
                                                   color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -1312,7 +1313,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                 const SizedBox(width: 6),
                                                 Text(
                                                   formattedDate,
-                                                  style: TextStyle(
+                                                  style: context.typography.dueDate.copyWith(
                                                     fontSize: 12,
                                                     color: Colors.grey.shade500,
                                                   ),
