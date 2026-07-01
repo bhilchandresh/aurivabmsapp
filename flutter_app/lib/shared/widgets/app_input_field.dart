@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_extensions.dart';
 
 class AppInputField extends StatelessWidget {
   final String label;
@@ -30,8 +29,6 @@ class AppInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,9 +36,9 @@ class AppInputField extends StatelessWidget {
           padding: const EdgeInsets.only(left: 4, bottom: 4),
           child: Text(
             label.toUpperCase(),
-            style: AppTextStyles.caption.copyWith(
+            style: context.typography.inputLabel.copyWith(
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
+              color: context.textTheme.bodyMedium?.color,
               letterSpacing: 0.5,
             ),
           ),
@@ -53,21 +50,23 @@ class AppInputField extends StatelessWidget {
           validator: validator,
           enabled: enabled,
           maxLines: maxLines,
-          style: AppTextStyles.body.copyWith(
+          style: context.typography.inputText.copyWith(
+            fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: Theme.of(context).textTheme.bodyLarge?.color,
+            color: context.textTheme.bodyLarge?.color,
           ),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: AppTextStyles.body.copyWith(
-              color: Theme.of(context).textTheme.bodyMedium?.color,
+            hintStyle: context.typography.searchHint.copyWith(
+              fontSize: 16,
+              color: context.textTheme.bodyMedium?.color,
             ),
             prefixIcon: prefixIcon != null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: IconTheme(
                       data: IconThemeData(
-                        color: Theme.of(context).textTheme.bodyMedium?.color,
+                        color: context.textTheme.bodyMedium?.color,
                       ),
                       child: prefixIcon!,
                     ),
@@ -80,7 +79,7 @@ class AppInputField extends StatelessWidget {
             suffixIcon: suffixIcon != null
                 ? IconTheme(
                     data: IconThemeData(
-                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                      color: context.textTheme.bodyMedium?.color,
                     ),
                     child: suffixIcon!,
                   )
