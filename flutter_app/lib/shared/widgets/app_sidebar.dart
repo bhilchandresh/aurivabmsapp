@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_extensions.dart';
 
 class AppSidebar extends StatelessWidget {
   final String currentRoute;
@@ -31,7 +31,7 @@ class AppSidebar extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Theme.of(context).colorScheme.outline),
+                    border: Border.all(color: context.colorScheme.outline),
                     boxShadow: [
                       BoxShadow(
                         color: AppColors.primary.withOpacity(0.2),
@@ -48,9 +48,8 @@ class AppSidebar extends StatelessWidget {
                 ),
                 RichText(
                   text: TextSpan(
-                    style: AppTextStyles.heading2.copyWith(
+                    style: context.typography.profileName.copyWith(
                       color: Colors.white,
-                      fontWeight: FontWeight.bold,
                     ),
                     children: const [
                       TextSpan(text: 'Auriva'),
@@ -64,10 +63,7 @@ class AppSidebar extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'BUSINESS MANAGEMENT SYSTEM',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
+                  style: context.typography.categoryHeader.copyWith(
                     color: Colors.grey.shade400,
                   ),
                 ),
@@ -127,11 +123,8 @@ class AppSidebar extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     'admin'.tr,
-                    style: TextStyle(
+                    style: context.typography.categoryHeader.copyWith(
                       color: Colors.grey,
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
                     ),
                   ),
                 ),
@@ -178,7 +171,7 @@ class AppSidebar extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Sign Out',
-                      style: AppTextStyles.label.copyWith(
+                      style: context.typography.drawerLabel.copyWith(
                         color: Colors.grey.shade400,
                         fontWeight: FontWeight.bold,
                       ),
@@ -233,9 +226,8 @@ class AppSidebar extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 title,
-                style: AppTextStyles.label.copyWith(
+                style: context.typography.drawerLabel.copyWith(
                   color: isActive ? Colors.white : Colors.grey.shade300,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
               if (isActive) ...[

@@ -287,6 +287,10 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
   /// Do NOT use for: Bottom navigation labels.
   final TextStyle drawerLabel;
 
+  /// Use for: Uppercase Category headers in list navigation / sidebars (size 10, bold, letterSpacing 1.5).
+  /// Do NOT use for: Button labels.
+  final TextStyle categoryHeader;
+
   // ---------------------------------------------------------------------------
   // OVERLAYS & DIALOGS
   // ---------------------------------------------------------------------------
@@ -444,6 +448,7 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
     required this.tableCell,
     required this.navigationLabel,
     required this.drawerLabel,
+    required this.categoryHeader,
     required this.dialogTitle,
     required this.dialogContent,
     required this.bottomSheetTitle,
@@ -522,6 +527,7 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       
       navigationLabel: AppTypography.labelSmall,
       drawerLabel: AppTypography.titleSmall.copyWith(color: AppColors.lightTextPrimary),
+      categoryHeader: AppTypography.labelSmall.copyWith(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: AppColors.lightTextSecondary),
       
       dialogTitle: AppTypography.titleLarge.copyWith(color: AppColors.lightTextPrimary),
       dialogContent: AppTypography.bodyMedium.copyWith(color: AppColors.lightTextPrimary),
@@ -605,6 +611,7 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       
       navigationLabel: AppTypography.labelSmall,
       drawerLabel: AppTypography.titleSmall.copyWith(color: AppColors.darkTextPrimary),
+      categoryHeader: AppTypography.labelSmall.copyWith(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: AppColors.darkTextSecondary),
       
       dialogTitle: AppTypography.titleLarge.copyWith(color: AppColors.darkTextPrimary),
       dialogContent: AppTypography.bodyMedium.copyWith(color: AppColors.darkTextPrimary),
@@ -690,6 +697,7 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       tableCell: TextStyle.lerp(tableCell, other.tableCell, t)!,
       navigationLabel: TextStyle.lerp(navigationLabel, other.navigationLabel, t)!,
       drawerLabel: TextStyle.lerp(drawerLabel, other.drawerLabel, t)!,
+      categoryHeader: TextStyle.lerp(categoryHeader, other.categoryHeader, t)!,
       dialogTitle: TextStyle.lerp(dialogTitle, other.dialogTitle, t)!,
       dialogContent: TextStyle.lerp(dialogContent, other.dialogContent, t)!,
       bottomSheetTitle: TextStyle.lerp(bottomSheetTitle, other.bottomSheetTitle, t)!,
