@@ -2335,7 +2335,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       iconColor: Colors.teal,
       trailing: Text(
         '${_itemsControllers.length} Items Added',
-        style: TextStyle(
+        style: context.typography.cardDescription.copyWith(
           fontSize: 11,
           color: Colors.grey,
           fontWeight: FontWeight.bold,
@@ -2407,7 +2407,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               children: [
                                 Text(
                                   'gst_rate_percent'.tr,
-                                  style: TextStyle(
+                                  style: context.typography.categoryHeader.copyWith(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey,
@@ -2445,35 +2445,35 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                           value: '0',
                                           child: Text(
                                             '0_exempt'.tr,
-                                            style: TextStyle(fontSize: 12),
+                                            style: context.typography.tableCell.copyWith(fontSize: 12),
                                           ),
                                         ),
                                         DropdownMenuItem(
                                           value: '5',
                                           child: Text(
                                             '5%',
-                                            style: TextStyle(fontSize: 12),
+                                            style: context.typography.tableCell.copyWith(fontSize: 12),
                                           ),
                                         ),
                                         DropdownMenuItem(
                                           value: '12',
                                           child: Text(
                                             '12%',
-                                            style: TextStyle(fontSize: 12),
+                                            style: context.typography.tableCell.copyWith(fontSize: 12),
                                           ),
                                         ),
                                         DropdownMenuItem(
                                           value: '18',
                                           child: Text(
                                             '18%',
-                                            style: TextStyle(fontSize: 12),
+                                            style: context.typography.tableCell.copyWith(fontSize: 12),
                                           ),
                                         ),
                                         DropdownMenuItem(
                                           value: '28',
                                           child: Text(
                                             '28%',
-                                            style: TextStyle(fontSize: 12),
+                                            style: context.typography.tableCell.copyWith(fontSize: 12),
                                           ),
                                         ),
                                       ],
@@ -2499,7 +2499,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               children: [
                                 Text(
                                   'tax_amount_caps'.tr,
-                                  style: TextStyle(
+                                  style: context.typography.categoryHeader.copyWith(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.blue,
@@ -2546,7 +2546,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                       }
                                       return Text(
                                         formatCurrency.format(taxAmt),
-                                        style: TextStyle(
+                                        style: context.typography.invoiceAmount.copyWith(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
                                           color: Colors.blue,
@@ -2585,7 +2585,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                             children: [
                               Text(
                                 'amount_caps'.tr,
-                                style: TextStyle(
+                                style: context.typography.categoryHeader.copyWith(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.grey,
@@ -2652,7 +2652,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 },
                 label: Text(
                   'add_new_item_line'.tr,
-                  style: TextStyle(
+                  style: context.typography.buttonText.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                     fontSize: 13,
@@ -2681,7 +2681,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   ),
                   label: Text(
                     'remove_item'.tr,
-                    style: TextStyle(
+                    style: context.typography.buttonText.copyWith(
                       fontWeight: FontWeight.bold,
                       color: AppColors.error,
                       fontSize: 13,
@@ -2772,7 +2772,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       children: [
         Text(
           'item_name_title'.tr,
-          style: TextStyle(
+          style: context.typography.categoryHeader.copyWith(
             fontSize: 11,
             fontWeight: FontWeight.bold,
             color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
@@ -2847,7 +2847,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                 children: [
                                   Text(
                                     option.itemName,
-                                    style: TextStyle(
+                                    style: context.typography.clientName.copyWith(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
                                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -2862,14 +2862,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                         option.sku.isNotEmpty
                                             ? option.sku
                                             : 'No SKU',
-                                        style: TextStyle(
+                                        style: context.typography.clientCompany.copyWith(
                                           fontSize: 10,
                                           color: Colors.grey,
                                         ),
                                       ),
                                       Text(
                                         '₹${option.unitPrice.toStringAsFixed(0)}',
-                                        style: TextStyle(
+                                        style: context.typography.invoiceAmount.copyWith(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.primary,
