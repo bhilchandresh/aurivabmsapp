@@ -110,6 +110,41 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
   final TextStyle cardSubtitle;
 
   // ---------------------------------------------------------------------------
+  // CARD & KPI TYPOGRAPHY
+  // ---------------------------------------------------------------------------
+  /// Use for: High-level KPI values in cards (size 24, w900).
+  /// Do NOT use for: Invoice list totals or screen headers.
+  final TextStyle kpiValue;
+
+  /// Use for: Descriptive labels above or below KPI values (size 12, bold, letterSpacing 1.0).
+  /// Do NOT use for: Form inputs labels.
+  final TextStyle kpiLabel;
+
+  /// Use for: Main statistic display numbers (size 24, bold).
+  /// Do NOT use for: Table headers.
+  final TextStyle statisticValue;
+
+  /// Use for: Labels describing a statistic (size 12, bold, letterSpacing 1.0, uppercase).
+  /// Do NOT use for: Table values.
+  final TextStyle statisticLabel;
+
+  /// Use for: Secondary descriptive paragraph text inside a card.
+  /// Do NOT use for: Form hints or warning messages.
+  final TextStyle cardDescription;
+
+  /// Use for: Small caption or detail text at the bottom of a card.
+  /// Do NOT use for: Main paragraph text.
+  final TextStyle cardCaption;
+
+  /// Use for: Card footers or action label text at the bottom.
+  /// Do NOT use for: Main button text.
+  final TextStyle cardFooter;
+
+  /// Use for: Trend indicators, positive/negative changes (size 12, bold).
+  /// Do NOT use for: Status labels.
+  final TextStyle trendText;
+
+  // ---------------------------------------------------------------------------
   // DASHBOARD & ANALYTICS
   // ---------------------------------------------------------------------------
   /// Use for: Hero-sized total numbers on the Dashboard.
@@ -333,11 +368,23 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
   /// Do NOT use for: Notification title.
   final TextStyle notificationSubtitle;
 
+  /// Use for: The timestamp of a notification.
+  /// Do NOT use for: General body text.
+  final TextStyle notificationTime;
+
   const AppTypographyExtension({
     required this.screenTitle,
     required this.sectionTitle,
     required this.cardTitle,
     required this.cardSubtitle,
+    required this.kpiValue,
+    required this.kpiLabel,
+    required this.statisticValue,
+    required this.statisticLabel,
+    required this.cardDescription,
+    required this.cardCaption,
+    required this.cardFooter,
+    required this.trendText,
     required this.dashboardValue,
     required this.dashboardLabel,
     required this.revenueValue,
@@ -388,6 +435,7 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
     required this.settingsTitle,
     required this.notificationTitle,
     required this.notificationSubtitle,
+    required this.notificationTime,
   });
 
   /// Factory for Light Theme Typography
@@ -397,6 +445,14 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       sectionTitle: AppTypography.titleMedium.copyWith(color: AppColors.lightTextPrimary),
       cardTitle: AppTypography.titleSmall.copyWith(color: AppColors.lightTextPrimary),
       cardSubtitle: AppTypography.bodySmall.copyWith(color: AppColors.lightTextSecondary),
+      kpiValue: AppTypography.headlineSmall.copyWith(fontWeight: FontWeight.w900, color: AppColors.lightTextPrimary),
+      kpiLabel: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.0, color: AppColors.lightTextSecondary),
+      statisticValue: AppTypography.headlineSmall.copyWith(fontWeight: FontWeight.bold, color: AppColors.lightTextPrimary),
+      statisticLabel: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.0, color: AppColors.lightTextSecondary),
+      cardDescription: AppTypography.bodyMedium.copyWith(height: 1.4, color: AppColors.lightTextSecondary),
+      cardCaption: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+      cardFooter: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500, color: AppColors.lightTextSecondary),
+      trendText: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
       
       dashboardValue: AppTypography.headlineMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.lightTextPrimary),
       dashboardLabel: AppTypography.labelMedium.copyWith(color: AppColors.lightTextSecondary),
@@ -453,8 +509,9 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       profileName: AppTypography.headlineSmall.copyWith(fontWeight: FontWeight.bold, color: AppColors.lightTextPrimary),
       profileRole: AppTypography.bodyMedium.copyWith(color: AppColors.lightTextSecondary),
       settingsTitle: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w600, color: AppColors.lightTextPrimary),
-      notificationTitle: AppTypography.titleSmall.copyWith(fontWeight: FontWeight.bold, color: AppColors.lightTextPrimary),
-      notificationSubtitle: AppTypography.bodySmall.copyWith(color: AppColors.lightTextSecondary),
+      notificationTitle: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.lightTextPrimary),
+      notificationSubtitle: AppTypography.bodyMedium.copyWith(height: 1.4, color: AppColors.lightTextSecondary),
+      notificationTime: AppTypography._baseStyle(13, FontWeight.w500, AppColors.lightTextSecondary),
     );
   }
 
@@ -465,6 +522,14 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       sectionTitle: AppTypography.titleMedium.copyWith(color: AppColors.darkTextPrimary),
       cardTitle: AppTypography.titleSmall.copyWith(color: AppColors.darkTextPrimary),
       cardSubtitle: AppTypography.bodySmall.copyWith(color: AppColors.darkTextSecondary),
+      kpiValue: AppTypography.headlineSmall.copyWith(fontWeight: FontWeight.w900, color: AppColors.darkTextPrimary),
+      kpiLabel: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.0, color: AppColors.darkTextSecondary),
+      statisticValue: AppTypography.headlineSmall.copyWith(fontWeight: FontWeight.bold, color: AppColors.darkTextPrimary),
+      statisticLabel: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1.0, color: AppColors.darkTextSecondary),
+      cardDescription: AppTypography.bodyMedium.copyWith(height: 1.4, color: AppColors.darkTextSecondary),
+      cardCaption: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
+      cardFooter: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.w500, color: AppColors.darkTextSecondary),
+      trendText: AppTypography.bodySmall.copyWith(fontWeight: FontWeight.bold),
       
       dashboardValue: AppTypography.headlineMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.darkTextPrimary),
       dashboardLabel: AppTypography.labelMedium.copyWith(color: AppColors.darkTextSecondary),
@@ -521,8 +586,9 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       profileName: AppTypography.headlineSmall.copyWith(fontWeight: FontWeight.bold, color: AppColors.darkTextPrimary),
       profileRole: AppTypography.bodyMedium.copyWith(color: AppColors.darkTextSecondary),
       settingsTitle: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w600, color: AppColors.darkTextPrimary),
-      notificationTitle: AppTypography.titleSmall.copyWith(fontWeight: FontWeight.bold, color: AppColors.darkTextPrimary),
-      notificationSubtitle: AppTypography.bodySmall.copyWith(color: AppColors.darkTextSecondary),
+      notificationTitle: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.darkTextPrimary),
+      notificationSubtitle: AppTypography.bodyMedium.copyWith(height: 1.4, color: AppColors.darkTextSecondary),
+      notificationTime: AppTypography._baseStyle(13, FontWeight.w500, AppColors.darkTextSecondary),
     );
   }
 
@@ -539,6 +605,14 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       sectionTitle: TextStyle.lerp(sectionTitle, other.sectionTitle, t)!,
       cardTitle: TextStyle.lerp(cardTitle, other.cardTitle, t)!,
       cardSubtitle: TextStyle.lerp(cardSubtitle, other.cardSubtitle, t)!,
+      kpiValue: TextStyle.lerp(kpiValue, other.kpiValue, t)!,
+      kpiLabel: TextStyle.lerp(kpiLabel, other.kpiLabel, t)!,
+      statisticValue: TextStyle.lerp(statisticValue, other.statisticValue, t)!,
+      statisticLabel: TextStyle.lerp(statisticLabel, other.statisticLabel, t)!,
+      cardDescription: TextStyle.lerp(cardDescription, other.cardDescription, t)!,
+      cardCaption: TextStyle.lerp(cardCaption, other.cardCaption, t)!,
+      cardFooter: TextStyle.lerp(cardFooter, other.cardFooter, t)!,
+      trendText: TextStyle.lerp(trendText, other.trendText, t)!,
       dashboardValue: TextStyle.lerp(dashboardValue, other.dashboardValue, t)!,
       dashboardLabel: TextStyle.lerp(dashboardLabel, other.dashboardLabel, t)!,
       revenueValue: TextStyle.lerp(revenueValue, other.revenueValue, t)!,
@@ -589,6 +663,7 @@ class AppTypographyExtension extends ThemeExtension<AppTypographyExtension> {
       settingsTitle: TextStyle.lerp(settingsTitle, other.settingsTitle, t)!,
       notificationTitle: TextStyle.lerp(notificationTitle, other.notificationTitle, t)!,
       notificationSubtitle: TextStyle.lerp(notificationSubtitle, other.notificationSubtitle, t)!,
+      notificationTime: TextStyle.lerp(notificationTime, other.notificationTime, t)!,
     );
   }
 }

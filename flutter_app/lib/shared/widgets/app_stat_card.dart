@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_extensions.dart';
 
 class AppStatCard extends StatelessWidget {
   final String title;
@@ -29,7 +28,7 @@ class AppStatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outline, width: 1),
+        border: Border.all(color: context.colorScheme.outline, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -64,10 +63,8 @@ class AppStatCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Text(
                   title.toUpperCase(),
-                  style: AppTextStyles.caption.copyWith(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                    color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                  style: context.typography.statisticLabel.copyWith(
+                    color: context.textTheme.bodyMedium?.color,
                   ),
                 ),
               ],
@@ -75,16 +72,14 @@ class AppStatCard extends StatelessWidget {
             const SizedBox(height: 12),
             Text(
               amount,
-              style: AppTextStyles.heading2.copyWith(
-                fontWeight: FontWeight.w900,
-                color: isFeatured ? color : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+              style: context.typography.kpiValue.copyWith(
+                color: isFeatured ? color : context.textTheme.displayLarge?.color,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: AppTextStyles.caption.copyWith(
-                fontWeight: FontWeight.bold,
+              style: context.typography.cardCaption.copyWith(
                 color: color,
               ),
             ),

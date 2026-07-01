@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_extensions.dart';
 
 enum AurivaNotificationType { payment, invoice }
 
@@ -65,19 +66,15 @@ class AurivaNotificationCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           'AurivaBMS',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                          style: context.typography.clientName.copyWith(
                             color: _textDark,
                           ),
                         ),
                         const Spacer(),
                         Text(
                           time,
-                          style: TextStyle(
-                            fontSize: 13,
+                          style: context.typography.notificationTime.copyWith(
                             color: _textGrey,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -89,9 +86,7 @@ class AurivaNotificationCard extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                          style: context.typography.notificationTitle.copyWith(
                             color: _textDark,
                           ),
                         ),
@@ -107,18 +102,14 @@ class AurivaNotificationCard extends StatelessWidget {
                     // Body Text
                     Text(
                       bodyText1,
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: context.typography.notificationSubtitle.copyWith(
                         color: _textGrey,
-                        height: 1.4,
                       ),
                     ),
                     Text(
                       bodyText2,
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: context.typography.notificationSubtitle.copyWith(
                         color: _textGrey,
-                        height: 1.4,
                       ),
                     ),
                   ],

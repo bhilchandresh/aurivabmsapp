@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_extensions.dart';
 import 'common_card.dart';
 
 class AnimatedStatCard extends StatelessWidget {
@@ -67,9 +68,7 @@ class AnimatedStatCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         trend,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                        style: context.typography.trendText.copyWith(
                           color: isPositive ? AppColors.success : AppColors.error,
                         ),
                       ),
@@ -81,16 +80,12 @@ class AnimatedStatCard extends StatelessWidget {
           const Spacer(),
           Text(
             title,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: context.typography.cardTitle,
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: theme.textTheme.displayMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+            style: context.typography.statisticValue,
           ),
         ],
       ),
