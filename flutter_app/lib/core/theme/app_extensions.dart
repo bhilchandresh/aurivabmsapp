@@ -26,8 +26,6 @@ extension ThemeContextExtension on BuildContext {
   /// Access to standard Material 3 color scheme.
   ColorScheme get colorScheme => Theme.of(this).colorScheme;
 
-  /// Access to standard Material 3 text theme.
-  TextTheme get textTheme => Theme.of(this).textTheme;
 
   // ---------------------------------------------------------------------------
   // LAYOUT HELPERS (Spacing, Radius, Shadows)

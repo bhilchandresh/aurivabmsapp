@@ -29,6 +29,7 @@ class AppInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -38,7 +39,7 @@ class AppInputField extends StatelessWidget {
             label.toUpperCase(),
             style: context.typography.inputLabel.copyWith(
               fontWeight: FontWeight.bold,
-              color: context.textTheme.bodyMedium?.color,
+              color: textTheme.bodyMedium?.color,
               letterSpacing: 0.5,
             ),
           ),
@@ -53,20 +54,20 @@ class AppInputField extends StatelessWidget {
           style: context.typography.inputText.copyWith(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: context.textTheme.bodyLarge?.color,
+            color: textTheme.bodyLarge?.color,
           ),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: context.typography.searchHint.copyWith(
               fontSize: 16,
-              color: context.textTheme.bodyMedium?.color,
+              color: textTheme.bodyMedium?.color,
             ),
             prefixIcon: prefixIcon != null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: IconTheme(
                       data: IconThemeData(
-                        color: context.textTheme.bodyMedium?.color,
+                        color: textTheme.bodyMedium?.color,
                       ),
                       child: prefixIcon!,
                     ),
@@ -79,7 +80,7 @@ class AppInputField extends StatelessWidget {
             suffixIcon: suffixIcon != null
                 ? IconTheme(
                     data: IconThemeData(
-                      color: context.textTheme.bodyMedium?.color,
+                      color: textTheme.bodyMedium?.color,
                     ),
                     child: suffixIcon!,
                   )

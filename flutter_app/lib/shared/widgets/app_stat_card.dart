@@ -23,6 +23,7 @@ class AppStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
@@ -64,7 +65,7 @@ class AppStatCard extends StatelessWidget {
                 Text(
                   title.toUpperCase(),
                   style: context.typography.statisticLabel.copyWith(
-                    color: context.textTheme.bodyMedium?.color,
+                    color: textTheme.bodyMedium?.color,
                   ),
                 ),
               ],
@@ -73,7 +74,7 @@ class AppStatCard extends StatelessWidget {
             Text(
               amount,
               style: context.typography.kpiValue.copyWith(
-                color: isFeatured ? color : context.textTheme.displayLarge?.color,
+                color: isFeatured ? color : textTheme.displayLarge?.color,
               ),
             ),
             const SizedBox(height: 4),

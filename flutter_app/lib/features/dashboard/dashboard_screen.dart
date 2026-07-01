@@ -1515,7 +1515,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(width: 8),
                 Text(
                   'collect_payment'.tr,
-                  style: TextStyle(
+                  style: context.typography.cardTitle.copyWith(
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
                     color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -1537,7 +1537,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
-                  style: TextStyle(
+                  style: context.typography.inputText.copyWith(
                     fontSize: 13,
                     color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                     fontFamily: Theme.of(
@@ -1546,7 +1546,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   hint: Text(
                     'select_client'.tr,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: context.typography.searchHint.copyWith(
                       fontSize: 13,
                       color: Colors.grey,
                     ),
@@ -1562,7 +1562,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       value: c.id,
                       child: Text(
                         c.name,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        style: context.typography.inputText.copyWith(
                           fontSize: 13,
                           color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                         ),
@@ -1592,7 +1592,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         Text(
                           'total_billed'.tr,
-                          style: TextStyle(
+                          style: context.typography.dashboardLabel.copyWith(
                             fontSize: 11,
                             color: Colors.grey,
                             fontWeight: FontWeight.bold,
@@ -1602,7 +1602,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Flexible(
                           child: Text(
                             formatCurrency.format(activeClient.totalBilled),
-                            style: TextStyle(
+                            style: context.typography.dashboardValue.copyWith(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -1619,7 +1619,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         Text(
                           'total_received'.tr,
-                          style: TextStyle(
+                          style: context.typography.dashboardLabel.copyWith(
                             fontSize: 11,
                             color: Colors.grey,
                             fontWeight: FontWeight.bold,
@@ -1629,7 +1629,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Flexible(
                           child: Text(
                             formatCurrency.format(activeClientTotalPaid),
-                            style: TextStyle(
+                            style: context.typography.dashboardValue.copyWith(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: tailwindEmerald,
@@ -1648,7 +1648,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       children: [
                         Text(
                           'ledger_balance'.tr,
-                          style: TextStyle(
+                          style: context.typography.dashboardLabel.copyWith(
                             fontSize: 11,
                             color: Theme.of(context).textTheme.bodyMedium?.color,
                             fontWeight: FontWeight.w900,
@@ -1659,7 +1659,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: activeClient.balance > 0
                               ? Text(
                                   '${formatCurrency.format(activeClient.balance)}${'due'.tr}',
-                                  style: TextStyle(
+                                  style: context.typography.dashboardValue.copyWith(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w900,
                                     color: tailwindRose,
@@ -1670,7 +1670,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               : activeClient.balance < 0
                               ? Text(
                                   '${formatCurrency.format(activeClient.balance.abs())}${'adv'.tr}',
-                                  style: TextStyle(
+                                  style: context.typography.dashboardValue.copyWith(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w900,
                                     color: tailwindBlue,
@@ -1680,7 +1680,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 )
                               : Text(
                                   'settled'.tr,
-                                  style: TextStyle(
+                                  style: context.typography.dashboardValue.copyWith(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w900,
                                     color: tailwindEmerald,
@@ -1713,20 +1713,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       keyboardType: const TextInputType.numberWithOptions(
                         decimal: true,
                       ),
-                      style: TextStyle(
+                      style: context.typography.inputText.copyWith(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                       ),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: '0.00',
                         prefixText: ' ₹ ',
-                        prefixStyle: TextStyle(
+                        prefixStyle: context.typography.inputText.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Colors.grey,
                         ),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
+                        contentPadding: const EdgeInsets.symmetric(
                           horizontal: 10,
                           vertical: 11,
                         ),
@@ -1778,7 +1778,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               const SizedBox(width: 6),
                               Text(
                                 'log_pay'.tr,
-                                style: TextStyle(
+                                style: context.typography.buttonText.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
