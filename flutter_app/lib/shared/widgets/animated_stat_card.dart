@@ -39,7 +39,7 @@ class AnimatedStatCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.15),
+                  color: primaryColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -53,8 +53,8 @@ class AnimatedStatCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isPositive
-                        ? AppColors.success.withOpacity(0.1)
-                        : AppColors.error.withOpacity(0.1),
+                        ? context.colorSchemeExtension.statusSuccess.withValues(alpha: 0.1)
+                        : AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
@@ -63,13 +63,13 @@ class AnimatedStatCard extends StatelessWidget {
                       Icon(
                         isPositive ? Icons.arrow_upward : Icons.arrow_downward,
                         size: 12,
-                        color: isPositive ? AppColors.success : AppColors.error,
+                        color: isPositive ? context.colorSchemeExtension.statusSuccess : AppColors.error,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         trend,
                         style: context.typography.trendText.copyWith(
-                          color: isPositive ? AppColors.success : AppColors.error,
+                          color: isPositive ? context.colorSchemeExtension.statusSuccess : AppColors.error,
                         ),
                       ),
                     ],

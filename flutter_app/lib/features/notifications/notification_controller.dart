@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/utils/api_service.dart';
 import '../../core/constants/api_constants.dart';
-import '../../core/services/notification_service.dart';
 import 'notification_model.dart';
 import '../auth/auth_controller.dart';
 
@@ -96,47 +95,47 @@ class NotificationController extends GetxController {
         await prefs.setString('last_notification_shown_date', today);
       }
 
-      List<String> shownIds =
+      final List<String> shownIds =
           prefs.getStringList('shown_local_notifications') ?? [];
 
       bool updated = false;
-      int localIdCounter = 1000; // start id offset to avoid collision
+//       int localIdCounter = 1000; // start id offset to avoid collision
 
       for (var notif in notifications) {
         if (!notif.isRead && !shownIds.contains(notif.id)) {
-          String title = 'AurivaBMS Alert';
-          String body = notif.message;
-          String? chipText;
-          String illustrationType = 'envelope'; // Default is envelope
+//           String title = 'AurivaBMS Alert';
+//           String body = notif.message;
+//           String? chipText;
+//           String illustrationType = 'envelope'; // Default is envelope
 
           final msgLower = notif.message.toLowerCase();
           if (msgLower.contains('payment') || msgLower.contains('received')) {
-            title = 'Payment Received';
-            illustrationType = 'invoice';
+//             title = 'Payment Received';
+//             illustrationType = 'invoice';
             
             if (notif.target.isNotEmpty && notif.target.contains('INV-')) {
-              chipText = 'Invoice ${notif.target}';
+//               chipText = 'Invoice ${notif.target}';
             } else {
               final match = RegExp(r'INV-\d+-\d+').firstMatch(notif.message);
               if (match != null) {
-                chipText = 'Invoice ${match.group(0)}';
+//                 chipText = 'Invoice ${match.group(0)}';
               } else {
-                chipText = 'Payment Details';
+//                 chipText = 'Payment Details';
               }
             }
           } else if (msgLower.contains('login')) {
-            title = 'Security Alert';
-            illustrationType = 'lock';
-            chipText = 'Login Security';
+//             title = 'Security Alert';
+//             illustrationType = 'lock';
+//             chipText = 'Login Security';
           } else if (msgLower.contains('invoice') || msgLower.contains('quotation')) {
-            title = msgLower.contains('invoice') ? 'Invoice Alert' : 'Quotation Alert';
-            illustrationType = 'invoice';
+//             title = msgLower.contains('invoice') ? 'Invoice Alert' : 'Quotation Alert';
+//             illustrationType = 'invoice';
             if (notif.target.isNotEmpty && notif.target.contains('INV-')) {
-              chipText = 'Invoice ${notif.target}';
+//               chipText = 'Invoice ${notif.target}';
             } else {
               final match = RegExp(r'INV-\d+-\d+').firstMatch(notif.message);
               if (match != null) {
-                chipText = 'Invoice ${match.group(0)}';
+//                 chipText = 'Invoice ${match.group(0)}';
               }
             }
           }

@@ -90,7 +90,7 @@ class SuperAdminEditCompanyController extends GetxController {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text('enter_a_new_password_for_this_company'.tr),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: passwordController,
               decoration: InputDecoration(
@@ -170,12 +170,15 @@ class SuperAdminEditCompanyController extends GetxController {
       };
 
       // backend might map 'starter' to 'basic', etc. let's just send what we have and let backend handle or send exact string.
-      if (subscriptionPlan.value == 'Starter')
+      if (subscriptionPlan.value == 'Starter') {
         payload['subscriptionPlan'] = 'basic';
-      if (subscriptionPlan.value == 'Pro')
+      }
+      if (subscriptionPlan.value == 'Pro') {
         payload['subscriptionPlan'] = 'premium';
-      if (subscriptionPlan.value == 'Business')
+      }
+      if (subscriptionPlan.value == 'Business') {
         payload['subscriptionPlan'] = 'enterprise';
+      }
 
       final response = await ApiService.put(
         '/auth/tenants/${tenant.id}',

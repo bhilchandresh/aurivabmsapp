@@ -1,3 +1,4 @@
+// ignore_for_file: unused_field, unused_local_variable, unused_element
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -255,7 +256,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
     final textColor = (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black);
     final subtextColor = (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey);
 
-    Widget infoDetails = Column(
+    final Widget infoDetails = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildInfoRow(
@@ -284,12 +285,12 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: isDark
-                  ? Colors.purple.shade900.withOpacity(0.15)
+                  ? Colors.purple.shade900.withValues(alpha: 0.15)
                   : Colors.purple.shade50,
               borderRadius: BorderRadius.circular(6),
               border: Border.all(
                 color: isDark
-                    ? Colors.purple.shade900.withOpacity(0.5)
+                    ? Colors.purple.shade900.withValues(alpha: 0.5)
                     : Colors.purple.shade100,
               ),
             ),
@@ -307,7 +308,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
       ],
     );
 
-    Widget actionsList = Wrap(
+    final Widget actionsList = Wrap(
       spacing: 8,
       runSpacing: 8,
       children: [
@@ -315,11 +316,10 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         _buildActionButton(
           icon: LucideIcons.phoneCall,
           label: 'call_sms'.tr,
-          backgroundColor: Colors.blue.shade900.withOpacity(
-            isDark ? 0.15 : 0.1,
+          backgroundColor: Colors.blue.shade900.withValues(alpha: isDark ? 0.15 : 0.1,
           ),
           foregroundColor: isDark ? Colors.blue.shade400 : Colors.blue.shade700,
-          borderColor: Colors.blue.shade900.withOpacity(isDark ? 0.4 : 0.3),
+          borderColor: Colors.blue.shade900.withValues(alpha: isDark ? 0.4 : 0.3),
           onTap: () =>
               _showCallSmsDialog(client, balance, billed, paid, invoices),
         ),
@@ -327,22 +327,22 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         _buildActionButton(
           icon: LucideIcons.messageSquare,
           label: 'whatsapp'.tr,
-          backgroundColor: Color(
+          backgroundColor: const Color(
             0xFF25D366,
-          ).withOpacity(isDark ? 0.15 : 0.1),
+          ).withValues(alpha: isDark ? 0.15 : 0.1),
           foregroundColor: isDark
-              ? Color(0xFF4ADE80)
-              : Color(0xFF128C7E),
-          borderColor: Color(0xFF25D366).withOpacity(isDark ? 0.4 : 0.3),
+              ? const Color(0xFF4ADE80)
+              : const Color(0xFF128C7E),
+          borderColor: const Color(0xFF25D366).withValues(alpha: isDark ? 0.4 : 0.3),
           onTap: () => _shareWhatsApp(client, balance, billed, paid, invoices),
         ),
         // Email Action
         _buildActionButton(
           icon: LucideIcons.mail,
           label: 'email'.tr,
-          backgroundColor: AppColors.primary.withOpacity(isDark ? 0.15 : 0.05),
-          foregroundColor: isDark ? Color(0xFF60A5FA) : AppColors.primary,
-          borderColor: AppColors.primary.withOpacity(isDark ? 0.4 : 0.2),
+          backgroundColor: AppColors.primary.withValues(alpha: isDark ? 0.15 : 0.05),
+          foregroundColor: isDark ? const Color(0xFF60A5FA) : AppColors.primary,
+          borderColor: AppColors.primary.withValues(alpha: isDark ? 0.4 : 0.2),
           isLoading: _isSendingEmail,
           onTap: () => _sendEmailSummary(client),
         ),
@@ -350,11 +350,11 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         _buildActionButton(
           icon: LucideIcons.edit3,
           label: 'edit'.tr,
-          backgroundColor: isDark ? Color(0xFF334155) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF334155) : Colors.white,
           foregroundColor: isDark
-              ? Color(0xFFE2E8F0)
+              ? const Color(0xFFE2E8F0)
               : Colors.grey.shade700,
-          borderColor: isDark ? Color(0xFF475569) : Colors.grey.shade300,
+          borderColor: isDark ? const Color(0xFF475569) : Colors.grey.shade300,
           onTap: () => _showEditClientDialog(client),
         ),
         // Delete Action
@@ -362,19 +362,19 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
           icon: LucideIcons.trash2,
           label: 'delete'.tr,
           backgroundColor: isDark
-              ? Colors.red.shade900.withOpacity(0.15)
+              ? Colors.red.shade900.withValues(alpha: 0.15)
               : Colors.red.shade50,
           foregroundColor: isDark ? Colors.red.shade400 : Colors.red.shade600,
-          borderColor: Colors.red.shade900.withOpacity(isDark ? 0.4 : 0.1),
+          borderColor: Colors.red.shade900.withValues(alpha: isDark ? 0.4 : 0.1),
           onTap: () => _showDeleteConfirmation(client),
         ),
         // Collect Payment Action
         ElevatedButton.icon(
           onPressed: () => _showCollectPaymentDialog(client),
-          icon: Icon(LucideIcons.indianRupee, size: 14),
+          icon: const Icon(LucideIcons.indianRupee, size: 14),
           label: Text(
             'collect'.tr,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           ),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
@@ -398,7 +398,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.15 : 0.01),
+            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.01),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -415,7 +415,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                     client.name.trim().isNotEmpty
                         ? client.name.trim()[0].toUpperCase()
                         : 'C',
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
@@ -457,7 +457,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                         client.name.trim().isNotEmpty
                             ? client.name.trim()[0].toUpperCase()
                             : 'C',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -574,15 +574,15 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Determine balance color card details
-    Color balanceBgColor = Color(0xFFFFF1F2);
-    Color balanceBorderColor = Color(0xFFFECDD3);
-    Color balanceTitleColor = Color(0xFFE11D48);
-    Color balanceAmountColor = Color(0xFFBE123C);
+    Color balanceBgColor = const Color(0xFFFFF1F2);
+    Color balanceBorderColor = const Color(0xFFFECDD3);
+    Color balanceTitleColor = const Color(0xFFE11D48);
+    Color balanceAmountColor = const Color(0xFFBE123C);
     String balanceLabel = 'outstanding_due'.tr;
 
     if (isDark) {
-      balanceBgColor = Colors.red.shade900.withOpacity(0.15);
-      balanceBorderColor = Colors.red.shade800.withOpacity(0.4);
+      balanceBgColor = Colors.red.shade900.withValues(alpha: 0.15);
+      balanceBorderColor = Colors.red.shade800.withValues(alpha: 0.4);
       balanceTitleColor = Colors.red.shade400;
       balanceAmountColor = Colors.red.shade300;
     }
@@ -590,8 +590,8 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
     if (balance < 0) {
       balanceLabel = 'advance_jama'.tr;
       if (isDark) {
-        balanceBgColor = Colors.blue.shade900.withOpacity(0.15);
-        balanceBorderColor = Colors.blue.shade800.withOpacity(0.4);
+        balanceBgColor = Colors.blue.shade900.withValues(alpha: 0.15);
+        balanceBorderColor = Colors.blue.shade800.withValues(alpha: 0.4);
         balanceTitleColor = Colors.blue.shade400;
         balanceAmountColor = Colors.blue.shade300;
       } else {
@@ -601,21 +601,21 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         balanceAmountColor = Colors.blue.shade700;
       }
     } else if (balance == 0) {
-      balanceLabel = 'settled'.tr + ' ✓';
+      balanceLabel = '${'settled'.tr} ✓';
       if (isDark) {
-        balanceBgColor = Colors.green.shade900.withOpacity(0.15);
-        balanceBorderColor = Colors.green.shade800.withOpacity(0.3);
+        balanceBgColor = Colors.green.shade900.withValues(alpha: 0.15);
+        balanceBorderColor = Colors.green.shade800.withValues(alpha: 0.3);
         balanceTitleColor = Colors.green.shade400;
         balanceAmountColor = Colors.green.shade300;
       } else {
-        balanceBgColor = Color(0xFFECFDF5);
-        balanceBorderColor = Color(0xFFA7F3D0);
-        balanceTitleColor = Color(0xFF059669);
-        balanceAmountColor = Color(0xFF047857);
+        balanceBgColor = const Color(0xFFECFDF5);
+        balanceBorderColor = const Color(0xFFA7F3D0);
+        balanceTitleColor = const Color(0xFF059669);
+        balanceAmountColor = const Color(0xFF047857);
       }
     }
 
-    List<Widget> cards = [
+    final List<Widget> cards = [
       _buildStatCard(
         title: 'total_paid'.tr,
         amount: paid,
@@ -718,10 +718,10 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                   child: Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: isDark ? Color(0xFF334155) : Colors.white,
+                      color: isDark ? const Color(0xFF334155) : Colors.white,
                       border: Border.all(
                         color: isDark
-                            ? Color(0xFF475569)
+                            ? const Color(0xFF475569)
                             : Colors.grey.shade200,
                       ),
                       borderRadius: BorderRadius.circular(6),
@@ -824,7 +824,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isMobile = MediaQuery.of(context).size.width < 600;
 
-    Widget tabButtonsRow = Row(
+    final Widget tabButtonsRow = Row(
       children: [
         _buildTabButton('invoices', 'invoices'.tr),
         _buildTabButton('quotations', 'quotations'.tr),
@@ -832,7 +832,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
       ],
     );
 
-    Widget sortDropdownRow = Padding(
+    final Widget sortDropdownRow = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: Row(
         mainAxisAlignment: isMobile
@@ -879,8 +879,8 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
     if (isMobile) {
       return Container(
         color: isDark
-            ? Color(0xFF0F172A).withOpacity(0.5)
-            : Colors.grey.shade50.withOpacity(0.5),
+            ? const Color(0xFF0F172A).withValues(alpha: 0.5)
+            : Colors.grey.shade50.withValues(alpha: 0.5),
         child: Column(
           children: [
             tabButtonsRow,
@@ -896,8 +896,8 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
 
     return Container(
       color: isDark
-          ? Color(0xFF0F172A).withOpacity(0.5)
-          : Colors.grey.shade50.withOpacity(0.5),
+          ? const Color(0xFF0F172A).withValues(alpha: 0.5)
+          : Colors.grey.shade50.withValues(alpha: 0.5),
       child: Row(
         children: [
           Expanded(child: tabButtonsRow),
@@ -992,22 +992,22 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         final formattedDate = _safeFormatDate(inv.date);
 
         Color badgeColor = isDark
-            ? Color(0xFF334155)
+            ? const Color(0xFF334155)
             : Colors.grey.shade100;
         Color textColor = (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey);
         if (inv.status == 'Paid') {
           badgeColor = isDark
-              ? Colors.green.shade900.withOpacity(0.3)
+              ? Colors.green.shade900.withValues(alpha: 0.3)
               : Colors.green.shade50;
           textColor = isDark ? Colors.green.shade400 : Colors.green.shade700;
         } else if (inv.status == 'Pending' || inv.status == 'Unpaid') {
           badgeColor = isDark
-              ? Colors.yellow.shade900.withOpacity(0.3)
+              ? Colors.yellow.shade900.withValues(alpha: 0.3)
               : Colors.yellow.shade50;
           textColor = isDark ? Colors.yellow.shade400 : Colors.yellow.shade800;
         } else if (inv.status == 'Partially Paid') {
           badgeColor = isDark
-              ? Colors.orange.shade900.withOpacity(0.3)
+              ? Colors.orange.shade900.withValues(alpha: 0.3)
               : Colors.orange.shade50;
           textColor = isDark ? Colors.orange.shade400 : Colors.orange.shade800;
         }
@@ -1024,7 +1024,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                       children: [
                         Text(
                           inv.invoiceNumber,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                             color: AppColors.primary,
@@ -1141,7 +1141,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                 children: [
                   Text(
                     quote.quotationNumber,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       color: Colors.purple,
@@ -1179,7 +1179,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
     List<ClientPayment> payments,
   ) {
     // Build ledger entries
-    List<Map<String, dynamic>> rawEntries = [];
+    final List<Map<String, dynamic>> rawEntries = [];
     for (var inv in invoices) {
       rawEntries.add({
         'key': '${inv.id}_inv',
@@ -1214,7 +1214,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
       (a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime),
     );
     double running = 0.0;
-    List<Map<String, dynamic>> withBalance = [];
+    final List<Map<String, dynamic>> withBalance = [];
     for (var entry in rawEntries) {
       running += (entry['debit'] as double) - (entry['credit'] as double);
       withBalance.add({...entry, 'balance': running});
@@ -1261,10 +1261,10 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                 decoration: BoxDecoration(
                   color: isDebit
                       ? (isDark
-                            ? Colors.blue.shade900.withOpacity(0.3)
+                            ? Colors.blue.shade900.withValues(alpha: 0.3)
                             : Colors.blue.shade50)
                       : (isDark
-                            ? Colors.green.shade900.withOpacity(0.3)
+                            ? Colors.green.shade900.withValues(alpha: 0.3)
                             : Colors.green.shade50),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -1307,7 +1307,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: isDark
-                                  ? Color(0xFF475569)
+                                  ? const Color(0xFF475569)
                                   : Colors.grey.shade300,
                             ),
                           ),
@@ -1361,7 +1361,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                 ? Colors.blue.shade500
                                 : (isDark
                                       ? Colors.red.shade400
-                                      : Color(0xFFE11D48))),
+                                      : const Color(0xFFE11D48))),
                     ),
                   ),
                 ],
@@ -1382,8 +1382,8 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
       child: Theme(
         data: Theme.of(context).copyWith(
           dividerColor: isDark
-              ? Colors.white.withOpacity(0.05)
-              : Colors.black.withOpacity(0.04),
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.black.withValues(alpha: 0.04),
         ),
         child: DataTable(
           columnSpacing: 24,
@@ -1501,7 +1501,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                     (entry['credit'] as double) > 0
                         ? '+ ${formatCurrency.format(entry['credit'])}'
                         : '-',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.success,
                       fontWeight: FontWeight.w600,
@@ -1522,7 +1522,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                 ? Colors.blue.shade500
                                 : (isDark
                                       ? Colors.red.shade400
-                                      : Color(0xFFE11D48))),
+                                      : const Color(0xFFE11D48))),
                     ),
                   ),
                 ),
@@ -1575,7 +1575,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         'phone_missing'.tr,
         'phone_not_configured'.tr,
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.error.withOpacity(0.1),
+        backgroundColor: AppColors.error.withValues(alpha: 0.1),
         colorText: AppColors.error,
       );
       return;
@@ -1620,13 +1620,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                             ).format(balance.abs())
                       : 'outstanding_nil'.tr;
                   final message =
-                      'hello_greeting'.tr +
-                      client.name +
-                      ',\nHere is your account summary:\nTotal Billed: Rs.' +
-                      NumberFormat.decimalPattern('en_IN').format(billed) +
-                      '\nTotal Paid: Rs.' +
-                      NumberFormat.decimalPattern('en_IN').format(paid) +
-                      '\n$balanceText\n\nRegards,\nAuriva BMS';
+                      '${'hello_greeting'.tr}${client.name},\nHere is your account summary:\nTotal Billed: Rs.${NumberFormat.decimalPattern('en_IN').format(billed)}\nTotal Paid: Rs.${NumberFormat.decimalPattern('en_IN').format(paid)}\n$balanceText\n\nRegards,\nAuriva BMS';
                   final cleanPhone = client.phone.replaceAll(
                     RegExp(r'[^0-9+]'),
                     '',
@@ -1643,7 +1637,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                     Get.snackbar(
                       'success'.tr,
                       'sms_sent_success'.tr + cleanPhone,
-                      backgroundColor: AppColors.success.withOpacity(0.1),
+                      backgroundColor: AppColors.success.withValues(alpha: 0.1),
                       colorText: AppColors.success,
                       snackPosition: SnackPosition.BOTTOM,
                     );
@@ -1651,7 +1645,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                     Get.snackbar(
                       'Error',
                       'sms_send_error'.tr + e.toString(),
-                      backgroundColor: AppColors.error.withOpacity(0.1),
+                      backgroundColor: AppColors.error.withValues(alpha: 0.1),
                       colorText: AppColors.error,
                     );
                   }
@@ -1659,15 +1653,15 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                   Get.snackbar(
                     'Permission Denied',
                     'sms_permission_denied'.tr,
-                    backgroundColor: AppColors.error.withOpacity(0.1),
+                    backgroundColor: AppColors.error.withValues(alpha: 0.1),
                     colorText: AppColors.error,
                   );
                 }
               },
-              icon: Icon(LucideIcons.messageCircle, color: Colors.blue),
+              icon: const Icon(LucideIcons.messageCircle, color: Colors.blue),
               label: Text(
                 'direct_sms'.tr,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.blue,
                   fontWeight: FontWeight.bold,
                 ),
@@ -1693,7 +1687,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                     Get.snackbar(
                       'Error',
                       'direct_call_error'.tr + e.toString(),
-                      backgroundColor: AppColors.error.withOpacity(0.1),
+                      backgroundColor: AppColors.error.withValues(alpha: 0.1),
                       colorText: AppColors.error,
                     );
                   }
@@ -1701,15 +1695,15 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                   Get.snackbar(
                     'Permission Denied',
                     'phone_permission_denied'.tr,
-                    backgroundColor: AppColors.error.withOpacity(0.1),
+                    backgroundColor: AppColors.error.withValues(alpha: 0.1),
                     colorText: AppColors.error,
                   );
                 }
               },
-              icon: Icon(LucideIcons.phone, size: 18),
+              icon: const Icon(LucideIcons.phone, size: 18),
               label: Text(
                 'call'.tr,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
@@ -1774,7 +1768,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         'Email Missing',
         'This client does not have an email address configured.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: AppColors.error.withOpacity(0.1),
+        backgroundColor: AppColors.error.withValues(alpha: 0.1),
         colorText: AppColors.error,
       );
       return;
@@ -1795,7 +1789,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
           'Email Sent',
           'Account summary email sent to ${client.email} successfully!',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.success.withOpacity(0.1),
+          backgroundColor: AppColors.success.withValues(alpha: 0.1),
           colorText: AppColors.success,
         );
       } else {
@@ -1803,7 +1797,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
           'Error',
           'Failed to send account summary email. Please try again.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.error.withOpacity(0.1),
+          backgroundColor: AppColors.error.withValues(alpha: 0.1),
           colorText: AppColors.error,
         );
       }
@@ -1828,7 +1822,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
           'Ledger records matched with all billing history.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: isDark
-              ? Colors.blue.shade900.withOpacity(0.2)
+              ? Colors.blue.shade900.withValues(alpha: 0.2)
               : Colors.blue.shade50,
           colorText: isDark ? Colors.blue.shade300 : Colors.blue.shade800,
         );
@@ -1837,7 +1831,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
           'Sync Failed',
           'Failed to sync ledger records. Please try again.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: AppColors.error.withOpacity(0.1),
+          backgroundColor: AppColors.error.withValues(alpha: 0.1),
           colorText: AppColors.error,
         );
       }
@@ -1857,13 +1851,15 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
       }
     } catch (_) {
       await Clipboard.setData(ClipboardData(text: fallbackText));
+      if (!context.mounted) return;
+      // ignore: use_build_context_synchronously
       final isDark = Theme.of(context).brightness == Brightness.dark;
       Get.snackbar(
         'Copied to Clipboard',
         'Could not launch WhatsApp. Summary text copied to clipboard instead.',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: isDark
-            ? Colors.orange.shade900.withOpacity(0.2)
+            ? Colors.orange.shade900.withValues(alpha: 0.2)
             : Colors.orange.shade50,
         colorText: isDark ? Colors.orange.shade300 : Colors.orange.shade800,
       );
@@ -1893,7 +1889,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
               ),
               title: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     LucideIcons.indianRupee,
                     size: 20,
                     color: AppColors.primary,
@@ -1924,7 +1920,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                         controller: amountController,
                         enabled: !isSaving,
                         keyboardType: TextInputType.number,
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           LucideIcons.indianRupee,
                           size: 18,
                         ),
@@ -2119,7 +2115,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                         hintText: 'txn_id_reference_etc'.tr,
                         controller: noteController,
                         enabled: !isSaving,
-                        prefixIcon: Icon(LucideIcons.pencil, size: 18),
+                        prefixIcon: const Icon(LucideIcons.pencil, size: 18),
                       ),
                       const SizedBox(height: 24),
                       Row(
@@ -2173,6 +2169,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                     }
 
                                     if (success) {
+                                      if (!context.mounted) return;
                                       Navigator.pop(context);
                                       Get.snackbar(
                                         'payment_saved'.tr,
@@ -2181,7 +2178,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                         }),
                                         snackPosition: SnackPosition.BOTTOM,
                                         backgroundColor: AppColors.success
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         colorText: AppColors.success,
                                       );
                                     } else {
@@ -2190,7 +2187,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                         'failed_save_payment'.tr,
                                         snackPosition: SnackPosition.BOTTOM,
                                         backgroundColor: AppColors.error
-                                            .withOpacity(0.1),
+                                            .withValues(alpha: 0.1),
                                         colorText: AppColors.error,
                                       );
                                     }
@@ -2215,7 +2212,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                   )
                                 : Text(
                                     'save_record'.tr,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -2240,7 +2237,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
     final phoneController = TextEditingController(text: client.phone);
     final gstinController = TextEditingController(text: client.gstin);
     final addressController = TextEditingController(text: client.address);
-    String selectedState = client.state.isNotEmpty ? client.state : '';
+    final String selectedState = client.state.isNotEmpty ? client.state : '';
     final isDark = Theme.of(context).brightness == Brightness.dark;
     bool isSaving = false;
 
@@ -2317,7 +2314,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: isDark
-                                    ? Color(0xFF334155)
+                                    ? const Color(0xFF334155)
                                     : Colors.grey.shade100,
                                 foregroundColor: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                                 elevation: 0,
@@ -2333,7 +2330,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                   : () => Navigator.pop(context),
                               child: Text(
                                 'cancel'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -2388,13 +2385,14 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                       }
 
                                       if (success) {
+                                        if (!context.mounted) return;
                                         Navigator.pop(context);
                                         Get.snackbar(
                                           'client_updated'.tr,
                                           'changes_saved_success'.tr,
                                           snackPosition: SnackPosition.BOTTOM,
                                           backgroundColor: AppColors.success
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           colorText: AppColors.success,
                                         );
                                       } else {
@@ -2403,7 +2401,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                           'failed_update_client'.tr,
                                           snackPosition: SnackPosition.BOTTOM,
                                           backgroundColor: AppColors.error
-                                              .withOpacity(0.1),
+                                              .withValues(alpha: 0.1),
                                           colorText: AppColors.error,
                                         );
                                       }
@@ -2422,7 +2420,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                     )
                                   : Text(
                                       'save_changes'.tr,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -2467,12 +2465,12 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                     width: 56,
                     decoration: BoxDecoration(
                       color: isDark
-                          ? Colors.red.shade900.withOpacity(0.15)
+                          ? Colors.red.shade900.withValues(alpha: 0.15)
                           : Colors.red.shade50,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isDark
-                            ? Colors.red.shade900.withOpacity(0.3)
+                            ? Colors.red.shade900.withValues(alpha: 0.3)
                             : Colors.red.shade100,
                       ),
                     ),
@@ -2513,7 +2511,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                         style: OutlinedButton.styleFrom(
                           side: BorderSide(
                             color: isDark
-                                ? Color(0xFF475569)
+                                ? const Color(0xFF475569)
                                 : Colors.grey.shade300,
                           ),
                           shape: RoundedRectangleBorder(
@@ -2525,7 +2523,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                           'cancel'.tr,
                           style: TextStyle(
                             color: isDark
-                                ? Color(0xFFE2E8F0)
+                                ? const Color(0xFFE2E8F0)
                                 : Colors.grey.shade600,
                             fontWeight: FontWeight.bold,
                           ),
@@ -2552,6 +2550,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                 }
 
                                 if (success) {
+                                  if (!context.mounted) return;
                                   Navigator.pop(context); // Pop Dialog
                                   Get.back(); // Pop Details Screen back to directory
                                   Get.snackbar(
@@ -2567,7 +2566,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                                     'failed_delete_client'.tr,
                                     snackPosition: SnackPosition.BOTTOM,
                                     backgroundColor: AppColors.error
-                                        .withOpacity(0.1),
+                                        .withValues(alpha: 0.1),
                                     colorText: AppColors.error,
                                   );
                                 }
@@ -2594,7 +2593,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                               )
                             : Text(
                                 'delete'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

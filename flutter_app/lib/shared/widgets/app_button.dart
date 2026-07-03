@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_extensions.dart';
 
 class AppButton extends StatelessWidget {
@@ -23,15 +22,15 @@ class AppButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
+          backgroundColor: context.colorScheme.primary,
           foregroundColor: Colors.white,
-          disabledBackgroundColor: AppColors.primary.withOpacity(0.7),
+          disabledBackgroundColor: context.colorScheme.primary.withValues(alpha: 0.7),
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           elevation: 4,
-          shadowColor: AppColors.primary.withOpacity(0.4),
+          shadowColor: context.colorScheme.primary.withValues(alpha: 0.4),
         ),
         child: isLoading
             ? const SizedBox(

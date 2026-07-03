@@ -1,4 +1,6 @@
+// ignore_for_file: curly_braces_in_flow_control_structures
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/theme/app_extensions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:get/get.dart';
@@ -9,12 +11,14 @@ import 'super_admin_analytics_controller.dart';
 class SuperAdminAnalyticsScreen extends StatelessWidget {
   const SuperAdminAnalyticsScreen({super.key});
 
+  BuildContext get context => Get.context!;
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(SuperAdminAnalyticsController());
 
     return Scaffold(
-      backgroundColor: Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -120,12 +124,12 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colorSchemeExtension.cardBackground,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -149,20 +153,20 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: context.typography.helperText.copyWith(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF94A3B8),
+                    color: const Color(0xFF94A3B8),
                     letterSpacing: 1.0,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: TextStyle(
+                  style: context.typography.cardTitle.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF1E293B),
+                    color: const Color(0xFF1E293B),
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -184,7 +188,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
     // Calculate Max Y for Bar Chart
     double maxTenants = 0;
     for (var item in controller.growthData) {
-      double count = (item['newTenants'] ?? 0).toDouble();
+      final double count = (item['newTenants'] ?? 0).toDouble();
       if (count > maxTenants) maxTenants = count;
     }
     maxTenants = (maxTenants * 1.5).ceilToDouble();
@@ -196,7 +200,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
           ? Center(
               child: Text(
                 'no_data_available'.tr,
-                style: TextStyle(color: Colors.grey),
+                style: context.typography.inputText.copyWith(color: Colors.grey),
               ),
             )
           : BarChart(
@@ -210,13 +214,13 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        int idx = value.toInt();
+                        final int idx = value.toInt();
                         if (idx >= 0 && idx < controller.growthData.length) {
                           return SideTitleWidget(
                             axisSide: meta.axisSide,
                             child: Text(
                               controller.growthData[idx]['month'] ?? '',
-                              style: TextStyle(
+                              style: context.typography.helperText.copyWith(
                                 color: Colors.grey,
                                 fontSize: 10,
                               ),
@@ -231,11 +235,12 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        if (value == 0 || value % (maxTenants / 4).ceil() != 0)
+                        if (value == 0 || value % (maxTenants / 4).ceil() != 0) {
                           return const SizedBox.shrink();
+                        }
                         return Text(
                           value.toInt().toString(),
-                          style: TextStyle(
+                          style: context.typography.helperText.copyWith(
                             color: Colors.grey,
                             fontSize: 10,
                           ),
@@ -265,8 +270,8 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                 ),
                 borderData: FlBorderData(show: false),
                 barGroups: controller.growthData.asMap().entries.map((entry) {
-                  int idx = entry.key;
-                  double count = (entry.value['newTenants'] ?? 0).toDouble();
+                  final int idx = entry.key;
+                  final double count = (entry.value['newTenants'] ?? 0).toDouble();
                   return BarChartGroupData(
                     x: idx,
                     barRods: [
@@ -286,7 +291,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
     // Calculate Max Y for Line Chart
     double maxMrr = 0;
     for (var item in controller.growthData) {
-      double mrr = (item['mrr'] ?? 0).toDouble();
+      final double mrr = (item['mrr'] ?? 0).toDouble();
       if (mrr > maxMrr) maxMrr = mrr;
     }
     maxMrr = (maxMrr * 1.3).ceilToDouble();
@@ -298,7 +303,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
           ? Center(
               child: Text(
                 'no_data_available'.tr,
-                style: TextStyle(color: Colors.grey),
+                style: context.typography.inputText.copyWith(color: Colors.grey),
               ),
             )
           : LineChart(
@@ -316,13 +321,13 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        int idx = value.toInt();
+                        final int idx = value.toInt();
                         if (idx >= 0 && idx < controller.growthData.length) {
                           return SideTitleWidget(
                             axisSide: meta.axisSide,
                             child: Text(
                               controller.growthData[idx]['month'] ?? '',
-                              style: TextStyle(
+                              style: context.typography.helperText.copyWith(
                                 color: Colors.grey,
                                 fontSize: 10,
                               ),
@@ -341,7 +346,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                         if (value == 0) return const SizedBox.shrink();
                         return Text(
                           value.toInt().toString(),
-                          style: TextStyle(
+                          style: context.typography.helperText.copyWith(
                             color: Colors.grey,
                             fontSize: 10,
                           ),
@@ -372,8 +377,8 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                 lineBarsData: [
                   LineChartBarData(
                     spots: controller.growthData.asMap().entries.map((entry) {
-                      int idx = entry.key;
-                      double mrr = (entry.value['mrr'] ?? 0).toDouble();
+                      final int idx = entry.key;
+                      final double mrr = (entry.value['mrr'] ?? 0).toDouble();
                       return FlSpot(idx.toDouble(), mrr);
                     }).toList(),
                     isCurved: true,
@@ -393,7 +398,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                     ),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: Colors.green.shade500.withOpacity(0.1),
+                      color: Colors.green.shade500.withValues(alpha: 0.1),
                     ),
                   ),
                 ],
@@ -402,7 +407,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
     );
 
     // Plan Distribution
-    bool hasPlanData = controller.planDistribution.any(
+    final bool hasPlanData = controller.planDistribution.any(
       (item) => (item['value'] ?? 0) > 0,
     );
 
@@ -412,7 +417,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
           ? Center(
               child: Text(
                 'no_data_available'.tr,
-                style: TextStyle(color: Colors.grey),
+                style: context.typography.inputText.copyWith(color: Colors.grey),
               ),
             )
           : Column(
@@ -424,22 +429,22 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                       centerSpaceRadius: 60,
                       sections: controller.planDistribution
                           .map<PieChartSectionData>((item) {
-                            String name = item['name'] ?? '';
-                            double val = (item['value'] ?? 0).toDouble();
+                            final String name = item['name'] ?? '';
+                            final double val = (item['value'] ?? 0).toDouble();
                             Color c = Colors.grey;
-                            if (name == 'Business')
-                              c = Color(0xFFA855F7);
-                            else if (name == 'Freelancer')
-                              c = Color(0xFFCBD5E1);
+                            if (name == 'Business') {
+                              c = const Color(0xFFA855F7);
+                            } else if (name == 'Freelancer')
+                              c = const Color(0xFFCBD5E1);
                             else if (name == 'Pro')
-                              c = Color(0xFF3B82F6);
+                              c = const Color(0xFF3B82F6);
 
                             return PieChartSectionData(
                               color: c,
                               value: val,
                               title: val > 0 ? val.toInt().toString() : '',
                               radius: 30,
-                              titleStyle: TextStyle(
+                              titleStyle: context.typography.categoryHeader.copyWith(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -454,11 +459,11 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildLegendItem(Color(0xFFA855F7), 'Business'),
+                    _buildLegendItem(const Color(0xFFA855F7), 'Business'),
                     const SizedBox(width: 16),
-                    _buildLegendItem(Color(0xFFCBD5E1), 'Freelancer'),
+                    _buildLegendItem(const Color(0xFFCBD5E1), 'Freelancer'),
                     const SizedBox(width: 16),
-                    _buildLegendItem(Color(0xFF3B82F6), 'Pro'),
+                    _buildLegendItem(const Color(0xFF3B82F6), 'Pro'),
                   ],
                 ),
               ],
@@ -468,7 +473,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
     // Feature Adoption Max calculation
     double maxAdoption = 0;
     for (var item in controller.featureAdoption) {
-      double val = (item['users'] ?? 0).toDouble();
+      final double val = (item['users'] ?? 0).toDouble();
       if (val > maxAdoption) maxAdoption = val;
     }
     if (maxAdoption == 0) maxAdoption = 1;
@@ -479,7 +484,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
           ? Center(
               child: Text(
                 'no_data_available'.tr,
-                style: TextStyle(color: Colors.grey),
+                style: context.typography.inputText.copyWith(color: Colors.grey),
               ),
             )
           : Column(
@@ -497,7 +502,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                           ) {
                             return Text(
                               item['name'] ?? '',
-                              style: TextStyle(
+                              style: context.typography.helperText.copyWith(
                                 color: Colors.grey,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -523,8 +528,8 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                               children: controller.featureAdoption.map<Widget>((
                                 item,
                               ) {
-                                double val = (item['users'] ?? 0).toDouble();
-                                double factor = (val / maxAdoption).clamp(
+                                final double val = (item['users'] ?? 0).toDouble();
+                                final double factor = (val / maxAdoption).clamp(
                                   0.0,
                                   1.0,
                                 );
@@ -545,7 +550,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                                         ),
                                         child: Text(
                                           val > 0 ? val.toInt().toString() : '',
-                                          style: TextStyle(
+                                          style: context.typography.helperText.copyWith(
                                             color: Colors.white,
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
@@ -570,32 +575,32 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                     children: [
                       Text(
                         '0',
-                        style: TextStyle(color: Colors.grey, fontSize: 10),
+                        style: context.typography.helperText.copyWith(color: Colors.grey, fontSize: 10),
                       ),
                       Text(
                         (maxAdoption * 0.25).toInt().toString(),
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           color: Colors.grey,
                           fontSize: 10,
                         ),
                       ),
                       Text(
                         (maxAdoption * 0.50).toInt().toString(),
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           color: Colors.grey,
                           fontSize: 10,
                         ),
                       ),
                       Text(
                         (maxAdoption * 0.75).toInt().toString(),
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           color: Colors.grey,
                           fontSize: 10,
                         ),
                       ),
                       Text(
                         maxAdoption.toInt().toString(),
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           color: Colors.grey,
                           fontSize: 10,
                         ),
@@ -651,7 +656,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -662,10 +667,10 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(
+            style: context.typography.helperText.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.w800,
-              color: Color(0xFF64748B),
+              color: const Color(0xFF64748B),
               letterSpacing: 1.2,
             ),
           ),
@@ -687,7 +692,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           text,
-          style: TextStyle(
+          style: context.typography.helperText.copyWith(
             fontSize: 12,
             color: color,
             fontWeight: FontWeight.w600,
@@ -820,7 +825,7 @@ class SkeletonLoader extends StatefulWidget {
   });
 
   @override
-  _SkeletonLoaderState createState() => _SkeletonLoaderState();
+  State<SkeletonLoader> createState() => _SkeletonLoaderState();
 }
 
 class _SkeletonLoaderState extends State<SkeletonLoader>

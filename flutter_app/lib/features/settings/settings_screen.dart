@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -11,7 +12,6 @@ import '../../shared/widgets/app_button.dart';
 import '../../core/utils/api_service.dart';
 import '../../core/constants/api_constants.dart';
 import '../auth/auth_controller.dart';
-import '../import_data/import_data_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -25,17 +25,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final ImagePicker _imagePicker = ImagePicker();
 
   // Controllers
-  TextEditingController _nameCtrl = TextEditingController();
-  TextEditingController _emailCtrl = TextEditingController();
-  TextEditingController _phoneCtrl = TextEditingController();
-  TextEditingController _websiteCtrl = TextEditingController();
-  TextEditingController _addressCtrl = TextEditingController();
-  TextEditingController _gstNumberCtrl = TextEditingController();
-  TextEditingController _termsCtrl = TextEditingController();
-  TextEditingController _accNameCtrl = TextEditingController();
-  TextEditingController _bankNameCtrl = TextEditingController();
-  TextEditingController _accNumCtrl = TextEditingController();
-  TextEditingController _ifscCtrl = TextEditingController();
+  final TextEditingController _nameCtrl = TextEditingController();
+  final TextEditingController _emailCtrl = TextEditingController();
+  final TextEditingController _phoneCtrl = TextEditingController();
+  final TextEditingController _websiteCtrl = TextEditingController();
+  final TextEditingController _addressCtrl = TextEditingController();
+  final TextEditingController _gstNumberCtrl = TextEditingController();
+  final TextEditingController _termsCtrl = TextEditingController();
+  final TextEditingController _accNameCtrl = TextEditingController();
+  final TextEditingController _bankNameCtrl = TextEditingController();
+  final TextEditingController _accNumCtrl = TextEditingController();
+  final TextEditingController _ifscCtrl = TextEditingController();
 
   String? _selectedState;
   bool _gstEnabled = false;
@@ -359,7 +359,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                       context,
                                                       error,
                                                       stackTrace,
-                                                    ) => Icon(
+                                                    ) => const Icon(
                                                       LucideIcons.image,
                                                       size: 28,
                                                     ),
@@ -377,7 +377,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                   const SizedBox(height: 4),
                                                   Text(
                                                     'no_logo'.tr,
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       fontWeight:
                                                           FontWeight.w900,
                                                       fontSize: 10,
@@ -397,11 +397,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       onTap: _removeLogo,
                                       child: Container(
                                         padding: const EdgeInsets.all(4),
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
                                           color: Colors.red,
                                           shape: BoxShape.circle,
                                         ),
-                                        child: Icon(
+                                        child: const Icon(
                                           LucideIcons.trash2,
                                           size: 12,
                                           color: Colors.white,
@@ -450,13 +450,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 children: [
                                   ElevatedButton.icon(
                                     onPressed: _pickLogo,
-                                    icon: Icon(
+                                    icon: const Icon(
                                       LucideIcons.upload,
                                       size: 14,
                                     ),
                                     label: Text(
                                       'upload_new_logo'.tr,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 11,
                                       ),
@@ -515,8 +515,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           hintText: 'eg_company_name'.tr,
                           controller: _nameCtrl,
                           validator: (val) {
-                            if (val == null || val.trim().isEmpty)
+                            if (val == null || val.trim().isEmpty) {
                               return 'Company name is required';
+                            }
                             return null;
                           },
                         ),
@@ -527,10 +528,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           controller: _emailCtrl,
                           keyboardType: TextInputType.emailAddress,
                           validator: (val) {
-                            if (val == null || val.trim().isEmpty)
+                            if (val == null || val.trim().isEmpty) {
                               return 'Email is required';
-                            if (!GetUtils.isEmail(val.trim()))
+                            }
+                            if (!GetUtils.isEmail(val.trim())) {
                               return 'Please enter a valid email';
+                            }
                             return null;
                           },
                         ),
@@ -578,14 +581,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               initialValue: _selectedState,
                               hint: Text(
                                 'select_state'.tr,
-                                style: TextStyle(fontSize: 12),
+                                style: const TextStyle(fontSize: 12),
                               ),
                               items: _indianStates.map((state) {
                                 return DropdownMenuItem<String>(
                                   value: state,
                                   child: Text(
                                     state,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -610,8 +613,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           controller: _addressCtrl,
                           maxLines: 3,
                           validator: (val) {
-                            if (val == null || val.trim().isEmpty)
+                            if (val == null || val.trim().isEmpty) {
                               return 'Address is required';
+                            }
                             return null;
                           },
                         ),
@@ -666,10 +670,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           enabled: _gstEnabled,
                           validator: (val) {
                             if (_gstEnabled) {
-                              if (val == null || val.trim().isEmpty)
+                              if (val == null || val.trim().isEmpty) {
                                 return 'GST number is required';
-                              if (val.trim().length != 15)
+                              }
+                              if (val.trim().length != 15) {
                                 return 'GSTIN must be exactly 15 characters';
+                              }
                             }
                             return null;
                           },
@@ -754,7 +760,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     width: double.infinity,
                     child: AppButton(
                       text: 'update_business_settings'.tr,
-                      icon: Icon(
+                      icon: const Icon(
                         LucideIcons.save,
                         size: 18,
                         color: Colors.white,
@@ -852,7 +858,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             BoxShadow(
               color: isHovered
                   ? AppColors.primary.withValues(alpha: 0.05)
-                  : Colors.black.withOpacity(0.01),
+                  : Colors.black.withValues(alpha: 0.01),
               blurRadius: isHovered ? 16 : 8,
               offset: const Offset(0, 4),
             ),

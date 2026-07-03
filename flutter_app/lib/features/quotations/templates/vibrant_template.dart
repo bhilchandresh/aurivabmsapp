@@ -111,7 +111,7 @@ class VibrantTemplate extends StatelessWidget {
                     padding: const EdgeInsets.all(6),
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: _buildLogoWidget(
@@ -122,7 +122,7 @@ class VibrantTemplate extends StatelessWidget {
                   ),
                 Text(
                   (tenant['name'] ?? ''),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w900,
                     color: Colors.white,
@@ -135,7 +135,7 @@ class VibrantTemplate extends StatelessWidget {
                     tenant['address'] ?? '',
                     style: TextStyle(
                       fontSize: 9,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                       height: 1.4,
                     ),
                   ),
@@ -160,13 +160,13 @@ class VibrantTemplate extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      border: Border.all(color: Colors.white.withOpacity(0.2)),
-                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white.withValues(alpha: 0.2),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       'GSTIN: ${tenant['gstNumber']}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 8,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -195,7 +195,7 @@ class VibrantTemplate extends StatelessWidget {
                   ),
                   child: Text(
                     params.documentTitle.toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 9,
                       fontWeight: FontWeight.w900,
                       color: Color(0xFF6D28D9), // violet-700
@@ -206,7 +206,7 @@ class VibrantTemplate extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   '#${params.quotationId}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -216,8 +216,8 @@ class VibrantTemplate extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    color: Colors.white.withValues(alpha: 0.2),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -230,12 +230,12 @@ class VibrantTemplate extends StatelessWidget {
                             'date_2'.tr,
                             style: TextStyle(
                               fontSize: 9,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
                           ),
                           Text(
                             _formatDate(params.date),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -251,12 +251,12 @@ class VibrantTemplate extends StatelessWidget {
                             '${params.documentTitle == "QUOTATION" ? "Valid Until" : "Due Date"}: ',
                             style: TextStyle(
                               fontSize: 9,
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                             ),
                           ),
                           Text(
                             _formatDate(params.dueDate),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -279,9 +279,9 @@ class VibrantTemplate extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        border: Border.all(color: Colors.white.withOpacity(0.2)),
-        borderRadius: BorderRadius.circular(8),
+        color: Colors.white.withValues(alpha: 0.2),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -290,7 +290,7 @@ class VibrantTemplate extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             text,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 8,
               fontWeight: FontWeight.w500,
               color: Colors.white,
@@ -310,7 +310,7 @@ class VibrantTemplate extends StatelessWidget {
           children: [
             Text(
               '${params.numberLabel} Ref: ${params.quotationId}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF7C3AED),
@@ -318,12 +318,12 @@ class VibrantTemplate extends StatelessWidget {
             ),
             Text(
               'Date: ${_formatDate(params.date)}',
-              style: TextStyle(fontSize: 10),
+              style: const TextStyle(fontSize: 10),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        Container(height: 2, color: Color(0xFF7C3AED)),
+        Container(height: 2, color: const Color(0xFF7C3AED)),
         const SizedBox(height: 16),
       ],
     );
@@ -377,15 +377,15 @@ class VibrantTemplate extends StatelessWidget {
                   ? 'QUOTE TO'
                   : 'BILLED TO',
               icon: Icons.person_outline,
-              borderColor: Color(0xFFEDE9FE), // violet-100
-              stripeColor: Color(0xFF8B5CF6), // violet-500
-              textColor: Color(0xFF7C3AED), // violet-600
+              borderColor: const Color(0xFFEDE9FE), // violet-100
+              stripeColor: const Color(0xFF8B5CF6), // violet-500
+              textColor: const Color(0xFF7C3AED), // violet-600
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     params.clientName,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                       color: Colors.black87,
@@ -423,7 +423,7 @@ class VibrantTemplate extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -447,9 +447,9 @@ class VibrantTemplate extends StatelessWidget {
             child: _buildInfoCard(
               title: 'PAYMENT DETAILS',
               icon: Icons.credit_card,
-              borderColor: Color(0xFFFAE8FF), // fuchsia-100
-              stripeColor: Color(0xFFD946EF), // fuchsia-500
-              textColor: Color(0xFFC026D3), // fuchsia-600
+              borderColor: const Color(0xFFFAE8FF), // fuchsia-100
+              stripeColor: const Color(0xFFD946EF), // fuchsia-500
+              textColor: const Color(0xFFC026D3), // fuchsia-600
               child:
                   (params.bankDetails.isNotEmpty &&
                       params.bankDetails['accountNumber'] != null)
@@ -594,7 +594,7 @@ class VibrantTemplate extends StatelessWidget {
       (item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty,
     );
 
-    Map<int, TableColumnWidth> colWidths = showHsn
+    final Map<int, TableColumnWidth> colWidths = showHsn
         ? const {
             0: FlexColumnWidth(1),
             1: FlexColumnWidth(4.5),
@@ -623,7 +623,7 @@ class VibrantTemplate extends StatelessWidget {
           children: [
             // HEADER
             TableRow(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color(0xFFF3F4F6),
               ), // gray-100
               children: [
@@ -646,12 +646,12 @@ class VibrantTemplate extends StatelessWidget {
               final double qty = ((item['quantity'] ?? 1) as num).toDouble();
               final double rate = ((item['rate'] ?? 0.0) as num).toDouble();
               final double amount = qty * rate;
-              final isOdd = index % 2 != 0;
+              final isEven = index % 2 == 0;
 
               return TableRow(
                 decoration: BoxDecoration(
-                  color: isOdd
-                      ? Colors.grey.shade50.withOpacity(0.5)
+                  color: isEven
+                      ? Colors.grey.shade50.withValues(alpha: 0.5)
                       : Colors.white,
                   border: Border(
                     bottom: BorderSide(color: Colors.grey.shade200),
@@ -792,18 +792,18 @@ class VibrantTemplate extends StatelessWidget {
           flex: 55,
           child: CustomPaint(
             painter: _DashedRectPainter(
-              color: Color(0xFFF5D0FE),
+              color: const Color(0xFFF5D0FE),
             ), // fuchsia-200
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Color(0xFFFDF4FF), // fuchsia-50
+                color: const Color(0xFFFDF4FF), // fuchsia-50
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'TOTAL AMOUNT (IN WORDS)',
                     style: TextStyle(
                       fontSize: 8,
@@ -815,7 +815,7 @@ class VibrantTemplate extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     convertNumberToWords(params.total),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF701A75),
@@ -855,7 +855,7 @@ class VibrantTemplate extends StatelessWidget {
                         params.discountAmount,
                         isBold: true,
                         isMinus: true,
-                        color: Color(0xFFC026D3),
+                        color: const Color(0xFFC026D3),
                       ), // fuchsia-600
                     ],
                     if (params.gstEnabled || params.discountAmount > 0) ...[
@@ -906,12 +906,12 @@ class VibrantTemplate extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                         Text(
                           params.formatCurrency.format(params.total),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
                             color: Colors.white,
@@ -926,7 +926,7 @@ class VibrantTemplate extends StatelessWidget {
                         decoration: BoxDecoration(
                           border: Border(
                             top: BorderSide(
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                             ),
                           ),
                         ),
@@ -936,13 +936,13 @@ class VibrantTemplate extends StatelessWidget {
                             Text(
                               'advance'.tr,
                               style: TextStyle(
-                                fontSize: 9,
-                                color: Colors.white.withOpacity(0.9),
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 10,
                               ),
                             ),
                             Text(
                               '- ${params.formatCurrency.format(params.advancePayment)}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 9,
                                 color: Colors.white,
                               ),
@@ -956,7 +956,7 @@ class VibrantTemplate extends StatelessWidget {
                         children: [
                           Text(
                             'balance'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -965,7 +965,7 @@ class VibrantTemplate extends StatelessWidget {
                           ),
                           Text(
                             params.formatCurrency.format(balanceDue),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
@@ -985,8 +985,8 @@ class VibrantTemplate extends StatelessWidget {
   }
 
   List<Widget> _buildGstRows() {
-    String place = params.placeOfSupply.toLowerCase();
-    String tenantState = (params.tenant['state'] ?? '')
+    final String place = params.placeOfSupply.toLowerCase();
+    final String tenantState = (params.tenant['state'] ?? '')
         .toString()
         .toLowerCase();
     bool isOutstate = false;
@@ -1084,7 +1084,7 @@ class VibrantTemplate extends StatelessWidget {
                         Container(
                           height: 40,
                           width: 120,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             border: Border(
                               bottom: BorderSide(
                                 color: Colors.grey,
@@ -1115,7 +1115,7 @@ class VibrantTemplate extends StatelessWidget {
                           children: [
                             Text(
                               displayName,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 9,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
@@ -1160,14 +1160,14 @@ class VibrantTemplate extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             children: [
               Icon(
                 Icons.description,
                 size: 10,
                 color: Color(0xFF7C3AED),
               ), // violet-600
-              const SizedBox(width: 4),
+              SizedBox(width: 4),
               Text(
                 'TERMS & CONDITIONS',
                 style: TextStyle(

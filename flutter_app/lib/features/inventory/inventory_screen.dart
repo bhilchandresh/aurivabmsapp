@@ -117,10 +117,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   colorText: Colors.white,
                 );
               },
-              icon: Icon(LucideIcons.lock, size: 16, color: Colors.white),
+              icon: const Icon(LucideIcons.lock, size: 16, color: Colors.white),
               label: Text(
                 'contact_admin_btn'.tr,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -152,7 +152,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.01),
+            color: Colors.black.withValues(alpha: 0.01),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -184,7 +184,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
           ),
           Text(
             price,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 13,
               color: AppColors.primary,
@@ -286,7 +286,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    Icon(
+                                    const Icon(
                                       LucideIcons.alertTriangle,
                                       size: 12,
                                       color: Colors.red,
@@ -344,9 +344,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                   ),
                                   const SizedBox(width: 12),
                                   Text(
-                                    '${_controller.selectedItems.length}' +
-                                        'selected'.tr,
-                                    style: TextStyle(
+                                    '${_controller.selectedItems.length}${'selected'.tr}',
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
                                     ),
@@ -355,14 +354,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               ),
                               ElevatedButton.icon(
                                 onPressed: _showBulkDeleteConfirmation,
-                                icon: Icon(
+                                icon: const Icon(
                                   LucideIcons.trash2,
                                   size: 16,
                                   color: Colors.white,
                                 ),
                                 label: Text(
                                   'delete'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -409,11 +408,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: 'search_products'.tr,
-                        hintStyle: TextStyle(
+                        hintStyle: const TextStyle(
                           color: Colors.grey,
                           fontSize: 12,
                         ),
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           LucideIcons.search,
                           color: Colors.grey,
                           size: 16,
@@ -433,7 +432,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: AppColors.primary,
                             width: 1.5,
                           ),
@@ -448,10 +447,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       onPressed: atLimit
                           ? null
                           : () => _showAddEditItemDialog(),
-                      icon: Icon(LucideIcons.plus, size: 14),
+                      icon: const Icon(LucideIcons.plus, size: 14),
                       label: Text(
                         'add_item'.tr,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -494,7 +493,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                             color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                           ),
                         ),
-                        Icon(
+                        const Icon(
                           LucideIcons.package,
                           size: 16,
                           color: Colors.grey,
@@ -670,7 +669,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    '${item.currentStock}' + 'units'.tr,
+                                    '${item.currentStock}${'units'.tr}',
                                     style: TextStyle(
                                       fontSize: 9,
                                       fontWeight: FontWeight.w900,
@@ -838,7 +837,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.all(20),
         child: SingleChildScrollView(
@@ -861,12 +860,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: Icon(LucideIcons.x, size: 18),
+                      icon: const Icon(LucideIcons.x, size: 18),
                       onPressed: () => Get.back(),
                     ),
                   ],
                 ),
-                Divider(),
+                const Divider(),
                 const SizedBox(height: 12),
 
                 // Item Name
@@ -875,8 +874,9 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   hintText: 'eg_mouse'.tr,
                   controller: nameCtrl,
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty)
+                    if (val == null || val.trim().isEmpty) {
                       return 'please_enter_product_name'.tr;
+                    }
                     return null;
                   },
                 ),
@@ -901,10 +901,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           controller: stockCtrl,
                           keyboardType: TextInputType.number,
                           validator: (val) {
-                            if (val == null || val.trim().isEmpty)
+                            if (val == null || val.trim().isEmpty) {
                               return 'required'.tr;
-                            if (int.tryParse(val) == null || int.parse(val) < 0)
+                            }
+                            if (int.tryParse(val) == null || int.parse(val) < 0) {
                               return 'invalid'.tr;
+                            }
                             return null;
                           },
                         ),
@@ -921,10 +923,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   controller: priceCtrl,
                   keyboardType: TextInputType.number,
                   validator: (val) {
-                    if (val == null || val.trim().isEmpty)
+                    if (val == null || val.trim().isEmpty) {
                       return 'please_enter_price'.tr;
-                    if (double.tryParse(val) == null || double.parse(val) < 0)
+                    }
+                    if (double.tryParse(val) == null || double.parse(val) < 0) {
                       return 'invalid_price'.tr;
+                    }
                     return null;
                   },
                 ),
@@ -1015,7 +1019,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               item != null
                                   ? 'save_changes'.tr
                                   : 'add_product_sku'.tr,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1041,7 +1045,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -1062,12 +1066,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(LucideIcons.x, size: 18),
+                    icon: const Icon(LucideIcons.x, size: 18),
                     onPressed: () => Get.back(),
                   ),
                 ],
               ),
-              Divider(),
+              const Divider(),
               const SizedBox(height: 8),
 
               Text(
@@ -1097,10 +1101,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
                 controller: qtyCtrl,
                 keyboardType: TextInputType.number,
                 validator: (val) {
-                  if (val == null || val.trim().isEmpty)
+                  if (val == null || val.trim().isEmpty) {
                     return 'please_enter_qty'.tr;
-                  if (int.tryParse(val) == null || int.parse(val) <= 0)
+                  }
+                  if (int.tryParse(val) == null || int.parse(val) <= 0) {
                     return 'must_be_greater_than_0'.tr;
+                  }
                   return null;
                 },
               ),
@@ -1161,7 +1167,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                           )
                         : Text(
                             'confirm_restock'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
                             ),
@@ -1184,7 +1190,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
       Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -1217,12 +1223,12 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   ],
                 ),
                 IconButton(
-                  icon: Icon(LucideIcons.x, size: 18),
+                  icon: const Icon(LucideIcons.x, size: 18),
                   onPressed: () => Get.back(),
                 ),
               ],
             ),
-            Divider(),
+            const Divider(),
             const SizedBox(height: 10),
 
             Flexible(
@@ -1258,7 +1264,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   physics: const BouncingScrollPhysics(),
                   itemCount: txList.length,
                   separatorBuilder: (context, index) =>
-                      Divider(height: 1),
+                      const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final tx = txList[index];
                     final isSale = tx.type == 'Sale';
@@ -1359,7 +1365,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('cancel'.tr, style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
           ),
           Obx(() {
             final isSaving = _controller.isLoading.value;
@@ -1397,7 +1403,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         strokeWidth: 2,
                       ),
                     )
-                  : Text('delete'.tr, style: TextStyle(color: Colors.white)),
+                  : Text('delete'.tr, style: const TextStyle(color: Colors.white)),
             );
           }),
         ],
@@ -1418,7 +1424,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('cancel'.tr, style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
           ),
           Obx(() {
             final isSaving = _controller.isLoading.value;
@@ -1458,7 +1464,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     )
                   : Text(
                       'delete_all'.tr,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
             );
           }),

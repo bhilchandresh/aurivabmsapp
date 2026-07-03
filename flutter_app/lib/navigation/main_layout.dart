@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
 import '../core/constants/app_colors.dart';
-import '../core/theme/app_text_styles.dart';
 import '../core/theme/app_extensions.dart';
 import '../core/utils/responsive_layout.dart';
 import '../features/dashboard/dashboard_screen.dart';
@@ -107,7 +106,7 @@ class MainLayout extends StatelessWidget {
             border: Border.all(color: const Color(0xFF334155), width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.25),
+                color: Colors.black.withValues(alpha: 0.25),
                 blurRadius: 20,
                 offset: const Offset(0, 6),
               ),
@@ -138,7 +137,7 @@ class MainLayout extends StatelessWidget {
           onDestinationSelected: controller.changeIndex,
           labelType: NavigationRailLabelType.all,
           selectedIconTheme: IconThemeData(color: theme.primaryColor),
-          unselectedIconTheme: IconThemeData(color: theme.colorScheme.onSurface.withOpacity(0.5)),
+          unselectedIconTheme: IconThemeData(color: theme.colorScheme.onSurface.withValues(alpha: 0.5)),
           selectedLabelTextStyle: context.typography.navigationLabel.copyWith(
             color: theme.primaryColor,
             fontWeight: FontWeight.bold,
@@ -197,9 +196,7 @@ class MainLayout extends StatelessWidget {
             vertical: 0,
           ),
           decoration: BoxDecoration(
-            color: isSelected
-                ? AppColors.primary.withOpacity(0.18)
-                : Colors.transparent,
+            color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.18) : Colors.transparent,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(
@@ -213,7 +210,7 @@ class MainLayout extends StatelessWidget {
                 curve: Curves.easeOut,
                 child: Icon(
                   icon,
-                  color: isSelected ? AppColors.primary : const Color(0xFF64748B),
+                  color: isSelected ? Theme.of(context).colorScheme.primary : const Color(0xFF64748B),
                   size: iconSize,
                 ),
               ),
@@ -284,7 +281,7 @@ class MainLayout extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: context.colorScheme.primary.withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -293,20 +290,20 @@ class MainLayout extends StatelessWidget {
                   child: Icon(
                     LucideIcons.hexagon,
                     size: 32,
-                    color: AppColors.primary,
+                    color: context.colorScheme.primary,
                   ),
                 ),
                 RichText(
                   text: TextSpan(
-                    style: AppTextStyles.heading2.copyWith(
+                    style: context.typography.profileName.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
-                    children: const [
-                      TextSpan(text: 'Auriva'),
+                    children: [
+                      const TextSpan(text: 'Auriva'),
                       TextSpan(
                         text: 'BMS',
-                        style: TextStyle(color: AppColors.primary),
+                        style: context.typography.profileName.copyWith(color: context.colorScheme.primary),
                       ),
                     ],
                   ),
@@ -314,7 +311,7 @@ class MainLayout extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'BUSINESS MANAGEMENT SYSTEM',
-                  style: TextStyle(
+                  style: context.typography.categoryHeader.copyWith(
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
@@ -400,7 +397,7 @@ class MainLayout extends StatelessWidget {
                     const SizedBox(width: 12),
                     Text(
                       'Sign Out',
-                      style: AppTextStyles.label.copyWith(
+                      style: context.typography.buttonText.copyWith(
                         color: Colors.red.shade400,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -435,12 +432,12 @@ class MainLayout extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : Colors.transparent,
+              color: isActive ? Theme.of(context).colorScheme.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
               boxShadow: isActive
                   ? [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.25),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -452,12 +449,12 @@ class MainLayout extends StatelessWidget {
                 Icon(
                   icon,
                   size: 20,
-                  color: isActive ? AppColors.primary : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
                 const SizedBox(width: 14),
                 Text(
                   title,
-                  style: AppTextStyles.label.copyWith(
+                  style: context.typography.inputText.copyWith(
                     color: isActive ? AppColors.primary : Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w600,
                   ),
@@ -467,7 +464,7 @@ class MainLayout extends StatelessWidget {
                   Icon(
                     LucideIcons.chevronRight,
                     size: 14,
-                    color: AppColors.primary.withOpacity(0.6),
+                    color: context.colorScheme.primary.withValues(alpha: 0.6),
                   ),
                 ],
               ],

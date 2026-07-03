@@ -1,9 +1,9 @@
+// ignore_for_file: unused_field, unused_element, deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -161,8 +161,8 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
 
   double get _subtotal {
     return _proposalItems.fold(0.0, (sum, item) {
-      double qty = ((item['quantity'] ?? 1) as num).toDouble();
-      double rate = ((item['rate'] ?? 0.0) as num).toDouble();
+      final double qty = ((item['quantity'] ?? 1) as num).toDouble();
+      final double rate = ((item['rate'] ?? 0.0) as num).toDouble();
       return sum + (qty * rate);
     });
   }
@@ -180,19 +180,19 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
 
     double calculatedTax = 0.0;
     for (var item in _proposalItems) {
-      double qty = ((item['quantity'] ?? 1) as num).toDouble();
-      double rate = ((item['rate'] ?? 0.0) as num).toDouble();
-      double gstRate = ((item['gst'] ?? item['gstRate'] ?? 18.0) as num)
+      final double qty = ((item['quantity'] ?? 1) as num).toDouble();
+      final double rate = ((item['rate'] ?? 0.0) as num).toDouble();
+      final double gstRate = ((item['gst'] ?? item['gstRate'] ?? 18.0) as num)
           .toDouble();
 
-      double itemSubtotal = qty * rate;
-      double itemDiscount = itemSubtotal * (_discountPercentage / 100);
-      double itemTaxable = itemSubtotal - itemDiscount;
+      final double itemSubtotal = qty * rate;
+      final double itemDiscount = itemSubtotal * (_discountPercentage / 100);
+      final double itemTaxable = itemSubtotal - itemDiscount;
 
       if (_taxType == 'exclusive') {
         calculatedTax += itemTaxable * (gstRate / 100);
       } else {
-        double basePrice = itemTaxable / (1 + (gstRate / 100));
+        final double basePrice = itemTaxable / (1 + (gstRate / 100));
         calculatedTax += itemTaxable - basePrice;
       }
     }
@@ -330,13 +330,13 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
     required double tableHeaderHeight,
     required double totalsHeight,
   }) {
-    List<List<Map<String, dynamic>>> pages = [];
+    final List<List<Map<String, dynamic>>> pages = [];
     List<Map<String, dynamic>> currentPageItems = [];
     double currentHeight = 0.0;
 
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
-      double requiredHeight = itemHeight;
+      final double requiredHeight = itemHeight;
 
       double pageCap;
       if (pages.isEmpty) {
@@ -345,7 +345,7 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
         pageCap = usableHeight - tableHeaderHeight;
       }
 
-      bool isLastItem = (i == items.length - 1);
+      final bool isLastItem = (i == items.length - 1);
       if (isLastItem) {
         if (currentHeight + requiredHeight + totalsHeight > pageCap) {
           if (currentPageItems.isNotEmpty) {
@@ -394,7 +394,7 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AnimatedDocumentLoader(
+      builder: (context) => const AnimatedDocumentLoader(
         message: 'Compiling premium proposal document...',
       ),
     );
@@ -681,6 +681,8 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
         Uri.parse(url),
         mode: LaunchMode.externalApplication,
       ).catchError((e) {
+        if (!context.mounted) return false;
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Could not open WhatsApp: $e'),
@@ -703,7 +705,7 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
 
   Future<void> _sendEmailViaApi() async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    String email = widget.clientEmail ?? '';
+    final String email = widget.clientEmail ?? '';
     if (email.isEmpty || email == 'billing@client.com') {
       scaffoldMessenger.showSnackBar(
         SnackBar(
@@ -912,7 +914,7 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? activeColor.withOpacity(0.08)
+                              ? activeColor.withValues(alpha: 0.08)
                               : Theme.of(context).cardTheme.color,
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
@@ -922,7 +924,7 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                           boxShadow: isSelected
                               ? [
                                   BoxShadow(
-                                    color: activeColor.withOpacity(0.12),
+                                    color: activeColor.withValues(alpha: 0.12),
                                     blurRadius: 8,
                                     offset: const Offset(0, 4),
                                   ),
@@ -973,9 +975,9 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
         const double targetWidth = 794.0;
         final double availableWidth = constraints.maxWidth;
 
-        Widget templateWidget = Container(
+        final Widget templateWidget = Container(
           width: targetWidth,
-          constraints: BoxConstraints(minHeight: targetWidth * 1.414),
+          constraints: const BoxConstraints(minHeight: targetWidth * 1.414),
           child: IntrinsicHeight(
             child: _buildSelectedTemplateRenderer(_selectedTemplate),
           ),
@@ -1056,9 +1058,9 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                 fontSize: 18,
               ),
             ),
-            Row(
+            const Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Icon(LucideIcons.hexagon, size: 10, color: Color(0xFF6366F1)),
                 SizedBox(width: 4),
                 Text(
@@ -1132,21 +1134,21 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.04),
+                        color: AppColors.primary.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                         ),
                       ),
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             LucideIcons.monitor,
                             size: 14,
                             color: AppColors.primary,
                           ),
                           const SizedBox(width: 8),
-                          Text(
+                          const Text(
                             'A4 LIVE PREVIEW CANVAS',
                             style: TextStyle(
                               fontSize: 10,
@@ -1159,13 +1161,13 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                           Container(
                             width: 6,
                             height: 6,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.green,
                             ),
                           ),
                           const SizedBox(width: 6),
-                          Text(
+                          const Text(
                             'Interactive Scaling',
                             style: TextStyle(
                               fontSize: 10,
@@ -1184,7 +1186,7 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                         border: Border.all(color: Theme.of(context).colorScheme.outline),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withValues(alpha: 0.04),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -1353,15 +1355,15 @@ class _PulsingStatusBadgeState extends State<PulsingStatusBadge>
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           decoration: BoxDecoration(
-            color: baseColor.withOpacity(0.1),
+            color: baseColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: baseColor.withOpacity(0.2 + 0.3 * _pulseAnimation.value),
+              color: baseColor.withValues(alpha: 0.2 + 0.3 * _pulseAnimation.value),
               width: 1.5,
             ),
             boxShadow: [
               BoxShadow(
-                color: baseColor.withOpacity(0.15 * _pulseAnimation.value),
+                color: baseColor.withValues(alpha: 0.15 * _pulseAnimation.value),
                 blurRadius: 8,
                 spreadRadius: 1,
               ),
@@ -1378,7 +1380,7 @@ class _PulsingStatusBadgeState extends State<PulsingStatusBadge>
                   color: baseColor,
                   boxShadow: [
                     BoxShadow(
-                      color: baseColor.withOpacity(0.6),
+                      color: baseColor.withValues(alpha: 0.6),
                       blurRadius: 4,
                       spreadRadius: 1 * _pulseAnimation.value,
                     ),

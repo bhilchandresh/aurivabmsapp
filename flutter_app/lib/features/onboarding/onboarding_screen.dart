@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/app_extensions.dart';
 import '../../core/constants/app_colors.dart';
 import '../auth/auth_controller.dart';
 
@@ -40,9 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseBgColor = isDark
-        ? Color(0xFF090D1A)
-        : Color(0xFFF1F5F9);
+    final baseBgColor = Theme.of(context).scaffoldBackgroundColor;
 
     return Scaffold(
       backgroundColor: baseBgColor,
@@ -137,11 +136,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             vertical: 16,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.primary,
+                            color: context.colorScheme.primary,
                             borderRadius: BorderRadius.circular(30),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.primary.withOpacity(0.3),
+                                color: context.colorScheme.primary.withValues(alpha: 0.3),
                                 blurRadius: 15,
                                 offset: const Offset(0, 5),
                               ),
@@ -155,7 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   padding: const EdgeInsets.only(right: 8),
                                   child: Text(
                                     'get_started'.tr,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
@@ -196,8 +195,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color:
-                  (isDark ? Color(0xFF1E3A8A) : Color(0xFFBFDBFE))
-                      .withOpacity(0.4),
+                  (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFBFDBFE))
+                      .withValues(alpha: 0.4),
             ),
           ),
         ),
@@ -210,8 +209,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color:
-                  (isDark ? Color(0xFF4C1D95) : Color(0xFFE9D5FF))
-                      .withOpacity(0.3),
+                  (isDark ? const Color(0xFF4C1D95) : const Color(0xFFE9D5FF))
+                      .withValues(alpha: 0.3),
             ),
           ),
         ),
@@ -286,7 +285,7 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 30,
                               offset: const Offset(0, 15),
                             ),
@@ -301,17 +300,17 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
                               children: [
                                 _buildBar(
                                   100,
-                                  AppColors.primary.withOpacity(0.5),
+                                  AppColors.primary.withValues(alpha: 0.5),
                                   0.2,
                                 ),
                                 _buildBar(
                                   140,
-                                  AppColors.primary.withOpacity(0.7),
+                                  AppColors.primary.withValues(alpha: 0.7),
                                   0.4,
                                 ),
                                 _buildBar(
                                   80,
-                                  AppColors.primary.withOpacity(0.4),
+                                  AppColors.primary.withValues(alpha: 0.4),
                                   0.6,
                                 ),
                                 _buildBar(180, AppColors.primary, 0.8),
@@ -363,19 +362,19 @@ class _Slide1State extends State<_Slide1> with SingleTickerProviderStateMixin {
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Color(0xFF10B981), // Success green
+                              color: const Color(0xFF10B981), // Success green
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(
+                                  color: const Color(
                                     0xFF10B981,
-                                  ).withOpacity(0.3),
+                                  ).withValues(alpha: 0.3),
                                   blurRadius: 10,
                                   offset: const Offset(0, 5),
                                 ),
                               ],
                             ),
-                            child: Icon(
+                            child: const Icon(
                               LucideIcons.trendingUp,
                               color: Colors.white,
                               size: 24,
@@ -485,7 +484,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
               children: [
                 _buildFloatingBox(
                   icon: LucideIcons.packageSearch,
-                  color: Color(0xFFF59E0B),
+                  color: const Color(0xFFF59E0B),
                   x: -60,
                   y: -40,
                   delay: 0.1,
@@ -494,7 +493,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
                 ),
                 _buildFloatingBox(
                   icon: LucideIcons.truck,
-                  color: Color(0xFF3B82F6),
+                  color: const Color(0xFF3B82F6),
                   x: 60,
                   y: 0,
                   delay: 0.3,
@@ -503,7 +502,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
                 ),
                 _buildFloatingBox(
                   icon: LucideIcons.boxes,
-                  color: Color(0xFF8B5CF6),
+                  color: const Color(0xFF8B5CF6),
                   x: -30,
                   y: 60,
                   delay: 0.5,
@@ -572,7 +571,7 @@ class _Slide2State extends State<_Slide2> with SingleTickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(0.2),
+                    color: color.withValues(alpha: 0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -659,7 +658,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
                             ),
@@ -677,13 +676,13 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                                   width: 36,
                                   height: 36,
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary.withOpacity(0.15),
+                                    color: context.colorScheme.primary.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Icon(
                                     LucideIcons.fileText,
                                     size: 18,
-                                    color: AppColors.primary,
+                                    color: context.colorScheme.primary,
                                   ),
                                 ),
                                 // Invoice Text & Date
@@ -858,7 +857,7 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                                   style: TextStyle(
                                     fontWeight: FontWeight.w900,
                                     fontSize: 15,
-                                    color: AppColors.primary,
+                                    color: context.colorScheme.primary,
                                   ),
                                 ),
                               ],
@@ -892,17 +891,17 @@ class _Slide3State extends State<_Slide3> with SingleTickerProviderStateMixin {
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Color(0xFF10B981),
+                            color: const Color(0xFF10B981),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Color(0xFF10B981).withOpacity(0.4),
+                                color: const Color(0xFF10B981).withValues(alpha: 0.4),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
                             ],
                           ),
-                          child: Icon(
+                          child: const Icon(
                             LucideIcons.checkCheck,
                             color: Colors.white,
                             size: 32,

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:excel/excel.dart';
@@ -90,13 +89,13 @@ class ImportDataController extends GetxController {
   Future<void> downloadTemplate() async {
     try {
       final template = templates[activeTab.value]!;
-      var excel = Excel.createExcel();
-      Sheet sheetObject = excel['Sheet1'];
+      final excel = Excel.createExcel();
+      final Sheet sheetObject = excel['Sheet1'];
       excel.setDefaultSheet('Sheet1');
 
-      List<String> headers = (template['headers'] as List<String>)
+      final List<String> headers = (template['headers'] as List<String>)
           .cast<String>();
-      List<String> sample = (template['sample'] as List<String>).cast<String>();
+      final List<String> sample = (template['sample'] as List<String>).cast<String>();
 
       sheetObject.appendRow(headers.map((h) => TextCellValue(h)).toList());
       sheetObject.appendRow(sample.map((s) => TextCellValue(s)).toList());
@@ -104,11 +103,12 @@ class ImportDataController extends GetxController {
       final directory = await getTemporaryDirectory();
       final path = '${directory.path}/${activeTab.value}_template.xlsx';
 
-      var fileBytes = excel.encode();
+      final fileBytes = excel.encode();
       if (fileBytes != null) {
         File(path)
           ..createSync(recursive: true)
           ..writeAsBytesSync(fileBytes);
+        // ignore: deprecated_member_use
         await Share.shareXFiles([
           XFile(path),
         ], text: 'Excel Template for ${activeTab.value}');
@@ -120,7 +120,7 @@ class ImportDataController extends GetxController {
 
   Future<void> pickFile() async {
     try {
-      FilePickerResult? result = await FilePicker.pickFiles(
+      final FilePickerResult? result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['xlsx', 'xls', 'csv'],
       );
@@ -133,7 +133,7 @@ class ImportDataController extends GetxController {
         final extension = filePath.split('.').last.toLowerCase();
 
         List<String> headers = [];
-        List<Map<String, dynamic>> data = [];
+        final List<Map<String, dynamic>> data = [];
 
         if (extension == 'csv') {
           final input = File(filePath).openRead();
@@ -148,10 +148,11 @@ class ImportDataController extends GetxController {
           for (int i = 1; i < fields.length; i++) {
             final row = fields[i];
             if (row.isEmpty ||
-                row.every((element) => element.toString().trim().isEmpty))
+                row.every((element) => element.toString().trim().isEmpty)) {
               continue;
+            }
 
-            Map<String, dynamic> rowData = {};
+            final Map<String, dynamic> rowData = {};
             for (int j = 0; j < headers.length; j++) {
               rowData[headers[j]] = j < row.length ? row[j].toString() : '';
             }
@@ -159,13 +160,14 @@ class ImportDataController extends GetxController {
           }
         } else {
           final bytes = File(filePath).readAsBytesSync();
-          var excel = Excel.decodeBytes(bytes);
+          final excel = Excel.decodeBytes(bytes);
 
           if (excel.tables.isEmpty) throw Exception("Excel file is empty");
 
-          var table = excel.tables[excel.tables.keys.first];
-          if (table == null || table.rows.isEmpty)
+          final table = excel.tables[excel.tables.keys.first];
+          if (table == null || table.rows.isEmpty) {
             throw Exception("Excel sheet is empty");
+          }
 
           headers = table.rows[0]
               .map((e) => e?.value.toString().trim() ?? '')
@@ -175,10 +177,11 @@ class ImportDataController extends GetxController {
             final row = table.rows[i];
             if (row.every(
               (element) => element?.value?.toString().trim().isEmpty ?? true,
-            ))
+            )) {
               continue;
+            }
 
-            Map<String, dynamic> rowData = {};
+            final Map<String, dynamic> rowData = {};
             for (int j = 0; j < headers.length; j++) {
               rowData[headers[j]] = j < row.length
                   ? (row[j]?.value?.toString() ?? '')
@@ -216,20 +219,21 @@ class ImportDataController extends GetxController {
               : 'NEW';
 
           // Normalize invoice status
-          String statusStr = (row['status']?.toString() ?? 'Unpaid')
+          final String statusStr = (row['status']?.toString() ?? 'Unpaid')
               .trim()
               .toLowerCase();
           String finalStatus = 'Unpaid';
-          if (statusStr == 'paid')
+          if (statusStr == 'paid') {
             finalStatus = 'Paid';
-          else if (statusStr == 'partially paid')
+          } else if (statusStr == 'partially paid') {
             finalStatus = 'Partially Paid';
-          else if (statusStr == 'pending')
+          } else if (statusStr == 'pending') {
             finalStatus = 'Pending';
-          else if (statusStr == 'overdue')
+          } else if (statusStr == 'overdue') {
             finalStatus = 'Overdue';
-          else if (statusStr == 'cancelled')
+          } else if (statusStr == 'cancelled') {
             finalStatus = 'Cancelled';
+          }
 
           if (!invoiceMap.containsKey(invNum)) {
             invoiceMap[invNum] = {
@@ -257,7 +261,7 @@ class ImportDataController extends GetxController {
         payload = parsedData.map((row) {
           final newRow = Map<String, dynamic>.from(row);
           if (newRow.containsKey('status')) {
-            String s =
+            final String s =
                 newRow['status']?.toString().trim().toLowerCase() ?? 'active';
             if (s == 'in stock' || s == 'active' || s == 'yes' || s == '1') {
               newRow['status'] = 'active';
@@ -275,12 +279,15 @@ class ImportDataController extends GetxController {
       }
 
       String endpoint = '';
-      if (activeTab.value == 'clients')
+      if (activeTab.value == 'clients') {
         endpoint = '${ApiConstants.clients}/bulk';
-      if (activeTab.value == 'inventory')
+      }
+      if (activeTab.value == 'inventory') {
         endpoint = '${ApiConstants.inventory}/bulk';
-      if (activeTab.value == 'invoices')
+      }
+      if (activeTab.value == 'invoices') {
         endpoint = '${ApiConstants.invoices}/bulk';
+      }
 
       final response = await ApiService.post(endpoint, payload);
 

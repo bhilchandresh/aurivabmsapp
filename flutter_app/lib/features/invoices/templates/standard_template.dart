@@ -76,7 +76,7 @@ class StandardTemplate extends StatelessWidget {
                   child: Text(
                     (params.tenant['address'] ?? '').toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -90,7 +90,7 @@ class StandardTemplate extends StatelessWidget {
                     '${(params.tenant['email'] ?? '').toUpperCase()}  •  ${(params.tenant['phone'] ?? '').toUpperCase()}'
                     '${params.tenant['website'] != null && params.tenant['website']!.isNotEmpty ? '  •  ${params.tenant['website']!.toUpperCase()}' : ''}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -106,7 +106,7 @@ class StandardTemplate extends StatelessWidget {
                     child: Text(
                       'GSTIN: ${(params.tenant['gstNumber'] ?? '').toUpperCase()}',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
@@ -152,14 +152,14 @@ class StandardTemplate extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text(
+                        const Text(
                           'Date:',
                           style: TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           formatCleanDate(params.date),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -171,14 +171,14 @@ class StandardTemplate extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text(
+                        const Text(
                           'Due Date:',
                           style: TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           formatCleanDate(params.dueDate),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -203,7 +203,7 @@ class StandardTemplate extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.black12, width: 1),
                           ),
@@ -234,7 +234,7 @@ class StandardTemplate extends StatelessWidget {
                       if (params.clientAddress.isNotEmpty) ...[
                         Text(
                           params.clientAddress,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             color: Colors.black54,
                             height: 1.4,
@@ -245,7 +245,7 @@ class StandardTemplate extends StatelessWidget {
                       if (params.clientEmail.isNotEmpty) ...[
                         Text(
                           params.clientEmail,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             color: Colors.black54,
                           ),
@@ -255,7 +255,7 @@ class StandardTemplate extends StatelessWidget {
                       if (params.clientPhone.isNotEmpty) ...[
                         Text(
                           params.clientPhone,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             color: Colors.black54,
                           ),
@@ -266,7 +266,7 @@ class StandardTemplate extends StatelessWidget {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black12),
-                            color: Colors.black.withOpacity(0.02),
+                            color: Colors.black.withValues(alpha: 0.02),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -274,7 +274,7 @@ class StandardTemplate extends StatelessWidget {
                           ),
                           child: Text(
                             'GSTIN: ${params.clientGst}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -293,7 +293,7 @@ class StandardTemplate extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             Container(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
                                     color: Colors.black12,
@@ -317,7 +317,7 @@ class StandardTemplate extends StatelessWidget {
                             RichText(
                               textAlign: TextAlign.right,
                               text: TextSpan(
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                   height: 1.5,
@@ -327,7 +327,7 @@ class StandardTemplate extends StatelessWidget {
                                     const TextSpan(text: 'Name: '),
                                     TextSpan(
                                       text: '$accountName\n',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
@@ -337,7 +337,7 @@ class StandardTemplate extends StatelessWidget {
                                     const TextSpan(text: 'Bank: '),
                                     TextSpan(
                                       text: '$bankName\n',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
@@ -347,7 +347,7 @@ class StandardTemplate extends StatelessWidget {
                                     const TextSpan(text: 'A/C: '),
                                     TextSpan(
                                       text: '$accountNumber\n',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
@@ -357,7 +357,7 @@ class StandardTemplate extends StatelessWidget {
                                     const TextSpan(text: 'IFSC: '),
                                     TextSpan(
                                       text: ifscCode,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
@@ -388,7 +388,7 @@ class StandardTemplate extends StatelessWidget {
                 ),
                 Text(
                   'Date: ${formatCleanDate(params.date)}',
-                  style: TextStyle(fontSize: 9, color: Colors.black54),
+                  style: const TextStyle(fontSize: 9, color: Colors.black54),
                 ),
               ],
             ),
@@ -399,7 +399,7 @@ class StandardTemplate extends StatelessWidget {
 
           // Elegant double-line table header
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(color: Colors.black12, width: 1.0),
                 bottom: BorderSide(color: Colors.black12, width: 1.0),
@@ -500,7 +500,7 @@ class StandardTemplate extends StatelessWidget {
             );
 
             return Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
                   bottom: BorderSide(color: Colors.black12, width: 0.5),
                 ),
@@ -540,7 +540,7 @@ class StandardTemplate extends StatelessWidget {
                           const SizedBox(height: 2),
                           Text(
                             item['additionalDetails'] as String,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 8,
                               color: Colors.grey,
                               fontStyle: FontStyle.italic,
@@ -556,7 +556,7 @@ class StandardTemplate extends StatelessWidget {
                       child: Text(
                         (item['hsn'] ?? '').toString(),
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 9,
                           color: Colors.black87,
                         ),
@@ -569,7 +569,7 @@ class StandardTemplate extends StatelessWidget {
                           ? qty.toStringAsFixed(0)
                           : qty.toStringAsFixed(2),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         color: Colors.black87,
                       ),
@@ -580,7 +580,7 @@ class StandardTemplate extends StatelessWidget {
                     child: Text(
                       params.formatCurrency.format(rate),
                       textAlign: TextAlign.right,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         color: Colors.black87,
                       ),
@@ -591,7 +591,7 @@ class StandardTemplate extends StatelessWidget {
                     child: Text(
                       params.formatCurrency.format(amount),
                       textAlign: TextAlign.right,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -653,14 +653,14 @@ class StandardTemplate extends StatelessWidget {
                         children: [
                           Text(
                             'subtotal'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black54,
                             ),
                           ),
                           Text(
                             params.formatCurrency.format(params.subtotal),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black87,
                             ),
@@ -674,14 +674,14 @@ class StandardTemplate extends StatelessWidget {
                           children: [
                             Text(
                               'Discount (${params.discountPercentage.toStringAsFixed(0)}%)',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.black54,
                               ),
                             ),
                             Text(
                               '- ${params.formatCurrency.format(params.discountAmount)}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.black87,
                               ),
@@ -702,7 +702,7 @@ class StandardTemplate extends StatelessWidget {
                             children: [
                               Text(
                                 'cgst'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
@@ -711,7 +711,7 @@ class StandardTemplate extends StatelessWidget {
                                 params.formatCurrency.format(
                                   params.taxAmount / 2,
                                 ),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -724,7 +724,7 @@ class StandardTemplate extends StatelessWidget {
                             children: [
                               Text(
                                 'sgst'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
@@ -733,7 +733,7 @@ class StandardTemplate extends StatelessWidget {
                                 params.formatCurrency.format(
                                   params.taxAmount / 2,
                                 ),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -746,14 +746,14 @@ class StandardTemplate extends StatelessWidget {
                             children: [
                               Text(
                                 'igst'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
                               ),
                               Text(
                                 params.formatCurrency.format(params.taxAmount),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -762,7 +762,7 @@ class StandardTemplate extends StatelessWidget {
                           ),
                         ],
                       ],
-                      Divider(height: 12, color: Colors.black12),
+                      const Divider(height: 12, color: Colors.black12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -789,10 +789,10 @@ class StandardTemplate extends StatelessWidget {
                       const SizedBox(height: 8),
                       Container(
                         decoration: BoxDecoration(
-                          color: Color(0xFF0F172A),
+                          color: const Color(0xFF0F172A),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: Colors.black.withValues(alpha: 0.08),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -843,7 +843,7 @@ class StandardTemplate extends StatelessWidget {
             const Spacer(),
             Container(height: 2, color: Colors.black87),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'TERMS & CONDITIONS',
               style: TextStyle(
                 fontSize: 8,
@@ -855,7 +855,7 @@ class StandardTemplate extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               params.tenant['defaultTerms'] ?? '',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 8,
                 color: Colors.grey,
                 height: 1.3,
@@ -865,7 +865,7 @@ class StandardTemplate extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 'Place of Supply: ${params.placeOfSupply}${params.tenant['state'] != null && params.tenant['state']!.isNotEmpty ? ' | Dispatch State: ${params.tenant['state']}' : ''}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 8,
                   color: Colors.grey,
                   fontWeight: FontWeight.w500,
@@ -970,14 +970,14 @@ class StandardTemplate extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             displayName,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 9,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
             textAlign: TextAlign.center,
           ),
-          Text(
+          const Text(
             'AUTHORIZED SIGNATORY',
             style: TextStyle(
               fontSize: 8,

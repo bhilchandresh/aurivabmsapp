@@ -45,7 +45,7 @@ class ElegantTemplate extends StatelessWidget {
       color: Colors.white,
       padding: EdgeInsets.all(paddingValue),
       child: DefaultTextStyle(
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Times New Roman',
           color: Colors.black87,
         ),
@@ -95,7 +95,7 @@ class ElegantTemplate extends StatelessWidget {
           ),
         Text(
           (tenant['name'] ?? '').toUpperCase(),
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
             letterSpacing: 2.0,
@@ -156,7 +156,7 @@ class ElegantTemplate extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4.0),
             child: Text(
               'GSTIN: ${tenant['gstNumber']}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 9,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Times New Roman',
@@ -188,7 +188,7 @@ class ElegantTemplate extends StatelessWidget {
               children: [
                 Text(
                   '#${params.invoiceId}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Times New Roman',
@@ -208,7 +208,7 @@ class ElegantTemplate extends StatelessWidget {
                     ),
                     Text(
                       _formatDate(params.date),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Times New Roman',
@@ -229,7 +229,7 @@ class ElegantTemplate extends StatelessWidget {
                     ),
                     Text(
                       _formatDate(params.dueDate),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         fontFamily: 'Times New Roman',
@@ -254,7 +254,7 @@ class ElegantTemplate extends StatelessWidget {
           children: [
             Text(
               '${params.numberLabel} Ref: ${params.invoiceId}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Times New Roman',
@@ -262,7 +262,7 @@ class ElegantTemplate extends StatelessWidget {
             ),
             Text(
               'Date: ${_formatDate(params.date)}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 10,
                 fontFamily: 'Times New Roman',
               ),
@@ -342,7 +342,7 @@ class ElegantTemplate extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 params.clientName,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   fontFamily: 'Times New Roman',
@@ -496,7 +496,7 @@ class ElegantTemplate extends StatelessWidget {
       (item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty,
     );
 
-    Map<int, TableColumnWidth> colWidths = showHsn
+    final Map<int, TableColumnWidth> colWidths = showHsn
         ? const {
             0: FlexColumnWidth(1),
             1: FlexColumnWidth(4.5),
@@ -833,7 +833,7 @@ class ElegantTemplate extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Balance Due',
                       style: TextStyle(
                         fontSize: 12,
@@ -844,7 +844,7 @@ class ElegantTemplate extends StatelessWidget {
                     ),
                     Text(
                       params.formatCurrency.format(balanceDue),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -862,8 +862,8 @@ class ElegantTemplate extends StatelessWidget {
   }
 
   List<Widget> _buildGstRows() {
-    String place = params.placeOfSupply.toLowerCase();
-    String tenantState = (params.tenant['state'] ?? '')
+    final String place = params.placeOfSupply.toLowerCase();
+    final String tenantState = (params.tenant['state'] ?? '')
         .toString()
         .toLowerCase();
     bool isOutstate = false;
@@ -997,7 +997,7 @@ class ElegantTemplate extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         displayName.toUpperCase(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                           fontFamily: 'Times New Roman',

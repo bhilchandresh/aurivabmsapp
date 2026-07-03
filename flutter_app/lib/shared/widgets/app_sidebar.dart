@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_extensions.dart';
 
 class AppSidebar extends StatelessWidget {
@@ -12,7 +11,7 @@ class AppSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Color(0xFF1E293B), // slate-800
+      backgroundColor: const Color(0xFF1E293B), // slate-800
       child: Column(
         children: [
           // Logo Area
@@ -34,7 +33,7 @@ class AppSidebar extends StatelessWidget {
                     border: Border.all(color: context.colorScheme.outline),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.2),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -43,7 +42,7 @@ class AppSidebar extends StatelessWidget {
                   child: Icon(
                     LucideIcons.hexagon,
                     size: 32,
-                    color: AppColors.primary,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 RichText(
@@ -51,11 +50,11 @@ class AppSidebar extends StatelessWidget {
                     style: context.typography.profileName.copyWith(
                       color: Colors.white,
                     ),
-                    children: const [
-                      TextSpan(text: 'Auriva'),
+                    children: [
+                      const TextSpan(text: 'Auriva'),
                       TextSpan(
                         text: 'BMS',
-                        style: TextStyle(color: AppColors.primary),
+                        style: context.typography.profileName.copyWith(color: Theme.of(context).colorScheme.primary),
                       ),
                     ],
                   ),
@@ -118,9 +117,9 @@ class AppSidebar extends StatelessWidget {
                   '/expenses',
                   LucideIcons.wallet,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Text(
                     'admin'.tr,
                     style: context.typography.categoryHeader.copyWith(
@@ -148,7 +147,7 @@ class AppSidebar extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.grey.shade800)),
+              border: Border(top: BorderSide(color: context.colorSchemeExtension.borderColor)),
             ),
             child: InkWell(
               onTap: () {
@@ -204,12 +203,12 @@ class AppSidebar extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: isActive ? AppColors.primary : Colors.transparent,
+            color: isActive ? Theme.of(context).colorScheme.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             boxShadow: isActive
                 ? [
                     BoxShadow(
-                      color: AppColors.primary.withOpacity(0.25),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -232,7 +231,7 @@ class AppSidebar extends StatelessWidget {
               ),
               if (isActive) ...[
                 const Spacer(),
-                Icon(
+                const Icon(
                   LucideIcons.chevronRight,
                   size: 14,
                   color: Colors.white60,

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/theme/app_extensions.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../widgets/super_admin_top_bar.dart';
 import 'super_admin_broadcast_controller.dart';
 
 class SuperAdminBroadcastScreen extends StatelessWidget {
+  BuildContext get context => Get.context!;
   final int initialIndex;
   const SuperAdminBroadcastScreen({super.key, this.initialIndex = 0});
 
@@ -13,7 +15,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
     final controller = Get.put(SuperAdminBroadcastController());
 
     return Scaffold(
-      backgroundColor: Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -46,19 +48,19 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.04),
+                                color: Colors.black.withValues(alpha: 0.04),
                                 blurRadius: 4,
                                 offset: const Offset(0, 2),
                               ),
                             ],
                           ),
-                          labelColor: Color(0xFF111827),
+                          labelColor: const Color(0xFF111827),
                           unselectedLabelColor: Colors.grey.shade600,
-                          labelStyle: TextStyle(
+                          labelStyle: context.typography.inputText.copyWith(
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
-                          unselectedLabelStyle: TextStyle(
+                          unselectedLabelStyle: context.typography.inputText.copyWith(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -99,7 +101,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
             border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -119,16 +121,16 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Broadcast Notification',
-                      style: TextStyle(
+                      style: context.typography.cardTitle.copyWith(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF111827),
+                        color: const Color(0xFF111827),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Send a popup message to all admins.',
-                      style: TextStyle(
+                      style: context.typography.helperText.copyWith(
                         fontSize: 12,
                         color: Colors.grey.shade500,
                       ),
@@ -146,7 +148,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                     // Message Content
                     Text(
                       'MESSAGE CONTENT',
-                      style: TextStyle(
+                      style: context.typography.helperText.copyWith(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.grey.shade500,
@@ -159,12 +161,12 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                       maxLines: 5,
                       decoration: InputDecoration(
                         hintText: 'type_your_message_here'.tr,
-                        hintStyle: TextStyle(
+                        hintStyle: context.typography.inputText.copyWith(
                           color: Colors.grey.shade400,
                           fontWeight: FontWeight.w500,
                         ),
                         filled: true,
-                        fillColor: Color(0xFFF9FAFB),
+                        fillColor: const Color(0xFFF9FAFB),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
                           borderSide: BorderSide(color: Colors.grey.shade200),
@@ -175,7 +177,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Color(0xFF2563EB),
                             width: 2,
                           ),
@@ -197,7 +199,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'NOTIFICATION TYPE',
-                                  style: TextStyle(
+                                  style: context.typography.helperText.copyWith(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey.shade500,
@@ -207,10 +209,10 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                                 const SizedBox(height: 8),
                                 Obx(
                                   () => DropdownButtonFormField<String>(
-                                    value: controller.selectedType.value,
+                                    initialValue: controller.selectedType.value,
                                     decoration: InputDecoration(
                                       filled: true,
-                                      fillColor: Color(0xFFF9FAFB),
+                                      fillColor: const Color(0xFFF9FAFB),
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(12),
                                         borderSide: BorderSide(
@@ -224,13 +226,13 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    icon: Icon(
+                                    icon: const Icon(
                                       LucideIcons.chevronDown,
                                       size: 16,
                                     ),
-                                    style: TextStyle(
+                                    style: context.typography.inputText.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      color: Color(0xFF1F2937),
+                                      color: const Color(0xFF1F2937),
                                       fontSize: 14,
                                     ),
                                     items: [
@@ -252,8 +254,9 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                                       ),
                                     ],
                                     onChanged: (val) {
-                                      if (val != null)
+                                      if (val != null) {
                                         controller.selectedType.value = val;
+                                      }
                                     },
                                   ),
                                 ),
@@ -272,7 +275,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   'TARGET AUDIENCE',
-                                  style: TextStyle(
+                                  style: context.typography.helperText.copyWith(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey.shade500,
@@ -281,10 +284,10 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 8),
                                 DropdownButtonFormField<String>(
-                                  value: 'all_admins',
+                                  initialValue: 'all_admins',
                                   decoration: InputDecoration(
                                     filled: true,
-                                    fillColor: Color(0xFFF9FAFB),
+                                    fillColor: const Color(0xFFF9FAFB),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: BorderSide(
@@ -298,11 +301,11 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  icon: Icon(
+                                  icon: const Icon(
                                     LucideIcons.chevronDown,
                                     size: 16,
                                   ),
-                                  style: TextStyle(
+                                  style: context.typography.inputText.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey.shade400,
                                     fontSize: 14,
@@ -342,15 +345,15 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                               ? null
                               : controller.sendBroadcast,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF2563EB),
+                            backgroundColor: const Color(0xFF2563EB),
                             foregroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            disabledBackgroundColor: Color(
+                            disabledBackgroundColor: const Color(
                               0xFF2563EB,
-                            ).withOpacity(0.6),
+                            ).withValues(alpha: 0.6),
                           ),
                           child: controller.isLoading.value
                               ? const SizedBox(
@@ -361,14 +364,14 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                                     strokeWidth: 3,
                                   ),
                                 )
-                              : const Row(
+                              : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(LucideIcons.shieldCheck, size: 20),
-                                    SizedBox(width: 12),
+                                    const Icon(LucideIcons.shieldCheck, size: 20),
+                                    const SizedBox(width: 12),
                                     Text(
                                       'Push Notification',
-                                      style: TextStyle(
+                                      style: context.typography.cardTitle.copyWith(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,
                                       ),
@@ -400,7 +403,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
             border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -420,16 +423,16 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Email Config (SMTP)',
-                      style: TextStyle(
+                      style: context.typography.cardTitle.copyWith(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF111827),
+                        color: const Color(0xFF111827),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Configure global outgoing email server.',
-                      style: TextStyle(
+                      style: context.typography.helperText.copyWith(
                         fontSize: 12,
                         color: Colors.grey.shade500,
                       ),
@@ -482,15 +485,15 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                               ? null
                               : controller.saveSmtpConfig,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF2563EB),
+                            backgroundColor: const Color(0xFF2563EB),
                             foregroundColor: Colors.white,
                             elevation: 0,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            disabledBackgroundColor: Color(
+                            disabledBackgroundColor: const Color(
                               0xFF2563EB,
-                            ).withOpacity(0.6),
+                            ).withValues(alpha: 0.6),
                           ),
                           child: controller.isSmtpSaving.value
                               ? const SizedBox(
@@ -501,14 +504,14 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
                                     strokeWidth: 3,
                                   ),
                                 )
-                              : const Row(
+                              : Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(LucideIcons.save, size: 20),
-                                    SizedBox(width: 12),
+                                    const Icon(LucideIcons.save, size: 20),
+                                    const SizedBox(width: 12),
                                     Text(
                                       'Save Configuration',
-                                      style: TextStyle(
+                                      style: context.typography.cardTitle.copyWith(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w900,
                                       ),
@@ -538,7 +541,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: context.typography.helperText.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.bold,
             color: Colors.grey.shade500,
@@ -551,7 +554,7 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
           obscureText: obscureText,
           decoration: InputDecoration(
             filled: true,
-            fillColor: Color(0xFFF9FAFB),
+            fillColor: const Color(0xFFF9FAFB),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(color: Colors.grey.shade200),
@@ -562,12 +565,12 @@ class SuperAdminBroadcastScreen extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Color(0xFF2563EB), width: 2),
+              borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
             ),
           ),
-          style: TextStyle(
+          style: context.typography.inputText.copyWith(
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1F2937),
+            color: const Color(0xFF1F2937),
             fontSize: 14,
           ),
         ),

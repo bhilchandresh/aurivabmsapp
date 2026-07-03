@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
 import '../../shared/widgets/app_top_bar.dart';
+import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_input_field.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'clients_controller.dart';
@@ -84,7 +84,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
   // Helper to filter and sort clients reactively
   List<Client> _getFilteredAndSortedClients(List<Client> allClients) {
     // 1. Filter
-    List<Client> filtered = allClients.where((client) {
+    final List<Client> filtered = allClients.where((client) {
       final term = _searchQuery.toLowerCase();
       return client.name.toLowerCase().contains(term) ||
           client.email.toLowerCase().contains(term) ||
@@ -120,7 +120,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -173,13 +173,13 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         children: [
                           Text(
                             '${'clients'.tr} (${listItems.length})',
-                            style: TextStyle(
+                            style: context.typography.categoryHeader.copyWith(
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).textTheme.displayLarge?.color,
                             ),
                           ),
-                          Icon(
+                          const Icon(
                             LucideIcons.slidersHorizontal,
                             size: 16,
                             color: Colors.grey,
@@ -217,19 +217,19 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
   Widget _buildFilterHeader(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 700;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    Widget searchBar = TextField(
+    final Widget searchBar = TextField(
       onChanged: (val) {
         setState(() {
           _searchQuery = val;
         });
       },
-      style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+      style: context.typography.inputText.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color),
       decoration: InputDecoration(
         hintText: 'search_clients'.tr,
-        hintStyle: TextStyle(color: Colors.grey, fontSize: 13),
-        prefixIcon: Icon(
+        hintStyle: context.typography.searchHint.copyWith(color: Colors.grey, fontSize: 13),
+        prefixIcon: const Icon(
           LucideIcons.search,
           color: Colors.grey,
           size: 18,
@@ -251,12 +251,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: BorderSide(color: context.colorScheme.primary, width: 1.5),
         ),
       ),
     );
 
-    Widget sortDropdown = Container(
+    final Widget sortDropdown = Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -269,7 +269,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
         child: DropdownButton<String>(
           value: _sortBy,
           dropdownColor: Theme.of(context).cardTheme.color,
-          icon: Icon(
+          icon: const Icon(
             LucideIcons.chevronDown,
             size: 14,
             color: Colors.grey,
@@ -328,15 +328,15 @@ class _ClientsScreenState extends State<ClientsScreen> {
       ),
     );
 
-    Widget addButton = ElevatedButton.icon(
+    final Widget addButton = ElevatedButton.icon(
       onPressed: _showAddClientDialog,
-      icon: Icon(LucideIcons.plus, size: 16),
+      icon: const Icon(LucideIcons.plus, size: 16),
       label: Text(
         'add_client'.tr,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: context.typography.buttonText.copyWith(fontWeight: FontWeight.bold),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
+        backgroundColor: context.colorScheme.primary,
         foregroundColor: Colors.white,
         elevation: 1,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -389,12 +389,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
           Icon(
             LucideIcons.users,
             size: 40,
-            color: isDark ? Color(0xFF475569) : Colors.grey,
+            color: isDark ? const Color(0xFF475569) : Colors.grey,
           ),
           const SizedBox(height: 12),
           Text(
             'no_clients_matching_search'.tr,
-            style: TextStyle(
+            style: context.typography.emptyStateDescription.copyWith(
               fontWeight: FontWeight.w600,
               color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
             ),
@@ -457,7 +457,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
     final cardBgColor = Theme.of(context).cardTheme.color;
     final cardBorderColor = isHovered
-        ? AppColors.primary.withOpacity(0.5)
+        ? AppColors.primary.withValues(alpha: 0.5)
         : Theme.of(context).colorScheme.outline;
     final cardTextColor = Theme.of(context).textTheme.displayLarge?.color;
     final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color;
@@ -481,8 +481,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
             boxShadow: [
               BoxShadow(
                 color: isHovered
-                    ? AppColors.primary.withOpacity(0.08)
-                    : Colors.black.withOpacity(0.01),
+                    ? AppColors.primary.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.01),
                 blurRadius: isHovered ? 12 : 6,
                 offset: const Offset(0, 4),
               ),
@@ -503,7 +503,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           height: 44,
                           width: 44,
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.05),
+                            color: context.colorScheme.primary.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Center(
@@ -511,8 +511,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               client.name.trim().isNotEmpty
                                   ? client.name.trim()[0].toUpperCase()
                                   : 'C',
-                              style: TextStyle(
-                                color: AppColors.primary,
+                              style: context.typography.clientName.copyWith(
+                                color: context.colorScheme.primary,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w900,
                               ),
@@ -528,7 +528,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 _capitalizeName(client.name),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                style: context.typography.clientName.copyWith(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w900,
                                   color: cardTextColor,
@@ -544,22 +544,20 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: isDark
-                                        ? Colors.purple.shade900.withOpacity(
-                                            0.15,
+                                        ? Colors.purple.shade900.withValues(alpha: 0.15,
                                           )
                                         : Colors.purple.shade50,
                                     borderRadius: BorderRadius.circular(4),
                                     border: Border.all(
                                       color: isDark
-                                          ? Colors.purple.shade900.withOpacity(
-                                              0.3,
+                                          ? Colors.purple.shade900.withValues(alpha: 0.3,
                                             )
                                           : Colors.purple.shade100,
                                     ),
                                   ),
                                   child: Text(
                                     'gst_reg'.tr.toUpperCase(),
-                                    style: TextStyle(
+                                    style: context.typography.invoiceStatus.copyWith(
                                       color: isDark
                                           ? Colors.purple.shade300
                                           : Colors.purple.shade700,
@@ -591,7 +589,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 : 'no_email_added'.tr,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: context.typography.cardSubtitle.copyWith(
                               fontSize: 12,
                               color: secondaryTextColor,
                               fontWeight: FontWeight.w500,
@@ -616,7 +614,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 : 'no_phone_added'.tr,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: context.typography.cardSubtitle.copyWith(
                               fontSize: 12,
                               color: secondaryTextColor,
                               fontWeight: FontWeight.w500,
@@ -650,7 +648,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       children: [
                         Text(
                           'total_billed'.tr.toUpperCase(),
-                          style: TextStyle(
+                          style: context.typography.cardSubtitle.copyWith(
                             fontSize: 9,
                             fontWeight: FontWeight.w900,
                             color: Colors.grey,
@@ -660,7 +658,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         const SizedBox(height: 2),
                         Text(
                           formatCurrency.format(client.totalBilled),
-                          style: TextStyle(
+                          style: context.typography.invoiceAmount.copyWith(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                             color: cardTextColor,
@@ -677,7 +675,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               : isClear
                               ? 'status'.tr.toUpperCase()
                               : 'balance_due'.tr,
-                          style: TextStyle(
+                          style: context.typography.cardSubtitle.copyWith(
                             fontSize: 9,
                             fontWeight: FontWeight.w900,
                             color: Colors.grey,
@@ -699,7 +697,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               const SizedBox(width: 4),
                               Text(
                                 'settled'.tr,
-                                style: TextStyle(
+                                style: context.typography.invoiceStatus.copyWith(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
                                   color: isDark
@@ -712,7 +710,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         else
                           Text(
                             formatCurrency.format(balance.abs()),
-                            style: TextStyle(
+                            style: context.typography.invoiceAmount.copyWith(
                               fontWeight: FontWeight.w900,
                               fontSize: 13,
                               color: isAdvance
@@ -738,17 +736,17 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   children: [
                     Text(
                       'view_customer_ledger'.tr,
-                      style: TextStyle(
+                      style: context.typography.buttonText.copyWith(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.primary,
+                        color: context.colorScheme.primary,
                       ),
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Icon(
                       LucideIcons.arrowRight,
                       size: 14,
-                      color: AppColors.primary,
+                      color: context.colorScheme.primary,
                     ),
                   ],
                 ),
@@ -772,7 +770,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
+//         final isDark = Theme.of(context).brightness == Brightness.dark;
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
@@ -782,7 +780,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
               ),
               title: Text(
                 'add_client'.tr,
-                style: TextStyle(
+                style: context.typography.invoiceTitle.copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                   color: Theme.of(context).textTheme.displayLarge?.color,
@@ -800,7 +798,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         label: 'business_name_star'.tr,
                         hintText: 'e_g_acme_corp'.tr,
                         controller: nameController,
-                        prefixIcon: Icon(LucideIcons.briefcase, size: 18),
+                        prefixIcon: const Icon(LucideIcons.briefcase, size: 18),
                       ),
                       const SizedBox(height: 16),
                       AppInputField(
@@ -808,7 +806,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         hintText: 'name_company_com'.tr,
                         keyboardType: TextInputType.emailAddress,
                         controller: emailController,
-                        prefixIcon: Icon(LucideIcons.mail, size: 18),
+                        prefixIcon: const Icon(LucideIcons.mail, size: 18),
                       ),
                       const SizedBox(height: 16),
                       AppInputField(
@@ -816,14 +814,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         hintText: '+91...',
                         keyboardType: TextInputType.phone,
                         controller: phoneController,
-                        prefixIcon: Icon(LucideIcons.phone, size: 18),
+                        prefixIcon: const Icon(LucideIcons.phone, size: 18),
                       ),
                       const SizedBox(height: 16),
                       AppInputField(
                         label: 'gstin'.tr,
                         hintText: 'e_g_22aaaaa0000a1z5'.tr,
                         controller: gstinController,
-                        prefixIcon: Icon(LucideIcons.percent, size: 18),
+                        prefixIcon: const Icon(LucideIcons.percent, size: 18),
                       ),
                       const SizedBox(height: 16),
                       Column(
@@ -833,7 +831,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                             padding: const EdgeInsets.only(left: 4, bottom: 4),
                             child: Text(
                               'state_ut'.tr.toUpperCase(),
-                              style: AppTextStyles.caption.copyWith(
+                              style: context.typography.cardSubtitle.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Theme.of(context).textTheme.bodyMedium?.color,
                                 letterSpacing: 0.5,
@@ -844,7 +842,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                             isExpanded: true,
                             hint: Text(
                               'select_state'.tr,
-                              style: TextStyle(
+                              style: context.typography.inputText.copyWith(
                                 color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                                 fontSize: 13,
                               ),
@@ -872,7 +870,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               ),
                             ),
                             dropdownColor: Theme.of(context).cardTheme.color,
-                            style: TextStyle(
+                            style: context.typography.inputText.copyWith(
                               color: Theme.of(context).textTheme.displayLarge?.color,
                               fontSize: 14,
                             ),
@@ -881,7 +879,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 value: state,
                                 child: Text(
                                   state,
-                                  style: TextStyle(
+                                  style: context.typography.inputText.copyWith(
                                     color: Theme.of(context).textTheme.displayLarge?.color,
                                     fontSize: 13,
                                   ),
@@ -905,7 +903,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         label: 'billing_address'.tr,
                         hintText: 'full_billing_address'.tr,
                         controller: addressController,
-                        prefixIcon: Icon(LucideIcons.mapPin, size: 18),
+                        prefixIcon: const Icon(LucideIcons.mapPin, size: 18),
                       ),
                     ],
                   ),
@@ -916,7 +914,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   onPressed: () => Navigator.pop(context),
                   child: Text(
                     'cancel'.tr,
-                    style: TextStyle(
+                    style: context.typography.buttonText.copyWith(
                       color: Colors.grey,
                       fontWeight: FontWeight.bold,
                     ),
@@ -942,12 +940,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       'client_saved'.tr,
                       'client_added_successfully'.tr,
                       snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: AppColors.success.withOpacity(0.1),
+                      backgroundColor: AppColors.success.withValues(alpha: 0.1),
                       colorText: AppColors.success,
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: context.colorScheme.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -955,7 +953,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                   ),
                   child: Text(
                     'save_client'.tr,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: context.typography.buttonText.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
               ],

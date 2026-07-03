@@ -126,8 +126,8 @@ class SupplierPurchaseBill {
   });
 
   factory SupplierPurchaseBill.fromJson(Map<String, dynamic> json) {
-    var list = json['items'] as List? ?? [];
-    List<PurchaseBillItem> itemsList = list
+    final list = json['items'] as List? ?? [];
+    final List<PurchaseBillItem> itemsList = list
         .map((i) => PurchaseBillItem.fromJson(i))
         .toList();
 
@@ -369,11 +369,11 @@ class SuppliersController extends GetxController {
     try {
       isLoading.value = true;
 
-      double computedSubtotal = items.fold(
+      final double computedSubtotal = items.fold(
         0.0,
         (sum, item) => sum + item.amount,
       );
-      double finalAmount = totalOverride > 0 ? totalOverride : computedSubtotal;
+      final double finalAmount = totalOverride > 0 ? totalOverride : computedSubtotal;
 
       final response =
           await ApiService.post('${ApiConstants.suppliers}/purchases/all', {

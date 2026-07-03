@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'app_typography.dart';
+import 'app_extensions.dart';
 import '../constants/app_colors.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:get/get.dart';
 import 'package:flutter/services.dart';
 
 class AppTheme {
@@ -45,6 +44,7 @@ class AppTheme {
       textTheme: AppTypography.lightTextTheme,
       extensions: <ThemeExtension<dynamic>>[
         AppTypographyExtension.light(),
+        AppColorSchemeExtension.light(),
       ],
       useMaterial3: true,
     );
@@ -88,6 +88,7 @@ class AppTheme {
       textTheme: AppTypography.darkTextTheme,
       extensions: <ThemeExtension<dynamic>>[
         AppTypographyExtension.dark(),
+        AppColorSchemeExtension.dark(),
       ],
       useMaterial3: true,
     );

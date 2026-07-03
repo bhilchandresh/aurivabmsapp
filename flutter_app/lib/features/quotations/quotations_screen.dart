@@ -13,6 +13,7 @@ import '../clients/clients_controller.dart';
 import 'create_quotation_screen.dart';
 import 'quotation_details_screen.dart';
 import '../../navigation/main_layout.dart';
+import '../../core/theme/app_extensions.dart';
 
 class Quotation {
   final String dbId;
@@ -165,7 +166,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
       msg: "Public Quotation Link copied to clipboard!",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
-      backgroundColor: AppColors.primary,
+      backgroundColor: context.colorScheme.primary,
       textColor: Colors.white,
     );
   }
@@ -201,7 +202,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                 );
               }
             },
-            child: Text('delete'.tr, style: TextStyle(color: Colors.red)),
+            child: Text('delete'.tr, style: context.typography.buttonText),
           ),
         ],
       ),
@@ -280,10 +281,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
             },
             child: Text(
               'convert'.tr,
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-              ),
+              style: context.typography.buttonText,
             ),
           ),
         ],
@@ -367,7 +365,6 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Action Button with ScaleOnPress & Premium Gradient Styling
                           FadeInUp(
                             delay: Duration.zero,
                             child: Row(
@@ -397,8 +394,8 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                         borderRadius: BorderRadius.circular(10),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: AppColors.primary
-                                                .withOpacity(0.15),
+                                            color: context.colorScheme.primary
+                                                .withValues(alpha: 0.15),
                                             blurRadius: 8,
                                             offset: const Offset(0, 4),
                                           ),
@@ -408,7 +405,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          Icon(
+                                          const Icon(
                                             LucideIcons.plus,
                                             size: 16,
                                             color: Colors.white,
@@ -416,11 +413,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                           const SizedBox(width: 8),
                                           Text(
                                             'create_quotation'.tr,
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 13,
-                                            ),
+                                            style: context.typography.buttonText.copyWith(color: Colors.white),
                                           ),
                                         ],
                                       ),
@@ -431,8 +424,6 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-
-                          // Search and Filter Box with FadeInUp
                           FadeInUp(
                             delay: const Duration(milliseconds: 50),
                             child: Container(
@@ -443,8 +434,8 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                 border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.01),
-                                    blurRadius: 8,
+                                    color: Colors.black.withValues(alpha: 0.01),
+                                    blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),
                                 ],
@@ -461,18 +452,15 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                       },
                                       decoration: InputDecoration(
                                         hintText: 'search_quotations'.tr,
-                                        hintStyle: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 13,
-                                        ),
-                                        prefixIcon: Icon(
+                                        hintStyle: context.typography.searchHint,
+                                        prefixIcon: const Icon(
                                           LucideIcons.search,
                                           color: Colors.grey,
                                           size: 18,
                                         ),
                                         filled: true,
                                         fillColor: Theme.of(context).scaffoldBackgroundColor
-                                            .withOpacity(0.5),
+                                            .withValues(alpha: 0.5),
                                         contentPadding:
                                             const EdgeInsets.symmetric(
                                               vertical: 10,
@@ -494,8 +482,8 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                             8,
                                           ),
                                           borderSide: BorderSide(
-                                            color: AppColors.primary
-                                                .withOpacity(0.5),
+                                            color: context.colorScheme.outline
+                                                .withValues(alpha: 0.5),
                                             width: 1.5,
                                           ),
                                         ),
@@ -510,28 +498,19 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                         horizontal: 10,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).scaffoldBackgroundColor.withOpacity(
-                                          0.5,
-                                        ),
+                                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: DropdownButtonHideUnderline(
                                         child: DropdownButton<String>(
                                           isExpanded: true,
                                           value: _selectedStatus,
-                                          icon: Icon(
+                                          icon: const Icon(
                                             LucideIcons.chevronDown,
                                             size: 14,
                                             color: Colors.grey,
                                           ),
-                                          style: TextStyle(
-                                            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w600,
-                                            fontFamily: Theme.of(
-                                              context,
-                                            ).textTheme.bodyMedium?.fontFamily,
-                                          ),
+                                          style: context.typography.inputText.copyWith(color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)),
                                           items: [
                                             DropdownMenuItem(
                                               value: 'all',
@@ -584,13 +563,9 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                             children: [
                               Text(
                                 'Estimates & Quotes',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                ),
+                                style: context.typography.categoryHeader,
                               ),
-                              Icon(
+                              const Icon(
                                 LucideIcons.slidersHorizontal,
                                 size: 16,
                                 color: Colors.grey,
@@ -615,7 +590,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     LucideIcons.fileSearch,
                                     size: 40,
                                     color: Colors.grey,
@@ -623,10 +598,10 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                   const SizedBox(height: 12),
                                   Text(
                                     'no_quotations_found'.tr,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.grey,
-                                    ),
+                                    style: context.typography.emptyStateDescription.copyWith(
+    fontWeight: FontWeight.w600,
+    color: Colors.grey,
+  ),
                                   ),
                                 ],
                               ),
@@ -789,15 +764,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                         Flexible(
                                                           child: Text(
                                                             qt.id,
-                                                            style:
-                                                                TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 13,
-                                                                  color: AppColors
-                                                                      .primary,
-                                                                ),
+                                                            style: context.typography.invoiceNumber.copyWith(fontWeight: FontWeight.bold, fontSize: 13, color: context.colorScheme.primary),
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
@@ -821,7 +788,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               value: 'Accepted',
                                                               child: Row(
                                                                 children: [
-                                                                  Icon(
+                                                                  const Icon(
                                                                     LucideIcons
                                                                         .checkCircle,
                                                                     size: 16,
@@ -842,7 +809,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               value: 'Pending',
                                                               child: Row(
                                                                 children: [
-                                                                  Icon(
+                                                                  const Icon(
                                                                     LucideIcons
                                                                         .clock,
                                                                     size: 16,
@@ -863,7 +830,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               value: 'Rejected',
                                                               child: Row(
                                                                 children: [
-                                                                  Icon(
+                                                                  const Icon(
                                                                     LucideIcons
                                                                         .xCircle,
                                                                     size: 16,
@@ -913,15 +880,10 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                                 Text(
                                                                   qt.status
                                                                       .toUpperCase(),
-                                                                  style: TextStyle(
+                                                                  style: context.typography.invoiceStatus.copyWith(
                                                                     fontSize: 8,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    color:
-                                                                        statusColor,
-                                                                    letterSpacing:
-                                                                        0.5,
+                                                                    fontWeight: FontWeight.bold,
+                                                                    color: statusColor,
                                                                   ),
                                                                 ),
                                                                 const SizedBox(
@@ -951,13 +913,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                       formatCurrency.format(
                                                         qt.amount,
                                                       ),
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w900,
-                                                        fontSize: 15,
-                                                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                                        letterSpacing: -0.5,
-                                                      ),
+                                                      style: context.typography.invoiceAmount.copyWith(fontWeight: FontWeight.w900, fontSize: 15, color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black), letterSpacing: -0.5),
                                                     ),
                                                   ),
                                                 ],
@@ -965,9 +921,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                               const SizedBox(height: 6),
                                               Text(
                                                 qt.clientName,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14,
+                                                style: context.typography.clientName.copyWith(
                                                   color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                                                 ),
                                               ),
@@ -997,8 +951,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                         Flexible(
                                                           child: Text(
                                                             formattedDate,
-                                                            style: TextStyle(
-                                                              fontSize: 12,
+                                                            style: context.typography.cardSubtitle.copyWith(
                                                               color: Colors
                                                                   .grey
                                                                   .shade500,
@@ -1031,7 +984,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               .withValues(
                                                                 alpha: 0.08,
                                                               ),
-                                                          child: Padding(
+                                                          child: const Padding(
                                                             padding:
                                                                 EdgeInsets.all(
                                                                   4.0,
@@ -1115,7 +1068,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               .withValues(
                                                                 alpha: 0.08,
                                                               ),
-                                                          child: Padding(
+                                                          child: const Padding(
                                                             padding:
                                                                 EdgeInsets.all(
                                                                   4.0,
@@ -1167,12 +1120,8 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               ),
                                                               Text(
                                                                 'Converted',
-                                                                style: TextStyle(
-                                                                  fontSize: 10,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                    color: (Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Colors.grey),
+                                                                style: context.typography.liveIndicator.copyWith(
+                                                                  color: (Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Colors.grey),
                                                                 ),
                                                               ),
                                                             ],
@@ -1196,7 +1145,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                                 .withValues(
                                                                   alpha: 0.08,
                                                                 ),
-                                                            child: Padding(
+                                                            child: const Padding(
                                                               padding:
                                                                   EdgeInsets.all(
                                                                     4.0,
@@ -1219,7 +1168,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               .isEmpty) ...[
                                                         Tooltip(
                                                           message:
-                                                              'Edit Quotation',
+                                                              'edit_quotation'.tr,
                                                           child: InkWell(
                                                             onTap: () {
                                                               final rawQuotation = _clientsController
@@ -1264,7 +1213,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                                       alpha:
                                                                           0.08,
                                                                     ),
-                                                            child: Padding(
+                                                            child: const Padding(
                                                               padding:
                                                                   EdgeInsets.all(
                                                                     4.0,
@@ -1299,7 +1248,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               .withValues(
                                                                 alpha: 0.08,
                                                               ),
-                                                          child: Padding(
+                                                          child: const Padding(
                                                             padding:
                                                                 EdgeInsets.all(
                                                                   6.0,

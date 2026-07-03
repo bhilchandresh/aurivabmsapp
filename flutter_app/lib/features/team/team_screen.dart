@@ -142,7 +142,7 @@ class _TeamScreenState extends State<TeamScreen> {
         child: Image.memory(decodedBytes, fit: BoxFit.contain),
       );
     } catch (_) {
-      return Icon(LucideIcons.imageOff, size: 18, color: Colors.grey);
+      return const Icon(LucideIcons.imageOff, size: 18, color: Colors.grey);
     }
   }
 
@@ -239,10 +239,10 @@ class _TeamScreenState extends State<TeamScreen> {
                   colorText: Colors.white,
                 );
               },
-              icon: Icon(LucideIcons.zap, size: 16, color: Colors.white),
+              icon: const Icon(LucideIcons.zap, size: 16, color: Colors.white),
               label: Text(
                 'upgrade_now'.tr,
-                style: TextStyle(
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -274,7 +274,7 @@ class _TeamScreenState extends State<TeamScreen> {
         border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.01),
+            color: Colors.black.withValues(alpha: 0.01),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -306,7 +306,7 @@ class _TeamScreenState extends State<TeamScreen> {
           ),
           Text(
             price,
-            style: TextStyle(
+            style: const TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 13,
               color: AppColors.primary,
@@ -356,7 +356,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.01),
+                          color: Colors.black.withValues(alpha: 0.01),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -404,7 +404,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 LucideIcons.alertTriangle,
                                 size: 12,
                                 color: Colors.red,
@@ -442,11 +442,11 @@ class _TeamScreenState extends State<TeamScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: 'search_staff'.tr,
-                        hintStyle: TextStyle(
+                        hintStyle: const TextStyle(
                           color: Colors.grey,
                           fontSize: 12,
                         ),
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           LucideIcons.search,
                           color: Colors.grey,
                           size: 16,
@@ -466,7 +466,7 @@ class _TeamScreenState extends State<TeamScreen> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: AppColors.primary,
                             width: 1.5,
                           ),
@@ -481,10 +481,10 @@ class _TeamScreenState extends State<TeamScreen> {
                       onPressed: atLimit
                           ? null
                           : () => _showAddMemberBottomSheet(context),
-                      icon: Icon(LucideIcons.plus, size: 14),
+                      icon: const Icon(LucideIcons.plus, size: 14),
                       label: Text(
                         'add_staff'.tr,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -521,7 +521,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                     ),
                   ),
-                  Icon(LucideIcons.users, size: 16, color: Colors.grey),
+                  const Icon(LucideIcons.users, size: 16, color: Colors.grey),
                 ],
               ),
               const SizedBox(height: 12),
@@ -615,7 +615,7 @@ class _TeamScreenState extends State<TeamScreen> {
                 border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.01),
+                    color: Colors.black.withValues(alpha: 0.01),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -628,7 +628,7 @@ class _TeamScreenState extends State<TeamScreen> {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: roleColor.withOpacity(0.08),
+                      color: roleColor.withValues(alpha: 0.08),
                       shape: BoxShape.circle,
                     ),
                     alignment: Alignment.center,
@@ -748,7 +748,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: roleColor.withOpacity(0.08),
+                          color: roleColor.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
@@ -775,13 +775,13 @@ class _TeamScreenState extends State<TeamScreen> {
                         IconButton(
                           onPressed: () =>
                               _confirmDeleteMember(context, member),
-                          icon: Icon(
+                          icon: const Icon(
                             LucideIcons.trash2,
                             size: 15,
                             color: Colors.red,
                           ),
                           style: IconButton.styleFrom(
-                            backgroundColor: Colors.red.withOpacity(0.06),
+                            backgroundColor: Colors.red.withValues(alpha: 0.06),
                             padding: const EdgeInsets.all(6),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
@@ -812,7 +812,7 @@ class _TeamScreenState extends State<TeamScreen> {
               onPressed: isSaving ? null : () => Get.back(),
               child: Text(
                 'cancel'.tr,
-                style: TextStyle(color: Colors.grey),
+                style: const TextStyle(color: Colors.grey),
               ),
             );
           }),
@@ -854,7 +854,7 @@ class _TeamScreenState extends State<TeamScreen> {
                     )
                   : Text(
                       'remove'.tr,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
             );
           }),
@@ -872,7 +872,7 @@ class _TeamScreenState extends State<TeamScreen> {
       Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -888,7 +888,7 @@ class _TeamScreenState extends State<TeamScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: roleColor.withOpacity(0.08),
+                    color: roleColor.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -901,7 +901,7 @@ class _TeamScreenState extends State<TeamScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(LucideIcons.x, size: 18),
+                  icon: const Icon(LucideIcons.x, size: 18),
                   onPressed: () => Get.back(),
                 ),
               ],
@@ -915,7 +915,7 @@ class _TeamScreenState extends State<TeamScreen> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: roleColor.withOpacity(0.08),
+                    color: roleColor.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -954,7 +954,7 @@ class _TeamScreenState extends State<TeamScreen> {
                 ),
               ],
             ),
-            Divider(height: 36),
+            const Divider(height: 36),
 
             // Digital Signature Preview Card
             Text(
@@ -990,7 +990,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           size: 24,
                         ),
                         const SizedBox(height: 6),
-                        Text(
+                        const Text(
                           'No digital signature uploaded',
                           style: TextStyle(
                             fontSize: 11,
@@ -1023,7 +1023,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       member.signatureImage != null
                           ? 'change'.tr
                           : 'upload_signature'.tr,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                         color: Colors.white,
@@ -1052,21 +1052,21 @@ class _TeamScreenState extends State<TeamScreen> {
                         Get.back();
                         _confirmDeleteMember(context, member);
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         LucideIcons.trash2,
                         size: 14,
                         color: Colors.red,
                       ),
                       label: Text(
                         'remove_member'.tr,
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.red,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.red),
+                        side: const BorderSide(color: Colors.red),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -1093,7 +1093,7 @@ class _TeamScreenState extends State<TeamScreen> {
           return Container(
             decoration: BoxDecoration(
               color: Theme.of(context).cardTheme.color,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
             ),
             padding: const EdgeInsets.all(20),
             child: SingleChildScrollView(
@@ -1116,12 +1116,12 @@ class _TeamScreenState extends State<TeamScreen> {
                           ),
                         ),
                         IconButton(
-                          icon: Icon(LucideIcons.x, size: 18),
+                          icon: const Icon(LucideIcons.x, size: 18),
                           onPressed: () => Get.back(),
                         ),
                       ],
                     ),
-                    Divider(),
+                    const Divider(),
                     const SizedBox(height: 12),
 
                     // Name
@@ -1130,8 +1130,9 @@ class _TeamScreenState extends State<TeamScreen> {
                       hintText: 'eg_name'.tr,
                       controller: _nameCtrl,
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty)
+                        if (val == null || val.trim().isEmpty) {
                           return 'Please enter name';
+                        }
                         return null;
                       },
                     ),
@@ -1144,10 +1145,12 @@ class _TeamScreenState extends State<TeamScreen> {
                       keyboardType: TextInputType.emailAddress,
                       controller: _emailCtrl,
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty)
+                        if (val == null || val.trim().isEmpty) {
                           return 'Please enter email';
-                        if (!GetUtils.isEmail(val.trim()))
+                        }
+                        if (!GetUtils.isEmail(val.trim())) {
                           return 'Invalid email address';
+                        }
                         return null;
                       },
                     ),
@@ -1160,10 +1163,12 @@ class _TeamScreenState extends State<TeamScreen> {
                       obscureText: true,
                       controller: _passwordCtrl,
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty)
+                        if (val == null || val.trim().isEmpty) {
                           return 'Please enter password';
-                        if (val.trim().length < 6)
+                        }
+                        if (val.trim().length < 6) {
                           return 'Password must be at least 6 chars';
+                        }
                         return null;
                       },
                     ),
@@ -1279,7 +1284,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                 },
                           icon: isSaving
                               ? const SizedBox.shrink()
-                              : Icon(
+                              : const Icon(
                                   LucideIcons.plus,
                                   size: 16,
                                   color: Colors.white,
@@ -1295,7 +1300,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                 )
                               : Text(
                                   'add_staff'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),

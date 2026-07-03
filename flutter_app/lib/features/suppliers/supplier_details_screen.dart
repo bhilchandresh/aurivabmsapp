@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../core/theme/app_extensions.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import '../../core/constants/app_colors.dart';
-import '../../shared/widgets/app_input_field.dart';
 import 'suppliers_controller.dart';
 import '../inventory/inventory_controller.dart';
 
@@ -74,7 +74,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
           body: Center(
             child: Text(
               'Supplier not found',
-              style: TextStyle(
+              style: context.typography.emptyStateDescription.copyWith(
                 color: Theme.of(context).textTheme.displayLarge?.color,
               ),
             ),
@@ -104,7 +104,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
           ),
           title: Text(
             'Supplier Ledger',
-            style: TextStyle(
+            style: context.typography.invoiceTitle.copyWith(
               color: Theme.of(context).textTheme.displayLarge?.color,
               fontWeight: FontWeight.bold,
               fontSize: 18,
@@ -114,14 +114,14 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         ),
         body: SafeArea(
           child: showSpinner
-              ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary),
+              ? Center(
+                  child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
                 )
               : RefreshIndicator(
                   onRefresh: () => _suppliersController.fetchSupplierDetails(
                     widget.supplierId,
                   ),
-                  color: AppColors.primary,
+                  color: Theme.of(context).colorScheme.primary,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
@@ -183,7 +183,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -196,14 +196,14 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: Text(
                 supplier.name.substring(0, 1).toUpperCase(),
-                style: TextStyle(
-                  color: AppColors.primary,
+                style: context.typography.clientName.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.w800,
                   fontSize: 24,
                 ),
@@ -217,7 +217,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
               children: [
                 Text(
                   supplier.name,
-                  style: TextStyle(
+                  style: context.typography.clientName.copyWith(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.displayLarge?.color,
@@ -267,9 +267,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
           Expanded(
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 12.5,
-                color: isDark ? Color(0xFFCBD5E1) : Colors.grey.shade700,
+              style: context.typography.cardSubtitle.copyWith(
+                  fontSize: 12.5,
+                  color: isDark ? const Color(0xFFCBD5E1) : Colors.grey.shade700,
               ),
             ),
           ),
@@ -291,7 +291,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
       builder: (context, constraints) {
         final bool isSmallScreen = constraints.maxWidth < 600;
 
-        List<Widget> statsCards = [
+        final List<Widget> statsCards = [
           _buildStatCard(
             title: 'Total Purchased',
             value: formatCurrency.format(supplier.totalPurchased),
@@ -317,10 +317,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             isDark: isDark,
             bgColor: hasPending
                 ? (isDark
-                      ? Colors.red.shade900.withOpacity(0.3)
+                      ? Colors.red.shade900.withValues(alpha: 0.3)
                       : Colors.red.shade50)
                 : (isDark
-                      ? Colors.teal.shade900.withOpacity(0.3)
+                      ? Colors.teal.shade900.withValues(alpha: 0.3)
                       : Colors.teal.shade50),
           ),
         ];
@@ -383,7 +383,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             children: [
               Text(
                 title.toUpperCase(),
-                style: TextStyle(
+                style: context.typography.cardSubtitle.copyWith(
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
@@ -398,7 +398,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             fit: BoxFit.scaleDown,
             child: Text(
               value,
-              style: TextStyle(
+              style: context.typography.invoiceAmount.copyWith(
                 fontSize: 22,
                 fontWeight: FontWeight.w900,
                 color: Theme.of(context).textTheme.displayLarge?.color,
@@ -408,7 +408,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(
+            style: context.typography.cardDescription.copyWith(
               fontSize: 11,
               color: Theme.of(context).textTheme.bodyMedium?.color,
             ),
@@ -428,10 +428,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () => _showAddBillDialog(context, supplierId),
-            icon: Icon(LucideIcons.plus, size: 16),
+            icon: const Icon(LucideIcons.plus, size: 16),
             label: Text('add_purchase_bill'.tr),
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
+              backgroundColor: Theme.of(context).colorScheme.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
               elevation: 0,
@@ -445,7 +445,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         Expanded(
           child: ElevatedButton.icon(
             onPressed: () => _showRecordPaymentDialog(context, supplierId),
-            icon: Icon(LucideIcons.creditCard, size: 16),
+            icon: const Icon(LucideIcons.creditCard, size: 16),
             label: Text('record_payment'.tr),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
@@ -486,21 +486,21 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
-              ? AppColors.primary.withOpacity(isDark ? 0.2 : 0.1)
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: isDark ? 0.2 : 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: isActive ? AppColors.primary : Colors.transparent,
+            color: isActive ? Theme.of(context).colorScheme.primary : Colors.transparent,
             width: 1,
           ),
         ),
         child: Text(
           label,
-          style: TextStyle(
+          style: context.typography.buttonText.copyWith(
             fontSize: 13.0,
             fontWeight: FontWeight.bold,
             color: isActive
-                ? AppColors.primary
+                ? Theme.of(context).colorScheme.primary
                 : ((Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
           ),
         ),
@@ -526,12 +526,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             Icon(
               LucideIcons.package,
               size: 40,
-              color: isDark ? Color(0xFF475569) : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+              color: isDark ? const Color(0xFF475569) : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 12),
             Text(
               'No purchase bills yet',
-              style: TextStyle(
+              style: context.typography.emptyStateDescription.copyWith(
                 fontWeight: FontWeight.bold,
                 color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
               ),
@@ -578,7 +578,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                   children: [
                     Text(
                       bill.billNumber,
-                      style: TextStyle(
+                      style: context.typography.invoiceNumber.copyWith(
                         fontFamily: 'monospace',
                         fontWeight: FontWeight.bold,
                         fontSize: 14.5,
@@ -588,7 +588,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                     const SizedBox(height: 4),
                     Text(
                       _safeFormatDate(bill.date),
-                      style: TextStyle(
+                      style: context.typography.dueDate.copyWith(
                         fontSize: 12,
                         color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                       ),
@@ -601,7 +601,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 children: [
                   Text(
                     formatCurrency.format(bill.totalAmount),
-                    style: TextStyle(
+                    style: context.typography.invoiceAmount.copyWith(
                       fontWeight: FontWeight.w800,
                       fontSize: 15,
                       color: Theme.of(context).textTheme.displayLarge?.color,
@@ -614,12 +614,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.12),
+                      color: statusColor.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       bill.status,
-                      style: TextStyle(
+                      style: context.typography.invoiceStatus.copyWith(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         color: statusColor,
@@ -645,7 +645,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 children: [
                   Text(
                     'Bill Details & Items',
-                    style: TextStyle(
+                    style: context.typography.categoryHeader.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
@@ -756,7 +756,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                     const SizedBox(height: 12),
                     Text(
                       'Notes:',
-                      style: TextStyle(
+                      style: context.typography.tableHeader.copyWith(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -765,7 +765,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                     const SizedBox(height: 4),
                     Text(
                       bill.notes,
-                      style: TextStyle(
+                      style: context.typography.cardDescription.copyWith(
                         fontSize: 11.5,
                         color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                       ),
@@ -777,7 +777,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                     children: [
                       Text(
                         'Amount Paid: ${formatCurrency.format(bill.amountPaid)}',
-                        style: TextStyle(
+                        style: context.typography.invoiceStatus.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: Colors.green.shade600,
@@ -786,13 +786,13 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                       IconButton(
                         onPressed: () =>
                             _confirmDeleteBill(bill.id, bill.billNumber),
-                        icon: Icon(
+                        icon: const Icon(
                           LucideIcons.trash2,
                           size: 16,
                           color: Colors.red,
                         ),
                         style: IconButton.styleFrom(
-                          backgroundColor: Colors.red.withOpacity(0.1),
+                          backgroundColor: Colors.red.withValues(alpha: 0.1),
                           padding: const EdgeInsets.all(8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -822,7 +822,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
       child: Text(
         text,
         textAlign: isRightAlign ? TextAlign.right : TextAlign.left,
-        style: TextStyle(
+        style: context.typography.tableCell.copyWith(
           fontSize: isHeader ? 11.5 : 12,
           fontWeight: isHeader
               ? FontWeight.bold
@@ -853,12 +853,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             Icon(
               LucideIcons.indianRupee,
               size: 40,
-              color: isDark ? Color(0xFF475569) : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+              color: isDark ? const Color(0xFF475569) : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 12),
             Text(
               'No payments recorded yet',
-              style: TextStyle(
+              style: context.typography.emptyStateDescription.copyWith(
                 fontWeight: FontWeight.bold,
                 color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
               ),
@@ -902,7 +902,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 children: [
                   Text(
                     _safeFormatDate(payment.paymentDate),
-                    style: TextStyle(
+                    style: context.typography.dueDate.copyWith(
                       fontSize: 12,
                       color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                     ),
@@ -914,15 +914,15 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.12),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       payment.paymentMode,
-                      style: TextStyle(
+                      style: context.typography.invoiceStatus.copyWith(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                   ),
@@ -930,7 +930,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
               ),
               Text(
                 formatCurrency.format(payment.amount),
-                style: TextStyle(
+                style: context.typography.invoiceAmount.copyWith(
                   fontWeight: FontWeight.w900,
                   fontSize: 17,
                   color: Colors.green,
@@ -945,7 +945,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
               children: [
                 Text(
                   'UTR/Ref: ',
-                  style: TextStyle(
+                  style: context.typography.tableHeader.copyWith(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -953,7 +953,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 ),
                 Text(
                   payment.referenceNumber,
-                  style: TextStyle(
+                  style: context.typography.tableCell.copyWith(
                     fontFamily: 'monospace',
                     fontSize: 11.5,
                     color: Theme.of(context).textTheme.displayLarge?.color,
@@ -966,24 +966,24 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             const SizedBox(height: 4),
             Text(
               payment.notes,
-              style: TextStyle(
+              style: context.typography.cardDescription.copyWith(
                 fontSize: 12,
                 color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
                 fontStyle: FontStyle.italic,
               ),
             ),
           ],
-          Divider(height: 24),
+          const Divider(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               ElevatedButton.icon(
                 onPressed: () =>
                     _confirmDeletePayment(payment.id, payment.amount),
-                icon: Icon(LucideIcons.trash2, size: 12),
+                icon: const Icon(LucideIcons.trash2, size: 12),
                 label: Text('delete'.tr),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.withOpacity(0.1),
+                  backgroundColor: Colors.red.withValues(alpha: 0.1),
                   foregroundColor: Colors.red,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(
@@ -1025,7 +1025,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('cancel'.tr, style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: context.typography.buttonText.copyWith(color: Colors.grey)),
           ),
           Obx(() {
             final isDeleting = _suppliersController.isLoading.value;
@@ -1064,7 +1064,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                         strokeWidth: 2,
                       ),
                     )
-                  : Text('delete'.tr, style: TextStyle(color: Colors.white)),
+                  : Text('delete'.tr, style: context.typography.buttonText.copyWith(color: Colors.white)),
             );
           }),
         ],
@@ -1082,7 +1082,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: Text('cancel'.tr, style: TextStyle(color: Colors.grey)),
+            child: Text('cancel'.tr, style: context.typography.buttonText.copyWith(color: Colors.grey)),
           ),
           Obx(() {
             final isDeleting = _suppliersController.isLoading.value;
@@ -1123,7 +1123,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                         strokeWidth: 2,
                       ),
                     )
-                  : Text('delete'.tr, style: TextStyle(color: Colors.white)),
+                  : Text('delete'.tr, style: context.typography.buttonText.copyWith(color: Colors.white)),
             );
           }),
         ],
@@ -1134,13 +1134,13 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
   void _showAddBillDialog(BuildContext context, String supplierId) {
     final billNoController = TextEditingController();
     final notesController = TextEditingController();
-    final overrideAmountController = TextEditingController();
+//     final overrideAmountController = TextEditingController();
 
     DateTime billDate = DateTime.now();
     DateTime? dueDate;
 
     // Dynamic items state
-    List<Map<String, dynamic>> selectedItems = [
+    final List<Map<String, dynamic>> selectedItems = [
       {'desc': '', 'qty': 1, 'rate': 0.0, 'inventoryId': null},
     ];
 
@@ -1156,8 +1156,8 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
           child: StatefulBuilder(
             builder: (context, setState) {
               final double subTotal = selectedItems.fold(0.0, (sum, item) {
-                double rate = item['rate'] ?? 0.0;
-                int qty = item['qty'] ?? 1;
+                final double rate = item['rate'] ?? 0.0;
+                final int qty = item['qty'] ?? 1;
                 return sum + (rate * qty);
               });
 
@@ -1179,13 +1179,13 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                           children: [
                             Icon(
                               LucideIcons.package,
-                              color: AppColors.primary,
+                              color: Theme.of(context).colorScheme.primary,
                               size: 20,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'add_purchase_bill'.tr,
-                              style: TextStyle(
+                              style: context.typography.invoiceTitle.copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -1195,7 +1195,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                         ),
                         IconButton(
                           onPressed: () => Get.back(),
-                          icon: Icon(
+                          icon: const Icon(
                             LucideIcons.x,
                             size: 20,
                             color: Colors.grey,
@@ -1238,8 +1238,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                       firstDate: DateTime(2000),
                                       lastDate: DateTime(2101),
                                     );
-                                    if (picked != null)
+                                    if (picked != null) {
                                       setState(() => billDate = picked);
+                                    }
                                   },
                                 ),
                               ),
@@ -1262,8 +1263,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                       firstDate: DateTime(2000),
                                       lastDate: DateTime(2101),
                                     );
-                                    if (picked != null)
+                                    if (picked != null) {
                                       setState(() => dueDate = picked);
+                                    }
                                   },
                                 ),
                               ),
@@ -1274,7 +1276,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                   children: [
                                     Text(
                                       'total_amount'.tr,
-                                      style: TextStyle(
+                                      style: context.typography.cardSubtitle.copyWith(
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.grey,
@@ -1298,7 +1300,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                       alignment: Alignment.centerLeft,
                                       child: Text(
                                         '₹${subTotal.toStringAsFixed(2)}',
-                                        style: TextStyle(
+                                        style: context.typography.inputText.copyWith(
                                           fontSize: 14,
                                           fontWeight: FontWeight.bold,
                                           color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.white),
@@ -1315,7 +1317,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                           // ITEMS HEADER
                           Text(
                             'items_materials_purchased'.tr,
-                            style: TextStyle(
+                            style: context.typography.categoryHeader.copyWith(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey,
@@ -1348,7 +1350,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                           children: [
                                             Text(
                                               'item_name'.tr,
-                                              style: TextStyle(
+                                              style: context.typography.cardSubtitle.copyWith(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey,
@@ -1362,10 +1364,11 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                     textEditingValue,
                                                   ) {
                                                     if (textEditingValue.text ==
-                                                        '')
+                                                        '') {
                                                       return const Iterable<
                                                         InventoryItem
                                                       >.empty();
+                                                    }
                                                     return _inventoryController
                                                         .items
                                                         .where(
@@ -1401,9 +1404,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                     if (controller
                                                             .text
                                                             .isEmpty &&
-                                                        item['desc'] != '')
+                                                        item['desc'] != '') {
                                                       controller.text =
                                                           item['desc'];
+                                                    }
                                                     return SizedBox(
                                                       height: 40,
                                                       child: TextFormField(
@@ -1413,7 +1417,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                           hintText:
                                                               'e_g_cement_bags'
                                                                   .tr,
-                                                          hintStyle: TextStyle(
+                                                          hintStyle: context.typography.searchHint.copyWith(
                                                             color: Colors
                                                                 .grey
                                                                 .shade400,
@@ -1450,7 +1454,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                                   8,
                                                                 ),
                                                             borderSide:
-                                                                BorderSide(
+                                                                const BorderSide(
                                                                   color: AppColors
                                                                       .primary,
                                                                 ),
@@ -1459,7 +1463,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                               Theme.of(context).scaffoldBackgroundColor,
                                                           filled: true,
                                                         ),
-                                                        style: TextStyle(
+                                                        style: context.typography.inputText.copyWith(
                                                           fontSize: 13,
                                                         ),
                                                         onChanged: (val) {
@@ -1508,11 +1512,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                                   ),
                                                               child: Text(
                                                                 '${option.itemName} (${option.sku})',
-                                                                style:
-                                                                    TextStyle(
-                                                                      fontSize:
-                                                                          13,
-                                                                    ),
+                                                                style: context.typography.inputText.copyWith(
+                                                                  fontSize: 13,
+                                                                ),
                                                               ),
                                                             ),
                                                           );
@@ -1536,7 +1538,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                             );
                                           }
                                         },
-                                        icon: Icon(
+                                        icon: const Icon(
                                           LucideIcons.trash2,
                                           size: 18,
                                           color: Colors.redAccent,
@@ -1559,7 +1561,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                           children: [
                                             Text(
                                               'qty'.tr,
-                                              style: TextStyle(
+                                              style: context.typography.cardSubtitle.copyWith(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey,
@@ -1605,7 +1607,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                               8,
                                                             ),
                                                         borderSide:
-                                                            BorderSide(
+                                                            const BorderSide(
                                                               color: AppColors
                                                                   .primary,
                                                             ),
@@ -1613,7 +1615,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                   fillColor: Theme.of(context).scaffoldBackgroundColor,
                                                   filled: true,
                                                 ),
-                                                style: TextStyle(
+                                                style: context.typography.inputText.copyWith(
                                                   fontSize: 13,
                                                 ),
                                                 keyboardType:
@@ -1636,7 +1638,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                           children: [
                                             Text(
                                               'rate_1'.tr,
-                                              style: TextStyle(
+                                              style: context.typography.cardSubtitle.copyWith(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey,
@@ -1686,7 +1688,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                               8,
                                                             ),
                                                         borderSide:
-                                                            BorderSide(
+                                                            const BorderSide(
                                                               color: AppColors
                                                                   .primary,
                                                             ),
@@ -1694,7 +1696,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                                   fillColor: Theme.of(context).scaffoldBackgroundColor,
                                                   filled: true,
                                                 ),
-                                                style: TextStyle(
+                                                style: context.typography.inputText.copyWith(
                                                   fontSize: 13,
                                                 ),
                                                 keyboardType:
@@ -1722,7 +1724,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                           children: [
                                             Text(
                                               'total_1'.tr,
-                                              style: TextStyle(
+                                              style: context.typography.cardSubtitle.copyWith(
                                                 fontSize: 10,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.grey,
@@ -1734,7 +1736,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                               alignment: Alignment.centerRight,
                                               child: Text(
                                                 '₹${((item['qty'] as int) * (item['rate'] as double)).toStringAsFixed(2)}',
-                                                style: TextStyle(
+                                                style: context.typography.inputText.copyWith(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w800,
                                                   color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -1773,20 +1775,20 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                   Container(
                                     padding: const EdgeInsets.all(4),
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary.withOpacity(0.1),
+                                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                     child: Icon(
                                       LucideIcons.plus,
                                       size: 14,
-                                      color: AppColors.primary,
+                                      color: Theme.of(context).colorScheme.primary,
                                     ),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     'add_item'.tr,
-                                    style: TextStyle(
-                                      color: AppColors.primary,
+                                    style: context.typography.buttonText.copyWith(
+                                      color: Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
                                     ),
@@ -1801,10 +1803,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.05),
+                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.05),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: AppColors.primary.withOpacity(0.1),
+                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                               ),
                             ),
                             child: Row(
@@ -1812,18 +1814,18 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                               children: [
                                 Text(
                                   'subtotal_1'.tr,
-                                  style: TextStyle(
+                                  style: context.typography.cardSubtitle.copyWith(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
-                                    color: AppColors.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                                 Text(
                                   '₹${subTotal.toStringAsFixed(2)}',
-                                  style: TextStyle(
+                                  style: context.typography.invoiceAmount.copyWith(
                                     fontWeight: FontWeight.w900,
                                     fontSize: 16,
-                                    color: AppColors.primary,
+                                    color: Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                               ],
@@ -1834,7 +1836,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                           // NOTES
                           Text(
                             'notes_1'.tr,
-                            style: TextStyle(
+                            style: context.typography.cardSubtitle.copyWith(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey,
@@ -1846,7 +1848,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                             maxLines: 3,
                             decoration: InputDecoration(
                               hintText: 'delivery_details_conditions_etc'.tr,
-                              hintStyle: TextStyle(
+                              hintStyle: context.typography.searchHint.copyWith(
                                 color: Colors.grey.shade400,
                                 fontSize: 13,
                               ),
@@ -1869,11 +1871,11 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
-                                  color: AppColors.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                             ),
-                            style: TextStyle(fontSize: 13),
+                            style: context.typography.inputText.copyWith(fontSize: 13),
                           ),
                         ],
                       ),
@@ -1894,7 +1896,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                           onPressed: () => Get.back(),
                           child: Text(
                             'cancel'.tr,
-                            style: TextStyle(
+                            style: context.typography.buttonText.copyWith(
                               color: Colors.grey,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1967,10 +1969,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                       return;
                                     }
 
-                                    List<PurchaseBillItem> billItems =
+                                    final List<PurchaseBillItem> billItems =
                                         selectedItems.map((item) {
-                                          double rate = item['rate'] ?? 0.0;
-                                          int qty = item['qty'] ?? 1;
+                                          final double rate = item['rate'] ?? 0.0;
+                                          final int qty = item['qty'] ?? 1;
                                           return PurchaseBillItem(
                                             description: item['desc'],
                                             quantity: qty,
@@ -1980,7 +1982,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                           );
                                         }).toList();
 
-                                    String dueDateStr = dueDate != null
+                                    final String dueDateStr = dueDate != null
                                         ? DateFormat(
                                             'yyyy-MM-dd',
                                           ).format(dueDate!)
@@ -2027,7 +2029,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                     }
                                   },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 24,
                                 vertical: 12,
@@ -2048,7 +2050,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                   )
                                 : Text(
                                     'save_bill'.tr,
-                                    style: TextStyle(
+                                    style: context.typography.buttonText.copyWith(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -2078,7 +2080,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: context.typography.cardSubtitle.copyWith(
             fontSize: 10,
             fontWeight: FontWeight.bold,
             color: Colors.grey,
@@ -2092,7 +2094,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             keyboardType: keyboardType,
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+              hintStyle: context.typography.searchHint.copyWith(color: Colors.grey.shade400, fontSize: 13),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 8,
@@ -2109,10 +2111,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppColors.primary),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
               ),
             ),
-            style: TextStyle(fontSize: 13),
+            style: context.typography.inputText.copyWith(fontSize: 13),
           ),
         ),
       ],
@@ -2130,7 +2132,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: context.typography.cardSubtitle.copyWith(
             fontSize: 10,
             fontWeight: FontWeight.bold,
             color: Colors.grey,
@@ -2154,7 +2156,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                   date != null
                       ? DateFormat('dd-MM-yyyy').format(date)
                       : (hint ?? 'dd-mm-yyyy'),
-                  style: TextStyle(
+                  style: context.typography.inputText.copyWith(
                     fontSize: 13,
                     color: date != null
                         ? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)
@@ -2185,7 +2187,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: context.typography.cardSubtitle.copyWith(
             fontSize: 10,
             fontWeight: FontWeight.bold,
             color: Colors.grey,
@@ -2195,7 +2197,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         SizedBox(
           height: 40,
           child: DropdownButtonFormField<String>(
-            value: value,
+            initialValue: value,
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -2211,12 +2213,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppColors.primary),
+                borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
               ),
               fillColor: Theme.of(context).scaffoldBackgroundColor,
               filled: true,
             ),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: context.typography.inputText.copyWith(
               fontSize: 13,
               color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
             ),
@@ -2225,14 +2227,12 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 value: val,
                 child: Text(
                   val,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontSize: 13),
+                  style: context.typography.inputText.copyWith(fontSize: 13),
                 ),
               );
             }).toList(),
             onChanged: onChanged,
-            icon: Icon(LucideIcons.chevronDown, size: 16),
+            icon: const Icon(LucideIcons.chevronDown, size: 16),
           ),
         ),
       ],
@@ -2274,7 +2274,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                       children: [
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               LucideIcons.creditCard,
                               color: Colors.green,
                               size: 20,
@@ -2282,7 +2282,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                             const SizedBox(width: 8),
                             Text(
                               'record_payment_to_supplier'.tr,
-                              style: TextStyle(
+                              style: context.typography.invoiceTitle.copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                                 color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -2292,7 +2292,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                         ),
                         IconButton(
                           onPressed: () => Get.back(),
-                          icon: Icon(
+                          icon: const Icon(
                             LucideIcons.x,
                             size: 20,
                             color: Colors.grey,
@@ -2354,8 +2354,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                     'Other',
                                   ],
                                   onChanged: (val) {
-                                    if (val != null)
+                                    if (val != null) {
                                       setState(() => paymentMode = val);
+                                    }
                                   },
                                 ),
                               ),
@@ -2370,7 +2371,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                           const SizedBox(height: 16),
                           Text(
                             'notes_1'.tr,
-                            style: TextStyle(
+                            style: context.typography.cardSubtitle.copyWith(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey,
@@ -2382,7 +2383,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                             maxLines: 3,
                             decoration: InputDecoration(
                               hintText: 'enter_internal_notes_optional'.tr,
-                              hintStyle: TextStyle(
+                              hintStyle: context.typography.searchHint.copyWith(
                                 color: Colors.grey.shade400,
                                 fontSize: 13,
                               ),
@@ -2405,13 +2406,13 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 borderSide: BorderSide(
-                                  color: AppColors.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                 ),
                               ),
                               fillColor: Theme.of(context).scaffoldBackgroundColor,
                               filled: true,
                             ),
-                            style: TextStyle(fontSize: 13),
+                            style: context.typography.inputText.copyWith(fontSize: 13),
                           ),
                         ],
                       ),
@@ -2432,7 +2433,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                           onPressed: () => Get.back(),
                           child: Text(
                             'cancel'.tr,
-                            style: TextStyle(
+                            style: context.typography.buttonText.copyWith(
                               color: Colors.grey,
                               fontWeight: FontWeight.w600,
                             ),
@@ -2445,7 +2446,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                             onPressed: isSaving
                                 ? null
                                 : () async {
-                                    double amount =
+                                    final double amount =
                                         double.tryParse(
                                           amountController.text,
                                         ) ??
@@ -2514,7 +2515,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                                   )
                                 : Text(
                                     'record_payment'.tr,
-                                    style: TextStyle(
+                                    style: context.typography.buttonText.copyWith(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                     ),

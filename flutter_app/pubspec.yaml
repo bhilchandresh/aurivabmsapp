@@ -79,6 +79,7 @@ dependencies:
   flutter_animate: ^4.5.0
   get_storage: ^2.1.1
 
+  path: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:get/get.dart';
@@ -74,7 +75,7 @@ class SuperAdminDashboardController extends GetxController {
   Future<void> deleteCompany(String tenantId) async {
     try {
       Get.dialog(
-        Center(child: CircularProgressIndicator()),
+        const Center(child: CircularProgressIndicator()),
         barrierDismissible: false,
       );
       final response = await ApiService.delete('/auth/tenants/$tenantId');

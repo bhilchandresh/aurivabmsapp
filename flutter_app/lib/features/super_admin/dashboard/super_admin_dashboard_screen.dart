@@ -1,11 +1,9 @@
+// ignore_for_file: unused_element
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/theme/app_text_styles.dart';
-import '../../auth/auth_controller.dart';
 import '../companies/super_admin_add_company_screen.dart';
 import '../companies/super_admin_edit_company_screen.dart';
 import '../widgets/super_admin_top_bar.dart';
@@ -19,7 +17,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8FAFC), // Light gray background
+      backgroundColor: const Color(0xFFF8FAFC), // Light gray background
       body: SafeArea(
         child: Column(
           children: [
@@ -47,7 +45,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                         minHeight:
                             70, // Estimated height of search bar container
                         maxHeight: 70,
-                        backgroundColor: Color(
+                        backgroundColor: const Color(
                           0xFFF8FAFC,
                         ), // Same as scaffold background to cover content behind
                         child: Padding(
@@ -89,7 +87,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Color(0xFF5B6CF9).withOpacity(0.3),
+                color: const Color(0xFF5B6CF9).withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 5),
               ),
@@ -103,7 +101,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 child: Icon(
                   LucideIcons.barChart2,
                   size: isMobile ? 80 : 120,
-                  color: Colors.white.withOpacity(0.15),
+                  color: Colors.white.withValues(alpha: 0.15),
                 ),
               ),
               Positioned(
@@ -112,7 +110,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 child: Icon(
                   LucideIcons.pieChart,
                   size: isMobile ? 50 : 80,
-                  color: Colors.white.withOpacity(0.1),
+                  color: Colors.white.withValues(alpha: 0.1),
                 ),
               ),
 
@@ -144,7 +142,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
                             'here_is_whats_happening'.tr,
                             style: TextStyle(
@@ -170,7 +168,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
+                              color: Colors.black.withValues(alpha: 0.1),
                               blurRadius: 5,
                               offset: const Offset(0, 2),
                             ),
@@ -179,7 +177,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
+                            const Icon(
                               LucideIcons.plus,
                               size: 14,
                               color: Color(0xFF2563EB),
@@ -213,7 +211,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
     // Colorful shimmer effect parameters
     final baseColor = Colors.blue.shade50;
     final highlightColor = Colors.white;
-    final skeletonBg = Colors.blue.withOpacity(0.1);
+    final skeletonBg = Colors.blue.withValues(alpha: 0.1);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
@@ -346,7 +344,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (!isMobile) Divider(height: 1),
+                if (!isMobile) const Divider(height: 1),
                 ...List.generate(
                   4,
                   (index) => Padding(
@@ -455,7 +453,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
 
     // Always use at least a 2-column grid to match the image, 4 on desktop
-    int crossAxisCount = width < 800 ? 2 : 4;
+    final int crossAxisCount = width < 800 ? 2 : 4;
 
     return GridView.count(
       crossAxisCount: crossAxisCount,
@@ -506,7 +504,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade200, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -557,7 +555,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                             const SizedBox(height: 2),
                             Text(
                               value,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF0F172A),
@@ -645,7 +643,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!isMobile) Divider(height: 1),
+          if (!isMobile) const Divider(height: 1),
           if (isMobile)
             Column(
               children: companies.map((t) {
@@ -746,7 +744,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Divider(height: 1),
+                    const Divider(height: 1),
                     // Table Body
                     ...companies.map((t) {
                       final isPro = t.subscriptionPlan == 'premium';
@@ -775,7 +773,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                             isPro: isPro,
                             isBusiness: isBusiness,
                           ),
-                          Divider(height: 1),
+                          const Divider(height: 1),
                         ],
                       );
                     }),
@@ -820,7 +818,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 children: [
                   Text(
                     'usage'.tr,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -828,7 +826,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                   ),
                   IconButton(
                     onPressed: () => Get.back(),
-                    icon: Icon(
+                    icon: const Icon(
                       LucideIcons.x,
                       size: 20,
                       color: Colors.black,
@@ -883,7 +881,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 height: 48,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF1E293B), // Dark slate
+                    backgroundColor: const Color(0xFF1E293B), // Dark slate
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -891,7 +889,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                   onPressed: () => Get.back(),
                   child: Text(
                     'close'.tr,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -909,7 +907,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
   Widget _buildUsageCard(String title, int count, MaterialColor color) {
     return Container(
       decoration: BoxDecoration(
-        color: color.shade50.withOpacity(0.5),
+        color: color.shade50.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.shade100),
       ),
@@ -959,7 +957,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
               Get.back();
               controller.deleteCompany(tenantId);
             },
-            child: Text('delete'.tr, style: TextStyle(color: Colors.white)),
+            child: Text('delete'.tr, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -1002,7 +1000,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
                   ),
@@ -1256,7 +1254,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                 child: Center(
                   child: Text(
                     name[0].toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
@@ -1272,7 +1270,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                         color: Color(0xFF1E293B),
@@ -1440,7 +1438,7 @@ class SuperAdminDashboardScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: color.shade50,
           shape: BoxShape.circle,
-          border: Border.all(color: color.shade100.withOpacity(0.5)),
+          border: Border.all(color: color.shade100.withValues(alpha: 0.5)),
         ),
         child: Icon(icon, size: 16, color: color.shade600),
       ),
@@ -1539,7 +1537,7 @@ class _MiniChartPainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [color.withOpacity(0.3), color.withOpacity(0.0)],
+        colors: [color.withValues(alpha: 0.3), color.withValues(alpha: 0.0)],
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
@@ -1565,7 +1563,7 @@ class _WavePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
-          .withOpacity(0.08) // Subtle wave
+          .withValues(alpha: 0.08) // Subtle wave
       ..style = PaintingStyle.fill;
 
     final path = Path();

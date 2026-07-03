@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import '../../core/theme/app_extensions.dart';
 
 class AnimatedDocumentLoader extends StatefulWidget {
   final String message;
@@ -43,7 +43,7 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+//     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Center(
       child: Material(
@@ -56,7 +56,7 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader>
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.15),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                 blurRadius: 40,
                 offset: const Offset(0, 10),
               ),
@@ -77,15 +77,15 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader>
                         height: 80,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: AppColors.primary.withOpacity(
-                            0.1 * _opacityAnimation.value,
-                          ),
-                          border: Border.all(
-                            color: AppColors.primary.withOpacity(
-                              0.3 * _opacityAnimation.value,
+                          color: Theme.of(context).colorScheme.primary.withValues(
+                              alpha: 0.1 * _opacityAnimation.value,
                             ),
-                            width: 2,
-                          ),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary.withValues(
+                                alpha: 0.3 * _opacityAnimation.value,
+                              ),
+                              width: 2,
+                            ),
                         ),
                       );
                     },
@@ -100,11 +100,11 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader>
                           height: 56,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: AppColors.primary.withOpacity(0.15),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                           ),
                           child: Icon(
                             LucideIcons.fileText,
-                            color: AppColors.primary,
+                            color: Theme.of(context).colorScheme.primary,
                             size: 28,
                           ),
                         ),
@@ -117,7 +117,7 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader>
               Text(
                 widget.message,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: context.typography.cardTitle.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: Theme.of(context).textTheme.displayLarge?.color,
@@ -128,7 +128,7 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader>
               Text(
                 "Please wait a moment while we process your request.",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: context.typography.inputText.copyWith(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -143,10 +143,10 @@ class _AnimatedDocumentLoaderState extends State<AnimatedDocumentLoader>
                   height: 4,
                   width: 140,
                   child: LinearProgressIndicator(
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                    valueColor: const AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
+                    backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                     valueColor: AlwaysStoppedAnimation<Color>(
+                       Theme.of(context).colorScheme.primary,
+                     ),
                   ),
                 ),
               ),

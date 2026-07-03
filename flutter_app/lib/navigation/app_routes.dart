@@ -74,7 +74,7 @@ class AppRoutes {
     ),
     GetPage(
       name: importData,
-      page: () => ImportDataScreen(),
+      page: () => const ImportDataScreen(),
       transition: Transition.rightToLeftWithFade,
     ),
     GetPage(

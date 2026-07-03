@@ -97,7 +97,7 @@ class MinimalistTemplate extends StatelessWidget {
                     ),
                   Text(
                     (tenant['name'] ?? '').toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 2.0,
@@ -123,7 +123,7 @@ class MinimalistTemplate extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 12.0),
                             child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.email,
                                   size: 8,
                                   color: Colors.black87,
@@ -144,7 +144,7 @@ class MinimalistTemplate extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 12.0),
                             child: Row(
                               children: [
-                                Icon(
+                                const Icon(
                                   Icons.phone,
                                   size: 8,
                                   color: Colors.black87,
@@ -169,7 +169,7 @@ class MinimalistTemplate extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 4.0),
                       child: Text(
                         'GSTIN: ${tenant['gstNumber']}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                         ),
@@ -193,7 +193,7 @@ class MinimalistTemplate extends StatelessWidget {
                 ),
                 Text(
                   '#${params.quotationId}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -211,7 +211,7 @@ class MinimalistTemplate extends StatelessWidget {
                     ),
                     Text(
                       _formatDate(params.date),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                       ),
@@ -231,7 +231,7 @@ class MinimalistTemplate extends StatelessWidget {
                     ),
                     Text(
                       _formatDate(params.dueDate),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                       ),
@@ -243,7 +243,7 @@ class MinimalistTemplate extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        Divider(thickness: 1.5, color: Colors.black),
+        const Divider(thickness: 1.5, color: Colors.black),
       ],
     );
   }
@@ -257,16 +257,16 @@ class MinimalistTemplate extends StatelessWidget {
           children: [
             Text(
               '${params.numberLabel} Ref: ${params.quotationId}',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
             ),
             Text(
               'Date: ${_formatDate(params.date)}',
-              style: TextStyle(fontSize: 10),
+              style: const TextStyle(fontSize: 10),
             ),
           ],
         ),
         const SizedBox(height: 8),
-        Divider(thickness: 1.5, color: Colors.black),
+        const Divider(thickness: 1.5, color: Colors.black),
         const SizedBox(height: 16),
       ],
     );
@@ -329,7 +329,7 @@ class MinimalistTemplate extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 params.clientName,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.bold,
                 ),
@@ -354,7 +354,7 @@ class MinimalistTemplate extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'GSTIN: ${params.clientGst}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 8,
                     fontWeight: FontWeight.bold,
                   ),
@@ -418,7 +418,7 @@ class MinimalistTemplate extends StatelessWidget {
           ),
           Text(
             value,
-            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -430,7 +430,7 @@ class MinimalistTemplate extends StatelessWidget {
       (item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty,
     );
 
-    Map<int, TableColumnWidth> colWidths = showHsn
+    final Map<int, TableColumnWidth> colWidths = showHsn
         ? const {
             0: FlexColumnWidth(4),
             1: FlexColumnWidth(1.5),
@@ -450,7 +450,7 @@ class MinimalistTemplate extends StatelessWidget {
       children: [
         // HEADER
         TableRow(
-          decoration: BoxDecoration(color: Colors.black),
+          decoration: const BoxDecoration(color: Colors.black),
           children: [
             _buildTableHeaderCell('ITEM DESCRIPTION', TextAlign.left),
             if (showHsn) _buildTableHeaderCell('HSN/SAC', TextAlign.center),
@@ -482,7 +482,7 @@ class MinimalistTemplate extends StatelessWidget {
                   children: [
                     Text(
                       item['description']?.toString() ?? '',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
@@ -535,7 +535,7 @@ class MinimalistTemplate extends StatelessWidget {
       child: Text(
         text,
         textAlign: align,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 8,
           fontWeight: FontWeight.bold,
           color: Colors.white,
@@ -589,7 +589,7 @@ class MinimalistTemplate extends StatelessWidget {
               const SizedBox(height: 6),
               Text(
                 convertNumberToWords(params.total),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
                   height: 1.3,
@@ -605,7 +605,7 @@ class MinimalistTemplate extends StatelessWidget {
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Colors.black, width: 2),
                   ),
@@ -665,7 +665,7 @@ class MinimalistTemplate extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Balance Due',
                       style: TextStyle(
                         fontSize: 12,
@@ -675,7 +675,7 @@ class MinimalistTemplate extends StatelessWidget {
                     ),
                     Text(
                       params.formatCurrency.format(balanceDue),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -692,8 +692,8 @@ class MinimalistTemplate extends StatelessWidget {
   }
 
   List<Widget> _buildGstRows() {
-    String place = params.placeOfSupply.toLowerCase();
-    String tenantState = (params.tenant['state'] ?? '')
+    final String place = params.placeOfSupply.toLowerCase();
+    final String tenantState = (params.tenant['state'] ?? '')
         .toString()
         .toLowerCase();
     bool isOutstate = false;
@@ -820,7 +820,7 @@ class MinimalistTemplate extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         displayName.toUpperCase(),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                         ),
@@ -856,9 +856,9 @@ class MinimalistTemplate extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Divider(color: Colors.black12, thickness: 1),
+        const Divider(color: Colors.black12, thickness: 1),
         const SizedBox(height: 12),
-        Text(
+        const Text(
           'TERMS & CONDITIONS',
           style: TextStyle(
             fontSize: 7,

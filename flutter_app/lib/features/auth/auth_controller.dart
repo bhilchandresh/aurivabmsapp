@@ -165,7 +165,7 @@ class AuthController extends GetxController {
           msg: "Welcome back, ${user['name']}!",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
-          backgroundColor: Color(0xFF10B981),
+          backgroundColor: const Color(0xFF10B981),
           textColor: Colors.white,
           fontSize: 14.0,
         );
@@ -184,7 +184,7 @@ class AuthController extends GetxController {
           msg: msg,
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.BOTTOM,
-          backgroundColor: Color(0xFFEF4444),
+          backgroundColor: const Color(0xFFEF4444),
           textColor: Colors.white,
           fontSize: 14.0,
         );
@@ -196,7 +196,7 @@ class AuthController extends GetxController {
             "Connection Failed: Please ensure server is running and accessible.",
         toastLength: Toast.LENGTH_LONG,
         gravity: ToastGravity.BOTTOM,
-        backgroundColor: Color(0xFFEF4444),
+        backgroundColor: const Color(0xFFEF4444),
         textColor: Colors.white,
         fontSize: 14.0,
       );

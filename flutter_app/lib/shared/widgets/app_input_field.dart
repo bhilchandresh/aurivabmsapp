@@ -29,7 +29,8 @@ class AppInputField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final bodyMediumColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final bodyLargeColor = Theme.of(context).textTheme.bodyLarge?.color;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -39,7 +40,7 @@ class AppInputField extends StatelessWidget {
             label.toUpperCase(),
             style: context.typography.inputLabel.copyWith(
               fontWeight: FontWeight.bold,
-              color: textTheme.bodyMedium?.color,
+              color: bodyMediumColor,
               letterSpacing: 0.5,
             ),
           ),
@@ -54,20 +55,20 @@ class AppInputField extends StatelessWidget {
           style: context.typography.inputText.copyWith(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: textTheme.bodyLarge?.color,
+            color: bodyLargeColor,
           ),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: context.typography.searchHint.copyWith(
               fontSize: 16,
-              color: textTheme.bodyMedium?.color,
+              color: bodyMediumColor,
             ),
             prefixIcon: prefixIcon != null
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: IconTheme(
                       data: IconThemeData(
-                        color: textTheme.bodyMedium?.color,
+                        color: bodyMediumColor,
                       ),
                       child: prefixIcon!,
                     ),
@@ -80,7 +81,7 @@ class AppInputField extends StatelessWidget {
             suffixIcon: suffixIcon != null
                 ? IconTheme(
                     data: IconThemeData(
-                      color: textTheme.bodyMedium?.color,
+                      color: bodyMediumColor,
                     ),
                     child: suffixIcon!,
                   )

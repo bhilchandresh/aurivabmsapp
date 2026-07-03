@@ -482,7 +482,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                               rowIndex: 0,
                                             ),
                                           )
-                                          .value = excel_pkg.DoubleCellValue(
+                                          .value = const excel_pkg.DoubleCellValue(
                                         0.0,
                                       ); // Temp place
                                       sheet
@@ -696,7 +696,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                       );
                                     }
                                   },
-                                  icon: Icon(
+                                  icon: const Icon(
                                     LucideIcons.download,
                                     size: 16,
                                   ),
@@ -727,7 +727,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                     );
                                     _clientsController.fetchClients();
                                   },
-                                  icon: Icon(LucideIcons.plus, size: 16),
+                                  icon: const Icon(LucideIcons.plus, size: 16),
                                   label: Text('create_invoice'.tr),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
@@ -775,7 +775,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                       color: Colors.grey,
                                       fontSize: 13,
                                     ),
-                                    prefixIcon: Icon(
+                                    prefixIcon: const Icon(
                                       LucideIcons.search,
                                       color: Colors.grey,
                                       size: 18,
@@ -825,7 +825,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                           child: DropdownButton<String>(
                                             isExpanded: true,
                                             value: _selectedStatus,
-                                            icon: Icon(
+                                            icon: const Icon(
                                               LucideIcons.chevronDown,
                                               size: 14,
                                               color: Colors.grey,
@@ -891,7 +891,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                           child: DropdownButton<String>(
                                             isExpanded: true,
                                             value: _selectedMonth,
-                                            icon: Icon(
+                                            icon: const Icon(
                                               LucideIcons.chevronDown,
                                               size: 14,
                                               color: Colors.grey,
@@ -958,7 +958,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                 color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                               ),
                             ),
-                            Icon(
+                            const Icon(
                               LucideIcons.slidersHorizontal,
                               size: 16,
                               color: Colors.grey,
@@ -980,7 +980,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(
+                                const Icon(
                                   LucideIcons.fileSearch,
                                   size: 40,
                                   color: Colors.grey,
@@ -1147,7 +1147,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                       value: 'Paid',
                                                       child: Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             LucideIcons
                                                                 .checkCircle,
                                                             size: 16,
@@ -1165,7 +1165,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                       value: 'Pending',
                                                       child: Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             LucideIcons.clock,
                                                             size: 16,
                                                             color: AppColors
@@ -1182,7 +1182,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                       value: 'Partially Paid',
                                                       child: Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             LucideIcons.clock,
                                                             size: 16,
                                                             color: Colors.blue,
@@ -1200,7 +1200,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                       value: 'Overdue',
                                                       child: Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             LucideIcons
                                                                 .alertTriangle,
                                                             size: 16,
@@ -1337,7 +1337,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         .withValues(
                                                           alpha: 0.08,
                                                         ),
-                                                    child: Padding(
+                                                    child: const Padding(
                                                       padding: EdgeInsets.all(
                                                         6.0,
                                                       ),
@@ -1416,7 +1416,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         .withValues(
                                                           alpha: 0.08,
                                                         ),
-                                                    child: Padding(
+                                                    child: const Padding(
                                                       padding: EdgeInsets.all(
                                                         6.0,
                                                       ),
@@ -1472,7 +1472,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         .withValues(
                                                           alpha: 0.08,
                                                         ),
-                                                    child: Padding(
+                                                    child: const Padding(
                                                       padding: EdgeInsets.all(
                                                         6.0,
                                                       ),
@@ -1501,7 +1501,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         .withValues(
                                                           alpha: 0.08,
                                                         ),
-                                                    child: Padding(
+                                                    child: const Padding(
                                                       padding: EdgeInsets.all(
                                                         6.0,
                                                       ),

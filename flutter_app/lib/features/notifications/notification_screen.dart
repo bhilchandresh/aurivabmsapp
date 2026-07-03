@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
-import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import 'notification_controller.dart';
 
@@ -28,8 +28,8 @@ class NotificationScreen extends StatelessWidget {
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.notifications.isEmpty) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
+          return Center(
+            child: CircularProgressIndicator(color: context.colorScheme.primary),
           );
         }
 
@@ -42,7 +42,7 @@ class NotificationScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   'no_notifications'.tr,
-                  style: TextStyle(
+                  style: context.typography.emptyStateDescription.copyWith(
                     color: Colors.grey.shade500,
                     fontWeight: FontWeight.w500,
                   ),
@@ -106,7 +106,7 @@ class NotificationScreen extends StatelessWidget {
                                   Expanded(
                                     child: Text(
                                       notif.message,
-                                      style: TextStyle(
+                                      style: context.typography.inputText.copyWith(
                                         fontSize: 14,
                                         height: 1.4,
                                         fontWeight: isRead
@@ -126,7 +126,7 @@ class NotificationScreen extends StatelessWidget {
                                       ),
                                       width: 8,
                                       height: 8,
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                         color: Colors.blue,
                                         shape: BoxShape.circle,
                                         boxShadow: [
@@ -150,7 +150,7 @@ class NotificationScreen extends StatelessWidget {
                                   const SizedBox(width: 4),
                                   Text(
                                     timeago.format(notif.createdAt),
-                                    style: TextStyle(
+                                    style: context.typography.helperText.copyWith(
                                       fontSize: 12,
                                       color: Colors.grey.shade500,
                                       fontWeight: FontWeight.w500,
@@ -166,17 +166,17 @@ class NotificationScreen extends StatelessWidget {
                                     children: [
                                       Text(
                                         'view_details'.tr,
-                                        style: TextStyle(
+                                        style: context.typography.buttonText.copyWith(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
-                                          color: AppColors.primary,
+                                          color: context.colorScheme.primary,
                                         ),
                                       ),
                                       const SizedBox(width: 4),
                                       Icon(
                                         LucideIcons.chevronRight,
                                         size: 14,
-                                        color: AppColors.primary,
+                                        color: context.colorScheme.primary,
                                       ),
                                     ],
                                   ),

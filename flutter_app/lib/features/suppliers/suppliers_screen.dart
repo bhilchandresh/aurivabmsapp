@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../core/theme/app_extensions.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../../shared/widgets/app_input_field.dart';
 import 'suppliers_controller.dart';
@@ -51,7 +51,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () => _suppliersController.fetchSuppliers(),
-        color: AppColors.primary,
+        color: Theme.of(context).colorScheme.primary,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
@@ -73,11 +73,11 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                       },
                       decoration: InputDecoration(
                         hintText: 'search_vendors'.tr,
-                        hintStyle: TextStyle(
+                        hintStyle: context.typography.searchHint.copyWith(
                           color: Colors.grey,
                           fontSize: 13,
                         ),
-                        prefixIcon: Icon(
+                        prefixIcon: const Icon(
                           LucideIcons.search,
                           color: Colors.grey,
                           size: 18,
@@ -98,7 +98,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            color: AppColors.primary,
+                            color: Theme.of(context).colorScheme.primary,
                             width: 1.5,
                           ),
                         ),
@@ -108,10 +108,10 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                   const SizedBox(width: 12),
                   ElevatedButton.icon(
                     onPressed: () => _showAddSupplierDialog(context),
-                    icon: Icon(LucideIcons.plus, size: 16),
+                    icon: const Icon(LucideIcons.plus, size: 16),
                     label: Text('add_vendor'.tr),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
                       elevation: 1,
                       padding: const EdgeInsets.symmetric(
@@ -133,13 +133,13 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 children: [
                   Text(
                     'vendors_registry'.tr,
-                    style: TextStyle(
+                    style: context.typography.categoryHeader.copyWith(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                     ),
                   ),
-                  Icon(
+                  const Icon(
                     LucideIcons.slidersHorizontal,
                     size: 16,
                     color: Colors.grey,
@@ -182,7 +182,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
+                        const Icon(
                           LucideIcons.truck,
                           size: 40,
                           color: Colors.grey,
@@ -190,7 +190,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                         const SizedBox(height: 12),
                         Text(
                           'no_suppliers_found'.tr,
-                          style: TextStyle(
+                          style: context.typography.emptyStateDescription.copyWith(
                             fontWeight: FontWeight.w600,
                             color: Colors.grey,
                           ),
@@ -244,15 +244,15 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: isHovered
-                                    ? AppColors.primary.withOpacity(0.5)
+                                    ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
                                     : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                                 width: 1,
                               ),
                               boxShadow: [
                                 BoxShadow(
                                   color: isHovered
-                                      ? AppColors.primary.withOpacity(0.04)
-                                      : Colors.black.withOpacity(0.01),
+                                      ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.04)
+                                      : Colors.black.withValues(alpha: 0.01),
                                   blurRadius: isHovered ? 12 : 6,
                                   offset: const Offset(0, 4),
                                 ),
@@ -268,8 +268,8 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                       width: 44,
                                       height: 44,
                                       decoration: BoxDecoration(
-                                        color: AppColors.primary.withOpacity(
-                                          0.05,
+                                        color: Theme.of(context).colorScheme.primary.withValues(
+                                          alpha: 0.05,
                                         ),
                                         shape: BoxShape.circle,
                                       ),
@@ -278,8 +278,8 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                           supplier.name
                                               .substring(0, 1)
                                               .toUpperCase(),
-                                          style: TextStyle(
-                                            color: AppColors.primary,
+                                          style: context.typography.clientName.copyWith(
+                                            color: Theme.of(context).colorScheme.primary,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 18,
                                           ),
@@ -294,7 +294,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                         children: [
                                           Text(
                                             supplier.name,
-                                            style: TextStyle(
+                                            style: context.typography.clientName.copyWith(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
                                               color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
@@ -303,7 +303,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                           const SizedBox(height: 6),
                                           Row(
                                             children: [
-                                              Icon(
+                                              const Icon(
                                                 LucideIcons.phone,
                                                 size: 12,
                                                 color: Colors.grey,
@@ -313,13 +313,13 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                                 supplier.phone.isNotEmpty
                                                     ? supplier.phone
                                                     : 'N/A',
-                                                style: TextStyle(
+                                                style: context.typography.cardSubtitle.copyWith(
                                                   fontSize: 11,
                                                   color: Colors.grey,
                                                 ),
                                               ),
                                               const SizedBox(width: 12),
-                                              Icon(
+                                              const Icon(
                                                 LucideIcons.mail,
                                                 size: 12,
                                                 color: Colors.grey,
@@ -330,7 +330,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                                   supplier.email.isNotEmpty
                                                       ? supplier.email
                                                       : 'N/A',
-                                                  style: TextStyle(
+                                                  style: context.typography.cardSubtitle.copyWith(
                                                     fontSize: 11,
                                                     color: Colors.grey,
                                                   ),
@@ -346,7 +346,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                             const SizedBox(height: 4),
                                             Row(
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   LucideIcons.hash,
                                                   size: 12,
                                                   color: Colors.grey,
@@ -354,7 +354,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   'GST: ${supplier.gstNumber}',
-                                                  style: TextStyle(
+                                                  style: context.typography.cardSubtitle.copyWith(
                                                     fontSize: 11,
                                                     color: Colors.grey,
                                                   ),
@@ -379,15 +379,15 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                           ),
                                         );
                                       },
-                                      icon: Icon(
+                                      icon: const Icon(
                                         LucideIcons.arrowRight,
                                         size: 12,
                                       ),
                                       label: Text('view_ledger'.tr),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.primary
-                                            .withOpacity(0.1),
-                                        foregroundColor: AppColors.primary,
+                                        backgroundColor: Theme.of(context).colorScheme.primary
+                                            .withValues(alpha: 0.1),
+                                        foregroundColor: Theme.of(context).colorScheme.primary,
                                         elevation: 0,
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 14,
@@ -406,14 +406,14 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                         supplier.id,
                                         supplier.name,
                                       ),
-                                      icon: Icon(
+                                      icon: const Icon(
                                         LucideIcons.trash2,
                                         size: 16,
                                         color: Colors.red,
                                       ),
                                       style: IconButton.styleFrom(
-                                        backgroundColor: Colors.red.withOpacity(
-                                          0.1,
+                                        backgroundColor: Colors.red.withValues(
+                                          alpha: 0.1,
                                         ),
                                         padding: const EdgeInsets.all(8),
                                         shape: RoundedRectangleBorder(
@@ -452,7 +452,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
       AlertDialog(
         title: Row(
           children: [
-            Icon(LucideIcons.truck, color: AppColors.primary),
+            Icon(LucideIcons.truck, color: Theme.of(context).colorScheme.primary),
             const SizedBox(width: 8),
             Text('add_supplier'.tr),
           ],
@@ -500,7 +500,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
             onPressed: () => Get.back(),
             child: Text(
               'cancel'.tr,
-              style: TextStyle(color: Colors.grey),
+              style: context.typography.buttonText.copyWith(color: Colors.grey),
             ),
           ),
           Obx(() {
@@ -548,7 +548,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                       }
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: Theme.of(context).colorScheme.primary,
               ),
               child: isSaving
                   ? const SizedBox(
@@ -561,7 +561,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     )
                   : Text(
                       'save_supplier'.tr,
-                      style: TextStyle(color: Colors.white),
+                      style: context.typography.buttonText.copyWith(color: Colors.white),
                     ),
             );
           }),
@@ -580,7 +580,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
             onPressed: () => Get.back(),
             child: Text(
               'cancel'.tr,
-              style: TextStyle(color: Colors.grey),
+              style: context.typography.buttonText.copyWith(color: Colors.grey),
             ),
           ),
           Obx(() {
@@ -623,7 +623,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     )
                   : Text(
                       'delete_vendor'.tr,
-                      style: TextStyle(color: Colors.white),
+                      style: context.typography.buttonText.copyWith(color: Colors.white),
                     ),
             );
           }),

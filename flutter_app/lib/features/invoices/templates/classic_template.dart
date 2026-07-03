@@ -109,7 +109,7 @@ class ClassicTemplate extends StatelessWidget {
                     const SizedBox(height: 48),
                   Text(
                     (tenant['name'] ?? '').toUpperCase(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Times New Roman',
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -120,7 +120,7 @@ class ClassicTemplate extends StatelessWidget {
                   if ((tenant['address'] ?? '').isNotEmpty)
                     Text(
                       tenant['address']!,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Times New Roman',
                         fontSize: 11,
                         color: Colors.black87,
@@ -129,7 +129,7 @@ class ClassicTemplate extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     _buildContactString(),
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontFamily: 'Times New Roman',
                       fontSize: 11,
                       color: Colors.black87,
@@ -140,7 +140,7 @@ class ClassicTemplate extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'GSTIN: ${tenant['gstNumber']}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Times New Roman',
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -168,7 +168,7 @@ class ClassicTemplate extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   params.invoiceId,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Times New Roman',
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
@@ -187,7 +187,7 @@ class ClassicTemplate extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-        Divider(thickness: 1, color: Colors.black),
+        const Divider(thickness: 1, color: Colors.black),
       ],
     );
   }
@@ -201,7 +201,7 @@ class ClassicTemplate extends StatelessWidget {
           children: [
             Text(
               '${params.numberLabel} Ref: ${params.invoiceId}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'Times New Roman',
@@ -209,7 +209,7 @@ class ClassicTemplate extends StatelessWidget {
             ),
             Text(
               'Date: ${_formatDate(params.date)}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 10,
                 fontFamily: 'Times New Roman',
               ),
@@ -217,7 +217,7 @@ class ClassicTemplate extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        Divider(thickness: 1, color: Colors.black),
+        const Divider(thickness: 1, color: Colors.black),
         const SizedBox(height: 16),
       ],
     );
@@ -260,11 +260,12 @@ class ClassicTemplate extends StatelessWidget {
 
   String _buildContactString() {
     final t = params.tenant;
-    List<String> parts = [];
+    final List<String> parts = [];
     if ((t['email'] ?? '').isNotEmpty) parts.add(t['email']!);
     if ((t['phone'] ?? '').isNotEmpty) parts.add(t['phone']!);
-    if ((t['website'] ?? '').isNotEmpty)
+    if ((t['website'] ?? '').isNotEmpty) {
       parts.add(t['website']!.replaceAll(RegExp(r'^https?://'), ''));
+    }
     return parts.join(' | ');
   }
 
@@ -276,7 +277,7 @@ class ClassicTemplate extends StatelessWidget {
         children: [
           Text(
             '$label: ',
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Times New Roman',
               fontSize: 11,
               color: Colors.black87,
@@ -284,7 +285,7 @@ class ClassicTemplate extends StatelessWidget {
           ),
           Text(
             _formatDate(date),
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Times New Roman',
               fontSize: 11,
               fontWeight: FontWeight.bold,
@@ -305,7 +306,7 @@ class ClassicTemplate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Colors.black, width: 1),
                   ),
@@ -313,7 +314,7 @@ class ClassicTemplate extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 2),
                 child: Text(
                   params.documentTitle == 'QUOTATION' ? 'QUOTE TO' : 'BILL TO',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Times New Roman',
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -323,7 +324,7 @@ class ClassicTemplate extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 params.clientName,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Times New Roman',
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -332,7 +333,7 @@ class ClassicTemplate extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 params.clientAddress,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Times New Roman',
                   fontSize: 11,
                   height: 1.4,
@@ -342,7 +343,7 @@ class ClassicTemplate extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'GSTIN: ${params.clientGst}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Times New Roman',
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -359,13 +360,13 @@ class ClassicTemplate extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   border: Border(
                     bottom: BorderSide(color: Colors.black, width: 1),
                   ),
                 ),
                 padding: const EdgeInsets.only(bottom: 2),
-                child: Text(
+                child: const Text(
                   'PAYMENT DETAILS',
                   style: TextStyle(
                     fontFamily: 'Times New Roman',
@@ -385,7 +386,7 @@ class ClassicTemplate extends StatelessWidget {
                 ),
                 _buildBankRow('IFSC: ', params.bankDetails['ifscCode'] ?? ''),
               ] else
-                Text(
+                const Text(
                   'No bank details available.',
                   style: TextStyle(
                     fontFamily: 'Times New Roman',
@@ -409,7 +410,7 @@ class ClassicTemplate extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Times New Roman',
               fontSize: 11,
               color: Colors.black54,
@@ -418,7 +419,7 @@ class ClassicTemplate extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Times New Roman',
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
@@ -435,7 +436,7 @@ class ClassicTemplate extends StatelessWidget {
       (item) => (item['hsnCode']?.toString() ?? '').trim().isNotEmpty,
     );
 
-    Map<int, TableColumnWidth> colWidths = showHsn
+    final Map<int, TableColumnWidth> colWidths = showHsn
         ? const {
             0: FixedColumnWidth(30),
             1: FlexColumnWidth(4),
@@ -503,7 +504,7 @@ class ClassicTemplate extends StatelessWidget {
                     children: [
                       Text(
                         item['description']?.toString() ?? '',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: 'Times New Roman',
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
@@ -559,7 +560,7 @@ class ClassicTemplate extends StatelessWidget {
 
   Widget _buildTableHeaderCell(String text, TextAlign align) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Color(0xFFF3F4F6),
         border: Border(bottom: BorderSide(color: Colors.black, width: 1.5)),
       ),
@@ -567,7 +568,7 @@ class ClassicTemplate extends StatelessWidget {
       child: Text(
         text,
         textAlign: align,
-        style: TextStyle(
+        style: const TextStyle(
           fontFamily: 'Times New Roman',
           fontSize: 9,
           fontWeight: FontWeight.bold,
@@ -593,7 +594,7 @@ class ClassicTemplate extends StatelessWidget {
   }
 
   Widget _buildTotalsSection() {
-    double balanceDue = params.total - params.advancePayment;
+    final double balanceDue = params.total - params.advancePayment;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -609,13 +610,13 @@ class ClassicTemplate extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(color: Colors.black, width: 1),
                     ),
                   ),
                   padding: const EdgeInsets.only(bottom: 2),
-                  child: Text(
+                  child: const Text(
                     'TOTAL AMOUNT (IN WORDS)',
                     style: TextStyle(
                       fontFamily: 'Times New Roman',
@@ -627,7 +628,7 @@ class ClassicTemplate extends StatelessWidget {
                 const SizedBox(height: 12),
                 Text(
                   convertNumberToWords(params.total),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Times New Roman',
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -667,7 +668,7 @@ class ClassicTemplate extends StatelessWidget {
                       ..._buildGstRows(),
                     ],
                     const SizedBox(height: 8),
-                    Divider(thickness: 1.5, color: Colors.black),
+                    const Divider(thickness: 1.5, color: Colors.black),
                     const SizedBox(height: 8),
                     _buildTotalRow(
                       'Total',
@@ -680,7 +681,7 @@ class ClassicTemplate extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             'Advance Paid',
                             style: TextStyle(
                               fontFamily: 'Times New Roman',
@@ -691,7 +692,7 @@ class ClassicTemplate extends StatelessWidget {
                           ),
                           Text(
                             '- ${params.formatCurrency.format(params.advancePayment)}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontFamily: 'Times New Roman',
                               fontSize: 11,
                               fontStyle: FontStyle.italic,
@@ -714,7 +715,7 @@ class ClassicTemplate extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Balance Due',
                       style: TextStyle(
                         fontFamily: 'Times New Roman',
@@ -725,7 +726,7 @@ class ClassicTemplate extends StatelessWidget {
                     ),
                     Text(
                       params.formatCurrency.format(balanceDue),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontFamily: 'Times New Roman',
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
@@ -743,8 +744,8 @@ class ClassicTemplate extends StatelessWidget {
   }
 
   List<Widget> _buildGstRows() {
-    String place = params.placeOfSupply.toLowerCase();
-    String tenantState = (params.tenant['state'] ?? '')
+    final String place = params.placeOfSupply.toLowerCase();
+    final String tenantState = (params.tenant['state'] ?? '')
         .toString()
         .toLowerCase();
     bool isOutstate = false;
@@ -877,7 +878,7 @@ class ClassicTemplate extends StatelessWidget {
                       style: BorderStyle.solid,
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Sign Here',
                     style: TextStyle(
                       fontSize: 10,
@@ -890,7 +891,7 @@ class ClassicTemplate extends StatelessWidget {
               ],
               Text(
                 displayName.toUpperCase(),
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Times New Roman',
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -898,7 +899,7 @@ class ClassicTemplate extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 2),
-              Text(
+              const Text(
                 'AUTHORIZED SIGNATORY',
                 style: TextStyle(
                   fontFamily: 'Times New Roman',
@@ -918,18 +919,18 @@ class ClassicTemplate extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 16),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         border: Border(top: BorderSide(color: Colors.black, width: 1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(bottom: BorderSide(color: Colors.grey, width: 1)),
             ),
             padding: const EdgeInsets.only(bottom: 2),
-            child: Text(
+            child: const Text(
               'TERMS & CONDITIONS',
               style: TextStyle(
                 fontFamily: 'Times New Roman',
@@ -941,7 +942,7 @@ class ClassicTemplate extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             params.tenant['defaultTerms'] ?? 'Payment is due upon receipt.',
-            style: TextStyle(
+            style: const TextStyle(
               fontFamily: 'Times New Roman',
               fontSize: 9,
               height: 1.4,
@@ -954,7 +955,7 @@ class ClassicTemplate extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Place of Supply: ${params.placeOfSupply}  |  Dispatch State: ${params.tenant['state'] ?? 'Not set'}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontFamily: 'Times New Roman',
                 fontSize: 9,
                 fontWeight: FontWeight.bold,

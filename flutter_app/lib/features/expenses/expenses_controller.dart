@@ -36,7 +36,7 @@ class Expense {
   }
 
   factory Expense.fromJson(Map<String, dynamic> json) {
-    String rawDate = json['date'] ?? '';
+    final String rawDate = json['date'] ?? '';
     String formattedDate = '';
     if (rawDate.length >= 10) {
       formattedDate = rawDate.substring(0, 10);

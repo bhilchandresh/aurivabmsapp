@@ -1,3 +1,4 @@
+// ignore_for_file: unused_element, deprecated_member_use, unused_local_variable
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -5,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -455,7 +455,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
             thickness: isMinimalist ? 1.5 : 1,
             color: isMinimalist
                 ? PdfColors.black
-                : (useSerif ? PdfColor.fromInt(0xFFD97706) : PdfColors.grey300),
+                : (useSerif ? const PdfColor.fromInt(0xFFD97706) : PdfColors.grey300),
           ),
         buildPdfLine(
           useSerif ? 'GRAND TOTAL' : 'Grand Total',
@@ -1512,7 +1512,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     pw.Font fontNormal,
     PdfColor primaryColor,
   ) {
-    final amberColor = PdfColor.fromInt(0xFFD97706);
+    final amberColor = const PdfColor.fromInt(0xFFD97706);
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -1921,7 +1921,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
         pw.SizedBox(height: 16),
         pw.Container(
           height: 2,
-          color: PdfColor.fromInt(0xFFE9D5FF),
+          color: const PdfColor.fromInt(0xFFE9D5FF),
         ), // Purple 200
         pw.SizedBox(height: 16),
 
@@ -2054,11 +2054,11 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
               child: pw.Container(
                 padding: const pw.EdgeInsets.all(12),
                 decoration: pw.BoxDecoration(
-                  color: PdfColor.fromInt(0xFFFAF5FF), // Light Purple
+                  color: const PdfColor.fromInt(0xFFFAF5FF), // Light Purple
                   borderRadius: const pw.BorderRadius.all(
                     pw.Radius.circular(10),
                   ),
-                  border: pw.Border.all(color: PdfColor.fromInt(0xFFE9D5FF)),
+                  border: pw.Border.all(color: const PdfColor.fromInt(0xFFE9D5FF)),
                 ),
                 child: _buildPdfSummarySection(
                   fontBold,
@@ -2103,7 +2103,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     pw.Font fontNormal,
     PdfColor primaryColor,
   ) {
-    final vibrantPink = PdfColor.fromInt(0xFFC026D3);
+    final vibrantPink = const PdfColor.fromInt(0xFFC026D3);
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
@@ -2218,7 +2218,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                     pw.Radius.circular(12),
                   ),
                   border: pw.Border.all(
-                    color: PdfColor.fromInt(0xFFF3E8FF),
+                    color: const PdfColor.fromInt(0xFFF3E8FF),
                     width: 1.5,
                   ),
                 ),
@@ -2263,7 +2263,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                     pw.Radius.circular(12),
                   ),
                   border: pw.Border.all(
-                    color: PdfColor.fromInt(0xFFFDF2F8),
+                    color: const PdfColor.fromInt(0xFFFDF2F8),
                     width: 1.5,
                   ),
                 ),
@@ -2406,13 +2406,13 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     required double totalsHeight,
     double signatureHeight = 0.0,
   }) {
-    List<List<Map<String, dynamic>>> pages = [];
+    final List<List<Map<String, dynamic>>> pages = [];
     List<Map<String, dynamic>> currentPageItems = [];
     double currentHeight = 0.0;
 
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
-      double requiredHeight = itemHeight;
+      final double requiredHeight = itemHeight;
 
       double pageCap;
       if (pages.isEmpty) {
@@ -2421,7 +2421,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
         pageCap = usableHeight - tableHeaderHeight;
       }
 
-      bool isLastItem = (i == items.length - 1);
+      final bool isLastItem = (i == items.length - 1);
       if (isLastItem) {
         if (currentHeight + requiredHeight + totalsHeight > pageCap) {
           if (currentPageItems.isNotEmpty) {
@@ -2431,7 +2431,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
           currentPageItems.add(item);
           // If even on a new page the signature doesn't fit, we might need a 3rd page, but usually it fits.
           // Let's just check if it fits on this new page:
-          double newPageCap = usableHeight - tableHeaderHeight;
+          final double newPageCap = usableHeight - tableHeaderHeight;
           if (requiredHeight + totalsHeight + signatureHeight > newPageCap) {
             pages.add(currentPageItems);
             pages.add([]);
@@ -2506,12 +2506,12 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
   Widget _buildBottomFooter(int currentPage, int totalPages) {
     return Column(
       children: [
-        Divider(height: 1, color: Colors.black12),
+        const Divider(height: 1, color: Colors.black12),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Thank you for your business! Generated via Auriva BMS.',
               style: TextStyle(
                 fontSize: 8,
@@ -2521,7 +2521,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
             ),
             Text(
               'Page $currentPage of $totalPages',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 8,
                 color: Colors.grey,
                 fontWeight: FontWeight.bold,
@@ -2540,7 +2540,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AnimatedDocumentLoader(
+      builder: (context) => const AnimatedDocumentLoader(
         message: 'Compiling premium invoice document...',
       ),
     );
@@ -2697,6 +2697,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
         Uri.parse(url),
         mode: LaunchMode.externalApplication,
       ).catchError((e) {
+        if (!context.mounted) return false;
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Could not open WhatsApp: $e'),
@@ -2737,7 +2739,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
 
   Future<void> _sendEmailViaApi() async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    String email = _clientEmail;
+    final String email = _clientEmail;
     if (email.isEmpty || email == 'billing@client.com') {
       scaffoldMessenger.showSnackBar(
         SnackBar(
@@ -2830,8 +2832,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(LucideIcons.hexagon, size: 10, color: Color(0xFF6366F1)),
-                SizedBox(width: 4),
+                const Icon(LucideIcons.hexagon, size: 10, color: Color(0xFF6366F1)),
+                const SizedBox(width: 4),
                 Text(
                   'AURIVA INVOICE',
                   style: context.typography.cardSubtitle.copyWith(
@@ -2917,7 +2919,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             LucideIcons.monitor,
                             size: 14,
                             color: AppColors.primary,
@@ -2936,7 +2938,7 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
                           Container(
                             width: 6,
                             height: 6,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.green,
                             ),
@@ -3060,8 +3062,8 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
   // --- MATH CALCULATION HELPER FUNCTIONS ---
   double get _subtotal {
     return _mockItems.fold(0.0, (sum, item) {
-      double qty = (item['quantity'] as num).toDouble();
-      double rate = (item['rate'] as num).toDouble();
+      final double qty = (item['quantity'] as num).toDouble();
+      final double rate = (item['rate'] as num).toDouble();
       return sum + (qty * rate);
     });
   }
@@ -3079,19 +3081,19 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
 
     double calculatedTax = 0.0;
     for (var item in _mockItems) {
-      double qty = (item['quantity'] as num).toDouble();
-      double rate = (item['rate'] as num).toDouble();
-      double gstRate = ((item['gst'] ?? item['gstRate'] ?? 18.0) as num)
+      final double qty = (item['quantity'] as num).toDouble();
+      final double rate = (item['rate'] as num).toDouble();
+      final double gstRate = ((item['gst'] ?? item['gstRate'] ?? 18.0) as num)
           .toDouble();
 
-      double itemSubtotal = qty * rate;
-      double itemDiscount = itemSubtotal * (_discountPercentage / 100);
-      double itemTaxable = itemSubtotal - itemDiscount;
+      final double itemSubtotal = qty * rate;
+      final double itemDiscount = itemSubtotal * (_discountPercentage / 100);
+      final double itemTaxable = itemSubtotal - itemDiscount;
 
       if (_taxType == 'exclusive') {
         calculatedTax += itemTaxable * (gstRate / 100);
       } else {
-        double basePrice = itemTaxable / (1 + (gstRate / 100));
+        final double basePrice = itemTaxable / (1 + (gstRate / 100));
         calculatedTax += itemTaxable - basePrice;
       }
     }
@@ -3202,9 +3204,9 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
           );
 
           // Single continuous scrollable page for the live preview!
-          Widget templateWidget = Container(
+          final Widget templateWidget = Container(
             width: targetWidth,
-            constraints: BoxConstraints(
+            constraints: const BoxConstraints(
               minHeight: targetWidth * 1.414,
             ), // MINIMUM A4 size, but grows if content is larger!
             child: IntrinsicHeight(

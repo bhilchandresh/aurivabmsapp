@@ -1,3 +1,4 @@
+// ignore_for_file: unused_field, unused_element, unused_local_variable, use_build_context_synchronously
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -228,7 +229,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       _clientGstController.text =
           clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
 
-      String pos =
+      final String pos =
           qt['placeOfSupply'] ?? clientObj['state'] ?? 'Maharashtra (27)';
       _placeOfSupplyController.text = pos;
       _selectedClientId =
@@ -356,21 +357,21 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   void _calculateTotals() {
     double sub = 0.0;
     double tax = 0.0;
-    double disc = double.tryParse(_discountPercentageController.text) ?? 0.0;
+    final double disc = double.tryParse(_discountPercentageController.text) ?? 0.0;
 
     for (var item in _itemsControllers) {
-      double qty = double.tryParse(item.qtyController.text) ?? 1.0;
-      double rate = double.tryParse(item.rateController.text) ?? 0.0;
-      double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
+      final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
+      final double rate = double.tryParse(item.rateController.text) ?? 0.0;
+      final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
 
-      double itemTotal = qty * rate;
+      final double itemTotal = qty * rate;
       sub += itemTotal;
 
       if (_gstEnabled) {
         if (_taxType == 'exclusive') {
           tax += itemTotal * (gstRate / 100);
         } else {
-          double singleTax = itemTotal - (itemTotal / (1 + (gstRate / 100)));
+          final double singleTax = itemTotal - (itemTotal / (1 + (gstRate / 100)));
           tax += singleTax;
         }
       }
@@ -401,14 +402,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
     required double totalsHeight,
     double signatureHeight = 0.0,
   }) {
-    List<List<Map<String, dynamic>>> pages = [];
+    final List<List<Map<String, dynamic>>> pages = [];
     List<Map<String, dynamic>> currentPageItems = [];
     double currentHeight = 0.0;
-    bool isFirstPage = true;
+    final bool isFirstPage = true;
 
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
-      double requiredHeight = itemHeight;
+      final double requiredHeight = itemHeight;
 
       double pageCap;
       if (pages.isEmpty) {
@@ -417,7 +418,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         pageCap = usableHeight - tableHeaderHeight;
       }
 
-      bool isLastItem = (i == items.length - 1);
+      final bool isLastItem = (i == items.length - 1);
       if (isLastItem) {
         if (currentHeight + requiredHeight + totalsHeight > pageCap) {
           if (currentPageItems.isNotEmpty) {
@@ -425,7 +426,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             currentPageItems = [];
           }
           currentPageItems.add(item);
-          double newPageCap = usableHeight - tableHeaderHeight;
+          final double newPageCap = usableHeight - tableHeaderHeight;
           if (requiredHeight + totalsHeight + signatureHeight > newPageCap) {
             pages.add(currentPageItems);
             pages.add([]);
@@ -507,11 +508,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         'taxType': _taxType,
       };
 
-      List<Map<String, dynamic>> itemsList = [];
+      final List<Map<String, dynamic>> itemsList = [];
       for (var item in _itemsControllers) {
-        double qty = double.tryParse(item.qtyController.text) ?? 1.0;
-        double rate = double.tryParse(item.rateController.text) ?? 0.0;
-        double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
+        final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
+        final double rate = double.tryParse(item.rateController.text) ?? 0.0;
+        final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
         itemsList.add({
           'description': item.nameController.text.trim(),
           'additionalDetails': item.descriptionController.text.trim(),
@@ -628,11 +629,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   }
 
   List<Map<String, dynamic>> _compileCurrentItems() {
-    List<Map<String, dynamic>> list = [];
+    final List<Map<String, dynamic>> list = [];
     for (var item in _itemsControllers) {
-      double qty = double.tryParse(item.qtyController.text) ?? 1.0;
-      double rate = double.tryParse(item.rateController.text) ?? 0.0;
-      double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
+      final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
+      final double rate = double.tryParse(item.rateController.text) ?? 0.0;
+      final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
       list.add({
         'description': item.nameController.text.trim().isEmpty
             ? 'Item Description'
@@ -813,7 +814,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   child: Text(
                     _companyInfo['address']!.toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -827,7 +828,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     '${_companyInfo['email']!.toUpperCase()}  •  ${_companyInfo['phone']!.toUpperCase()}'
                     '${_companyInfo['website'] != null && _companyInfo['website']!.isNotEmpty ? '  •  ${_companyInfo['website']!.toUpperCase()}' : ''}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -843,7 +844,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     child: Text(
                       'GSTIN: ${_companyInfo['gstNumber']!.toUpperCase()}',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
@@ -878,7 +879,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   children: [
                     Text(
                       '#$quoteNumber',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -897,7 +898,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         ),
                         Text(
                           quoteDate,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -918,7 +919,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         ),
                         Text(
                           validUntil,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -943,7 +944,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.black12, width: 1),
                           ),
@@ -973,7 +974,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 4),
                       Text(
                         clientAddress,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           color: Colors.black54,
                           height: 1.4,
@@ -982,7 +983,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 2),
                       Text(
                         clientEmail,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           color: Colors.black54,
                         ),
@@ -997,7 +998,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.black12, width: 1),
                           ),
@@ -1018,7 +1019,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       RichText(
                         textAlign: TextAlign.right,
                         text: TextSpan(
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             color: Colors.black54,
                             height: 1.5,
@@ -1027,7 +1028,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             TextSpan(text: 'name_colon'.tr),
                             TextSpan(
                               text: '${_mockBankDetails['accountName']}\n',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
                               ),
@@ -1035,7 +1036,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             TextSpan(text: 'bank_colon'.tr),
                             TextSpan(
                               text: '${_mockBankDetails['bankName']}\n',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
                               ),
@@ -1043,7 +1044,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             TextSpan(text: 'ac_colon'.tr),
                             TextSpan(
                               text: '${_mockBankDetails['accountNumber']}\n',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
                               ),
@@ -1051,7 +1052,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             TextSpan(text: 'ifsc_colon'.tr),
                             TextSpan(
                               text: '${_mockBankDetails['ifscCode']}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black87,
                               ),
@@ -1080,7 +1081,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 ),
                 Text(
                   "${'date_colon'.tr}$quoteDate",
-                  style: TextStyle(fontSize: 9, color: Colors.black54),
+                  style: const TextStyle(fontSize: 9, color: Colors.black54),
                 ),
               ],
             ),
@@ -1091,7 +1092,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
 
           // Elegant double-line table header
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(color: Colors.black87, width: 1.5),
                 bottom: BorderSide(color: Colors.black87, width: 1.5),
@@ -1178,7 +1179,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             );
 
             return Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
                   bottom: BorderSide(color: Colors.black12, width: 0.5),
                 ),
@@ -1218,7 +1219,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           const SizedBox(height: 2),
                           Text(
                             item['additionalDetails'] as String,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 8,
                               color: Colors.grey,
                             ),
@@ -1234,7 +1235,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           ? qty.toStringAsFixed(0)
                           : qty.toStringAsFixed(2),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         color: Colors.black87,
                       ),
@@ -1245,7 +1246,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     child: Text(
                       formatCurrency.format(rate),
                       textAlign: TextAlign.right,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         color: Colors.black87,
                       ),
@@ -1256,7 +1257,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     child: Text(
                       formatCurrency.format(amount),
                       textAlign: TextAlign.right,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -1317,14 +1318,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         children: [
                           Text(
                             'subtotal'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black54,
                             ),
                           ),
                           Text(
                             formatCurrency.format(_subtotal),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black87,
                             ),
@@ -1338,14 +1339,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           children: [
                             Text(
                               "${'discount_percent'.tr.split('(')[0]} (${discountPercentage.toStringAsFixed(0)}%)",
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.black54,
                               ),
                             ),
                             Text(
                               '- ${formatCurrency.format(_discountAmount)}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.black87,
                               ),
@@ -1362,14 +1363,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             children: [
                               Text(
                                 'cgst_9'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
                               ),
                               Text(
                                 formatCurrency.format(_taxAmount / 2),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -1382,14 +1383,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             children: [
                               Text(
                                 'sgst_9'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
                               ),
                               Text(
                                 formatCurrency.format(_taxAmount / 2),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -1402,14 +1403,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             children: [
                               Text(
                                 'igst_18'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
                               ),
                               Text(
                                 formatCurrency.format(_taxAmount),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -1418,7 +1419,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           ),
                         ],
                       ],
-                      Divider(height: 12, color: Colors.black12),
+                      const Divider(height: 12, color: Colors.black12),
                       Container(
                         color: Colors.black,
                         padding: const EdgeInsets.symmetric(
@@ -1525,11 +1526,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     const SizedBox(height: 4),
                     Text(
                       '${_companyInfo['email']!} | ${_companyInfo['phone']!}',
-                      style: TextStyle(fontSize: 10, color: Colors.grey),
+                      style: const TextStyle(fontSize: 10, color: Colors.grey),
                     ),
                     Text(
                       'GSTIN: ${_companyInfo['gstNumber']!}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
@@ -1546,10 +1547,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: Text(
+                      child: const Text(
                         'ESTIMATE PROPOSAL',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -1587,7 +1588,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       children: [
                         Text(
                           'proposal_for'.tr,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 8,
                             fontWeight: FontWeight.w900,
                             color: AppColors.primary,
@@ -1597,14 +1598,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         const SizedBox(height: 6),
                         Text(
                           clientName,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
                         ),
                         Text(
                           quoteDate,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             color: Colors.grey,
                           ),
@@ -1626,7 +1627,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       children: [
                         Text(
                           'valid_until_caps'.tr,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 8,
                             fontWeight: FontWeight.w900,
                             color: AppColors.primary,
@@ -1636,7 +1637,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         const SizedBox(height: 6),
                         Text(
                           validUntil,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
                             color: AppColors.error,
@@ -1644,7 +1645,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         ),
                         Text(
                           "${'place_of_supply'.tr}: $placeOfSupply",
-                          style: TextStyle(fontSize: 10, color: Colors.grey),
+                          style: const TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -1674,13 +1675,13 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 ),
               ],
             ),
-            Divider(thickness: 1.0, color: Colors.black12),
+            const Divider(thickness: 1.0, color: Colors.black12),
             const SizedBox(height: 20),
           ],
 
           _buildItemTable(
             headerBgColor: AppColors.primary,
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             ),
@@ -1704,7 +1705,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       children: [
                         Text(
                           'bank_accreditation'.tr,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 8,
                             fontWeight: FontWeight.w900,
                             color: AppColors.primary,
@@ -1713,18 +1714,18 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         const SizedBox(height: 4),
                         Text(
                           "${'ac_name_colon'.tr}${_mockBankDetails['accountName']}",
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           "${'number_colon'.tr}${_mockBankDetails['accountNumber']}",
-                          style: TextStyle(fontSize: 10),
+                          style: const TextStyle(fontSize: 10),
                         ),
                         Text(
                           "${'ifsc_colon'.tr}${_mockBankDetails['ifscCode']}",
-                          style: TextStyle(fontSize: 10),
+                          style: const TextStyle(fontSize: 10),
                         ),
                       ],
                     ),
@@ -1787,7 +1788,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           if (isFirstPage) ...[
             Container(
               padding: const EdgeInsets.all(24.0),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF0F172A), Color(0xFF1E40AF)],
                   begin: Alignment.centerLeft,
@@ -1803,7 +1804,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     children: [
                       Text(
                         _companyInfo['name']!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                           color: Colors.white,
@@ -1814,7 +1815,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         width: 260,
                         child: Text(
                           _companyInfo['address']!,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             color: Colors.white70,
                             height: 1.3,
@@ -1824,7 +1825,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 8),
                       Text(
                         'GSTIN: ${_companyInfo['gstNumber']!}',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           color: Colors.white70,
                           fontWeight: FontWeight.bold,
@@ -1841,15 +1842,15 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.15),
+                          color: Colors.white.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(6),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Text(
                           'proposal'.tr,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 10,
                             color: Colors.white,
@@ -1860,7 +1861,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 8),
                       Text(
                         '#$quoteNumber',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 18,
                           color: Colors.white,
@@ -1869,11 +1870,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 4),
                       Text(
                         "${'date_colon'.tr}$quoteDate",
-                        style: TextStyle(fontSize: 10, color: Colors.white70),
+                        style: const TextStyle(fontSize: 10, color: Colors.white70),
                       ),
                       Text(
                         "${'valid_until_colon'.tr}$validUntil",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           color: Colors.white70,
                           fontWeight: FontWeight.bold,
@@ -1888,13 +1889,13 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           ] else ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              color: Color(0xFF0F172A),
+              color: const Color(0xFF0F172A),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'Proposal: $quoteNumber',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -1902,7 +1903,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   ),
                   Text(
                     "${'date_colon'.tr}$quoteDate",
-                    style: TextStyle(fontSize: 11, color: Colors.white70),
+                    style: const TextStyle(fontSize: 11, color: Colors.white70),
                   ),
                 ],
               ),
@@ -1925,7 +1926,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         children: [
                           Text(
                             'client_details_caps'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 8,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF1E40AF),
@@ -1934,7 +1935,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           const SizedBox(height: 4),
                           Text(
                             clientName,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
                             ),
@@ -1943,7 +1944,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             _clientAddressController.text.trim().isEmpty
                                 ? 'Corporate Hub, Sector V, Hitech Avenue, Suite 101'
                                 : _clientAddressController.text.trim(),
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
+                            style: const TextStyle(fontSize: 10, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -1952,7 +1953,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         children: [
                           Text(
                             'logistics_supply'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 8,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF1E40AF),
@@ -1961,14 +1962,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           const SizedBox(height: 4),
                           Text(
                             placeOfSupply,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 11,
                             ),
                           ),
                           Text(
                             'fob_delivery'.tr,
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
+                            style: const TextStyle(fontSize: 10, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -1978,8 +1979,8 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 ],
 
                 _buildItemTable(
-                  headerBgColor: Color(0xFF1E40AF),
-                  textStyle: TextStyle(
+                  headerBgColor: const Color(0xFF1E40AF),
+                  textStyle: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -1997,7 +1998,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           children: [
                             Text(
                               'remittance_gateway'.tr,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 8,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF1E40AF),
@@ -2006,18 +2007,18 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             const SizedBox(height: 4),
                             Text(
                               _mockBankDetails['bankName']!,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               "${'number_colon'.tr}${_mockBankDetails['accountNumber']}",
-                              style: TextStyle(fontSize: 10),
+                              style: const TextStyle(fontSize: 10),
                             ),
                             Text(
                               "${'ifsc_colon'.tr}${_mockBankDetails['ifscCode']}",
-                              style: TextStyle(fontSize: 10),
+                              style: const TextStyle(fontSize: 10),
                             ),
                           ],
                         ),
@@ -2027,12 +2028,12 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Color(0xFFEFF6FF),
+                            color: const Color(0xFFEFF6FF),
                             borderRadius: BorderRadius.circular(10),
-                            border: Border.all(color: Color(0xFFDBEAFE)),
+                            border: Border.all(color: const Color(0xFFDBEAFE)),
                           ),
                           child: _buildDynamicScreenSummarySection(
-                            primaryColor: Color(0xFF1E40AF),
+                            primaryColor: const Color(0xFF1E40AF),
                           ),
                         ),
                       ),
@@ -2139,7 +2140,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Divider(thickness: 2, color: Colors.amber),
+            const Divider(thickness: 2, color: Colors.amber),
             const SizedBox(height: 12),
 
             Row(
@@ -2150,7 +2151,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   children: [
                     Text(
                       'to_client'.tr,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.bold,
                         color: Colors.grey,
@@ -2169,7 +2170,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       _clientAddressController.text.trim().isEmpty
                           ? 'Corporate Hub, Sector V, Hitech Avenue, Suite 101'
                           : _clientAddressController.text.trim(),
-                      style: TextStyle(fontSize: 10, color: Colors.black54),
+                      style: const TextStyle(fontSize: 10, color: Colors.black54),
                     ),
                   ],
                 ),
@@ -2227,7 +2228,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 ),
               ],
             ),
-            Divider(thickness: 1.5, color: Colors.amber),
+            const Divider(thickness: 1.5, color: Colors.amber),
             const SizedBox(height: 20),
           ],
 
@@ -2254,7 +2255,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     children: [
                       Text(
                         'terms_conditions_caps'.tr,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey,
@@ -2334,7 +2335,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               children: [
                 Text(
                   _companyInfo['name']!.toUpperCase(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w900,
                     fontSize: 15,
                     letterSpacing: 1,
@@ -2342,7 +2343,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 ),
                 Text(
                   'proposal'.tr,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w300,
                     fontSize: 20,
                     letterSpacing: 3,
@@ -2353,7 +2354,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             const SizedBox(height: 6),
             Text(
               _companyInfo['address']!,
-              style: TextStyle(fontSize: 9, color: Colors.black54),
+              style: const TextStyle(fontSize: 9, color: Colors.black54),
             ),
             const SizedBox(height: 24),
 
@@ -2365,7 +2366,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   children: [
                     Text(
                       'client'.tr,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 8,
                         fontWeight: FontWeight.bold,
                         color: Colors.black45,
@@ -2374,7 +2375,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     const SizedBox(height: 2),
                     Text(
                       clientName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 12,
                       ),
@@ -2386,18 +2387,18 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   children: [
                     Text(
                       "${'quote_no_colon'.tr}$quoteNumber",
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 11,
                       ),
                     ),
                     Text(
                       "${'issued_colon'.tr}$quoteDate",
-                      style: TextStyle(fontSize: 10),
+                      style: const TextStyle(fontSize: 10),
                     ),
                     Text(
                       "${'valid_until_colon'.tr}$validUntil",
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
@@ -2413,30 +2414,30 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               children: [
                 Text(
                   "${'quote_no_colon'.tr}$quoteNumber",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   "${'issued_colon'.tr}$quoteDate",
-                  style: TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 10),
                 ),
               ],
             ),
-            Divider(thickness: 1.0, color: Colors.black26),
+            const Divider(thickness: 1.0, color: Colors.black26),
             const SizedBox(height: 20),
           ],
 
           _buildItemTable(
             headerBgColor: Colors.transparent,
-            textStyle: TextStyle(
+            textStyle: const TextStyle(
               color: Colors.black87,
               fontWeight: FontWeight.bold,
             ),
             items: itemsList,
           ),
-          Divider(thickness: 1, color: Colors.black12),
+          const Divider(thickness: 1, color: Colors.black12),
           const SizedBox(height: 16),
 
           if (isLastPage) ...[
@@ -2514,7 +2515,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     const SizedBox(height: 2),
                     Text(
                       _companyInfo['address']!,
-                      style: TextStyle(fontSize: 9, color: Colors.grey),
+                      style: const TextStyle(fontSize: 9, color: Colors.grey),
                     ),
                   ],
                 ),
@@ -2523,7 +2524,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   children: [
                     Text(
                       'elegant_proposal'.tr,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w900,
                         fontSize: 14,
                         letterSpacing: 2,
@@ -2550,7 +2551,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     children: [
                       Text(
                         'prepared_for'.tr,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                           color: Colors.deepPurple,
@@ -2570,7 +2571,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         _clientAddressController.text.trim().isEmpty
                             ? 'Cyber Tower Complex, Hyd'
                             : _clientAddressController.text.trim(),
-                        style: TextStyle(fontSize: 10, color: Colors.grey),
+                        style: const TextStyle(fontSize: 10, color: Colors.grey),
                       ),
                     ],
                   ),
@@ -2581,18 +2582,18 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     children: [
                       Text(
                         "${'proposal_ref_colon'.tr}#$quoteNumber",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 11,
                         ),
                       ),
                       Text(
                         "${'created_on_colon'.tr}$quoteDate",
-                        style: TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 10),
                       ),
                       Text(
                         "${'valid_until_colon'.tr}$validUntil",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                           color: Colors.deepPurple,
@@ -2610,7 +2611,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               children: [
                 Text(
                   "${'proposal_ref_colon'.tr}#$quoteNumber",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: Colors.deepPurple,
@@ -2618,7 +2619,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 ),
                 Text(
                   "${'date_colon'.tr}$quoteDate",
-                  style: TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 10),
                 ),
               ],
             ),
@@ -2653,7 +2654,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     children: [
                       Text(
                         'payment_protocol'.tr,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 8,
                           fontWeight: FontWeight.bold,
                           color: Colors.deepPurple,
@@ -2662,22 +2663,22 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 4),
                       Text(
                         "${'beneficiary_colon'.tr}${_mockBankDetails['accountName']}",
-                        style: TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 10),
                       ),
                       Text(
                         "${'bank_name_colon'.tr}${_mockBankDetails['bankName']}",
-                        style: TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 10),
                       ),
                       Text(
                         "${'number_colon'.tr}${_mockBankDetails['accountNumber']}",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         "${'ifsc_colon'.tr}${_mockBankDetails['ifscCode']}",
-                        style: TextStyle(fontSize: 10),
+                        style: const TextStyle(fontSize: 10),
                       ),
                     ],
                   ),
@@ -2687,7 +2688,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.deepPurple[50]!.withOpacity(0.3),
+                      color: Colors.deepPurple[50]!.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.deepPurple[100]!),
                     ),
@@ -2743,7 +2744,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           if (isFirstPage) ...[
             Container(
               padding: const EdgeInsets.all(24.0),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF7C3AED), Color(0xFFC026D3)],
                   begin: Alignment.topLeft,
@@ -2763,7 +2764,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           color: Colors.white24,
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           LucideIcons.sparkles,
                           color: Colors.white,
                           size: 22,
@@ -2772,7 +2773,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 10),
                       Text(
                         _companyInfo['name']!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 16,
                           color: Colors.white,
@@ -2783,7 +2784,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         width: 250,
                         child: Text(
                           _companyInfo['address']!,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             color: Colors.white70,
                             height: 1.3,
@@ -2806,7 +2807,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         ),
                         child: Text(
                           'proposal'.tr,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 9,
                             color: Color(0xFF7C3AED),
@@ -2817,7 +2818,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 8),
                       Text(
                         '#$quoteNumber',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.w900,
                           fontSize: 18,
                           color: Colors.white,
@@ -2826,11 +2827,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 4),
                       Text(
                         "${'date_colon'.tr}$quoteDate",
-                        style: TextStyle(fontSize: 10, color: Colors.white70),
+                        style: const TextStyle(fontSize: 10, color: Colors.white70),
                       ),
                       Text(
                         "${'valid_until_colon'.tr}$validUntil",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           color: Colors.white70,
                           fontWeight: FontWeight.bold,
@@ -2844,7 +2845,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           ] else ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [Color(0xFF7C3AED), Color(0xFFC026D3)],
                 ),
@@ -2854,7 +2855,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 children: [
                   Text(
                     'Proposal: #$quoteNumber',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -2862,7 +2863,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   ),
                   Text(
                     "${'date_colon'.tr}$quoteDate",
-                    style: TextStyle(fontSize: 10, color: Colors.white70),
+                    style: const TextStyle(fontSize: 10, color: Colors.white70),
                   ),
                 ],
               ),
@@ -2883,7 +2884,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Color(0xFFF3E8FF),
+                              color: const Color(0xFFF3E8FF),
                               width: 1.5,
                             ),
                           ),
@@ -2892,7 +2893,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             children: [
                               Text(
                                 'billed_client'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 8,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF7C3AED),
@@ -2901,7 +2902,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 clientName,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 12,
                                 ),
@@ -2910,7 +2911,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                 _clientEmailController.text.trim().isEmpty
                                     ? '${clientName.toLowerCase().replaceAll(' ', '')}@acme.com'
                                     : _clientEmailController.text.trim(),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.grey,
                                 ),
@@ -2919,7 +2920,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                 _clientAddressController.text.trim().isEmpty
                                     ? 'Corporate Hub, Sector V, Hitech Avenue, Suite 101'
                                     : _clientAddressController.text.trim(),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 9,
                                   color: Colors.grey,
                                 ),
@@ -2937,7 +2938,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Color(0xFFFDF2F8),
+                              color: const Color(0xFFFDF2F8),
                               width: 1.5,
                             ),
                           ),
@@ -2946,7 +2947,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             children: [
                               Text(
                                 'revenue_channel'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 8,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFD946EF),
@@ -2955,14 +2956,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 _mockBankDetails['bankName']!,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 12,
                                 ),
                               ),
                               Text(
                                 "${'ac_colon'.tr}${_mockBankDetails['accountNumber']}",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.grey,
                                 ),
@@ -2977,8 +2978,8 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 ],
 
                 _buildItemTable(
-                  headerBgColor: Color(0xFF7C3AED),
-                  textStyle: TextStyle(
+                  headerBgColor: const Color(0xFF7C3AED),
+                  textStyle: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
@@ -2996,7 +2997,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           children: [
                             Text(
                               'amount_in_words'.tr,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 8,
                                 fontWeight: FontWeight.bold,
                                 color: Color(0xFF7C3AED),
@@ -3005,7 +3006,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             const SizedBox(height: 4),
                             Text(
                               _convertNumberToWords(_total),
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 height: 1.3,
@@ -3065,11 +3066,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(label, style: TextStyle(fontSize: 10, color: Colors.grey)),
+          Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
           const SizedBox(width: 6),
           Text(
             value,
-            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -3082,8 +3083,8 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
     bool isVibrant = false,
     bool isMinimalist = false,
   }) {
-    String place = _placeOfSupplyController.text.trim().toLowerCase();
-    bool isOutstate =
+    final String place = _placeOfSupplyController.text.trim().toLowerCase();
+    final bool isOutstate =
         place.isNotEmpty &&
         !place.contains("telangana") &&
         !place.contains("36");
@@ -3246,7 +3247,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   border: Border(
                     bottom: BorderSide(
                       color: isTransparent
-                          ? Colors.black.withOpacity(0.05)
+                          ? Colors.black.withValues(alpha: 0.05)
                           : Colors.black12,
                     ),
                   ),
@@ -3346,11 +3347,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Divider(),
+        const Divider(),
         const SizedBox(height: 6),
         Text(
           'terms_conditions_caps'.tr,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 8,
             fontWeight: FontWeight.bold,
             color: Colors.grey,
@@ -3360,7 +3361,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         const SizedBox(height: 4),
         Text(
           _companyInfo['defaultTerms']!,
-          style: TextStyle(fontSize: 8, color: Colors.grey, height: 1.3),
+          style: const TextStyle(fontSize: 8, color: Colors.grey, height: 1.3),
         ),
       ],
     );
@@ -3369,12 +3370,12 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   Widget _buildBottomFooter(int currentPage, int totalPages) {
     return Column(
       children: [
-        Divider(height: 1, color: Colors.black12),
+        const Divider(height: 1, color: Colors.black12),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Thank you for your business! Generated via Auriva BMS.',
               style: TextStyle(
                 fontSize: 8,
@@ -3384,7 +3385,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             ),
             Text(
               'Page $currentPage of $totalPages',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 8,
                 color: Colors.grey,
                 fontWeight: FontWeight.bold,
@@ -3471,7 +3472,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
     if (_clientNameController.text.trim().isNotEmpty) score += 0.25;
     if (_quoteNumberController.text.trim().isNotEmpty) score += 0.25;
 
-    bool hasValidItem =
+    final bool hasValidItem =
         _itemsControllers.isNotEmpty &&
         _itemsControllers.any(
           (item) =>
@@ -3555,7 +3556,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: percentage == 100
-                          ? [AppColors.success, Color(0xFF047857)]
+                          ? [AppColors.success, const Color(0xFF047857)]
                           : [
                               AppColors.primary,
                               AppColors.primary.withValues(alpha: 0.6),
@@ -3607,11 +3608,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
     );
 
     // Compile items to pass to details
-    List<Map<String, dynamic>> itemsList = [];
+    final List<Map<String, dynamic>> itemsList = [];
     for (var item in _itemsControllers) {
-      double qty = double.tryParse(item.qtyController.text) ?? 1.0;
-      double rate = double.tryParse(item.rateController.text) ?? 0.0;
-      double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
+      final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
+      final double rate = double.tryParse(item.rateController.text) ?? 0.0;
+      final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
       itemsList.add({
         'description': item.nameController.text.trim(),
         'additionalDetails': item.descriptionController.text.trim(),
@@ -3655,6 +3656,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       } else {
         response = await ApiService.post(ApiConstants.quotations, payload);
       }
+      if (!context.mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -3682,6 +3684,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         final String address = clientObj['address'] ?? '';
         final String gst = clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
 
+        if (!context.mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -3727,6 +3730,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         );
       }
     } catch (e) {
+      if (!context.mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
       Fluttertoast.showToast(
         msg: "Error connecting to server: $e",
@@ -3794,11 +3798,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               alignment: Alignment.center,
               child: Row(
                 children: [
-                  Icon(LucideIcons.save, size: 14, color: Colors.white),
+                  const Icon(LucideIcons.save, size: 14, color: Colors.white),
                   const SizedBox(width: 6),
                   Text(
                     'save'.tr,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 11,
@@ -3935,7 +3939,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             icon: LucideIcons.search,
             suffixIcon: _clientSearchController.text.isNotEmpty
                 ? IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       LucideIcons.x,
                       size: 16,
                       color: Colors.grey,
@@ -3986,9 +3990,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       client.email.isNotEmpty
                           ? client.email
                           : 'No email address',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
                     ),
-                    trailing: Icon(
+                    trailing: const Icon(
                       LucideIcons.arrowUpLeft,
                       size: 14,
                       color: AppColors.primary,
@@ -4130,7 +4134,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           LucideIcons.creditCard,
                           size: 18,
                           color: AppColors.primary,
@@ -4138,7 +4142,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         const SizedBox(width: 10),
                         Text(
                           'enable_gst'.tr,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                             color: AppColors.primary,
@@ -4256,7 +4260,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       iconColor: Colors.teal,
       headerTrailing: Text(
         '${_itemsControllers.length} Items Added',
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 12,
           color: Colors.grey,
           fontWeight: FontWeight.bold,
@@ -4335,7 +4339,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                               children: [
                                 Text(
                                   'gst_rate_percent'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.grey,
@@ -4373,31 +4377,31 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                           value: '0',
                                           child: Text(
                                             '0_exempt'.tr,
-                                            style: TextStyle(fontSize: 12),
+                                            style: const TextStyle(fontSize: 12),
                                           ),
                                         ),
-                                        DropdownMenuItem(
+                                        const DropdownMenuItem(
                                           value: '5',
                                           child: Text(
                                             '5%',
                                             style: TextStyle(fontSize: 12),
                                           ),
                                         ),
-                                        DropdownMenuItem(
+                                        const DropdownMenuItem(
                                           value: '12',
                                           child: Text(
                                             '12%',
                                             style: TextStyle(fontSize: 12),
                                           ),
                                         ),
-                                        DropdownMenuItem(
+                                        const DropdownMenuItem(
                                           value: '18',
                                           child: Text(
                                             '18%',
                                             style: TextStyle(fontSize: 12),
                                           ),
                                         ),
-                                        DropdownMenuItem(
+                                        const DropdownMenuItem(
                                           value: '28',
                                           child: Text(
                                             '28%',
@@ -4427,7 +4431,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                               children: [
                                 Text(
                                   'tax_amount_caps'.tr,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.blue,
@@ -4450,22 +4454,22 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                   ),
                                   child: Builder(
                                     builder: (context) {
-                                      double q =
+                                      final double q =
                                           double.tryParse(
                                             item.qtyController.text,
                                           ) ??
                                           0;
-                                      double r =
+                                      final double r =
                                           double.tryParse(
                                             item.rateController.text,
                                           ) ??
                                           0;
-                                      double g =
+                                      final double g =
                                           double.tryParse(
                                             item.gstController.text,
                                           ) ??
                                           18;
-                                      double amt = q * r;
+                                      final double amt = q * r;
                                       double taxAmt = 0.0;
                                       if (_taxType == 'exclusive') {
                                         taxAmt = amt * (g / 100);
@@ -4474,7 +4478,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                       }
                                       return Text(
                                         formatCurrency.format(taxAmt),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
                                           color: Colors.blue,
@@ -4513,7 +4517,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             children: [
                               Text(
                                 'amount_caps'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.grey,
@@ -4564,7 +4568,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 onPressed: _addItem,
                 label: Text(
                   'add_new_item_line'.tr,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                     fontSize: 13,
@@ -4586,14 +4590,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     });
                     _calculateTotals();
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     LucideIcons.trash2,
                     size: 16,
                     color: AppColors.error,
                   ),
                   label: Text(
                     'remove_item'.tr,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.error,
                       fontSize: 13,
@@ -4618,13 +4622,13 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   }
 
   Widget _buildSummaryAndTermsSection(bool isWide) {
-    String place = _placeOfSupplyController.text.trim().toLowerCase();
-    bool isOutstate =
+    final String place = _placeOfSupplyController.text.trim().toLowerCase();
+    final bool isOutstate =
         place.isNotEmpty &&
         !place.contains("maharashtra") &&
         place != 'select state';
 
-    Widget termsCard = _buildCard(
+    final Widget termsCard = _buildCard(
       title: 'terms_notes'.tr,
       icon: LucideIcons.fileSignature,
       iconColor: Colors.orange,
@@ -4633,7 +4637,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         children: [
           Text(
             'terms_notes'.tr,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
@@ -4683,7 +4687,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       ),
     );
 
-    Widget financialCard = _buildCard(
+    final Widget financialCard = _buildCard(
       title: 'financial_summary'.tr,
       icon: LucideIcons.calculator,
       iconColor: Colors.deepPurple,
@@ -4727,7 +4731,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       controller: _discountPercentageController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -4775,7 +4779,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               ),
               Text(
                 '- ${formatCurrency.format(_discountAmount)}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: AppColors.error,
@@ -4907,7 +4911,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       controller: _advanceReceivedController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -4953,7 +4957,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               ),
               Text(
                 '- ${formatCurrency.format(double.tryParse(_advanceReceivedController.text) ?? 0.0)}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   color: AppColors.success,
@@ -4971,7 +4975,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               children: [
                 Text(
                   'balance_due'.tr,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 10,
                     color: Colors.grey,
                     fontWeight: FontWeight.bold,
@@ -5011,7 +5015,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 const SizedBox(height: 4),
                 Text(
                   "${'amount'.tr}: ${formatCurrency.format(_total)}",
-                  style: TextStyle(fontSize: 11, color: Colors.grey),
+                  style: const TextStyle(fontSize: 11, color: Colors.grey),
                 ),
               ],
             ),
@@ -5049,7 +5053,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         onChanged: onChanged,
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
         decoration: InputDecoration(
           contentPadding: EdgeInsets.zero,
           enabledBorder: OutlineInputBorder(
@@ -5058,7 +5062,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
-            borderSide: BorderSide(color: AppColors.primary),
+            borderSide: const BorderSide(color: AppColors.primary),
           ),
         ),
       ),
@@ -5161,14 +5165,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                         option.sku.isNotEmpty
                                             ? option.sku
                                             : 'No SKU',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 10,
                                           color: Colors.grey,
                                         ),
                                       ),
                                       Text(
                                         '₹${option.unitPrice.toStringAsFixed(0)}',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 11,
                                           fontWeight: FontWeight.bold,
                                           color: AppColors.primary,
@@ -5221,7 +5225,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       fontSize: 12,
                       color: Colors.grey,
                     ),
-                    prefixIcon: Icon(
+                    prefixIcon: const Icon(
                       LucideIcons.tag,
                       color: Colors.grey,
                       size: 16,
@@ -5238,7 +5242,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: AppColors.primary,
                         width: 1.5,
                       ),

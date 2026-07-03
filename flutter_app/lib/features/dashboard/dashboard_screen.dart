@@ -89,7 +89,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         msg: 'please_select_client'.tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
-        backgroundColor: Color(0xFFEF4444),
+        backgroundColor: const Color(0xFFEF4444),
         textColor: Colors.white,
       );
       return;
@@ -102,7 +102,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         msg: 'please_enter_amount'.tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
-        backgroundColor: Color(0xFFEF4444),
+        backgroundColor: const Color(0xFFEF4444),
         textColor: Colors.white,
       );
       return;
@@ -135,7 +135,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         msg: 'payment_logged_success'.tr,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
-        backgroundColor: Color(0xFF10B981),
+        backgroundColor: const Color(0xFF10B981),
         textColor: Colors.white,
       );
     }
@@ -158,7 +158,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   DateTime? _parseDate(String dateStr) {
     if (dateStr.isEmpty) return null;
     final clean = dateStr.trim();
-    var parsed = DateTime.tryParse(clean);
+    final parsed = DateTime.tryParse(clean);
     if (parsed != null) return parsed;
 
     try {
@@ -511,7 +511,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     style: context.typography.screenTitle.copyWith(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.primary,
+                                      color: context.colorScheme.primary,
                                     ),
                                   ),
                                   Text(
@@ -547,14 +547,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   decoration: BoxDecoration(
                                     color: isWarning
                                         ? Colors.red.withValues(alpha: 0.08)
-                                        : Color(
+                                        : const Color(
                                             0xFFE0F2FE,
                                           ), // light blue-50
                                     borderRadius: BorderRadius.circular(20),
                                     border: Border.all(
                                       color: isWarning
                                           ? Colors.red.withValues(alpha: 0.15)
-                                          : Color(0xFFBAE6FD),
+                                          : const Color(0xFFBAE6FD),
                                       width: 1,
                                     ),
                                   ),
@@ -578,7 +578,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         decoration: BoxDecoration(
                                           color: isWarning
                                               ? Colors.red
-                                              : Color(0xFF0369A1),
+                                              : const Color(0xFF0369A1),
                                           shape: BoxShape.circle,
                                         ),
                                       ),
@@ -627,7 +627,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: AppColors.primary.withValues(
+                                    color: context.colorScheme.primary.withValues(
                                       alpha: 0.3,
                                     ),
                                     blurRadius: 10,
@@ -641,7 +641,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     ? MainAxisSize.max
                                     : MainAxisSize.min,
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     LucideIcons.plus,
                                     size: 16,
                                     color: Colors.white,
@@ -729,7 +729,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             value: formatCurrency.format(netProfit),
                             subtitle: 'bottom_line'.tr,
                             icon: LucideIcons.trendingUp,
-                            color: AppColors.primary,
+                            color: context.colorScheme.primary,
                             bgColor: AppColors.primary.withValues(alpha: 0.1),
                             isFeatured: false,
                             delay: 150,
@@ -840,12 +840,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Container(
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: (Theme.of(context).cardTheme.color ?? Colors.white).withOpacity(isDark ? 0.6 : 0.8),
+            color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isFeatured
-                  ? AppColors.primary.withOpacity(0.5)
-                  : Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                  ? AppColors.primary.withValues(alpha: 0.5)
+                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
               width: isFeatured ? 1.5 : 1.0,
             ),
             boxShadow: [
@@ -929,7 +929,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              if (isFeatured) Container(height: 4, color: AppColors.primary),
+              if (isFeatured) Container(height: 4, color: context.colorScheme.primary),
             ],
           ),
         ),
@@ -955,9 +955,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withOpacity(isDark ? 0.6 : 0.8),
+          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.01),
@@ -1018,7 +1018,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         fontWeight: FontWeight.bold,
                         color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                       ),
-                      icon: Icon(LucideIcons.chevronDown, size: 14),
+                      icon: const Icon(LucideIcons.chevronDown, size: 14),
                       items: [
                         DropdownMenuItem(
                           value: 'monthly',
@@ -1062,7 +1062,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       barRods: [
                         BarChartRodData(
                           toY: inc,
-                          color: AppColors.primary,
+                          color: context.colorScheme.primary,
                           width: 10,
                           borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(4),
@@ -1148,7 +1148,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   barTouchData: BarTouchData(
                     enabled: true,
                     touchTooltipData: BarTouchTooltipData(
-                      getTooltipColor: (group) => Color(0xFF0F172A),
+                      getTooltipColor: (group) => const Color(0xFF0F172A),
                       tooltipRoundedRadius: 8,
                       getTooltipItem: (group, groupIndex, rod, rodIndex) {
                         final title = rodIndex == 0
@@ -1207,9 +1207,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withOpacity(isDark ? 0.6 : 0.8),
+          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.01),
@@ -1261,7 +1261,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     style: context.typography.buttonText.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.primary,
+                      color: context.colorScheme.primary,
                     ),
                   ),
                 ),
@@ -1491,9 +1491,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withOpacity(isDark ? 0.6 : 0.8),
+          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.01),
@@ -1507,7 +1507,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   LucideIcons.wallet,
                   size: 16,
                   color: tailwindEmerald,
@@ -1770,7 +1770,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         : Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
+                              const Icon(
                                 LucideIcons.checkCircle,
                                 size: 14,
                                 color: Colors.white,
@@ -1802,9 +1802,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withOpacity(isDark ? 0.6 : 0.8),
+          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withOpacity(0.5)),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.01),
@@ -1851,7 +1851,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Icon(
                             LucideIcons.users,
                             size: 16,
-                            color: AppColors.primary,
+                            color: context.colorScheme.primary,
                           ),
                           const SizedBox(width: 8),
                           Text(
@@ -1892,7 +1892,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Icon(
                             LucideIcons.arrowRight,
                             size: 16,
-                            color: AppColors.primary,
+                            color: context.colorScheme.primary,
                           ),
                           const SizedBox(width: 8),
                           Text(

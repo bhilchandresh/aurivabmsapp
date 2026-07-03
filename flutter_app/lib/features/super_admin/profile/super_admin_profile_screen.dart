@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/theme/app_extensions.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../auth/auth_controller.dart';
-import '../widgets/super_admin_top_bar.dart';
 import '../logs/super_admin_logs_screen.dart';
 import '../broadcast/super_admin_broadcast_screen.dart';
 import '../notifications/super_admin_notifications_screen.dart';
@@ -10,10 +10,12 @@ import '../notifications/super_admin_notifications_screen.dart';
 class SuperAdminProfileScreen extends StatelessWidget {
   const SuperAdminProfileScreen({super.key});
 
+  BuildContext get context => Get.context!;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -21,7 +23,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 40),
-              color: Color(0xFF1E293B), // Dark background from screenshot
+              color: const Color(0xFF1E293B), // Dark background from screenshot
               child: Column(
                 children: [
                   // App Icon (White square, blue hexagon)
@@ -49,7 +51,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
                     children: [
                       Text(
                         'Auriva',
-                        style: TextStyle(
+                        style: context.typography.screenTitle.copyWith(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
                           color: Colors.white,
@@ -58,7 +60,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
                       ),
                       Text(
                         'BMS',
-                        style: TextStyle(
+                        style: context.typography.screenTitle.copyWith(
                           fontSize: 32,
                           fontWeight: FontWeight.w900,
                           color: Colors.blue.shade600,
@@ -70,10 +72,10 @@ class SuperAdminProfileScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     'BUSINESS MANAGEMENT SYSTEM',
-                    style: TextStyle(
+                    style: context.typography.helperText.copyWith(
                       fontSize: 10,
                       fontWeight: FontWeight.w800,
-                      color: Color(0xFF94A3B8),
+                      color: const Color(0xFF94A3B8),
                       letterSpacing: 2.0,
                     ),
                   ),
@@ -94,7 +96,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.shade200),
+                              border: Border.all(color: context.colorSchemeExtension.borderColor),
                             ),
                             child: Column(
                               children: [
@@ -121,7 +123,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: Colors.grey.shade200),
+                              border: Border.all(color: context.colorSchemeExtension.borderColor),
                             ),
                             child: Column(
                               children: [
@@ -167,10 +169,10 @@ class SuperAdminProfileScreen extends StatelessWidget {
                                     Get.find<AuthController>();
                                 authController.logout();
                               },
-                              icon: Icon(LucideIcons.logOut, size: 20),
+                              icon: const Icon(LucideIcons.logOut, size: 20),
                               label: Text(
                                 'Secure Logout',
-                                style: TextStyle(
+                                style: context.typography.cardTitle.copyWith(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -210,7 +212,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         border: showBorder
-            ? Border(bottom: BorderSide(color: Colors.grey.shade100))
+            ? Border(bottom: BorderSide(color: context.colorSchemeExtension.borderColor))
             : null,
       ),
       child: Row(
@@ -230,7 +232,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: context.typography.helperText.copyWith(
                     fontSize: 12,
                     color: Colors.grey.shade500,
                     fontWeight: FontWeight.bold,
@@ -239,9 +241,9 @@ class SuperAdminProfileScreen extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: TextStyle(
+                  style: context.typography.cardTitle.copyWith(
                     fontSize: 15,
-                    color: Color(0xFF1E293B),
+                    color: const Color(0xFF1E293B),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -266,7 +268,7 @@ class SuperAdminProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           border: showBorder
-              ? Border(bottom: BorderSide(color: Colors.grey.shade100))
+              ? Border(bottom: BorderSide(color: context.colorSchemeExtension.borderColor))
               : null,
         ),
         child: Row(
@@ -283,9 +285,9 @@ class SuperAdminProfileScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
+                style: context.typography.cardTitle.copyWith(
                   fontSize: 15,
-                  color: Color(0xFF1E293B),
+                  color: const Color(0xFF1E293B),
                   fontWeight: FontWeight.w600,
                 ),
               ),

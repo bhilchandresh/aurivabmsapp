@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_extensions.dart';
 import '../auth/auth_controller.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -78,8 +77,8 @@ class _SplashScreenState extends State<SplashScreen>
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withOpacity(
-                                isDark ? 0.3 : 0.15,
+                              color: context.colorScheme.primary.withValues(
+                                alpha: isDark ? 0.3 : 0.15,
                               ),
                               blurRadius: 20,
                               offset: const Offset(0, 10),
@@ -105,11 +104,11 @@ class _SplashScreenState extends State<SplashScreen>
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.5,
                           ),
-                          children: const [
-                            TextSpan(text: 'Auriva'),
+                          children: [
+                            const TextSpan(text: 'Auriva'),
                             TextSpan(
                               text: 'BMS',
-                              style: TextStyle(color: AppColors.primary),
+                              style: TextStyle(color: context.colorScheme.primary),
                             ),
                           ],
                         ),

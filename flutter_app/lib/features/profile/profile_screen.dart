@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_extensions.dart';
 import '../auth/auth_controller.dart';
 import '../inventory/inventory_screen.dart';
 import '../suppliers/suppliers_screen.dart';
@@ -12,7 +12,6 @@ import '../expenses/expenses_screen.dart';
 import '../team/team_screen.dart';
 import '../settings/settings_screen.dart';
 import '../import_data/import_data_screen.dart';
-import '../notifications/notification_controller.dart';
 import '../notifications/notification_screen.dart';
 import 'your_information_screen.dart';
 import '../../core/theme/theme_service.dart';
@@ -84,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Title
               Text(
                 'sign_out'.tr,
-                style: TextStyle(
+                style: context.typography.dialogTitle.copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: titleColor,
@@ -96,7 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(
                 'sign_out_confirm'.tr,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: context.typography.dialogContent.copyWith(
                   fontSize: 13,
                   color: subtitleColor,
                   height: 1.5,
@@ -126,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: Text(
                         'cancel'.tr,
-                        style: const TextStyle(
+                        style: context.typography.buttonText.copyWith(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
@@ -154,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: Text(
                         'sign_out'.tr,
-                        style: const TextStyle(
+                        style: context.typography.buttonText.copyWith(
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
@@ -171,14 +170,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  String _getInitials(String name) {
-    if (name.isEmpty) return '??';
-    final parts = name.trim().split(RegExp(r'\s+'));
-    if (parts.length > 1) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
-  }
+//   String _getInitials(String name) {
+//     if (name.isEmpty) return '??';
+//     final parts = name.trim().split(RegExp(r'\s+'));
+//     if (parts.length > 1) {
+//       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+//     }
+//     return parts[0].substring(0, parts[0].length >= 2 ? 2 : 1).toUpperCase();
+//   }
 
   @override
   Widget build(BuildContext context) {
@@ -186,10 +185,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
 
-    final NotificationController notificationController =
-        Get.isRegistered<NotificationController>()
-        ? Get.find<NotificationController>()
-        : Get.put(NotificationController(), permanent: true);
+//     final NotificationController notificationController =
+//         Get.isRegistered<NotificationController>()
+//         ? Get.find<NotificationController>()
+//         : Get.put(NotificationController(), permanent: true);
 
     return SafeArea(
       child: Scaffold(
@@ -201,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(top: 40, bottom: 40),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFF1E293B), // Dark background from screenshot
                   borderRadius: BorderRadius.only(
                     bottomLeft: Radius.circular(32),
@@ -262,15 +261,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 4),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
                           'BUSINESS MANAGEMENT SYSTEM',
-                          style: TextStyle(
+                          style: context.typography.categoryHeader.copyWith(
                             fontSize: 10,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF94A3B8),
+                            color: const Color(0xFF94A3B8),
                             letterSpacing: 2.0,
                           ),
                         ),
@@ -309,7 +308,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: 1),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.01),
+                              color: Colors.black.withValues(alpha: 0.01),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -372,7 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               icon: LucideIcons.database,
                               iconColor: Colors.teal.shade600,
                               iconBg: Colors.teal.shade50,
-                              onTap: () => Get.to(() => ImportDataScreen()),
+                              onTap: () => Get.to(() => const ImportDataScreen()),
                             ),
                             _buildDivider(),
                             _buildMenuRow(
@@ -413,7 +412,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 },
                                 trailing: CupertinoSwitch(
                                   value: isDark,
-                                  activeColor: AppColors.primary,
+                                  activeTrackColor: context.colorScheme.primary,
                                   onChanged: (val) {
                                     Get.find<ThemeService>().switchTheme();
                                   },
@@ -449,7 +448,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: 1),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.01),
+                              color: Colors.black.withValues(alpha: 0.01),
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -499,13 +498,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 54,
                         child: OutlinedButton.icon(
                           onPressed: () => _showLogoutConfirmDialog(context, authController),
-                          icon: Icon(LucideIcons.logOut, size: 18),
+                          icon: const Icon(LucideIcons.logOut, size: 18),
                           label: Text(
                             'sign_out'.tr,
-                            style: TextStyle(
+                            style: context.typography.buttonText.copyWith(
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.5,
                               fontSize: 14,
+                              color: Theme.of(context).brightness == Brightness.dark ? Colors.red.shade400 : Colors.red.shade600,
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
@@ -519,7 +519,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             backgroundColor: Theme.of(context).brightness == Brightness.dark
                                 ? Colors.red.withValues(alpha: 0.06)
-                                : Colors.red.shade50.withOpacity(0.3),
+                                : Colors.red.shade50.withValues(alpha: 0.3),
                           ),
                         ),
                       ),
@@ -542,7 +542,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
       child: Text(
         title,
-        style: TextStyle(
+        style: context.typography.categoryHeader.copyWith(
           fontSize: 11,
           fontWeight: FontWeight.bold,
           color: Colors.grey,
@@ -552,58 +552,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileItem({
-    required IconData icon,
-    required String title,
-    required String value,
-    required bool showBorder,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: showBorder
-            ? Border(bottom: BorderSide(color: Colors.grey.shade100))
-            : null,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.blue.shade50,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: Colors.blue.shade600, size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade500,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Color(0xFF1E293B),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+//   Widget _buildProfileItem({
+//     required IconData icon,
+//     required String title,
+//     required String value,
+//     required bool showBorder,
+//   }) {
+//     return Container(
+//       padding: const EdgeInsets.all(16),
+//       decoration: BoxDecoration(
+//         border: showBorder
+//             ? Border(bottom: BorderSide(color: Colors.grey.shade100))
+//             : null,
+//       ),
+//       child: Row(
+//         children: [
+//           Container(
+//             padding: const EdgeInsets.all(10),
+//             decoration: BoxDecoration(
+//               color: Colors.blue.shade50,
+//               borderRadius: BorderRadius.circular(10),
+//             ),
+//             child: Icon(icon, color: Colors.blue.shade600, size: 20),
+//           ),
+//           const SizedBox(width: 16),
+//           Expanded(
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Text(
+//                   title,
+//                   style: context.typography.inputLabel.copyWith(
+//                     fontSize: 12,
+//                     color: Colors.grey.shade500,
+//                     fontWeight: FontWeight.bold,
+//                   ),
+//                 ),
+//                 const SizedBox(height: 2),
+//                 Text(
+//                   value,
+//                   style: context.typography.inputText.copyWith(
+//                     fontSize: 15,
+//                     color: const Color(0xFF1E293B),
+//                     fontWeight: FontWeight.w600,
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
 
   Widget _buildMenuRow(
     BuildContext context, {
@@ -631,7 +631,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
         decoration: BoxDecoration(
           color: isHovered
-              ? AppColors.primary.withOpacity(0.02)
+              ? AppColors.primary.withValues(alpha: 0.02)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
@@ -641,7 +641,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: isHovered ? AppColors.primary.withOpacity(0.15) : iconBg,
+                color: isHovered ? AppColors.primary.withValues(alpha: 0.15) : iconBg,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
@@ -657,7 +657,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: context.typography.settingsTitle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: isHovered
@@ -668,10 +668,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(
+                    style: context.typography.cardSubtitle.copyWith(
                       fontSize: 12,
                       color: isHovered
-                          ? AppColors.primary.withOpacity(0.7)
+                          ? AppColors.primary.withValues(alpha: 0.7)
                           : Colors.grey.shade500,
                     ),
                   ),

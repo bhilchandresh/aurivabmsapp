@@ -326,7 +326,6 @@ class AppTranslations extends Translations {
       'bms_full_caps': 'BUSINESS MANAGEMENT SYSTEM',
       'your_information': 'Your Information',
       'your_info_sub': 'View your personal details and role',
-      'notifications': 'Notifications',
       'notifications_sub': 'Your recent updates',
       'no_notifications': 'No notifications yet',
       'view_details': 'View Details',
@@ -360,34 +359,10 @@ class AppTranslations extends Translations {
       'taxable_amount': 'Taxable Amount',
 
       // New added strings
-      'contact_client': 'Contact ',
-      'contact_method_prompt': 'How would you like to contact the client?',
-      'outstanding_due_rs': 'Outstanding Due: Rs.',
-      'advance_rs': 'Advance: Rs.',
-      'outstanding_nil': 'Outstanding Due: Nil',
-      'hello_greeting': 'Hello ',
-      'sms_sent_success': 'SMS sent directly to ',
-      'sms_send_error': 'Could not send SMS: ',
-      'sms_permission_denied':
-          'SMS permission is required to send messages in the background',
-      'direct_call_error': 'Could not make direct call: ',
-      'phone_permission_denied':
-          'Phone permission is required to make direct calls',
-      'direct_sms': 'Direct SMS',
-      'call': 'Call',
-      'phone_missing': 'Phone Missing',
-      'phone_not_configured':
-          'This client does not have a phone number configured.',
-      'qty_rate': 'QTY / RATE',
-      'gst_rate_percent': 'GST RATE (%)',
-      'tax_amount_caps': 'TAX AMOUNT',
-      'hsn_sac_code': 'HSN/SAC CODE',
-      'taxable_amount': 'Taxable Amount',
 
       // General
       'app_name': 'AurivaBms',
       'save_and_exit': 'Save and Exit',
-      'language': 'Language',
 
       // Profile/Settings
       'my_account': 'My Account',
@@ -406,7 +381,6 @@ class AppTranslations extends Translations {
       'team_access_sub': 'Permissions & staff logs',
       'settings': 'Settings',
       'settings_sub': 'App & business settings',
-      'sign_out': 'SIGN OUT',
 
       // Dashboard
       'dashboard': 'Dashboard',
@@ -414,7 +388,6 @@ class AppTranslations extends Translations {
       'welcome_back': 'Welcome back, ',
       'days_left': ' Days Left',
       'expired': 'Expired',
-      'new_invoice': 'New Invoice',
       'revenue': 'REVENUE',
       'income_arrow': '↗ Income',
       'expenses_caps': 'EXPENSES',
@@ -437,14 +410,11 @@ class AppTranslations extends Translations {
       'latest_billing_activities': 'Latest billing activities',
       'view_all': 'View All',
       'no_invoices_yet': 'No invoices created yet.',
-      'collect_payment': 'Collect Payment',
       'select_client': 'Select a Client...',
-      'total_billed': 'Total Billed:',
       'total_received': 'Total Received:',
       'ledger_balance': 'Ledger Balance:',
       'due': ' Due',
       'adv': ' Adv',
-      'settled': 'Settled ✓',
       'log_pay': 'Log Pay',
       'quick_actions': 'QUICK ACTIONS',
       'add_client': 'Add Client',
@@ -458,7 +428,6 @@ class AppTranslations extends Translations {
       'manage_billing': 'Manage your billing',
       'search_invoices': 'Search invoices...',
       'filter': 'Filter',
-      'create_invoice': 'Create Invoice',
       'all': 'All',
       'paid': 'Paid',
       'partially_paid': 'Partially Paid',
@@ -466,14 +435,10 @@ class AppTranslations extends Translations {
       'draft': 'Draft',
       'recent_expenses': 'Recent Expenses',
       'show_less': 'Show Less',
-      'view_all': 'View All',
       'no_expenses_found': 'No expenses found',
       'no_invoices_found': 'No invoices found',
       'create_first_invoice': 'Create your first invoice to get started.',
-      'delete_invoice': 'Delete Invoice',
       'delete_invoice_confirm': 'Are you sure you want to delete this invoice?',
-      'cancel': 'Cancel',
-      'delete': 'Delete',
       'invoice_deleted': 'Invoice deleted',
       'share': 'Share',
       'edit': 'Edit',
@@ -485,18 +450,15 @@ class AppTranslations extends Translations {
       'accepted': 'Accepted',
       'rejected': 'Rejected',
       'no_quotations_found': 'No quotations found',
-      'delete_quotation': 'Delete Quotation',
       'delete_quotation_confirm':
           'Are you sure you want to delete this quotation?',
       'quotation_deleted': 'Quotation deleted',
-      'convert_to_invoice': 'Convert to Invoice',
 
       // Clients
       'clients': 'Clients',
       'manage_customers': 'Manage your customers',
       'search_clients': 'Search clients...',
       'edit_client': 'Edit Client',
-      'client_details': 'Client details',
       'name': 'Name',
       'name_colon': 'Name: ',
       'bank_colon': 'Bank: ',
@@ -507,7 +469,6 @@ class AppTranslations extends Translations {
       'state': 'State',
       'save_client': 'Save Client',
       'client_saved_success': 'Client saved successfully',
-      'delete_client': 'Delete Client',
       'delete_client_confirm': 'Are you sure you want to delete this client?',
 
       // Expenses
@@ -518,8 +479,6 @@ class AppTranslations extends Translations {
       'spending_analysis': 'Spending Analysis',
       'by_category': '(By Category)',
       'all_time': 'All Time',
-      'newest_first': 'Newest First',
-      'oldest_first': 'Oldest First',
       'high_amount': 'High Amount',
       'low_amount': 'Low Amount',
       'select_outflow_period': 'Select Outflow Period',
@@ -538,7 +497,6 @@ class AppTranslations extends Translations {
       'amount_rupees': 'Amount (₹) *',
       'category_star': 'Category *',
       'select_category': 'Select a category',
-      'payment_mode': 'Payment Mode',
       'select_payment_mode': 'Select payment mode',
       'expense_desc': 'Expense Description *',
       'select_date': 'Select Date',
@@ -566,7 +524,6 @@ class AppTranslations extends Translations {
           'Inventory limits reached. Upgrade to Business for unlimited SKUs.',
       'selected': ' Selected',
       'search_products': 'Search by Product Name or SKU...',
-      'add_item': 'Add Item',
       'warehouse_registry': 'Warehouse Registry',
       'no_inventory_found': 'No inventory items found.',
       'units': ' UNITS',
@@ -586,7 +543,6 @@ class AppTranslations extends Translations {
       'optional_details': 'Optional details...',
 
       // Suppliers
-      'suppliers': 'Suppliers',
       'manage_vendors': 'Manage your vendors and purchase history',
       'search_vendors': 'Search vendors by name, email or GST...',
       'add_vendor': 'Add Vendor',
@@ -597,15 +553,11 @@ class AppTranslations extends Translations {
       'add_supplier': 'Add Supplier',
       'supplier_name_star': 'Supplier Name *',
       'eg_supplier_name': 'e.g. Apex Technologies',
-      'email': 'Email',
       'eg_email': 'e.g. sales@apextech.com',
-      'phone': 'Phone',
       'eg_phone': 'e.g. +91 98765 43210',
       'gst_number': 'GST Number',
       'eg_gst': 'e.g. 29ABCDE1234F1Z1',
-      'address': 'Address',
       'eg_address': 'e.g. 22, Industrial Area, Bangalore',
-      'cancel': 'Cancel',
       'save_supplier': 'Save Supplier',
       'supplier_name_req': 'Supplier name is required',
       'supplier_added_success': 'Supplier added successfully',
@@ -616,7 +568,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'Failed to delete supplier',
 
       // Team
-      'team_access': 'Team & Access',
       'manage_roles': 'Manage roles and verify digital signatures',
       'team_pro_feature': 'Team Members — Pro Feature',
       'team_pro_desc':
@@ -633,7 +584,6 @@ class AppTranslations extends Translations {
       'add_staff': 'Add Staff',
       'access_registry': 'Access Registry & Signatures',
       'no_staff_found': 'No staff members found.',
-      'change': 'Change',
       'upload': 'Upload',
       'its_you': 'It\'s You',
       'remove_member': 'Remove Team Member',
@@ -680,7 +630,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'Full physical address details...',
       'taxation_invoice_terms': 'Taxation & Invoice Terms',
       'register_for_gst': 'Register for GST',
-      'gstin': 'GSTIN',
       'eg_gstin': 'Enter 15-digit GSTIN (e.g. 09AAACA1234A1Z5)',
       'default_invoice_terms': 'Default Invoice Terms',
       'eg_invoice_terms': 'Enter default billing notes...',
@@ -719,7 +668,6 @@ class AppTranslations extends Translations {
       'manage_inventory_desc':
           'Keep track of your stock levels and manage suppliers effortlessly in one centralized hub.',
       'invoice_caps': 'INVOICE',
-      'total': 'Total',
       'seamless_invoicing': 'Seamless Invoicing',
       'seamless_invoicing_desc':
           'Generate professional invoices, send quotations, and get paid faster with a few taps.',
@@ -734,6 +682,8 @@ class AppTranslations extends Translations {
       'email_req': 'Email is required',
       'password_req': 'Password is required',
       'new_quotation': 'New Quotation',
+      'edit_quotation': 'Edit Quotation',
+      'edit_estimate_proposal': 'Edit Estimate/Proposal',
       'create_new_estimate_proposal': 'Create New Estimate/Proposal',
       'create_new_estimate_puposal': 'Create New Estimate/Proposal',
       'quote_to': 'Quote To',
@@ -751,9 +701,7 @@ class AppTranslations extends Translations {
       'desc_optional': 'Detailed description (optional)',
       'detailed_description_optional': 'Detailed description (optional)',
       'add_extra_details': 'Add extra details',
-      'qty': 'Qty *',
       'qty_star': 'Qty *',
-      'rate': 'Rate *',
       'rate_star': 'Rate *',
       'amount_caps': 'AMOUNT',
       'financial_summary': 'Financial Summary',
@@ -761,24 +709,18 @@ class AppTranslations extends Translations {
       'discount_percent': 'Discount (%)',
       'descount_percent': 'Discount (%)',
       'advance_received': 'Advance Received',
-      'amount': 'Amount',
       'terms_notes': 'Terms & Notes',
       'Tearms_niotes': 'Terms & Notes',
       'bill_to': 'Bill To',
-      'details': 'Details',
       'invoice_details': 'Invoice Details',
       'invoice_date_star': 'Invoice Date *',
       'due_date_star': 'Due Date *',
       'place_of_supply_star': 'Place of Supply *',
-      'enable_gst': 'Enable GST',
       'code': 'Code',
-      'add_new_item_line': '+ Add New Item Line',
-      'remove_item': 'Remove Item',
       'amount_colon': 'Amount: ',
       'error_req_client': 'Please enter Client Name',
       'error_req_invoice_no': 'Please enter Invoice Number',
       'generating_invoice_pdf': 'Generating premium Invoice PDF...',
-      'select_state': 'Select State',
       'error_req_item_name': 'Please enter name for Item',
       'outstanding_due': 'Outstanding Due',
       'advance_jama': 'Advance (Jama) +',
@@ -1153,7 +1095,6 @@ class AppTranslations extends Translations {
       'bms_full_caps': 'व्यवसाय प्रबंधन प्रणाली',
       'your_information': 'आपकी जानकारी',
       'your_info_sub': 'अपना व्यक्तिगत विवरण और भूमिका देखें',
-      'notifications': 'सूचनाएं',
       'notifications_sub': 'आपके हाल के अपडेट',
       'no_notifications': 'अभी तक कोई सूचना नहीं',
       'view_details': 'विवरण देखें',
@@ -1185,32 +1126,10 @@ class AppTranslations extends Translations {
       'taxable_amount': 'कर योग्य राशि',
 
       // New added strings
-      'contact_client': 'संपर्क ',
-      'contact_method_prompt': 'आप ग्राहक से कैसे संपर्क करना चाहेंगे?',
-      'outstanding_due_rs': 'बकाया राशि: रु.',
-      'advance_rs': 'अग्रिम: रु.',
-      'outstanding_nil': 'बकाया राशि: शून्य',
-      'hello_greeting': 'नमस्ते ',
-      'sms_sent_success': 'को सीधे SMS भेजा गया ',
-      'sms_send_error': 'SMS नहीं भेजा जा सका: ',
-      'sms_permission_denied':
-          'बैकग्राउंड में संदेश भेजने के लिए SMS अनुमति आवश्यक है',
-      'direct_call_error': 'सीधी कॉल नहीं की जा सकी: ',
-      'phone_permission_denied': 'सीधी कॉल करने के लिए फ़ोन अनुमति आवश्यक है',
-      'direct_sms': 'सीधा SMS',
-      'call': 'कॉल',
-      'phone_missing': 'फ़ोन मौजूद नहीं है',
-      'phone_not_configured': 'इस ग्राहक के पास फ़ोन नंबर कॉन्फ़िगर नहीं है।',
-      'qty_rate': 'मात्रा / दर',
-      'gst_rate_percent': 'जीएसटी दर (%)',
-      'tax_amount_caps': 'कर राशि',
-      'hsn_sac_code': 'HSN/SAC CODE',
-      'taxable_amount': 'कर योग्य राशि',
 
       // General
       'app_name': 'ऑरिवा बीएमएस',
       'save_and_exit': 'सेव करें और बाहर जाएं',
-      'language': 'भाषा',
 
       // Profile/Settings
       'my_account': 'मेरा खाता',
@@ -1229,11 +1148,6 @@ class AppTranslations extends Translations {
       'team_access_sub': 'अनुमतियां और स्टाफ लॉग',
       'settings': 'सेटिंग्स',
       'settings_sub': 'ऐप और व्यवसाय सेटिंग्स',
-      'sign_out': 'साइन आउट',
-      'sign_out_confirm': 'क्या आप सच में साइन आउट करना चाहते हैं?',
-      'light_mode': 'लाइट मोड',
-      'dark_mode': 'डार्क मोड',
-      'toggle_theme': 'ऐप थीम बदलें',
 
       // Dashboard
       'dashboard': 'डैशबोर्ड',
@@ -1241,7 +1155,6 @@ class AppTranslations extends Translations {
       'welcome_back': 'वापसी पर स्वागत है, ',
       'days_left': ' दिन बचे हैं',
       'expired': 'समाप्त',
-      'new_invoice': 'नया चालान',
       'revenue': 'आय',
       'income_arrow': '↗ आय',
       'expenses_caps': 'खर्चे',
@@ -1264,14 +1177,11 @@ class AppTranslations extends Translations {
       'latest_billing_activities': 'नवीनतम बिलिंग गतिविधियां',
       'view_all': 'सभी देखें',
       'no_invoices_yet': 'अभी तक कोई चालान नहीं बनाया गया है।',
-      'collect_payment': 'भुगतान प्राप्त करें',
       'select_client': 'एक ग्राहक चुनें...',
-      'total_billed': 'कुल बिल:',
       'total_received': 'कुल प्राप्त:',
       'ledger_balance': 'बहीखाता शेष:',
       'due': ' बाकी',
       'adv': ' अग्रिम',
-      'settled': 'चुकाया गया ✓',
       'log_pay': 'लॉग भुगतान',
       'quick_actions': 'त्वरित कार्य',
       'add_client': 'ग्राहक जोड़ें',
@@ -1285,7 +1195,6 @@ class AppTranslations extends Translations {
       'manage_billing': 'अपनी बिलिंग प्रबंधित करें',
       'search_invoices': 'चालान खोजें...',
       'filter': 'फ़िल्टर',
-      'create_invoice': 'चालान बनाएं',
       'all': 'सभी',
       'paid': 'भुगतान किया',
       'partially_paid': 'आंशिक भुगतान किया',
@@ -1293,14 +1202,10 @@ class AppTranslations extends Translations {
       'draft': 'मसौदा',
       'recent_expenses': 'हाल के खर्च',
       'show_less': 'कम दिखाएं',
-      'view_all': 'सभी देखें',
       'no_expenses_found': 'कोई खर्च नहीं मिला',
       'no_invoices_found': 'कोई चालान नहीं मिला',
       'create_first_invoice': 'आरंभ करने के लिए अपना पहला चालान बनाएं।',
-      'delete_invoice': 'चालान हटाएं',
       'delete_invoice_confirm': 'क्या आप वाकई इस चालान को हटाना चाहते हैं?',
-      'cancel': 'रद्द करें',
-      'delete': 'हटाएं',
       'invoice_deleted': 'चालान हटा दिया गया',
       'share': 'साझा करें',
       'edit': 'संपादित करें',
@@ -1312,17 +1217,14 @@ class AppTranslations extends Translations {
       'accepted': 'स्वीकृत',
       'rejected': 'अस्वीकृत',
       'no_quotations_found': 'कोई कोटेशन नहीं मिला',
-      'delete_quotation': 'कोटेशन हटाएं',
       'delete_quotation_confirm': 'क्या आप वाकई इस कोटेशन को हटाना चाहते हैं?',
       'quotation_deleted': 'कोटेशन हटा दिया गया',
-      'convert_to_invoice': 'चालान में बदलें',
 
       // Clients
       'clients': 'ग्राहक',
       'manage_customers': 'अपने ग्राहकों का प्रबंधन करें',
       'search_clients': 'ग्राहक खोजें...',
       'edit_client': 'ग्राहक संपादित करें',
-      'client_details': 'ग्राहक विवरण',
       'name': 'नाम',
       'name_colon': 'नाम: ',
       'bank_colon': 'बैंक: ',
@@ -1333,7 +1235,6 @@ class AppTranslations extends Translations {
       'state': 'राज्य',
       'save_client': 'ग्राहक सहेजें',
       'client_saved_success': 'ग्राहक सफलतापूर्वक सहेजा गया',
-      'delete_client': 'ग्राहक हटाएं',
       'delete_client_confirm': 'क्या आप वाकई इस ग्राहक को हटाना चाहते हैं?',
 
       // Expenses
@@ -1345,8 +1246,6 @@ class AppTranslations extends Translations {
       'spending_analysis': 'खर्च का विश्लेषण',
       'by_category': '(श्रेणी के अनुसार)',
       'all_time': 'पूरा समय',
-      'newest_first': 'नवीनतम पहले',
-      'oldest_first': 'पुराना पहले',
       'high_amount': 'अधिक राशि',
       'low_amount': 'कम राशि',
       'select_outflow_period': 'बहिर्वाह अवधि का चयन करें',
@@ -1364,7 +1263,6 @@ class AppTranslations extends Translations {
       'amount_rupees': 'राशि (₹) *',
       'category_star': 'श्रेणी *',
       'select_category': 'एक श्रेणी चुनें',
-      'payment_mode': 'भुगतान का प्रकार',
       'select_payment_mode': 'भुगतान मोड का चयन करें',
       'expense_desc': 'खर्च का विवरण *',
       'select_date': 'तारीख चुनें',
@@ -1393,7 +1291,6 @@ class AppTranslations extends Translations {
           'इन्वेंटरी सीमा पूरी हो गई। असीमित SKU के लिए व्यवसाय में अपग्रेड करें।',
       'selected': ' चयनित',
       'search_products': 'उत्पाद नाम या SKU से खोजें...',
-      'add_item': 'आइटम जोड़ें',
       'warehouse_registry': 'गोदाम रजिस्ट्री',
       'no_inventory_found': 'कोई इन्वेंटरी आइटम नहीं मिला।',
       'units': ' इकाइयां',
@@ -1413,7 +1310,6 @@ class AppTranslations extends Translations {
       'optional_details': 'वैकल्पिक विवरण...',
 
       // Suppliers
-      'suppliers': 'आपूर्तिकर्ता',
       'manage_vendors': 'अपने विक्रेताओं और खरीद इतिहास का प्रबंधन करें',
       'search_vendors': 'नाम, ईमेल या जीएसटी द्वारा विक्रेता खोजें...',
       'add_vendor': 'विक्रेता जोड़ें',
@@ -1424,15 +1320,11 @@ class AppTranslations extends Translations {
       'add_supplier': 'आपूर्तिकर्ता जोड़ें',
       'supplier_name_star': 'आपूर्तिकर्ता का नाम *',
       'eg_supplier_name': 'उदा. एपेक्स टेक्नोलॉजीज',
-      'email': 'ईमेल',
       'eg_email': 'उदा. sales@apextech.com',
-      'phone': 'फोन',
       'eg_phone': 'उदा. +91 98765 43210',
       'gst_number': 'जीएसटी नंबर',
       'eg_gst': 'उदा. 29ABCDE1234F1Z1',
-      'address': 'पता',
       'eg_address': 'उदा. 22, औद्योगिक क्षेत्र, बैंगलोर',
-      'cancel': 'रद्द करें',
       'save_supplier': 'आपूर्तिकर्ता सहेजें',
       'supplier_name_req': 'आपूर्तिकर्ता का नाम आवश्यक है',
       'supplier_added_success': 'आपूर्तिकर्ता सफलतापूर्वक जोड़ा गया',
@@ -1444,7 +1336,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'आपूर्तिकर्ता को हटाने में विफल',
 
       // Team
-      'team_access': 'टीम और पहुंच',
       'manage_roles':
           'भूमिकाओं का प्रबंधन करें और डिजिटल हस्ताक्षर सत्यापित करें',
       'team_pro_feature': 'टीम के सदस्य — प्रो फीचर',
@@ -1462,7 +1353,6 @@ class AppTranslations extends Translations {
       'add_staff': 'स्टाफ जोड़ें',
       'access_registry': 'एक्सेस रजिस्ट्री और हस्ताक्षर',
       'no_staff_found': 'कोई स्टाफ सदस्य नहीं मिला।',
-      'change': 'बदलें',
       'upload': 'अपलोड करें',
       'its_you': 'यह आप हैं',
       'remove_member': 'टीम के सदस्य को हटाएं',
@@ -1511,7 +1401,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'पूर्ण भौतिक पते का विवरण...',
       'taxation_invoice_terms': 'कराधान और चालान शर्तें',
       'register_for_gst': 'जीएसटी के लिए पंजीकरण करें',
-      'gstin': 'जीएसटी नंबर (GSTIN)',
       'eg_gstin': '15-अंकीय जीएसटी नंबर दर्ज करें (उदा. 09AAACA1234A1Z5)',
       'default_invoice_terms': 'डिफ़ॉल्ट चालान शर्तें',
       'eg_invoice_terms': 'डिफ़ॉल्ट बिलिंग नोट दर्ज करें...',
@@ -1550,7 +1439,6 @@ class AppTranslations extends Translations {
       'manage_inventory_desc':
           'अपने स्टॉक स्तरों पर नज़र रखें और एक केंद्रीकृत हब में आसानी से आपूर्तिकर्ताओं का प्रबंधन करें।',
       'invoice_caps': 'चालान (INVOICE)',
-      'total': 'कुल',
       'seamless_invoicing': 'निर्बाध चालान',
       'seamless_invoicing_desc':
           'पेशेवर चालान उत्पन्न करें, उद्धरण भेजें, और कुछ ही टैप में तेजी से भुगतान प्राप्त करें।',
@@ -1565,6 +1453,8 @@ class AppTranslations extends Translations {
       'email_req': 'ईमेल आवश्यक है',
       'password_req': 'पासवर्ड आवश्यक है',
       'new_quotation': 'नया उद्धरण',
+      'edit_quotation': 'उद्धरण संपादित करें',
+      'edit_estimate_proposal': 'अनुमान/प्रस्ताव संपादित करें',
       'create_new_estimate_proposal': 'नया अनुमान/प्रस्ताव बनाएं',
       'create_new_estimate_puposal': 'नया अनुमान/प्रस्ताव बनाएं',
       'quote_to': 'उद्धृत करें (Quote To)',
@@ -1582,9 +1472,7 @@ class AppTranslations extends Translations {
       'desc_optional': 'विस्तृत विवरण (वैकल्पिक)',
       'detailed_description_optional': 'विस्तृत विवरण (वैकल्पिक)',
       'add_extra_details': 'अतिरिक्त विवरण जोड़ें',
-      'qty': 'मात्रा *',
       'qty_star': 'मात्रा *',
-      'rate': 'दर *',
       'rate_star': 'दर *',
       'amount_caps': 'राशि',
       'financial_summary': 'वित्तीय सारांश',
@@ -1592,24 +1480,18 @@ class AppTranslations extends Translations {
       'discount_percent': 'छूट (%)',
       'descount_percent': 'छूट (%)',
       'advance_received': 'अग्रिम प्राप्त',
-      'amount': 'राशि',
       'terms_notes': 'नियम और नोट्स',
       'Tearms_niotes': 'नियम और नोट्स',
       'bill_to': 'को बिल करें',
-      'details': 'विवरण',
       'invoice_details': 'चालान विवरण',
       'invoice_date_star': 'चालान तिथि *',
       'due_date_star': 'नियत तिथि *',
       'place_of_supply_star': 'आपूर्ति का स्थान *',
-      'enable_gst': 'जीएसटी सक्षम करें',
       'code': 'कोड',
-      'add_new_item_line': '+ नई आइटम पंक्ति जोड़ें',
-      'remove_item': 'आइटम निकालें',
       'amount_colon': 'राशि: ',
       'error_req_client': 'कृपया ग्राहक का नाम दर्ज करें',
       'error_req_invoice_no': 'कृपया चालान संख्या दर्ज करें',
       'generating_invoice_pdf': 'प्रीमियम चालान पीडीएफ जनरेट हो रहा है...',
-      'select_state': 'राज्य चुनें',
       'error_req_item_name': 'कृपया आइटम का नाम दर्ज करें',
       'outstanding_due': 'बकाया राशि',
       'advance_jama': 'अग्रिम (जमा) +',
@@ -1734,28 +1616,6 @@ class AppTranslations extends Translations {
       'taxable_amount': 'করযোগ্য পরিমাণ',
 
       // New added strings
-      'contact_client': 'যোগাযোগ ',
-      'contact_method_prompt':
-          'আপনি কিভাবে ক্লায়েন্টের সাথে যোগাযোগ করতে চান?',
-      'outstanding_due_rs': 'বকেয়া পাওনা: টাকা ',
-      'advance_rs': 'অগ্রিম: টাকা ',
-      'outstanding_nil': 'বকেয়া পাওনা: শূন্য',
-      'hello_greeting': 'হ্যালো ',
-      'sms_sent_success': 'সরাসরি এসএমএস পাঠানো হয়েছে ',
-      'sms_send_error': 'এসএমএস পাঠানো যায়নি: ',
-      'sms_permission_denied':
-          'ব্যাকগ্রাউন্ডে বার্তা পাঠাতে এসএমএস অনুমতি প্রয়োজন',
-      'direct_call_error': 'সরাসরি কল করা যায়নি: ',
-      'phone_permission_denied': 'সরাসরি কল করতে ফোন অনুমতি প্রয়োজন',
-      'direct_sms': 'সরাসরি এসএমএস',
-      'call': 'কল',
-      'phone_missing': 'ফোন নেই',
-      'phone_not_configured': 'এই ক্লায়েন্টের কোন ফোন নম্বর কনফিগার করা নেই।',
-      'qty_rate': 'পরিমাণ / হার',
-      'gst_rate_percent': 'জিএসটি হার (%)',
-      'tax_amount_caps': 'করের পরিমাণ',
-      'hsn_sac_code': 'এইচএসএন/এসএসি কোড',
-      'taxable_amount': 'করযোগ্য পরিমাণ',
 
       // General
       'app_name': 'AurivaBms',
@@ -1963,7 +1823,6 @@ class AppTranslations extends Translations {
       'optional_details': 'ঐচ্ছিক বিবরণ...',
 
       // Suppliers
-      'suppliers': 'সরবরাহকারী',
       'manage_vendors': 'আপনার বিক্রেতা এবং ক্রয়ের ইতিহাস পরিচালনা করুন',
       'search_vendors': 'নাম, ইমেইল বা GST দ্বারা বিক্রেতা খুঁজুন...',
       'add_vendor': 'বিক্রেতা যোগ করুন',
@@ -1974,13 +1833,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'সরবরাহকারী যোগ করুন',
       'supplier_name_star': 'সরবরাহকারীর নাম *',
       'eg_supplier_name': 'যেমন: অ্যাপেক্স টেকনোলজিস',
-      'email': 'ইমেইল',
       'eg_email': 'যেমন: sales@apextech.com',
-      'phone': 'ফোন',
       'eg_phone': 'যেমন: +91 98765 43210',
       'gst_number': 'GST নম্বর',
       'eg_gst': 'যেমন: 29ABCDE1234F1Z1',
-      'address': 'ঠিকানা',
       'eg_address': 'যেমন: ২২, শিল্প এলাকা, বেঙ্গালুরু',
       'save_supplier': 'সরবরাহকারী সংরক্ষণ করুন',
       'supplier_name_req': 'সরবরাহকারীর নাম আবশ্যক',
@@ -1993,7 +1849,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'সরবরাহকারী মুছে ফেলতে ব্যর্থ',
 
       // Team
-      'team_access': 'টিম এবং অ্যাক্সেস',
       'manage_roles': 'ভূমিকা পরিচালনা করুন এবং ডিজিটাল স্বাক্ষর যাচাই করুন',
       'team_pro_feature': 'টিম সদস্য — প্রো বৈশিষ্ট্য',
       'team_pro_desc':
@@ -2057,7 +1912,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'সম্পূর্ণ ঠিকানার বিবরণ...',
       'taxation_invoice_terms': 'কর এবং ইনভয়েসের শর্তাবলী',
       'register_for_gst': 'GST-এর জন্য নিবন্ধন করুন',
-      'gstin': 'GSTIN',
       'eg_gstin': '১৫-অঙ্কের GSTIN লিখুন',
       'default_invoice_terms': 'ডিফল্ট ইনভয়েস শর্তাবলী',
       'eg_invoice_terms': 'ডিফল্ট বিলিং নোট লিখুন...',
@@ -2112,6 +1966,8 @@ class AppTranslations extends Translations {
       'email_req': 'ইমেইল আবশ্যক',
       'password_req': 'পাসওয়ার্ড আবশ্যক',
       'new_quotation': 'নতুন কোটেশন',
+      'edit_quotation': 'কোটেশন সম্পাদনা করুন',
+      'edit_estimate_proposal': 'অনুমান/প্রস্তাব সম্পাদনা করুন',
       'create_new_estimate_proposal': 'নতুন অনুমান/প্রস্তাব তৈরি করুন',
       'create_new_estimate_puposal': 'নতুন অনুমান/প্রস্তাব তৈরি করুন',
       'quote_to': 'কোট করুন (Quote To)',
@@ -2157,7 +2013,6 @@ class AppTranslations extends Translations {
       'error_req_client': 'অনুগ্রহ করে ক্লায়েন্টের নাম লিখুন',
       'error_req_invoice_no': 'অনুগ্রহ করে চালান নম্বর লিখুন',
       'generating_invoice_pdf': 'প্রিমিয়াম ইনভয়েস পিডিএফ তৈরি হচ্ছে...',
-      'select_state': 'রাজ্য নির্বাচন করুন',
       'error_req_item_name': 'অনুগ্রহ করে আইটেমের নাম লিখুন',
     },
     'te_IN': {
@@ -2232,26 +2087,6 @@ class AppTranslations extends Translations {
       'taxable_amount': 'పన్ను విధించదగిన మొత్తం',
 
       // New added strings
-      'contact_client': 'సంప్రదించండి ',
-      'contact_method_prompt': 'మీరు క్లయింట్‌ను ఎలా సంప్రదించాలనుకుంటున్నారు?',
-      'outstanding_due_rs': 'బకాయి: రూ. ',
-      'advance_rs': 'అడ్వాన్స్: రూ. ',
-      'outstanding_nil': 'బకాయి: సున్నా',
-      'hello_greeting': 'హలో ',
-      'sms_sent_success': 'నేరుగా SMS పంపబడింది ',
-      'sms_send_error': 'SMS పంపలేకపోయాము: ',
-      'sms_permission_denied': 'నేపథ్యంలో సందేశాలు పంపడానికి SMS అనుమతి అవసరం',
-      'direct_call_error': 'నేరుగా కాల్ చేయలేకపోయాము: ',
-      'phone_permission_denied': 'నేరుగా కాల్ చేయడానికి ఫోన్ అనుమతి అవసరం',
-      'direct_sms': 'డైరెక్ట్ SMS',
-      'call': 'కాల్',
-      'phone_missing': 'ఫోన్ లేదు',
-      'phone_not_configured': 'ఈ క్లయింట్‌కు ఫోన్ నంబర్ కాన్ఫిగర్ చేయబడలేదు.',
-      'qty_rate': 'మొత్తం / ధర',
-      'gst_rate_percent': 'GST రేటు (%)',
-      'tax_amount_caps': 'పన్ను మొత్తం',
-      'hsn_sac_code': 'HSN/SAC కోడ్',
-      'taxable_amount': 'పన్ను విధించదగిన మొత్తం',
 
       // General
       'app_name': 'AurivaBms',
@@ -2460,7 +2295,6 @@ class AppTranslations extends Translations {
       'optional_details': 'ఐచ్ఛిక వివరాలు...',
 
       // Suppliers
-      'suppliers': 'సరఫరాదారులు',
       'manage_vendors': 'మీ విక్రేతలు మరియు కొనుగోలు చరిత్రను నిర్వహించండి',
       'search_vendors': 'పేరు, ఇమెయిల్ లేదా GST ద్వారా విక్రేతను వెతకండి...',
       'add_vendor': 'విక్రేతను జోడించండి',
@@ -2471,13 +2305,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'సరఫరాదారుని జోడించండి',
       'supplier_name_star': 'సరఫరాదారు పేరు *',
       'eg_supplier_name': 'ఉదా. అపెక్స్ టెక్నాలజీస్',
-      'email': 'ఇమెయిల్',
       'eg_email': 'ఉదా. sales@apextech.com',
-      'phone': 'ఫోన్',
       'eg_phone': 'ఉదా. +91 98765 43210',
       'gst_number': 'GST నంబర్',
       'eg_gst': 'ఉదా. 29ABCDE1234F1Z1',
-      'address': 'చిరునామా',
       'eg_address': 'ఉదా. 22, పారిశ్రామిక ప్రాంతం, బెంగళూరు',
       'save_supplier': 'సరఫరాదారుని సేవ్ చేయండి',
       'supplier_name_req': 'సరఫరాదారు పేరు అవసరం',
@@ -2490,7 +2321,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'సరఫరాదారుని తొలగించడంలో విఫలమైంది',
 
       // Team
-      'team_access': 'బృందం మరియు యాక్సెస్',
       'manage_roles':
           'పాత్రలను నిర్వహించండి మరియు డిజిటల్ సంతకాలను ధృవీకరించండి',
       'team_pro_feature': 'బృంద సభ్యులు — ప్రో ఫీచర్',
@@ -2557,7 +2387,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'పూర్తి చిరునామా వివరాలు...',
       'taxation_invoice_terms': 'పన్నులు మరియు ఇన్‌వాయిస్ నిబంధనలు',
       'register_for_gst': 'GST కోసం నమోదు చేయండి',
-      'gstin': 'GSTIN',
       'eg_gstin': '15-అంకెల GSTIN నమోదు చేయండి',
       'default_invoice_terms': 'డిఫాల్ట్ ఇన్‌వాయిస్ నిబంధనలు',
       'eg_invoice_terms': 'డిఫాల్ట్ బిల్లింగ్ గమనికలను నమోదు చేయండి...',
@@ -2612,6 +2441,8 @@ class AppTranslations extends Translations {
       'email_req': 'ఇమెయిల్ అవసరం',
       'password_req': 'పాస్‌వర్డ్ అవసరం',
       'new_quotation': 'కొత్త కొటేషన్',
+      'edit_quotation': 'కొటేషన్‌ను సవరించండి',
+      'edit_estimate_proposal': 'అంచనా/ప్రతిపాదనను సవరించండి',
       'create_new_estimate_proposal': 'కొత్త అంచనా/ప్రతిపాదనను సృష్టించండి',
       'create_new_estimate_puposal': 'కొత్త అంచనా/ప్రతిపాదనను సృష్టించండి',
       'quote_to': 'కు కొటేషన్',
@@ -2657,7 +2488,6 @@ class AppTranslations extends Translations {
       'error_req_client': 'దయచేసి క్లయింట్ పేరును నమోదు చేయండి',
       'error_req_invoice_no': 'దయచేసి ఇన్‌వాయిస్ నంబర్‌ను నమోదు చేయండి',
       'generating_invoice_pdf': 'ప్రీమియం ఇన్‌వాయిస్ PDFని రూపొందిస్తోంది...',
-      'select_state': 'రాష్ట్రాన్ని ఎంచుకోండి',
       'error_req_item_name': 'దయచేసి వస్తువు పేరును నమోదు చేయండి',
     },
     'ta_IN': {
@@ -2735,29 +2565,6 @@ class AppTranslations extends Translations {
       'taxable_amount': 'வரிக்கு உட்பட்ட தொகை',
 
       // New added strings
-      'contact_client': 'தொடர்பு கொள்க ',
-      'contact_method_prompt':
-          'வாடிக்கையாளரை எவ்வாறு தொடர்பு கொள்ள விரும்புகிறீர்கள்?',
-      'outstanding_due_rs': 'நிலுவைத் தொகை: ரூ. ',
-      'advance_rs': 'முன்பணம்: ரூ. ',
-      'outstanding_nil': 'நிலுவைத் தொகை: இல்லை',
-      'hello_greeting': 'வணக்கம் ',
-      'sms_sent_success': 'நேரடியாக SMS அனுப்பப்பட்டது ',
-      'sms_send_error': 'SMS அனுப்ப முடியவில்லை: ',
-      'sms_permission_denied': 'பின்னணியில் செய்திகளை அனுப்ப SMS அனுமதி தேவை',
-      'direct_call_error': 'நேரடி அழைப்பு செய்ய முடியவில்லை: ',
-      'phone_permission_denied':
-          'நேரடி அழைப்புகளைச் செய்ய தொலைபேசி அனுமதி தேவை',
-      'direct_sms': 'நேரடி SMS',
-      'call': 'அழை',
-      'phone_missing': 'தொலைபேசி இல்லை',
-      'phone_not_configured':
-          'இந்த வாடிக்கையாளருக்கு தொலைபேசி எண் அமைக்கப்படவில்லை.',
-      'qty_rate': 'அளவு / விலை',
-      'gst_rate_percent': 'GST விகிதம் (%)',
-      'tax_amount_caps': 'வரித் தொகை',
-      'hsn_sac_code': 'HSN/SAC குறியீடு',
-      'taxable_amount': 'வரிக்கு உட்பட்ட தொகை',
 
       // General
       'app_name': 'AurivaBms',
@@ -2967,7 +2774,6 @@ class AppTranslations extends Translations {
       'optional_details': 'விருப்ப விவரங்கள்...',
 
       // Suppliers
-      'suppliers': 'சப்ளையர்கள்',
       'manage_vendors':
           'உங்கள் விற்பனையாளர்கள் மற்றும் கொள்முதல் வரலாற்றை நிர்வகிக்கவும்',
       'search_vendors':
@@ -2980,13 +2786,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'சப்ளையரைச் சேர்க்கவும்',
       'supplier_name_star': 'சப்ளையர் பெயர் *',
       'eg_supplier_name': 'உதாரணம்: அபெக்ஸ் டெக்னாலஜிஸ்',
-      'email': 'மின்னஞ்சல்',
       'eg_email': 'உதாரணம்: sales@apextech.com',
-      'phone': 'தொலைபேசி',
       'eg_phone': 'உதாரணம்: +91 98765 43210',
       'gst_number': 'GST எண்',
       'eg_gst': 'உதாரணம்: 29ABCDE1234F1Z1',
-      'address': 'முகவரி',
       'eg_address': 'உதாரணம்: 22, தொழில்துறை பகுதி, பெங்களூர்',
       'save_supplier': 'சப்ளையரைச் சேமி',
       'supplier_name_req': 'சப்ளையர் பெயர் தேவை',
@@ -2999,7 +2802,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'சப்ளையரை நீக்குவதில் தோல்வி',
 
       // Team
-      'team_access': 'குழு மற்றும் அணுகல்',
       'manage_roles':
           'பணிகளை நிர்வகிக்கவும் மற்றும் டிஜிட்டல் கையொப்பங்களை சரிபார்க்கவும்',
       'team_pro_feature': 'குழு உறுப்பினர்கள் — ப்ரோ அம்சம்',
@@ -3066,7 +2868,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'முழு முகவரி விவரங்கள்...',
       'taxation_invoice_terms': 'வரி மற்றும் இன்வாய்ஸ் விதிமுறைகள்',
       'register_for_gst': 'GST-க்கு பதிவு செய்யவும்',
-      'gstin': 'GSTIN',
       'eg_gstin': '15-இலக்க GSTIN ஐ உள்ளிடவும்',
       'default_invoice_terms': 'இயல்புநிலை இன்வாய்ஸ் விதிமுறைகள்',
       'eg_invoice_terms': 'இயல்புநிலை பில்லிங் குறிப்புகளை உள்ளிடவும்...',
@@ -3121,6 +2922,8 @@ class AppTranslations extends Translations {
       'email_req': 'மின்னஞ்சல் தேவை',
       'password_req': 'கடவுச்சொல் தேவை',
       'new_quotation': 'புதிய மேற்கோள்',
+      'edit_quotation': 'மேற்கோளைத் திருத்தவும்',
+      'edit_estimate_proposal': 'மதிப்பீடு/முன்மொழிவைத் திருத்தவும்',
       'create_new_estimate_proposal': 'புதிய மதிப்பீடு/முன்மொழிவை உருவாக்கவும்',
       'create_new_estimate_puposal': 'புதிய மதிப்பீடு/முன்மொழிவை உருவாக்கவும்',
       'quote_to': 'மேற்கோள்',
@@ -3167,7 +2970,6 @@ class AppTranslations extends Translations {
       'error_req_invoice_no': 'விலைப்பட்டியல் எண்ணை உள்ளிடவும்',
       'generating_invoice_pdf':
           'பிரீமியம் விலைப்பட்டியல் PDF ஐ உருவாக்குகிறது...',
-      'select_state': 'மாநிலத்தைத் தேர்ந்தெடுக்கவும்',
       'error_req_item_name': 'உருப்படியின் பெயரை உள்ளிடவும்',
     },
     'ur_IN': {
@@ -3244,28 +3046,6 @@ class AppTranslations extends Translations {
       'taxable_amount': 'قابل ٹیکس رقم',
 
       // New added strings
-      'contact_client': 'رابطہ کریں ',
-      'contact_method_prompt': 'آپ کلائنٹ سے کیسے رابطہ کرنا چاہیں گے؟',
-      'outstanding_due_rs': 'بقایا جات: روپے ',
-      'advance_rs': 'ایڈوانس: روپے ',
-      'outstanding_nil': 'بقایا جات: کچھ نہیں',
-      'hello_greeting': 'ہیلو ',
-      'sms_sent_success': 'براہ راست SMS بھیجا گیا ',
-      'sms_send_error': 'SMS نہیں بھیجا جا سکا: ',
-      'sms_permission_denied':
-          'پس منظر میں پیغامات بھیجنے کے لیے SMS کی اجازت درکار ہے',
-      'direct_call_error': 'براہ راست کال نہیں کی جا سکی: ',
-      'phone_permission_denied':
-          'براہ راست کال کرنے کے لیے فون کی اجازت درکار ہے',
-      'direct_sms': 'براہ راست SMS',
-      'call': 'کال کریں',
-      'phone_missing': 'فون غائب',
-      'phone_not_configured': 'اس کلائنٹ کا فون نمبر کنفیگر نہیں کیا گیا ہے۔',
-      'qty_rate': 'مقدار / شرح',
-      'gst_rate_percent': 'جی ایس ٹی کی شرح (%)',
-      'tax_amount_caps': 'ٹیکس کی رقم',
-      'hsn_sac_code': 'HSN/SAC کوڈ',
-      'taxable_amount': 'قابل ٹیکس رقم',
 
       // General
       'app_name': 'AurivaBms',
@@ -3471,7 +3251,6 @@ class AppTranslations extends Translations {
       'optional_details': 'اختیاری تفصیلات...',
 
       // Suppliers
-      'suppliers': 'سپلائرز',
       'manage_vendors': 'اپنے وینڈرز اور خریداری کی ہسٹری کا نظم کریں',
       'search_vendors': 'نام، ای میل یا GST کے ذریعہ وینڈر تلاش کریں...',
       'add_vendor': 'وینڈر شامل کریں',
@@ -3482,13 +3261,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'سپلائر شامل کریں',
       'supplier_name_star': 'سپلائر کا نام *',
       'eg_supplier_name': 'مثال: ایپکس ٹیکنالوجیز',
-      'email': 'ای میل',
       'eg_email': 'مثال: sales@apextech.com',
-      'phone': 'فون',
       'eg_phone': 'مثال: +91 98765 43210',
       'gst_number': 'GST نمبر',
       'eg_gst': 'مثال: 29ABCDE1234F1Z1',
-      'address': 'پتہ',
       'eg_address': 'مثال: 22، انڈسٹریل ایریا، بنگلور',
       'save_supplier': 'سپلائر محفوظ کریں',
       'supplier_name_req': 'سپلائر کا نام درکار ہے',
@@ -3501,7 +3277,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'سپلائر حذف کرنے میں ناکامی',
 
       // Team
-      'team_access': 'ٹیم اور رسائی',
       'manage_roles': 'کرداروں کا نظم کریں اور ڈیجیٹل دستخطوں کی تصدیق کریں',
       'team_pro_feature': 'ٹیم ممبرز — پرو فیچر',
       'team_pro_desc':
@@ -3566,7 +3341,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'مکمل پتے کی تفصیلات...',
       'taxation_invoice_terms': 'ٹیکس اور انوائس کی شرائط',
       'register_for_gst': 'GST کے لیے رجسٹر کریں',
-      'gstin': 'GSTIN',
       'eg_gstin': '15 ہندسوں کا GSTIN درج کریں',
       'default_invoice_terms': 'پہلے سے طے شدہ انوائس کی شرائط',
       'eg_invoice_terms': 'پہلے سے طے شدہ بلنگ نوٹس درج کریں...',
@@ -3621,6 +3395,8 @@ class AppTranslations extends Translations {
       'email_req': 'ای میل درکار ہے',
       'password_req': 'پاس ورڈ درکار ہے',
       'new_quotation': 'نیا کوٹیشن',
+      'edit_quotation': 'کوٹیشن میں ترمیم کریں',
+      'edit_estimate_proposal': 'تخمینہ/تجویز میں ترمیم کریں',
       'create_new_estimate_proposal': 'نیا تخمینہ/تجویز بنائیں',
       'create_new_estimate_puposal': 'نیا تخمینہ/تجویز بنائیں',
       'quote_to': 'کوٹ کریں',
@@ -3666,7 +3442,6 @@ class AppTranslations extends Translations {
       'error_req_client': 'براہ کرم کلائنٹ کا نام درج کریں',
       'error_req_invoice_no': 'براہ کرم انوائس نمبر درج کریں',
       'generating_invoice_pdf': 'پریمیم انوائس پی ڈی ایف بن رہی ہے...',
-      'select_state': 'ریاست منتخب کریں',
       'error_req_item_name': 'براہ کرم آئٹم کا نام درج کریں',
     },
     'kn_IN': {
@@ -3742,27 +3517,6 @@ class AppTranslations extends Translations {
       'taxable_amount': 'ತೆರಿಗೆಗೆ ಒಳಪಡುವ ಮೊತ್ತ',
 
       // New added strings
-      'contact_client': 'ಸಂಪರ್ಕಿಸಿ ',
-      'contact_method_prompt': 'ಕ್ಲೈಂಟ್ ಅನ್ನು ಹೇಗೆ ಸಂಪರ್ಕಿಸಲು ನೀವು ಬಯಸುತ್ತೀರಿ?',
-      'outstanding_due_rs': 'ಬಾಕಿ ಮೊತ್ತ: ರೂ. ',
-      'advance_rs': 'ಮುಂಗಡ: ರೂ. ',
-      'outstanding_nil': 'ಬಾಕಿ ಮೊತ್ತ: ಇಲ್ಲ',
-      'hello_greeting': 'ನಮಸ್ಕಾರ ',
-      'sms_sent_success': 'ನೇರ SMS ಕಳುಹಿಸಲಾಗಿದೆ ',
-      'sms_send_error': 'SMS ಕಳುಹಿಸಲಾಗಲಿಲ್ಲ: ',
-      'sms_permission_denied':
-          'ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಸಂದೇಶಗಳನ್ನು ಕಳುಹಿಸಲು SMS ಅನುಮತಿ ಅಗತ್ಯವಿದೆ',
-      'direct_call_error': 'ನೇರ ಕರೆ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ: ',
-      'phone_permission_denied': 'ನೇರ ಕರೆಗಳನ್ನು ಮಾಡಲು ಫೋನ್ ಅನುಮತಿ ಅಗತ್ಯವಿದೆ',
-      'direct_sms': 'ನೇರ SMS',
-      'call': 'ಕರೆ ಮಾಡಿ',
-      'phone_missing': 'ಫೋನ್ ಇಲ್ಲ',
-      'phone_not_configured': 'ಈ ಕ್ಲೈಂಟ್‌ಗೆ ಫೋನ್ ಸಂಖ್ಯೆ ಕಾನ್ಫಿಗರ್ ಆಗಿಲ್ಲ.',
-      'qty_rate': 'ಪ್ರಮಾಣ / ದರ',
-      'gst_rate_percent': 'GST ದರ (%)',
-      'tax_amount_caps': 'ತೆರಿಗೆ ಮೊತ್ತ',
-      'hsn_sac_code': 'HSN/SAC ಕೋಡ್',
-      'taxable_amount': 'ತೆರಿಗೆಗೆ ಒಳಪಡುವ ಮೊತ್ತ',
 
       // General
       'app_name': 'AurivaBms',
@@ -3970,7 +3724,6 @@ class AppTranslations extends Translations {
       'optional_details': 'ಐಚ್ಛಿಕ ವಿವರಗಳು...',
 
       // Suppliers
-      'suppliers': 'ಪೂರೈಕೆದಾರರು',
       'manage_vendors': 'ನಿಮ್ಮ ಮಾರಾಟಗಾರರು ಮತ್ತು ಖರೀದಿ ಇತಿಹಾಸವನ್ನು ನಿರ್ವಹಿಸಿ',
       'search_vendors': 'ಹೆಸರು, ಇಮೇಲ್ ಅಥವಾ GST ಮೂಲಕ ಮಾರಾಟಗಾರರನ್ನು ಹುಡುಕಿ...',
       'add_vendor': 'ಮಾರಾಟಗಾರರನ್ನು ಸೇರಿಸಿ',
@@ -3981,13 +3734,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'ಪೂರೈಕೆದಾರರನ್ನು ಸೇರಿಸಿ',
       'supplier_name_star': 'ಪೂರೈಕೆದಾರರ ಹೆಸರು *',
       'eg_supplier_name': 'ಉದಾ. ಅಪೆಕ್ಸ್ ಟೆಕ್ನಾಲಜೀಸ್',
-      'email': 'ಇಮೇಲ್',
       'eg_email': 'ಉದಾ. sales@apextech.com',
-      'phone': 'ಫೋನ್',
       'eg_phone': 'ಉದಾ. +91 98765 43210',
       'gst_number': 'GST ಸಂಖ್ಯೆ',
       'eg_gst': 'ಉದಾ. 29ABCDE1234F1Z1',
-      'address': 'ವಿಳಾಸ',
       'eg_address': 'ಉದಾ. 22, ಕೈಗಾರಿಕಾ ಪ್ರದೇಶ, ಬೆಂಗಳೂರು',
       'save_supplier': 'ಪೂರೈಕೆದಾರರನ್ನು ಉಳಿಸಿ',
       'supplier_name_req': 'ಪೂರೈಕೆದಾರರ ಹೆಸರು ಅಗತ್ಯವಿದೆ',
@@ -4000,7 +3750,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'ಪೂರೈಕೆದಾರರನ್ನು ಅಳಿಸಲು ವಿಫಲವಾಗಿದೆ',
 
       // Team
-      'team_access': 'ತಂಡ ಮತ್ತು ಪ್ರವೇಶ',
       'manage_roles': 'ಪಾತ್ರಗಳನ್ನು ನಿರ್ವಹಿಸಿ ಮತ್ತು ಡಿಜಿಟಲ್ ಸಹಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ',
       'team_pro_feature': 'ತಂಡದ ಸದಸ್ಯರು — ಪ್ರೊ ವೈಶಿಷ್ಟ್ಯ',
       'team_pro_desc':
@@ -4066,7 +3815,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'ಪೂರ್ಣ ವಿಳಾಸ ವಿವರಗಳು...',
       'taxation_invoice_terms': 'ತೆರಿಗೆ ಮತ್ತು ಇನ್‌ವಾಯ್ಸ್ ನಿಯಮಗಳು',
       'register_for_gst': 'GST ಗಾಗಿ ನೋಂದಾಯಿಸಿ',
-      'gstin': 'GSTIN',
       'eg_gstin': '15-ಅಂಕಿಯ GSTIN ನಮೂದಿಸಿ',
       'default_invoice_terms': 'ಡೀಫಾಲ್ಟ್ ಇನ್‌ವಾಯ್ಸ್ ನಿಯಮಗಳು',
       'eg_invoice_terms': 'ಡೀಫಾಲ್ಟ್ ಬಿಲ್ಲಿಂಗ್ ಟಿಪ್ಪಣಿಗಳನ್ನು ನಮೂದಿಸಿ...',
@@ -4122,6 +3870,8 @@ class AppTranslations extends Translations {
       'email_req': 'ಇಮೇಲ್ ಅಗತ್ಯವಿದೆ',
       'password_req': 'ಪಾಸ್‌ವರ್ಡ್ ಅಗತ್ಯವಿದೆ',
       'new_quotation': 'ಹೊಸ ಉಲ್ಲೇಖ',
+      'edit_quotation': 'ಉಲ್ಲೇಖವನ್ನು ಸಂಪಾದಿಸಿ',
+      'edit_estimate_proposal': 'ಅಂದಾಜು/ಪ್ರಸ್ತಾವನೆಯನ್ನು ಸಂಪಾದಿಸಿ',
       'create_new_estimate_proposal': 'ಹೊಸ ಅಂದಾಜು/ಪ್ರಸ್ತಾವನೆಯನ್ನು ರಚಿಸಿ',
       'create_new_estimate_puposal': 'ಹೊಸ ಅಂದಾಜು/ಪ್ರಸ್ತಾವನೆಯನ್ನು ರಚಿಸಿ',
       'quote_to': 'ಉಲ್ಲೇಖ',
@@ -4167,7 +3917,6 @@ class AppTranslations extends Translations {
       'error_req_client': 'ದಯವಿಟ್ಟು ಕ್ಲೈಂಟ್ ಹೆಸರನ್ನು ನಮೂದಿಸಿ',
       'error_req_invoice_no': 'ದಯವಿಟ್ಟು ಇನ್‌ವಾಯ್ಸ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ',
       'generating_invoice_pdf': 'ಪ್ರೀಮಿಯಂ ಇನ್‌ವಾಯ್ಸ್ ಪಿಡಿಎಫ್ ರಚಿಸಲಾಗುತ್ತಿದೆ...',
-      'select_state': 'ರಾಜ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
       'error_req_item_name': 'ದಯವಿಟ್ಟು ಐಟಂ ಹೆಸರನ್ನು ನಮೂದಿಸಿ',
     },
     'or_IN': {
@@ -4244,28 +3993,6 @@ class AppTranslations extends Translations {
       'taxable_amount': 'ଟ୍ୟାକ୍ସଯୋଗ୍ୟ ପରିମାଣ',
 
       // New added strings
-      'contact_client': 'ସମ୍ପର୍କ କରନ୍ତୁ ',
-      'contact_method_prompt':
-          'ଆପଣ କ୍ଲାଏଣ୍ଟଙ୍କ ସହ କିପରି ସମ୍ପର୍କ କରିବାକୁ ଚାହାଁନ୍ତି?',
-      'outstanding_due_rs': 'ବକେୟା: ଟ. ',
-      'advance_rs': 'ଅଗ୍ରୀମ: ଟ. ',
-      'outstanding_nil': 'ବକେୟା: ଶୂନ୍ୟ',
-      'hello_greeting': 'ନମସ୍କାର ',
-      'sms_sent_success': 'ସିଧାସଳଖ SMS ପଠାଗଲା ',
-      'sms_send_error': 'SMS ପଠାଇ ହେଲାନି: ',
-      'sms_permission_denied':
-          'ବ୍ୟାକଗ୍ରାଉଣ୍ଡରେ ମେସେଜ୍ ପଠାଇବା ପାଇଁ SMS ଅନୁମତି ଆବଶ୍ୟକ',
-      'direct_call_error': 'ସିଧା କଲ୍ କରିହେଲାନି: ',
-      'phone_permission_denied': 'ସିଧା କଲ୍ କରିବା ପାଇଁ ଫୋନ୍ ଅନୁମତି ଆବଶ୍ୟକ',
-      'direct_sms': 'ସିଧା SMS',
-      'call': 'କଲ୍ କରନ୍ତୁ',
-      'phone_missing': 'ଫୋନ୍ ନାହିଁ',
-      'phone_not_configured': 'ଏହି କ୍ଲାଏଣ୍ଟର ଫୋନ୍ ନମ୍ବର କନଫିଗର ହୋଇନାହିଁ।',
-      'qty_rate': 'ପରିମାଣ / ହାର',
-      'gst_rate_percent': 'GST ହାର (%)',
-      'tax_amount_caps': 'ଟ୍ୟାକ୍ସ ପରିମାଣ',
-      'hsn_sac_code': 'HSN/SAC କୋଡ୍',
-      'taxable_amount': 'ଟ୍ୟାକ୍ସଯୋଗ୍ୟ ପରିମାଣ',
 
       // General
       'app_name': 'AurivaBms',
@@ -4475,7 +4202,6 @@ class AppTranslations extends Translations {
       'optional_details': 'ଇଚ୍ଛାଧୀନ ବିବରଣୀ...',
 
       // Suppliers
-      'suppliers': 'ଯୋଗାଣକାରୀ',
       'manage_vendors': 'ଆପଣଙ୍କର ବିକ୍ରେତା ଏବଂ କ୍ରୟ ଇତିହାସ ପରିଚାଳନା କରନ୍ତୁ',
       'search_vendors': 'ନାମ, ଇମେଲ୍ କିମ୍ବା GST ଦ୍ୱାରା ବିକ୍ରେତା ଖୋଜନ୍ତୁ...',
       'add_vendor': 'ବିକ୍ରେତା ଯୋଗ କରନ୍ତୁ',
@@ -4486,13 +4212,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'ଯୋଗାଣକାରୀ ଯୋଗ କରନ୍ତୁ',
       'supplier_name_star': 'ଯୋଗାଣକାରୀଙ୍କ ନାମ *',
       'eg_supplier_name': 'ଉଦାହରଣ: ଆପେକ୍ସ ଟେକ୍ନୋଲୋଜିସ୍',
-      'email': 'ଇମେଲ୍',
       'eg_email': 'ଉଦାହରଣ: sales@apextech.com',
-      'phone': 'ଫୋନ୍',
       'eg_phone': 'ଉଦାହରଣ: +91 98765 43210',
       'gst_number': 'GST ନମ୍ବର',
       'eg_gst': 'ଉଦାହରଣ: 29ABCDE1234F1Z1',
-      'address': 'ଠିକଣା',
       'eg_address': 'ଉଦାହରଣ: 22, ଇଣ୍ଡଷ୍ଟ୍ରିଆଲ୍ ଏରିଆ, ବାଙ୍ଗାଲୋର',
       'save_supplier': 'ଯୋଗାଣକାରୀଙ୍କୁ ସେଭ୍ କରନ୍ତୁ',
       'supplier_name_req': 'ଯୋଗାଣକାରୀଙ୍କ ନାମ ଆବଶ୍ୟକ',
@@ -4505,7 +4228,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'ଯୋଗାଣକାରୀଙ୍କୁ ଡିଲିଟ୍ କରିବାରେ ବିଫଳ',
 
       // Team
-      'team_access': 'ଟିମ୍ ଏବଂ ଆକ୍ସେସ୍',
       'manage_roles': 'ଭୂମିକା ପରିଚାଳନା କରନ୍ତୁ ଏବଂ ଡିଜିଟାଲ୍ ଦସ୍ତଖତ ଯାଞ୍ଚ କରନ୍ତୁ',
       'team_pro_feature': 'ଟିମ୍ ସଦସ୍ୟ — ପ୍ରୋ ଫିଚର',
       'team_pro_desc':
@@ -4571,7 +4293,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'ସମ୍ପୂର୍ଣ୍ଣ ଠିକଣା ବିବରଣୀ...',
       'taxation_invoice_terms': 'ଟିକସ ଏବଂ ଇନଭଏସ୍ ସର୍ତ୍ତାବଳୀ',
       'register_for_gst': 'GST ପାଇଁ ପଞ୍ଜିକରଣ କରନ୍ତୁ',
-      'gstin': 'GSTIN',
       'eg_gstin': '15-ଅଙ୍କ ବିଶିଷ୍ଟ GSTIN ପ୍ରବେଶ କରନ୍ତୁ',
       'default_invoice_terms': 'ଡିଫଲ୍ଟ ଇନଭଏସ୍ ସର୍ତ୍ତାବଳୀ',
       'eg_invoice_terms': 'ଡିଫଲ୍ଟ ବିଲିଂ ନୋଟ୍ ପ୍ରବେଶ କରନ୍ତୁ...',
@@ -4626,6 +4347,8 @@ class AppTranslations extends Translations {
       'email_req': 'ଇମେଲ୍ ଆବଶ୍ୟକ',
       'password_req': 'ପାସୱାର୍ଡ ଆବଶ୍ୟକ',
       'new_quotation': 'ନୂତନ କୋଟେସନ୍',
+      'edit_quotation': 'କୋଟେସନ୍ ସମ୍ପାଦନ କରନ୍ତୁ',
+      'edit_estimate_proposal': 'ଅନୁମାନ/ପ୍ରସ୍ତାବ ସମ୍ପାଦନ କରନ୍ତୁ',
       'create_new_estimate_proposal': 'ନୂତନ ଅନୁମାନ/ପ୍ରସ୍ତାବ ତିଆରି କରନ୍ତୁ',
       'create_new_estimate_puposal': 'ନୂତନ ଅନୁମାନ/ପ୍ରସ୍ତାବ ତିଆରି କରନ୍ତୁ',
       'quote_to': 'କୋଟେସନ୍ ଦିଅନ୍ତୁ',
@@ -4671,7 +4394,6 @@ class AppTranslations extends Translations {
       'error_req_client': 'ଦୟାକରି କ୍ଲାଏଣ୍ଟ ନାମ ଦିଅନ୍ତୁ',
       'error_req_invoice_no': 'ଦୟାକରି ଚାଲାଣ ନମ୍ବର ଦିଅନ୍ତୁ',
       'generating_invoice_pdf': 'ପ୍ରିମିୟମ୍ ଚାଲାଣ PDF ତିଆରି ହେଉଛି...',
-      'select_state': 'ରାଜ୍ୟ ବାଛନ୍ତୁ',
       'error_req_item_name': 'ଦୟାକରି ଆଇଟମ୍ ନାମ ଦିଅନ୍ତୁ',
     },
     'ml_IN': {
@@ -4749,29 +4471,6 @@ class AppTranslations extends Translations {
       'taxable_amount': 'നികുതി വിധേയമായ തുക',
 
       // New added strings
-      'contact_client': 'ബന്ധപ്പെടുക ',
-      'contact_method_prompt':
-          'നിങ്ങൾ എങ്ങനെ ക്ലയന്റുമായി ബന്ധപ്പെടാൻ ആഗ്രഹിക്കുന്നു?',
-      'outstanding_due_rs': 'കുടിശ്ശിക: രൂ. ',
-      'advance_rs': 'അഡ്വാൻസ്: രൂ. ',
-      'outstanding_nil': 'കുടിശ്ശിക: ഇല്ല',
-      'hello_greeting': 'ഹലോ ',
-      'sms_sent_success': 'നേരിട്ട് SMS അയച്ചു ',
-      'sms_send_error': 'SMS അയക്കാൻ കഴിഞ്ഞില്ല: ',
-      'sms_permission_denied':
-          'പശ്ചാത്തലത്തിൽ സന്ദേശങ്ങൾ അയക്കുന്നതിന് SMS അനുമതി ആവശ്യമാണ്',
-      'direct_call_error': 'നേരിട്ട് വിളിക്കാൻ കഴിഞ്ഞില്ല: ',
-      'phone_permission_denied':
-          'നേരിട്ടുള്ള കോളുകൾ ചെയ്യാൻ ഫോൺ അനുമതി ആവശ്യമാണ്',
-      'direct_sms': 'നേരിട്ടുള്ള SMS',
-      'call': 'വിളിക്കുക',
-      'phone_missing': 'ഫോൺ ഇല്ല',
-      'phone_not_configured': 'ഈ ക്ലയന്റിന് ഫോൺ നമ്പർ നൽകിയിട്ടില്ല.',
-      'qty_rate': 'അളവ് / നിരക്ക്',
-      'gst_rate_percent': 'GST നിരക്ക് (%)',
-      'tax_amount_caps': 'നികുതി തുക',
-      'hsn_sac_code': 'HSN/SAC കോഡ്',
-      'taxable_amount': 'നികുതി വിധേയമായ തുക',
 
       // General
       'app_name': 'AurivaBms',
@@ -4977,7 +4676,6 @@ class AppTranslations extends Translations {
       'optional_details': 'ഓപ്ഷണൽ വിവരങ്ങൾ...',
 
       // Suppliers
-      'suppliers': 'വിതരണക്കാർ',
       'manage_vendors':
           'നിങ്ങളുടെ വെണ്ടർമാരെയും പർച്ചേസ് ചരിത്രവും നിയന്ത്രിക്കുക',
       'search_vendors': 'പേര്, ഇമെയിൽ അല്ലെങ്കിൽ GST വെച്ച് വെണ്ടറെ തിരയുക...',
@@ -4989,13 +4687,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'വിതരണക്കാരനെ ചേർക്കുക',
       'supplier_name_star': 'വിതരണക്കാരന്റെ പേര് *',
       'eg_supplier_name': 'ഉദാഹരണം: അപെക്സ് ടെക്നോളജീസ്',
-      'email': 'ഇമെയിൽ',
       'eg_email': 'ഉദാഹരണം: sales@apextech.com',
-      'phone': 'ഫോൺ',
       'eg_phone': 'ഉദാഹരണം: +91 98765 43210',
       'gst_number': 'GST നമ്പർ',
       'eg_gst': 'ഉദാഹരണം: 29ABCDE1234F1Z1',
-      'address': 'വിലാസം',
       'eg_address': 'ഉദാഹരണം: 22, ഇൻഡസ്ട്രിയൽ ഏരിയ, ബാംഗ്ലൂർ',
       'save_supplier': 'വിതരണക്കാരനെ സേവ് ചെയ്യുക',
       'supplier_name_req': 'വിതരണക്കാരന്റെ പേര് ആവശ്യമാണ്',
@@ -5009,7 +4704,6 @@ class AppTranslations extends Translations {
           'വിതരണക്കാരനെ ഡിലീറ്റ് ചെയ്യുന്നതിൽ പരാജയപ്പെട്ടു',
 
       // Team
-      'team_access': 'ടീമും ആക്സസും',
       'manage_roles': 'റോളുകൾ നിയന്ത്രിക്കുക, ഡിജിറ്റൽ ഒപ്പുകൾ പരിശോധിക്കുക',
       'team_pro_feature': 'ടീം അംഗങ്ങൾ — പ്രോ ഫീച്ചർ',
       'team_pro_desc':
@@ -5074,7 +4768,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'മുഴുവൻ വിലാസ വിവരങ്ങൾ...',
       'taxation_invoice_terms': 'നികുതി, ഇൻവോയ്സ് നിബന്ധനകൾ',
       'register_for_gst': 'GST-ക്ക് രജിസ്റ്റർ ചെയ്യുക',
-      'gstin': 'GSTIN',
       'eg_gstin': '15 അക്ക GSTIN നൽകുക',
       'default_invoice_terms': 'സ്ഥിരമായ ഇൻവോയ്സ് നിബന്ധനകൾ',
       'eg_invoice_terms': 'സ്ഥിരമായ ബില്ലിംഗ് കുറിപ്പുകൾ നൽകുക...',
@@ -5129,6 +4822,8 @@ class AppTranslations extends Translations {
       'email_req': 'ഇമെയിൽ ആവശ്യമാണ്',
       'password_req': 'പാസ്‌വേഡ് ആവശ്യമാണ്',
       'new_quotation': 'പുതിയ കൊട്ടേഷൻ',
+      'edit_quotation': 'കൊട്ടേഷൻ എഡിറ്റ് ചെയ്യുക',
+      'edit_estimate_proposal': 'എസ്റ്റിമേറ്റ്/പ്രൊപ്പോസൽ എഡിറ്റ് ചെയ്യുക',
       'create_new_estimate_proposal':
           'പുതിയ എസ്റ്റിമേറ്റ്/പ്രൊപ്പോസൽ ഉണ്ടാക്കുക',
       'create_new_estimate_puposal':
@@ -5176,7 +4871,6 @@ class AppTranslations extends Translations {
       'error_req_client': 'ദയവായി ക്ലയൻ്റിൻ്റെ പേര് നൽകുക',
       'error_req_invoice_no': 'ദയവായി ഇൻവോയ്സ് നമ്പർ നൽകുക',
       'generating_invoice_pdf': 'പ്രീമിയം ഇൻവോയ്സ് പിഡിഎഫ് സൃഷ്ടിക്കുന്നു...',
-      'select_state': 'സംസ്ഥാനം തിരഞ്ഞെടുക്കുക',
       'error_req_item_name': 'ദയവായി ഇനത്തിൻ്റെ പേര് നൽകുക',
     },
     'gu_IN': {
@@ -5504,7 +5198,6 @@ class AppTranslations extends Translations {
       'bms_full_caps': 'વ્યાપાર સંચાલન સિસ્ટમ',
       'your_information': 'તમારી માહિતી',
       'your_info_sub': 'તમારી વ્યક્તિગત વિગતો અને ભૂમિકા જુઓ',
-      'notifications': 'સૂચનાઓ',
       'notifications_sub': 'તમારા તાજેતરના અપડેટ્સ',
       'no_notifications': 'હજી સુધી કોઈ સૂચનાઓ નથી',
       'view_details': 'વિગતો જુઓ',
@@ -5536,32 +5229,10 @@ class AppTranslations extends Translations {
       'taxable_amount': 'કરપાત્ર રકમ',
 
       // New added strings
-      'contact_client': 'સંપર્ક કરો ',
-      'contact_method_prompt': 'તમે ક્લાયંટનો કેવી રીતે સંપર્ક કરવા માંગો છો?',
-      'outstanding_due_rs': 'બાકી રકમ: રૂ. ',
-      'advance_rs': 'એડવાન્સ: રૂ. ',
-      'outstanding_nil': 'બાકી રકમ: શૂન્ય',
-      'hello_greeting': 'નમસ્તે ',
-      'sms_sent_success': 'સીધો SMS મોકલ્યો ',
-      'sms_send_error': 'SMS મોકલી શક્યા નથી: ',
-      'sms_permission_denied':
-          'બેકગ્રાઉન્ડમાં મેસેજ મોકલવા માટે SMS પરવાનગી જરૂરી છે',
-      'direct_call_error': 'સીધો કૉલ કરી શક્યા નથી: ',
-      'phone_permission_denied': 'સીધા કૉલ કરવા માટે ફોન પરવાનગી જરૂરી છે',
-      'direct_sms': 'સીધો SMS',
-      'call': 'કૉલ કરો',
-      'phone_missing': 'ફોન ગેરહાજર',
-      'phone_not_configured': 'આ ક્લાયંટ માટે ફોન નંબર ગોઠવેલ નથી.',
-      'qty_rate': 'જથ્થો / દર',
-      'gst_rate_percent': 'GST દર (%)',
-      'tax_amount_caps': 'કરની રકમ',
-      'hsn_sac_code': 'HSN/SAC કોડ',
-      'taxable_amount': 'કરપાત્ર રકમ',
 
       // General
       'app_name': 'AurivaBms',
       'save_and_exit': 'સાચવો અને બહાર નીકળો',
-      'language': 'ભાષા',
 
       // Profile/Settings
       'my_account': 'મારું ખાતું',
@@ -5580,11 +5251,6 @@ class AppTranslations extends Translations {
       'team_access_sub': 'પરવાનગીઓ અને સ્ટાફ લૉગ્સ',
       'settings': 'સેટિંગ્સ',
       'settings_sub': 'એપ અને વ્યવસાય સેટિંગ્સ',
-      'sign_out': 'સાઇન આઉટ',
-      'sign_out_confirm': 'શું તમે ખરેખર સાઇન આઉટ કરવા માંગો છો?',
-      'light_mode': 'લાઇટ મોડ',
-      'dark_mode': 'ડાર્ક મોડ',
-      'toggle_theme': 'ઍપ થીમ બદલો',
 
       // Dashboard
       'dashboard': 'ડેશબોર્ડ',
@@ -5592,7 +5258,6 @@ class AppTranslations extends Translations {
       'welcome_back': 'ફરીથી સ્વાગત છે, ',
       'days_left': ' દિવસ બાકી છે',
       'expired': 'સમાપ્ત થઈ ગયું',
-      'new_invoice': 'નવું ઇન્વોઇસ',
       'revenue': 'આવક',
       'income_arrow': '↗ આવક',
       'expenses_caps': 'ખર્ચ',
@@ -5615,14 +5280,11 @@ class AppTranslations extends Translations {
       'latest_billing_activities': 'નવીનતમ બિલિંગ પ્રવૃત્તિઓ',
       'view_all': 'બધા જુઓ',
       'no_invoices_yet': 'હજી સુધી કોઈ ઇન્વોઇસ નથી.',
-      'collect_payment': 'પેમેન્ટ મેળવો',
       'select_client': 'ગ્રાહક પસંદ કરો...',
-      'total_billed': 'કુલ બિલ:',
       'total_received': 'કુલ પ્રાપ્ત થયેલ:',
       'ledger_balance': 'ખાતાવહી બેલેન્સ:',
       'due': ' બાકી',
       'adv': ' એડવાન્સ',
-      'settled': 'પતાવટ થઈ ગઈ ✓',
       'log_pay': 'લોગ પે',
       'quick_actions': 'ઝડપી ક્રિયાઓ',
       'add_client': 'ગ્રાહક ઉમેરો',
@@ -5636,7 +5298,6 @@ class AppTranslations extends Translations {
       'manage_billing': 'તમારું બિલિંગ મેનેજ કરો',
       'search_invoices': 'ઇન્વોઇસ શોધો...',
       'filter': 'ફિલ્ટર',
-      'create_invoice': 'ઇન્વોઇસ બનાવો',
       'all': 'બધા',
       'paid': 'ચૂકવેલ',
       'partially_paid': 'આંશિક ચૂકવેલ',
@@ -5647,10 +5308,7 @@ class AppTranslations extends Translations {
       'no_expenses_found': 'કોઈ ખર્ચ મળ્યા નથી',
       'no_invoices_found': 'કોઈ ઇન્વોઇસ મળ્યા નથી',
       'create_first_invoice': 'શરૂ કરવા માટે તમારું પહેલું ઇન્વોઇસ બનાવો.',
-      'delete_invoice': 'ઇન્વોઇસ કાઢી નાખો',
       'delete_invoice_confirm': 'શું તમે ખરેખર આ ઇન્વોઇસ કાઢી નાખવા માંગો છો?',
-      'cancel': 'રદ કરો',
-      'delete': 'કાઢી નાખો',
       'invoice_deleted': 'ઇન્વોઇસ કાઢી નાખવામાં આવ્યું',
       'share': 'શેર કરો',
       'edit': 'ફેરફાર કરો',
@@ -5662,18 +5320,15 @@ class AppTranslations extends Translations {
       'accepted': 'સ્વીકારવામાં આવ્યું',
       'rejected': 'નકારવામાં આવ્યું',
       'no_quotations_found': 'કોઈ ક્વોટેશન મળ્યા નથી',
-      'delete_quotation': 'ક્વોટેશન કાઢી નાખો',
       'delete_quotation_confirm':
           'શું તમે ખરેખર આ ક્વોટેશન કાઢી નાખવા માંગો છો?',
       'quotation_deleted': 'ક્વોટેશન કાઢી નાખવામાં આવ્યું',
-      'convert_to_invoice': 'ઇન્વોઇસમાં રૂપાંતરિત કરો',
 
       // Clients
       'clients': 'ગ્રાહકો',
       'manage_customers': 'તમારા ગ્રાહકોનું સંચાલન કરો',
       'search_clients': 'ગ્રાહકો શોધો...',
       'edit_client': 'ગ્રાહકમાં ફેરફાર કરો',
-      'client_details': 'ગ્રાહકની વિગતો',
       'name': 'નામ',
       'name_colon': 'નામ: ',
       'bank_colon': 'બેંક: ',
@@ -5684,7 +5339,6 @@ class AppTranslations extends Translations {
       'state': 'રાજ્ય',
       'save_client': 'ગ્રાહક સાચવો',
       'client_saved_success': 'ગ્રાહક સફળતાપૂર્વક સાચવવામાં આવ્યો',
-      'delete_client': 'ગ્રાહક કાઢી નાખો',
       'delete_client_confirm': 'શું તમે ખરેખર આ ગ્રાહક કાઢી નાખવા માંગો છો?',
 
       // Expenses
@@ -5695,8 +5349,6 @@ class AppTranslations extends Translations {
       'spending_analysis': 'ખર્ચ વિશ્લેષણ',
       'by_category': '(કેટેગરી દ્વારા)',
       'all_time': 'તમામ સમય',
-      'newest_first': 'પહેલા નવીનતમ',
-      'oldest_first': 'પહેલા સૌથી જૂનું',
       'high_amount': 'વધુ રકમ',
       'low_amount': 'ઓછી રકમ',
       'select_outflow_period': 'જાવકનો સમયગાળો પસંદ કરો',
@@ -5714,7 +5366,6 @@ class AppTranslations extends Translations {
       'amount_rupees': 'રકમ (₹) *',
       'category_star': 'કેટેગરી *',
       'select_category': 'કેટેગરી પસંદ કરો',
-      'payment_mode': 'પેમેન્ટ મોડ',
       'select_payment_mode': 'પેમેન્ટ મોડ પસંદ કરો',
       'expense_desc': 'ખર્ચનું વર્ણન *',
       'select_date': 'તારીખ પસંદ કરો',
@@ -5741,7 +5392,6 @@ class AppTranslations extends Translations {
           'ઇન્વેન્ટરી મર્યાદા પહોંચી ગઈ છે. અમર્યાદિત SKU માટે અપગ્રેડ કરો.',
       'selected': ' પસંદ કરેલ',
       'search_products': 'ઉત્પાદન નામ અથવા SKU દ્વારા શોધો...',
-      'add_item': 'વસ્તુ ઉમેરો',
       'warehouse_registry': 'વેરહાઉસ રજિસ્ટ્રી',
       'no_inventory_found': 'કોઈ ઇન્વેન્ટરી વસ્તુઓ મળી નથી.',
       'units': ' એકમો',
@@ -5761,7 +5411,6 @@ class AppTranslations extends Translations {
       'optional_details': 'વૈકલ્પિક વિગતો...',
 
       // Suppliers
-      'suppliers': 'સપ્લાયર્સ',
       'manage_vendors': 'તમારા વિક્રેતાઓ અને ખરીદી ઇતિહાસનું સંચાલન કરો',
       'search_vendors': 'નામ, ઇમેઇલ અથવા GST દ્વારા વિક્રેતા શોધો...',
       'add_vendor': 'વિક્રેતા ઉમેરો',
@@ -5772,13 +5421,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'સપ્લાયર ઉમેરો',
       'supplier_name_star': 'સપ્લાયર નામ *',
       'eg_supplier_name': 'દા.ત. એપેક્સ ટેક્નોલોજીસ',
-      'email': 'ઇમેઇલ',
       'eg_email': 'દા.ત. sales@apextech.com',
-      'phone': 'ફોન',
       'eg_phone': 'દા.ત. +91 98765 43210',
       'gst_number': 'GST નંબર',
       'eg_gst': 'દા.ત. 29ABCDE1234F1Z1',
-      'address': 'સરનામું',
       'eg_address': 'દા.ત. 22, ઔદ્યોગિક વિસ્તાર, બેંગ્લોર',
       'save_supplier': 'સપ્લાયર સાચવો',
       'supplier_name_req': 'સપ્લાયર નામ જરૂરી છે',
@@ -5790,7 +5436,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'સપ્લાયર કાઢી નાખવામાં નિષ્ફળ',
 
       // Team
-      'team_access': 'ટીમ અને ઍક્સેસ',
       'manage_roles': 'ભૂમિકાઓ મેનેજ કરો અને ડિજિટલ સહીઓ ચકાસો',
       'team_pro_feature': 'ટીમ મેમ્બર્સ — પ્રો સુવિધા',
       'team_pro_desc':
@@ -5807,7 +5452,6 @@ class AppTranslations extends Translations {
       'add_staff': 'સ્ટાફ ઉમેરો',
       'access_registry': 'ઍક્સેસ રજિસ્ટ્રી અને સહીઓ',
       'no_staff_found': 'કોઈ સ્ટાફ મેમ્બર મળ્યા નથી.',
-      'change': 'બદલો',
       'upload': 'અપલોડ કરો',
       'its_you': 'તે તમે છો',
       'remove_member': 'ટીમ મેમ્બરને દૂર કરો',
@@ -5855,7 +5499,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'સંપૂર્ણ સરનામાની વિગતો...',
       'taxation_invoice_terms': 'કરવેરા અને ઇન્વોઇસની શરતો',
       'register_for_gst': 'GST માટે નોંધણી કરો',
-      'gstin': 'GSTIN',
       'eg_gstin': '15-અંકનો GSTIN દાખલ કરો',
       'default_invoice_terms': 'ડિફોલ્ટ ઇન્વોઇસની શરતો',
       'eg_invoice_terms': 'ડિફોલ્ટ બિલિંગ નોંધો દાખલ કરો...',
@@ -5894,7 +5537,6 @@ class AppTranslations extends Translations {
       'manage_inventory_desc':
           'તમારા સ્ટોક લેવલ પર નજર રાખો અને એક જ જગ્યાએથી સપ્લાયર્સનું સંચાલન કરો.',
       'invoice_caps': 'ઇન્વોઇસ (INVOICE)',
-      'total': 'કુલ',
       'seamless_invoicing': 'સરળ ઇન્વોઇસિંગ',
       'seamless_invoicing_desc':
           'વ્યાવસાયિક ઇન્વોઇસ બનાવો, ક્વોટેશન મોકલો અને ઝડપથી પેમેન્ટ મેળવો.',
@@ -5910,6 +5552,8 @@ class AppTranslations extends Translations {
       'email_req': 'ઇમેઇલ જરૂરી છે',
       'password_req': 'પાસવર્ડ જરૂરી છે',
       'new_quotation': 'નવું અવતરણ',
+      'edit_quotation': 'અવતરણ સંપાદિત કરો',
+      'edit_estimate_proposal': 'અંદાજ/દરખાસ્ત સંપાદિત કરો',
       'create_new_estimate_proposal': 'નવો અંદાજ/દરખાસ્ત બનાવો',
       'create_new_estimate_puposal': 'નવો અંદાજ/દરખાસ્ત બનાવો',
       'quote_to': 'અવતરણ કરો',
@@ -5927,9 +5571,7 @@ class AppTranslations extends Translations {
       'desc_optional': 'વિગતવાર વર્ણન (વૈકલ્પિક)',
       'detailed_description_optional': 'વિગતવાર વર્ણન (વૈકલ્પિક)',
       'add_extra_details': 'વધારાની વિગતો ઉમેરો',
-      'qty': 'જથ્થો *',
       'qty_star': 'જથ્થો *',
-      'rate': 'દર *',
       'rate_star': 'દર *',
       'amount_caps': 'રકમ',
       'financial_summary': 'નાણાકીય સારાંશ',
@@ -5937,24 +5579,18 @@ class AppTranslations extends Translations {
       'discount_percent': 'ડિસ્કાઉન્ટ (%)',
       'descount_percent': 'ડિસ્કાઉન્ટ (%)',
       'advance_received': 'એડવાન્સ મળેલ',
-      'amount': 'રકમ',
       'terms_notes': 'નિયમો અને નોંધો',
       'Tearms_niotes': 'નિયમો અને નોંધો',
       'bill_to': 'બિલ કરો',
-      'details': 'વિગતો',
       'invoice_details': 'ઇન્વૉઇસ વિગતો',
       'invoice_date_star': 'ઇન્વૉઇસ તારીખ *',
       'due_date_star': 'નિયત તારીખ *',
       'place_of_supply_star': 'સપ્લાયનું સ્થાન *',
-      'enable_gst': 'જીએસટી સક્ષમ કરો',
       'code': 'કોડ',
-      'add_new_item_line': '+ નવી આઇટમ લાઇન ઉમેરો',
-      'remove_item': 'આઇટમ કાઢી નાખો',
       'amount_colon': 'રકમ: ',
       'error_req_client': 'કૃપા કરીને ક્લાયન્ટનું નામ દાખલ કરો',
       'error_req_invoice_no': 'કૃપા કરીને ઇન્વૉઇસ નંબર દાખલ કરો',
       'generating_invoice_pdf': 'પ્રીમિયમ ઇન્વૉઇસ પીડીએફ બનાવી રહ્યા છીએ...',
-      'select_state': 'રાજ્ય પસંદ કરો',
       'error_req_item_name': 'કૃપા કરીને આઇટમનું નામ દાખલ કરો',
       'outstanding_due': 'બાકી રકમ',
       'advance_jama': 'એડવાન્સ (જમા) +',
@@ -6077,27 +5713,6 @@ class AppTranslations extends Translations {
       'taxable_amount': 'करपात्र रक्कम',
 
       // New added strings
-      'contact_client': 'संपर्क करा ',
-      'contact_method_prompt': 'आपल्याला क्लायंटशी कसा संपर्क साधायचा आहे?',
-      'outstanding_due_rs': 'थकबाकी: रु. ',
-      'advance_rs': 'आगाऊ रक्कम: रु. ',
-      'outstanding_nil': 'थकबाकी: काहीही नाही',
-      'hello_greeting': 'नमस्कार ',
-      'sms_sent_success': 'थेट SMS पाठवला ',
-      'sms_send_error': 'SMS पाठवू शकलो नाही: ',
-      'sms_permission_denied':
-          'पार्श्वभूमीत संदेश पाठवण्यासाठी SMS परवानगी आवश्यक आहे',
-      'direct_call_error': 'थेट कॉल करू शकलो नाही: ',
-      'phone_permission_denied': 'थेट कॉल करण्यासाठी फोन परवानगी आवश्यक आहे',
-      'direct_sms': 'थेट SMS',
-      'call': 'कॉल करा',
-      'phone_missing': 'फोन उपलब्ध नाही',
-      'phone_not_configured': 'या क्लायंटसाठी फोन नंबर कॉन्फिगर केलेला नाही.',
-      'qty_rate': 'प्रमाण / दर',
-      'gst_rate_percent': 'GST दर (%)',
-      'tax_amount_caps': 'कर रक्कम',
-      'hsn_sac_code': 'HSN/SAC कोड',
-      'taxable_amount': 'करपात्र रक्कम',
 
       // General
       'app_name': 'AurivaBms',
@@ -6307,7 +5922,6 @@ class AppTranslations extends Translations {
       'optional_details': 'पर्यायी तपशील...',
 
       // Suppliers
-      'suppliers': 'पुरवठादार',
       'manage_vendors': 'तुमचे विक्रेते आणि खरेदी इतिहास व्यवस्थापित करा',
       'search_vendors': 'नाव, ईमेल किंवा GST द्वारे विक्रेते शोधा...',
       'add_vendor': 'विक्रेता जोडा',
@@ -6318,13 +5932,10 @@ class AppTranslations extends Translations {
       'add_supplier': 'पुरवठादार जोडा',
       'supplier_name_star': 'पुरवठादाराचे नाव *',
       'eg_supplier_name': 'उदा. ऍपेक्स टेक्नॉलॉजीज',
-      'email': 'ईमेल',
       'eg_email': 'उदा. sales@apextech.com',
-      'phone': 'फोन',
       'eg_phone': 'उदा. +91 98765 43210',
       'gst_number': 'GST क्रमांक',
       'eg_gst': 'उदा. 29ABCDE1234F1Z1',
-      'address': 'पत्ता',
       'eg_address': 'उदा. 22, औद्योगिक क्षेत्र, बंगळुरू',
       'save_supplier': 'पुरवठादार सेव्ह करा',
       'supplier_name_req': 'पुरवठादाराचे नाव आवश्यक आहे',
@@ -6337,7 +5948,6 @@ class AppTranslations extends Translations {
       'supplier_delete_error': 'पुरवठादार हटवण्यात अयशस्वी',
 
       // Team
-      'team_access': 'टीम आणि ॲक्सेस',
       'manage_roles':
           'भूमिका व्यवस्थापित करा आणि डिजिटल स्वाक्षऱ्यांची पडताळणी करा',
       'team_pro_feature': 'टीम सदस्य — प्रो वैशिष्ट्य',
@@ -6404,7 +6014,6 @@ class AppTranslations extends Translations {
       'eg_business_address': 'पूर्ण पत्ता तपशील...',
       'taxation_invoice_terms': 'कर आणि इन्व्हॉइस अटी',
       'register_for_gst': 'GST साठी नोंदणी करा',
-      'gstin': 'GSTIN',
       'eg_gstin': '15-अंकी GSTIN प्रविष्ट करा',
       'default_invoice_terms': 'डिफॉल्ट इन्व्हॉइस अटी',
       'eg_invoice_terms': 'डिफॉल्ट बिलिंग नोट्स प्रविष्ट करा...',

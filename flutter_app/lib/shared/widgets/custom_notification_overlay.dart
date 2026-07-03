@@ -6,7 +6,7 @@ import '../../core/theme/app_extensions.dart';
 
 class AurivaNotificationIcon extends StatelessWidget {
   final String type;
-  const AurivaNotificationIcon({Key? key, required this.type}) : super(key: key);
+  const AurivaNotificationIcon({super.key, required this.type});
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +31,9 @@ class AurivaNotificationIcon extends StatelessWidget {
       width: 64,
       height: 64,
       decoration: BoxDecoration(
-        color: primaryBlue.withOpacity(0.04),
+        color: primaryBlue.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -66,7 +66,7 @@ class AurivaNotificationIcon extends StatelessWidget {
       width: 3,
       height: 3,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
     );
@@ -253,13 +253,13 @@ class _NotificationWidgetState extends State<_NotificationWidget>
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: _primaryBlue.withOpacity(0.06),
+            color: _primaryBlue.withValues(alpha: 0.06),
             blurRadius: 24,
             spreadRadius: 4,
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -285,7 +285,7 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                         Container(
                           width: 8,
                           height: 8,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: _primaryBlue,
                             shape: BoxShape.circle,
                           ),
@@ -323,9 +323,9 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                         ),
                         const SizedBox(width: 6),
                         if (widget.type == 'payment')
-                          Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
+                          const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
                         else
-                          Icon(Icons.description, color: _primaryBlue, size: 18),
+                          const Icon(Icons.description, color: _primaryBlue, size: 18),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -366,7 +366,7 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                 width: 32,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: _primaryBlue.withOpacity(0.2),
+                  color: _primaryBlue.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -386,7 +386,7 @@ class _NotificationWidgetState extends State<_NotificationWidget>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 15,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -424,9 +424,9 @@ class _NotificationWidgetState extends State<_NotificationWidget>
       width: 64,
       height: 64,
       decoration: BoxDecoration(
-        color: _primaryBlue.withOpacity(0.04),
+        color: _primaryBlue.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -464,7 +464,7 @@ class _NotificationWidgetState extends State<_NotificationWidget>
       width: 3,
       height: 3,
       decoration: BoxDecoration(
-        color: _primaryBlue.withOpacity(0.15),
+        color: _primaryBlue.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
     );

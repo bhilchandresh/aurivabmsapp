@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
-import '../core/constants/app_colors.dart';
 import '../core/theme/app_extensions.dart';
 import '../features/super_admin/dashboard/super_admin_dashboard_screen.dart';
 import '../features/super_admin/broadcast/super_admin_broadcast_screen.dart';
-import '../features/super_admin/logs/super_admin_logs_screen.dart';
 import '../features/super_admin/companies/super_admin_add_company_screen.dart';
 import '../features/super_admin/profile/super_admin_profile_screen.dart';
 import '../features/super_admin/analytics/super_admin_analytics_screen.dart';
@@ -33,6 +31,8 @@ class SuperAdminMainLayoutController extends GetxController {
 
 class SuperAdminMainLayout extends StatelessWidget {
   const SuperAdminMainLayout({super.key});
+
+  BuildContext get context => Get.context!;
 
   @override
   Widget build(BuildContext context) {
@@ -79,15 +79,15 @@ class SuperAdminMainLayout extends StatelessWidget {
                     margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     decoration: BoxDecoration(
-                      color: Color(0xFF0F172A), // slate-900
+                      color: const Color(0xFF0F172A), // slate-900
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.08),
+                        color: Colors.white.withValues(alpha: 0.08),
                         width: 1,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 20,
                           offset: const Offset(0, 10),
                         ),
@@ -160,12 +160,12 @@ class SuperAdminMainLayout extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             color: isSelected
-                ? AppColors.primary.withOpacity(0.15)
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.15)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected
-                  ? AppColors.primary.withOpacity(0.3)
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.3)
                   : Colors.transparent,
               width: 1,
             ),
@@ -175,7 +175,7 @@ class SuperAdminMainLayout extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: isSelected ? AppColors.primary : Colors.grey.shade400,
+                color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey.shade400,
                 size: 20,
               ),
               if (isSelected) const SizedBox(width: 8),
@@ -204,9 +204,9 @@ class SuperAdminMainLayout extends StatelessWidget {
       width: 280,
       height: double.infinity,
       decoration: BoxDecoration(
-        color: Color(0xFF0F172A), // Slate 900
+        color: const Color(0xFF0F172A), // Slate 900
         border: Border(
-          right: BorderSide(color: Colors.white.withOpacity(0.08), width: 1),
+          right: BorderSide(color: Colors.white.withValues(alpha: 0.08), width: 1),
         ),
       ),
       child: Column(
@@ -229,7 +229,7 @@ class SuperAdminMainLayout extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.3),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -238,21 +238,21 @@ class SuperAdminMainLayout extends StatelessWidget {
                   child: Icon(
                     LucideIcons.shieldCheck,
                     size: 32,
-                    color: AppColors.primary,
+                    color: context.colorScheme.primary,
                   ),
                 ),
                 RichText(
-                  text: const TextSpan(
-                    style: TextStyle(
+                  text: TextSpan(
+                    style: context.typography.profileName.copyWith(
                       fontSize: 24,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                     children: [
-                      TextSpan(text: 'Super'),
+                      const TextSpan(text: 'Super'),
                       TextSpan(
                         text: 'Admin',
-                        style: TextStyle(color: AppColors.primary),
+                        style: context.typography.profileName.copyWith(color: context.colorScheme.primary),
                       ),
                     ],
                   ),
@@ -260,7 +260,7 @@ class SuperAdminMainLayout extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   'MASTER CONTROL PANEL',
-                  style: TextStyle(
+                  style: context.typography.categoryHeader.copyWith(
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
@@ -332,12 +332,12 @@ class SuperAdminMainLayout extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primary : Colors.transparent,
+              color: isActive ? Theme.of(context).colorScheme.primary : Colors.transparent,
               borderRadius: BorderRadius.circular(14),
               boxShadow: isActive
                   ? [
                       BoxShadow(
-                        color: AppColors.primary.withOpacity(0.25),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.25),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -354,7 +354,7 @@ class SuperAdminMainLayout extends StatelessWidget {
                 const SizedBox(width: 14),
                 Text(
                   title,
-                  style: TextStyle(
+                  style: context.typography.inputText.copyWith(
                     fontSize: 14,
                     color: isActive ? Colors.white : Colors.grey.shade300,
                     fontWeight: FontWeight.w600,
@@ -362,7 +362,7 @@ class SuperAdminMainLayout extends StatelessWidget {
                 ),
                 if (isActive) ...[
                   const Spacer(),
-                  Icon(
+                  const Icon(
                     LucideIcons.chevronRight,
                     size: 14,
                     color: Colors.white60,

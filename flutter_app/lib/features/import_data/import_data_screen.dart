@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
+import '../../core/theme/app_extensions.dart';
 import 'import_data_controller.dart';
 
 class ImportDataScreen extends StatefulWidget {
@@ -103,12 +104,12 @@ class _ImportDataScreenState extends State<ImportDataScreen>
       ),
       child: TabBar(
         controller: _tabController,
-        indicatorColor: AppColors.primary,
+        indicatorColor: context.colorScheme.primary,
         indicatorWeight: 3,
         labelColor: AppColors.primary,
         unselectedLabelColor: Theme.of(context).textTheme.bodyMedium?.color,
-        labelStyle: TextStyle(fontWeight: FontWeight.w900, fontSize: 14),
-        unselectedLabelStyle: TextStyle(
+        labelStyle: context.typography.inputText.copyWith(fontWeight: FontWeight.w900, fontSize: 14),
+        unselectedLabelStyle: context.typography.inputText.copyWith(
           fontWeight: FontWeight.w600,
           fontSize: 14,
         ),
@@ -117,31 +118,34 @@ class _ImportDataScreenState extends State<ImportDataScreen>
         tabs: [
           Tab(
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(LucideIcons.users, size: 18),
-                SizedBox(width: 8),
-                Text('clients'.tr),
+                const Icon(LucideIcons.users, size: 18),
+                const SizedBox(width: 4),
+                Flexible(child: Text('clients'.tr, overflow: TextOverflow.ellipsis)),
               ],
             ),
           ),
           Tab(
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(LucideIcons.package, size: 18),
-                SizedBox(width: 8),
-                Text('inventory'.tr),
+                const Icon(LucideIcons.package, size: 18),
+                const SizedBox(width: 4),
+                Flexible(child: Text('inventory'.tr, overflow: TextOverflow.ellipsis)),
               ],
             ),
           ),
           Tab(
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(LucideIcons.fileText, size: 18),
-                SizedBox(width: 8),
-                Text('invoices'.tr),
+                const Icon(LucideIcons.fileText, size: 18),
+                const SizedBox(width: 4),
+                Flexible(child: Text('invoices'.tr, overflow: TextOverflow.ellipsis)),
               ],
             ),
           ),
@@ -163,10 +167,10 @@ class _ImportDataScreenState extends State<ImportDataScreen>
               icon: LucideIcons.download,
               iconColor: Colors.blue,
               bgColor: isDark
-                  ? Colors.blue.shade900.withOpacity(0.2)
+                  ? Colors.blue.shade900.withValues(alpha: 0.2)
                   : Colors.blue.shade50,
               borderColor: isDark
-                  ? Colors.blue.shade900.withOpacity(0.5)
+                  ? Colors.blue.shade900.withValues(alpha: 0.5)
                   : Colors.blue.shade100,
               buttonText: 'download_excel_btn'.tr,
               onTap: _controller.downloadTemplate,
@@ -188,10 +192,10 @@ class _ImportDataScreenState extends State<ImportDataScreen>
               icon: LucideIcons.upload,
               iconColor: Colors.purple,
               bgColor: isDark
-                  ? Colors.purple.shade900.withOpacity(0.2)
+                  ? Colors.purple.shade900.withValues(alpha: 0.2)
                   : Colors.purple.shade50,
               borderColor: isDark
-                  ? Colors.purple.shade900.withOpacity(0.5)
+                  ? Colors.purple.shade900.withValues(alpha: 0.5)
                   : Colors.purple.shade100,
               buttonText: 'upload_excel_btn'.tr,
               onTap: _controller.pickFile,
@@ -247,7 +251,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -258,7 +262,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
           const SizedBox(height: 16),
           Text(
             title,
-            style: TextStyle(
+            style: context.typography.cardTitle.copyWith(
               fontWeight: FontWeight.w900,
               fontSize: 16,
               color: Theme.of(context).textTheme.bodyLarge?.color,
@@ -267,7 +271,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
           const SizedBox(height: 4),
           Text(
             subtitle,
-            style: TextStyle(
+            style: context.typography.cardSubtitle.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.w500,
               color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -304,9 +308,10 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                           )
                         : Text(
                             label,
-                            style: TextStyle(
+                            style: context.typography.buttonText.copyWith(
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
+                              color: Theme.of(context).textTheme.bodyLarge?.color,
                             ),
                           ),
                   ),
@@ -358,7 +363,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                   Expanded(
                     child: Row(
                       children: [
-                        Icon(
+                        const Icon(
                           LucideIcons.checkCircle,
                           color: Colors.green,
                           size: 20,
@@ -366,9 +371,8 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            '${_controller.parsedData.length} ' +
-                                'parsed_rows_ready'.tr,
-                            style: TextStyle(
+                            '${_controller.parsedData.length} ${'parsed_rows_ready'.tr}',
+                            style: context.typography.inputText.copyWith(
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).textTheme.bodyLarge?.color,
                             ),
@@ -383,7 +387,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                         ? null
                         : _controller.importData,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: context.colorScheme.primary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -404,7 +408,10 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                           )
                         : Text(
                             'start_import'.tr,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: context.typography.buttonText.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                   ),
                 ],
@@ -427,7 +434,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                             (h) => DataColumn(
                               label: Text(
                                 h.toUpperCase(),
-                                style: TextStyle(
+                                style: context.typography.tableHeader.copyWith(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w900,
                                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -444,7 +451,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                             return DataCell(
                               Text(
                                 val.isEmpty ? '-' : val,
-                                style: TextStyle(
+                                style: context.typography.tableCell.copyWith(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                   color: Theme.of(context).textTheme.bodyMedium?.color,
@@ -463,7 +470,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                 alignment: Alignment.center,
                 child: Text(
                   'showing_first_50_rows'.tr,
-                  style: TextStyle(
+                  style: context.typography.helperText.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).textTheme.bodyMedium?.color,

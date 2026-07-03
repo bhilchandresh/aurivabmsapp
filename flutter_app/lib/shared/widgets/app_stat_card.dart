@@ -23,7 +23,8 @@ class AppStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final bodyMediumColor = Theme.of(context).textTheme.bodyMedium?.color;
+    final displayLargeColor = Theme.of(context).textTheme.displayLarge?.color;
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
@@ -32,7 +33,7 @@ class AppStatCard extends StatelessWidget {
         border: Border.all(color: context.colorScheme.outline, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -65,7 +66,7 @@ class AppStatCard extends StatelessWidget {
                 Text(
                   title.toUpperCase(),
                   style: context.typography.statisticLabel.copyWith(
-                    color: textTheme.bodyMedium?.color,
+                    color: bodyMediumColor,
                   ),
                 ),
               ],
@@ -74,7 +75,7 @@ class AppStatCard extends StatelessWidget {
             Text(
               amount,
               style: context.typography.kpiValue.copyWith(
-                color: isFeatured ? color : textTheme.displayLarge?.color,
+                color: isFeatured ? color : displayLargeColor,
               ),
             ),
             const SizedBox(height: 4),

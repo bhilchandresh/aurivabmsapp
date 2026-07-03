@@ -111,7 +111,7 @@ class InventoryController extends GetxController {
     if (selectedItems.isEmpty) return false;
     try {
       isLoading.value = true;
-      List<Future> futures = [];
+      final List<Future> futures = [];
       for (String id in selectedItems) {
         futures.add(ApiService.delete('${ApiConstants.inventory}/$id'));
       }

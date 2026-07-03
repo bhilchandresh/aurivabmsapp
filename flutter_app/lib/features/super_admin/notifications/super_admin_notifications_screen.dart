@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/theme/app_extensions.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
@@ -12,15 +13,15 @@ class SuperAdminNotificationsScreen extends StatelessWidget {
     final controller = Get.put(SuperAdminNotificationsController());
 
     return Scaffold(
-      backgroundColor: Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: false,
         title: Text(
           'Notifications',
-          style: TextStyle(
-            color: Color(0xFF111827),
+          style: context.typography.screenTitle.copyWith(
+            color: const Color(0xFF111827),
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -44,10 +45,10 @@ class SuperAdminNotificationsScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade200),
+                      border: Border.all(color: context.colorSchemeExtension.borderColor),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.02),
+                          color: Colors.black.withValues(alpha: 0.02),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -57,7 +58,7 @@ class SuperAdminNotificationsScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16),
                       child: Obx(() {
                         if (controller.isLoading.value) {
-                          return Padding(
+                          return const Padding(
                             padding: EdgeInsets.all(60.0),
                             child: Center(
                               child: CircularProgressIndicator(
@@ -81,7 +82,7 @@ class SuperAdminNotificationsScreen extends StatelessWidget {
                                   const SizedBox(height: 16),
                                   Text(
                                     'No new notifications',
-                                    style: TextStyle(
+                                    style: context.typography.cardTitle.copyWith(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.grey.shade400,
@@ -140,11 +141,11 @@ class SuperAdminNotificationsScreen extends StatelessWidget {
                               ),
                               tileColor: isRead
                                   ? Colors.transparent
-                                  : Colors.blue.shade50.withOpacity(0.3),
+                                  : Colors.blue.shade50.withValues(alpha: 0.3),
                               leading: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: iconColor.withOpacity(0.1),
+                                  color: iconColor.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
@@ -155,11 +156,11 @@ class SuperAdminNotificationsScreen extends StatelessWidget {
                               ),
                               title: Text(
                                 notif['message'] ?? '',
-                                style: TextStyle(
+                                style: context.typography.cardTitle.copyWith(
                                   fontWeight: isRead
                                       ? FontWeight.w500
                                       : FontWeight.bold,
-                                  color: Color(0xFF1E293B),
+                                  color: const Color(0xFF1E293B),
                                   fontSize: 15,
                                 ),
                               ),
@@ -167,7 +168,7 @@ class SuperAdminNotificationsScreen extends StatelessWidget {
                                 padding: const EdgeInsets.only(top: 6.0),
                                 child: Text(
                                   timeStr,
-                                  style: TextStyle(
+                                  style: context.typography.inputText.copyWith(
                                     color: Colors.grey.shade500,
                                     fontSize: 13,
                                   ),

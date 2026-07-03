@@ -11,13 +11,13 @@ class AurivaNotificationCard extends StatelessWidget {
   final String bodyText2;
 
   const AurivaNotificationCard({
-    Key? key,
+    super.key,
     required this.type,
     required this.title,
     required this.time,
     required this.bodyText1,
     required this.bodyText2,
-  }) : super(key: key);
+  });
 
   static const Color _primaryBlue = Color(0xFF1D58F7);
   static const Color _textDark = Color(0xFF111827);
@@ -33,7 +33,7 @@ class AurivaNotificationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: _primaryBlue.withOpacity(0.06),
+            color: _primaryBlue.withValues(alpha: 0.06),
             blurRadius: 24,
             spreadRadius: 4,
             offset: const Offset(0, 8),
@@ -58,7 +58,7 @@ class AurivaNotificationCard extends StatelessWidget {
                         Container(
                           width: 8,
                           height: 8,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: _primaryBlue,
                             shape: BoxShape.circle,
                           ),
@@ -92,9 +92,9 @@ class AurivaNotificationCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 6),
                         if (type == AurivaNotificationType.payment)
-                          Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
+                          const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
                         else
-                          Icon(Icons.description, color: _primaryBlue, size: 18),
+                          const Icon(Icons.description, color: _primaryBlue, size: 18),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -130,7 +130,7 @@ class AurivaNotificationCard extends StatelessWidget {
                 width: 32,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: _primaryBlue.withOpacity(0.2),
+                  color: _primaryBlue.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -150,7 +150,7 @@ class AurivaNotificationCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 15,
             spreadRadius: 0,
             offset: const Offset(0, 4),
@@ -188,9 +188,9 @@ class AurivaNotificationCard extends StatelessWidget {
       width: 64,
       height: 64,
       decoration: BoxDecoration(
-        color: _primaryBlue.withOpacity(0.04),
+        color: _primaryBlue.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -228,7 +228,7 @@ class AurivaNotificationCard extends StatelessWidget {
       width: 3,
       height: 3,
       decoration: BoxDecoration(
-        color: _primaryBlue.withOpacity(0.15),
+        color: _primaryBlue.withValues(alpha: 0.15),
         shape: BoxShape.circle,
       ),
     );

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/theme/app_extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import '../../../core/theme/app_text_styles.dart';
 import '../../auth/auth_controller.dart';
 import '../notifications/super_admin_notifications_screen.dart';
 
@@ -17,7 +16,7 @@ class SuperAdminTopBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+        border: Border(bottom: BorderSide(color: context.colorSchemeExtension.borderColor)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -33,19 +32,19 @@ class SuperAdminTopBar extends StatelessWidget {
                 children: [
                   Text(
                     'Auriva',
-                    style: TextStyle(
+                    style: context.typography.screenTitle.copyWith(
                       fontSize: isMobile ? 22 : 26,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF0F172A),
+                      color: const Color(0xFF0F172A),
                       letterSpacing: -0.5,
                     ),
                   ),
                   Text(
                     'BMS',
-                    style: TextStyle(
+                    style: context.typography.screenTitle.copyWith(
                       fontSize: isMobile ? 22 : 26,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFF2563EB),
+                      color: const Color(0xFF2563EB),
                       letterSpacing: -0.5,
                     ),
                   ),
@@ -53,10 +52,10 @@ class SuperAdminTopBar extends StatelessWidget {
               ),
               Text(
                 'BUSINESS MANAGEMENT SYSTEM',
-                style: TextStyle(
+                style: context.typography.screenTitle.copyWith(
                   fontSize: isMobile ? 8 : 10,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF64748B),
+                  color: const Color(0xFF64748B),
                   letterSpacing: 1.5,
                 ),
               ),
@@ -70,7 +69,7 @@ class SuperAdminTopBar extends StatelessWidget {
               GestureDetector(
                 onTap: () =>
                     Get.to(() => const SuperAdminNotificationsScreen()),
-                child: Icon(
+                child: const Icon(
                   CupertinoIcons.bell,
                   color: Color(0xFF64748B),
                   size: 24,
@@ -92,19 +91,19 @@ class SuperAdminTopBar extends StatelessWidget {
                   children: [
                     Text(
                       'SUPER ADMIN',
-                      style: TextStyle(
+                      style: context.typography.inputText.copyWith(
                         fontSize: 13,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF0F172A),
+                        color: const Color(0xFF0F172A),
                         letterSpacing: 0.5,
                       ),
                     ),
                     Text(
                       'SECURE SESSION',
-                      style: TextStyle(
+                      style: context.typography.helperText.copyWith(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: Color(0xFF94A3B8),
+                        color: const Color(0xFF94A3B8),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -123,20 +122,20 @@ class SuperAdminTopBar extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Color(0xFF3B82F6),
+                    color: const Color(0xFF3B82F6),
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
-                        color: Color(0xFF3B82F6).withOpacity(0.3),
+                        color: const Color(0xFF3B82F6).withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Text(
                       'S',
-                      style: TextStyle(
+                      style: context.typography.screenTitle.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w900,
                         fontSize: 20,

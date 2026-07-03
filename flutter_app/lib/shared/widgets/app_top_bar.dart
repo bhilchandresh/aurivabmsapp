@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
-import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_extensions.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/notifications/notification_controller.dart';
@@ -101,7 +100,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                               width: 6,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: AppColors.success,
+                                color: context.colorSchemeExtension.statusSuccess,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -126,10 +125,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -183,7 +182,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                             if (controller.unreadCount.value > 0) {
                               return Container(
                                 padding: const EdgeInsets.all(4),
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: Colors.red,
                                   shape: BoxShape.circle,
                                 ),
@@ -221,7 +220,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.2),
+                          color: context.colorScheme.primary.withValues(alpha: 0.2),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),

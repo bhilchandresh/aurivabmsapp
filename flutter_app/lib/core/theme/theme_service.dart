@@ -10,7 +10,7 @@ class ThemeService extends GetxService {
   late final RxBool isDarkMode;
 
   ThemeService() {
-    bool isDark = _box.read<bool>(_key) ?? false;
+    final bool isDark = _box.read<bool>(_key) ?? false;
     isDarkMode = RxBool(isDark);
   }
 

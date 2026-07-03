@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_extensions.dart';
 import '../auth/auth_controller.dart';
 
 class YourInformationScreen extends StatelessWidget {
@@ -20,14 +20,14 @@ class YourInformationScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'your_information'.tr,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: context.typography.topBarTitle.copyWith(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         foregroundColor: Theme.of(context).textTheme.displayLarge?.color,
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft),
+          icon: const Icon(LucideIcons.arrowLeft),
           onPressed: () => Get.back(),
         ),
       ),
@@ -59,7 +59,7 @@ class YourInformationScreen extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Color(
+                            color: const Color(
                               0xFF8B5CF6,
                             ).withValues(alpha: 0.4),
                             blurRadius: 24,
@@ -75,7 +75,7 @@ class YourInformationScreen extends StatelessWidget {
                               : 'U';
                           return Text(
                             initial,
-                            style: TextStyle(
+                            style: context.typography.avatarLetter.copyWith(
                               fontSize: 50,
                               color: Colors.white,
                               fontWeight: FontWeight.w900,
@@ -97,7 +97,7 @@ class YourInformationScreen extends StatelessWidget {
                       authController.userName.value.isNotEmpty
                           ? authController.userName.value
                           : 'my_account'.tr,
-                      style: TextStyle(
+                      style: context.typography.profileName.copyWith(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).textTheme.displayLarge?.color,
@@ -115,20 +115,20 @@ class YourInformationScreen extends StatelessWidget {
                         vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Color(0xFF8B5CF6).withValues(alpha: 0.1),
+                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                          color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
                         ),
                       ),
                       child: Text(
                         authController.userRole.value.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF8B5CF6),
-                          letterSpacing: 1.5,
-                        ),
+                          style: context.typography.roleBadgeText.copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: const Color(0xFF8B5CF6),
+                            letterSpacing: 1.5,
+                          ),
                       ),
                     ),
                   ),
@@ -147,7 +147,7 @@ class YourInformationScreen extends StatelessWidget {
                       value: authController.userName.value.isNotEmpty
                           ? authController.userName.value
                           : 'my_account'.tr,
-                      iconColor: Color(0xFF3B82F6),
+                      iconColor: const Color(0xFF3B82F6),
                     ),
                   ),
                 ),
@@ -162,7 +162,7 @@ class YourInformationScreen extends StatelessWidget {
                         icon: LucideIcons.mail,
                         title: 'email_address'.tr,
                         value: authController.userEmail.value,
-                        iconColor: Color(0xFFF59E0B),
+                        iconColor: const Color(0xFFF59E0B),
                       ),
                     );
                   }
@@ -180,7 +180,7 @@ class YourInformationScreen extends StatelessWidget {
                       value: authController.userRole.value.isNotEmpty
                           ? authController.userRole.value.toUpperCase()
                           : 'user_role_default'.tr,
-                      iconColor: Color(0xFF10B981),
+                      iconColor: const Color(0xFF10B981),
                     ),
                   ),
                 ),
@@ -236,7 +236,7 @@ class YourInformationScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: context.typography.inputLabel.copyWith(
                     fontSize: 13,
                     color: Theme.of(context).textTheme.bodyMedium?.color,
                     fontWeight: FontWeight.bold,
@@ -245,7 +245,7 @@ class YourInformationScreen extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   value,
-                  style: TextStyle(
+                  style: context.typography.inputText.copyWith(
                     fontSize: 16,
                     color: Theme.of(context).textTheme.bodyLarge?.color,
                     fontWeight: FontWeight.w800,
@@ -308,7 +308,7 @@ class _FloatingBlobsBackgroundState extends State<FloatingBlobsBackground>
                       100 * math.sin(_controller.value * 2 * math.pi),
                   left: -50 + 100 * math.cos(_controller.value * 2 * math.pi),
                   child: _buildBlob(
-                    Color(0xFF3B82F6).withValues(alpha: 0.3),
+                    const Color(0xFF3B82F6).withValues(alpha: 0.3),
                     350,
                   ),
                 ),
@@ -318,7 +318,7 @@ class _FloatingBlobsBackgroundState extends State<FloatingBlobsBackground>
                       80 * math.cos(_controller.value * 2 * math.pi),
                   right: -50 + 80 * math.sin(_controller.value * 2 * math.pi),
                   child: _buildBlob(
-                    Color(0xFF8B5CF6).withValues(alpha: 0.3),
+                    const Color(0xFF8B5CF6).withValues(alpha: 0.3),
                     300,
                   ),
                 ),
@@ -328,7 +328,7 @@ class _FloatingBlobsBackgroundState extends State<FloatingBlobsBackground>
                       60 * math.cos(_controller.value * 2 * math.pi),
                   right: 50 + 60 * math.sin(_controller.value * 2 * math.pi),
                   child: _buildBlob(
-                    Color(0xFFF43F5E).withValues(alpha: 0.2),
+                    const Color(0xFFF43F5E).withValues(alpha: 0.2),
                     250,
                   ),
                 ),

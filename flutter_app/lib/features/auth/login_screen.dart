@@ -2,8 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
+import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_input_field.dart';
 import 'auth_controller.dart';
@@ -23,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen>
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _showPassword = false;
-  final bool _isLoading = false;
+//   final bool _isLoading = false;
   String? _errorMessage;
 
   // Background floating blobs animations
@@ -101,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen>
 
     // Dynamic theme colors
     final baseBgColor = Theme.of(context).scaffoldBackgroundColor;
-    final cardBgColor = Theme.of(context).cardTheme.color?.withOpacity(0.65) ?? Colors.white.withOpacity(0.8);
+    final cardBgColor = Theme.of(context).cardTheme.color?.withValues(alpha: 0.65) ?? Colors.white.withValues(alpha: 0.8);
     final cardBorderColor = Theme.of(context).colorScheme.outline;
     final textColor = Theme.of(context).textTheme.displayLarge?.color;
     final subtextColor = Theme.of(context).textTheme.bodyMedium?.color;
@@ -128,9 +127,9 @@ class _LoginScreenState extends State<LoginScreen>
                         shape: BoxShape.circle,
                         color:
                             (isDark
-                                    ? Color(0xFF1E3A8A)
-                                    : Color(0xFFBFDBFE))
-                                .withOpacity(isDark ? 0.35 : 0.45),
+                                    ? const Color(0xFF1E3A8A)
+                                    : const Color(0xFFBFDBFE))
+                                .withValues(alpha: isDark ? 0.35 : 0.45),
                       ),
                     ),
                   ),
@@ -144,9 +143,9 @@ class _LoginScreenState extends State<LoginScreen>
                         shape: BoxShape.circle,
                         color:
                             (isDark
-                                    ? Color(0xFF4C1D95)
-                                    : Color(0xFFE9D5FF))
-                                .withOpacity(isDark ? 0.3 : 0.4),
+                                    ? const Color(0xFF4C1D95)
+                                    : const Color(0xFFE9D5FF))
+                                .withValues(alpha: isDark ? 0.3 : 0.4),
                       ),
                     ),
                   ),
@@ -179,8 +178,7 @@ class _LoginScreenState extends State<LoginScreen>
                         border: Border.all(color: cardBorderColor, width: 1.5),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(
-                              isDark ? 0.25 : 0.05,
+                            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05,
                             ),
                             blurRadius: 30,
                             offset: const Offset(0, 15),
@@ -193,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen>
                           // Top accent line
                           Container(
                             height: 4,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
                               ),
@@ -222,19 +220,18 @@ class _LoginScreenState extends State<LoginScreen>
                                           ),
                                           boxShadow: [
                                             BoxShadow(
-                                              color: AppColors.primary
-                                                  .withOpacity(
-                                                    isDark ? 0.3 : 0.1,
+                                              color: context.colorScheme.primary
+                                                  .withValues(alpha: isDark ? 0.3 : 0.1,
                                                   ),
                                               blurRadius: 12,
                                               offset: const Offset(0, 4),
                                             ),
                                           ],
                                         ),
-                                        child: const Center(
+                                        child: Center(
                                           child: Icon(
                                             LucideIcons.hexagon,
-                                            color: AppColors.primary,
+                                            color: context.colorScheme.primary,
                                             size: 32,
                                           ),
                                         ),
@@ -242,18 +239,18 @@ class _LoginScreenState extends State<LoginScreen>
                                       const SizedBox(height: 20),
                                       RichText(
                                         text: TextSpan(
-                                          style: AppTextStyles.heading1
+                                          style: context.typography.screenTitle
                                               .copyWith(
                                                 color: textColor,
                                                 fontWeight: FontWeight.w800,
                                                 letterSpacing: -0.5,
                                               ),
-                                          children: const [
-                                            TextSpan(text: 'Auriva'),
+                                          children: [
+                                            const TextSpan(text: 'Auriva'),
                                             TextSpan(
                                               text: 'BMS',
-                                              style: TextStyle(
-                                                color: AppColors.primary,
+                                              style: context.typography.screenTitle.copyWith(
+                                                color: context.colorScheme.primary,
                                               ),
                                             ),
                                           ],
@@ -262,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       const SizedBox(height: 6),
                                       Text(
                                         'bms_subtitle'.tr,
-                                        style: AppTextStyles.label.copyWith(
+                                        style: context.typography.inputText.copyWith(
                                           color: subtextColor,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -282,8 +279,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       padding: const EdgeInsets.all(14),
                                       decoration: BoxDecoration(
                                         color: isDark
-                                            ? Colors.red.shade900.withOpacity(
-                                                0.3,
+                                            ? Colors.red.shade900.withValues(alpha: 0.3,
                                               )
                                             : Colors.red.shade50,
                                         border: Border(
@@ -305,7 +301,7 @@ class _LoginScreenState extends State<LoginScreen>
                                           Expanded(
                                             child: Text(
                                               _errorMessage!,
-                                              style: TextStyle(
+                                              style: context.typography.errorText.copyWith(
                                                 color: isDark
                                                     ? Colors.red.shade200
                                                     : Colors.red.shade800,
@@ -332,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen>
                                           controller: _emailController,
                                           keyboardType:
                                               TextInputType.emailAddress,
-                                          prefixIcon: Icon(
+                                          prefixIcon: const Icon(
                                             LucideIcons.mail,
                                             size: 20,
                                           ),
@@ -351,7 +347,7 @@ class _LoginScreenState extends State<LoginScreen>
                                           hintText: '••••••••',
                                           controller: _passwordController,
                                           obscureText: !_showPassword,
-                                          prefixIcon: Icon(
+                                          prefixIcon: const Icon(
                                             LucideIcons.lock,
                                             size: 20,
                                           ),
@@ -383,7 +379,7 @@ class _LoginScreenState extends State<LoginScreen>
                                             isLoading:
                                                 _authController.isLoading.value,
                                             onPressed: _handleLogin,
-                                            icon: Icon(
+                                            icon: const Icon(
                                               LucideIcons.arrowRight,
                                               size: 16,
                                             ),
@@ -404,7 +400,7 @@ class _LoginScreenState extends State<LoginScreen>
                                       Text(
                                         'protected_by_security'.tr,
                                         textAlign: TextAlign.center,
-                                        style: AppTextStyles.caption.copyWith(
+                                        style: context.typography.helperText.copyWith(
                                           color: subtextColor,
                                           height: 1.4,
                                         ),

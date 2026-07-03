@@ -92,7 +92,7 @@ Widget buildItemTable({
                 border: Border(
                   bottom: BorderSide(
                     color: isTransparent
-                        ? Colors.black.withOpacity(0.05)
+                        ? Colors.black.withValues(alpha: 0.05)
                         : Colors.black12,
                   ),
                 ),
@@ -169,8 +169,8 @@ Widget buildDynamicScreenSummarySection({
   bool isVibrant = false,
   bool isMinimalist = false,
 }) {
-  String place = params.placeOfSupply.toLowerCase();
-  bool isOutstate =
+  final String place = params.placeOfSupply.toLowerCase();
+  final bool isOutstate =
       place.isNotEmpty &&
       (params.tenant['state'] != null
           ? (!place.contains(params.tenant['state']!.toString().toLowerCase()))
@@ -271,9 +271,9 @@ Widget buildFooterSection(InvoiceTemplateParams params) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Divider(),
+      const Divider(),
       const SizedBox(height: 6),
-      Text(
+      const Text(
         'TERMS & CONDITIONS',
         style: TextStyle(
           fontSize: 8,
@@ -285,7 +285,7 @@ Widget buildFooterSection(InvoiceTemplateParams params) {
       const SizedBox(height: 4),
       Text(
         params.tenant['defaultTerms'] ?? '',
-        style: TextStyle(fontSize: 8, color: Colors.grey, height: 1.3),
+        style: const TextStyle(fontSize: 8, color: Colors.grey, height: 1.3),
       ),
     ],
   );
@@ -360,12 +360,12 @@ String convertNumberToWords(double amount) {
 Widget buildBottomFooter(int currentPage, int totalPages) {
   return Column(
     children: [
-      Divider(height: 1, color: Colors.black12),
+      const Divider(height: 1, color: Colors.black12),
       const SizedBox(height: 8),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
+          const Text(
             'Thank you for your business! Generated via Auriva BMS.',
             style: TextStyle(
               fontSize: 8,
@@ -375,7 +375,7 @@ Widget buildBottomFooter(int currentPage, int totalPages) {
           ),
           Text(
             'Page $currentPage of $totalPages',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 8,
               color: Colors.grey,
               fontWeight: FontWeight.bold,
@@ -393,13 +393,13 @@ String formatCleanDate(String dateStr) {
   DateTime? parsed = DateTime.tryParse(dateStr);
 
   if (parsed == null) {
-    String cleaned = dateStr
+    final String cleaned = dateStr
         .replaceAll(',', ' ')
         .replaceAll('/', ' ')
         .replaceAll('-', ' ')
         .trim();
 
-    List<String> parts = cleaned.split(' ').where((s) => s.isNotEmpty).toList();
+    final List<String> parts = cleaned.split(' ').where((s) => s.isNotEmpty).toList();
 
     const Map<String, int> monthMap = {
       'jan': 1,
@@ -432,11 +432,11 @@ String formatCleanDate(String dateStr) {
     int? year;
 
     for (var part in parts) {
-      String low = part.toLowerCase();
+      final String low = part.toLowerCase();
       if (monthMap.containsKey(low)) {
         month = monthMap[low];
       } else {
-        int? val = int.tryParse(part);
+        final int? val = int.tryParse(part);
         if (val != null) {
           if (val >= 1000) {
             year = val;
@@ -455,9 +455,9 @@ String formatCleanDate(String dateStr) {
     if (year != null && month != null && day != null) {
       parsed = DateTime(year, month, day);
     } else if (parts.length == 3) {
-      int? p1 = int.tryParse(parts[0]);
-      int? p2 = int.tryParse(parts[1]);
-      int? p3 = int.tryParse(parts[2]);
+      final int? p1 = int.tryParse(parts[0]);
+      final int? p2 = int.tryParse(parts[1]);
+      final int? p3 = int.tryParse(parts[2]);
       if (p1 != null && p2 != null && p3 != null) {
         if (p1 > 1000) {
           parsed = DateTime(p1, p2, p3);

@@ -119,16 +119,16 @@ class SuperAdminAddCompanyController extends GetxController {
     }
   }
 
-  void _resetForm() {
-    companyNameController.clear();
-    slugController.clear();
-    adminNameController.clear();
-    adminEmailController.clear();
-    passwordController.clear();
-    selectedPlan.value = 'basic';
-    validUntil.value = DateTime.now().add(const Duration(days: 365));
-    selectedDuration.value = 12;
-    invoiceDesign.value = 'standard';
-    quotationDesign.value = 'standard';
-  }
+//   void _resetForm() {
+//     companyNameController.clear();
+//     slugController.clear();
+//     adminNameController.clear();
+//     adminEmailController.clear();
+//     passwordController.clear();
+//     selectedPlan.value = 'basic';
+//     validUntil.value = DateTime.now().add(const Duration(days: 365));
+//     selectedDuration.value = 12;
+//     invoiceDesign.value = 'standard';
+//     quotationDesign.value = 'standard';
+//   }
 }

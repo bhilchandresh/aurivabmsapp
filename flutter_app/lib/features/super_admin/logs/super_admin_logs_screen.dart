@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/theme/app_extensions.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
@@ -14,7 +15,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
     final controller = Get.put(SuperAdminLogsController());
 
     return Scaffold(
-      backgroundColor: Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -25,7 +26,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     LucideIcons.history,
                     color: Color(0xFF1E293B),
                     size: 20,
@@ -33,9 +34,9 @@ class SuperAdminLogsScreen extends StatelessWidget {
                   const SizedBox(width: 8),
                   Text(
                     'system_logs'.tr,
-                    style: TextStyle(
+                    style: context.typography.cardTitle.copyWith(
                       fontSize: 18,
-                      color: Color(0xFF1E293B),
+                      color: const Color(0xFF1E293B),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -51,7 +52,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
                   return Center(
                     child: Text(
                       'No logs found',
-                      style: TextStyle(
+                      style: context.typography.cardTitle.copyWith(
                         color: Colors.grey.shade500,
                         fontSize: 16,
                       ),
@@ -89,7 +90,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: context.colorSchemeExtension.borderColor),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,16 +109,16 @@ class SuperAdminLogsScreen extends StatelessWidget {
                         ),
                         child: Text(
                           log.action,
-                          style: TextStyle(
+                          style: context.typography.helperText.copyWith(
                             fontSize: 10,
                             fontWeight: FontWeight.w900,
-                            color: Color(0xFF374151),
+                            color: const Color(0xFF374151),
                           ),
                         ),
                       ),
                       Text(
                         timeStr,
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           fontSize: 12,
                           fontFamily: 'monospace',
                           color: Colors.grey.shade500,
@@ -128,13 +129,13 @@ class SuperAdminLogsScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     log.details,
-                    style: TextStyle(
+                    style: context.typography.inputText.copyWith(
                       fontSize: 14,
-                      color: Color(0xFF1F2937),
+                      color: const Color(0xFF1F2937),
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Divider(height: 1),
+                  const Divider(height: 1),
                   const SizedBox(height: 12),
                   Row(
                     children: [
@@ -146,10 +147,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         log.userName,
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF111827),
+                          color: const Color(0xFF111827),
                         ),
                       ),
                     ],
@@ -171,7 +172,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200),
+            border: Border.all(color: context.colorSchemeExtension.borderColor),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -182,7 +183,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
                   horizontal: 24,
                   vertical: 16,
                 ),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color(0xFFF3F4F6), // bg-gray-100
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(12),
@@ -195,10 +196,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                       flex: 1,
                       child: Text(
                         'time'.tr,
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF374151),
+                          color: const Color(0xFF374151),
                         ),
                       ),
                     ),
@@ -206,10 +207,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                       flex: 2,
                       child: Text(
                         'action'.tr,
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF374151),
+                          color: const Color(0xFF374151),
                         ),
                       ),
                     ),
@@ -217,10 +218,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                       flex: 4,
                       child: Text(
                         'details'.tr,
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF374151),
+                          color: const Color(0xFF374151),
                         ),
                       ),
                     ),
@@ -229,10 +230,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                       child: Text(
                         'user'.tr,
                         textAlign: TextAlign.right,
-                        style: TextStyle(
+                        style: context.typography.helperText.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF374151),
+                          color: const Color(0xFF374151),
                         ),
                       ),
                     ),
@@ -251,7 +252,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade100),
+                      bottom: BorderSide(color: context.colorSchemeExtension.borderColor),
                     ),
                   ),
                   child: Row(
@@ -261,10 +262,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                         flex: 1,
                         child: Text(
                           timeStr,
-                          style: TextStyle(
+                          style: context.typography.helperText.copyWith(
                             fontSize: 12,
                             fontFamily: 'monospace',
-                            color: Color(0xFF4B5563),
+                            color: const Color(0xFF4B5563),
                           ),
                         ),
                       ),
@@ -283,10 +284,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                             ),
                             child: Text(
                               log.action,
-                              style: TextStyle(
+                              style: context.typography.helperText.copyWith(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w900,
-                                color: Color(0xFF374151),
+                                color: const Color(0xFF374151),
                               ),
                             ),
                           ),
@@ -296,9 +297,9 @@ class SuperAdminLogsScreen extends StatelessWidget {
                         flex: 4,
                         child: Text(
                           log.details,
-                          style: TextStyle(
+                          style: context.typography.inputText.copyWith(
                             fontSize: 14,
-                            color: Color(0xFF1F2937),
+                            color: const Color(0xFF1F2937),
                           ),
                         ),
                       ),
@@ -307,10 +308,10 @@ class SuperAdminLogsScreen extends StatelessWidget {
                         child: Text(
                           log.userName,
                           textAlign: TextAlign.right,
-                          style: TextStyle(
+                          style: context.typography.helperText.copyWith(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF111827),
+                            color: const Color(0xFF111827),
                           ),
                         ),
                       ),
@@ -355,11 +356,11 @@ class SuperAdminLogsScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: context.colorSchemeExtension.borderColor),
         ),
         child: Column(
           children: [
-            Container(height: 48, color: Color(0xFFF3F4F6)),
+            Container(height: 48, color: const Color(0xFFF3F4F6)),
             ...List.generate(
               6,
               (index) => Shimmer.fromColors(
@@ -369,7 +370,7 @@ class SuperAdminLogsScreen extends StatelessWidget {
                   height: 70,
                   decoration: BoxDecoration(
                     border: Border(
-                      bottom: BorderSide(color: Colors.grey.shade100),
+                      bottom: BorderSide(color: context.colorSchemeExtension.borderColor),
                     ),
                   ),
                   child: Row(

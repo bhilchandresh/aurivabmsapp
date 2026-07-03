@@ -1,3 +1,4 @@
+// ignore_for_file: unused_element, unused_local_variable, use_build_context_synchronously
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -288,26 +289,26 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     double tempSubtotal = 0.0;
     double tempTaxAmount = 0.0;
 
-    double discountPct =
+    final double discountPct =
         double.tryParse(_discountPercentageController.text) ?? 0.0;
 
     for (var item in _itemsControllers) {
-      double qty = double.tryParse(item.qtyController.text) ?? 0.0;
-      double rate = double.tryParse(item.rateController.text) ?? 0.0;
-      double itemSubtotal = qty * rate;
+      final double qty = double.tryParse(item.qtyController.text) ?? 0.0;
+      final double rate = double.tryParse(item.rateController.text) ?? 0.0;
+      final double itemSubtotal = qty * rate;
       tempSubtotal += itemSubtotal;
 
       if (_gstEnabled) {
-        double gstRate = double.tryParse(item.gstController.text) ?? 0.0;
-        double itemDiscount = itemSubtotal * (discountPct / 100);
-        double itemTaxable = itemSubtotal - itemDiscount;
+        final double gstRate = double.tryParse(item.gstController.text) ?? 0.0;
+        final double itemDiscount = itemSubtotal * (discountPct / 100);
+        final double itemTaxable = itemSubtotal - itemDiscount;
 
         double itemTax = 0.0;
         if (_taxType == 'exclusive') {
           itemTax = itemTaxable * (gstRate / 100);
         } else {
           // Inclusive
-          double basePrice = itemTaxable / (1 + (gstRate / 100));
+          final double basePrice = itemTaxable / (1 + (gstRate / 100));
           itemTax = itemTaxable - basePrice;
         }
         tempTaxAmount += itemTax;
@@ -324,7 +325,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       _total = _subtotal - _discountAmount;
     }
 
-    double advancePaid = double.tryParse(_advancePaidController.text) ?? 0.0;
+    final double advancePaid = double.tryParse(_advancePaidController.text) ?? 0.0;
     _balanceDue = _total - advancePaid;
 
     setState(() {});
@@ -403,11 +404,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       final screenshotController = ScreenshotController();
 
       // Compile items
-      List<Map<String, dynamic>> itemsList = [];
+      final List<Map<String, dynamic>> itemsList = [];
       for (var item in _itemsControllers) {
-        double qty = double.tryParse(item.qtyController.text) ?? 1.0;
-        double rate = double.tryParse(item.rateController.text) ?? 0.0;
-        double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
+        final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
+        final double rate = double.tryParse(item.rateController.text) ?? 0.0;
+        final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
         itemsList.add({
           'description': item.nameController.text.trim(),
           'additionalDetails': item.descriptionController.text.trim(),
@@ -545,7 +546,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     required double tableHeaderHeight,
     required double totalsHeight,
   }) {
-    List<List<Map<String, dynamic>>> pages = [];
+    final List<List<Map<String, dynamic>>> pages = [];
     List<Map<String, dynamic>> currentPageItems = [];
     double currentHeight = 0.0;
     bool isFirstPage = true;
@@ -560,7 +561,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       }
 
       // Check if this is the last item, in which case we MUST fit totals on the same page
-      bool isLastItem = (i == items.length - 1);
+      final bool isLastItem = (i == items.length - 1);
       double requiredHeightForThisItem = itemHeight;
 
       if (isLastItem) {
@@ -716,7 +717,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   child: Text(
                     _mockTenant['address']!.toUpperCase(),
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -730,7 +731,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     '${_mockTenant['email']!.toUpperCase()}  •  ${_mockTenant['phone']!.toUpperCase()}'
                     '${_mockTenant['website'] != null && _mockTenant['website']!.isNotEmpty ? '  •  ${_mockTenant['website']!.toUpperCase()}' : ''}',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 10,
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
@@ -746,7 +747,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     child: Text(
                       'GSTIN: ${_mockTenant['gstNumber']!.toUpperCase()}',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 10,
                         color: Colors.grey,
                         fontWeight: FontWeight.bold,
@@ -781,7 +782,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   children: [
                     Text(
                       '#${invoiceData['id']}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -800,7 +801,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         ),
                         Text(
                           invoiceData['date'] as String,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -821,7 +822,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         ),
                         Text(
                           invoiceData['dueDate'] as String,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -846,7 +847,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.black12, width: 1),
                           ),
@@ -876,7 +877,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       const SizedBox(height: 4),
                       Text(
                         invoiceData['address'] as String,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           color: Colors.black54,
                           height: 1.4,
@@ -885,7 +886,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       const SizedBox(height: 2),
                       Text(
                         invoiceData['email'] as String,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 10,
                           color: Colors.black54,
                         ),
@@ -895,7 +896,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         Container(
                           decoration: BoxDecoration(
                             border: Border.all(color: Colors.black12),
-                            color: Colors.black.withOpacity(0.02),
+                            color: Colors.black.withValues(alpha: 0.02),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 6,
@@ -903,7 +904,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           ),
                           child: Text(
                             'GSTIN: $clientGstVal',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
@@ -921,7 +922,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           border: Border(
                             bottom: BorderSide(color: Colors.black12, width: 1),
                           ),
@@ -1009,7 +1010,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ),
                 Text(
                   'Date: ${invoiceData['date']}',
-                  style: TextStyle(fontSize: 9, color: Colors.black54),
+                  style: const TextStyle(fontSize: 9, color: Colors.black54),
                 ),
               ],
             ),
@@ -1020,7 +1021,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
           // Elegant double-line table header
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               border: Border(
                 top: BorderSide(color: Colors.black87, width: 1.5),
                 bottom: BorderSide(color: Colors.black87, width: 1.5),
@@ -1124,7 +1125,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 );
 
                 return Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(color: Colors.black12, width: 0.5),
                     ),
@@ -1164,7 +1165,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               const SizedBox(height: 2),
                               Text(
                                 item['additionalDetails'] as String,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 8,
                                   color: Colors.grey,
                                 ),
@@ -1179,7 +1180,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           child: Text(
                             (item['hsn'] ?? '').toString(),
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 9,
                               color: Colors.black87,
                             ),
@@ -1192,7 +1193,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               ? qty.toStringAsFixed(0)
                               : qty.toStringAsFixed(2),
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 9,
                             color: Colors.black87,
                           ),
@@ -1203,7 +1204,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         child: Text(
                           formatCurrency.format(rate),
                           textAlign: TextAlign.right,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 9,
                             color: Colors.black87,
                           ),
@@ -1214,7 +1215,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         child: Text(
                           formatCurrency.format(amount),
                           textAlign: TextAlign.right,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -1264,7 +1265,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Text(
+                      const Text(
                         'TERMS & CONDITIONS',
                         style: TextStyle(
                           fontSize: 8,
@@ -1298,14 +1299,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         children: [
                           Text(
                             'subtotal'.tr,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black54,
                             ),
                           ),
                           Text(
                             formatCurrency.format(subtotalVal),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 10,
                               color: Colors.black87,
                             ),
@@ -1319,14 +1320,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           children: [
                             Text(
                               '${'discount'.tr} (${discountPct.toStringAsFixed(0)}%)',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.black54,
                               ),
                             ),
                             Text(
                               '- ${formatCurrency.format(discountAmountVal)}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.black87,
                               ),
@@ -1346,14 +1347,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                             children: [
                               Text(
                                 'cgst_9'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
                               ),
                               Text(
                                 formatCurrency.format(taxAmountVal / 2),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -1366,14 +1367,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                             children: [
                               Text(
                                 'sgst_9'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
                               ),
                               Text(
                                 formatCurrency.format(taxAmountVal / 2),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -1386,14 +1387,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                             children: [
                               Text(
                                 'igst_18'.tr,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black54,
                                 ),
                               ),
                               Text(
                                 formatCurrency.format(taxAmountVal),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.black87,
                                 ),
@@ -1402,7 +1403,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           ),
                         ],
                       ],
-                      Divider(height: 12, color: Colors.black12),
+                      const Divider(height: 12, color: Colors.black12),
                       Container(
                         color: Colors.black,
                         padding: const EdgeInsets.symmetric(
@@ -1448,7 +1449,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   children: [
                     Text(
                       'for_auriva_business_solutions_pvt_ltd'.tr,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 8,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1571,11 +1572,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       ),
     );
 
-    List<Map<String, dynamic>> itemsList = [];
+    final List<Map<String, dynamic>> itemsList = [];
     for (var item in _itemsControllers) {
-      double qty = double.tryParse(item.qtyController.text) ?? 1.0;
-      double rate = double.tryParse(item.rateController.text) ?? 0.0;
-      double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
+      final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
+      final double rate = double.tryParse(item.rateController.text) ?? 0.0;
+      final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
       itemsList.add({
         'description': item.nameController.text.trim(),
         'additionalDetails': item.descriptionController.text.trim(),
@@ -1627,6 +1628,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         response = await ApiService.post(ApiConstants.invoices, payload);
       }
 
+      if (!context.mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -1647,6 +1649,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
         final isEdit = widget.invoiceToEdit != null;
 
+        if (!context.mounted) return;
         CustomNotificationOverlay.show(
           context: context,
           title: isEdit ? "Invoice Updated" : "Invoice Created",
@@ -1660,6 +1663,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
         await _clientsController.fetchClients();
         if (isEdit) {
+          if (!context.mounted) return;
           Navigator.pop(context);
         } else {
           final String name = clientObj['name'] ?? 'Unknown';
@@ -1669,6 +1673,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           final String address = clientObj['address'] ?? '';
           final String gst = clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
 
+          if (!context.mounted) return;
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -1707,6 +1712,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         );
       }
     } catch (e) {
+      if (!context.mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
       Fluttertoast.showToast(
         msg: "Error connecting to server: $e",
@@ -1721,7 +1727,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     if (_clientNameController.text.trim().isNotEmpty) score += 0.25;
     if (_invoiceNumberController.text.trim().isNotEmpty) score += 0.25;
 
-    bool hasValidItem =
+    final bool hasValidItem =
         _itemsControllers.isNotEmpty &&
         _itemsControllers.any(
           (item) =>
@@ -1805,7 +1811,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: percentage == 100
-                          ? [AppColors.success, Color(0xFF047857)]
+                          ? [AppColors.success, const Color(0xFF047857)]
                           : [
                               AppColors.primary,
                               AppColors.primary.withValues(alpha: 0.6),
@@ -1861,10 +1867,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ],
               ),
               alignment: Alignment.center,
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(LucideIcons.save, size: 14, color: Colors.white),
-                  SizedBox(width: 6),
+                  const Icon(LucideIcons.save, size: 14, color: Colors.white),
+                  const SizedBox(width: 6),
                   Text(
                     'Save',
                     style: context.typography.buttonText.copyWith(
@@ -1983,7 +1989,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             controller: _clientSearchController,
             suffixIcon: _clientSearchController.text.isNotEmpty
                 ? IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       LucideIcons.x,
                       size: 16,
                       color: Colors.grey,
@@ -2036,7 +2042,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           : 'No email address',
                       style: context.typography.clientCompany.copyWith(fontSize: 11, color: Colors.grey),
                     ),
-                    trailing: Icon(
+                    trailing: const Icon(
                       LucideIcons.arrowUpLeft,
                       size: 14,
                       color: AppColors.primary,
@@ -2187,8 +2193,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: const SizedBox(),
+              const Expanded(
+                child: SizedBox(),
               ), // Empty space for alignment as seen in typical 2 column layout
             ],
           ),
@@ -2209,7 +2215,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(
+                        const Icon(
                           LucideIcons.creditCard,
                           size: 18,
                           color: AppColors.primary,
@@ -2522,22 +2528,22 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                   ),
                                   child: Builder(
                                     builder: (context) {
-                                      double q =
+                                      final double q =
                                           double.tryParse(
                                             item.qtyController.text,
                                           ) ??
                                           0;
-                                      double r =
+                                      final double r =
                                           double.tryParse(
                                             item.rateController.text,
                                           ) ??
                                           0;
-                                      double g =
+                                      final double g =
                                           double.tryParse(
                                             item.gstController.text,
                                           ) ??
                                           18;
-                                      double amt = q * r;
+                                      final double amt = q * r;
                                       double taxAmt = 0.0;
                                       if (_taxType == 'exclusive') {
                                         taxAmt = amt * (g / 100);
@@ -2674,7 +2680,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     });
                     _calculateTotals();
                   },
-                  icon: Icon(
+                  icon: const Icon(
                     LucideIcons.trash2,
                     size: 16,
                     color: AppColors.error,
@@ -2920,7 +2926,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       fontSize: 12,
                       color: Colors.grey,
                     ),
-                    prefixIcon: Icon(
+                    prefixIcon: const Icon(
                       LucideIcons.tag,
                       color: Colors.grey,
                       size: 16,
@@ -2937,7 +2943,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         color: AppColors.primary,
                         width: 1.5,
                       ),
@@ -2951,8 +2957,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   }
 
   Widget _buildSummarySection() {
-    String place = _placeOfSupplyController.text.trim().toLowerCase();
-    bool isOutstate =
+    final String place = _placeOfSupplyController.text.trim().toLowerCase();
+    final bool isOutstate =
         place.isNotEmpty &&
         !place.contains("maharashtra") &&
         place != 'select state';

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/core/theme/app_extensions.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
@@ -7,25 +8,27 @@ import 'super_admin_add_company_controller.dart';
 class SuperAdminAddCompanyScreen extends StatelessWidget {
   const SuperAdminAddCompanyScreen({super.key});
 
+  BuildContext get context => Get.context!;
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(SuperAdminAddCompanyController());
 
     return Scaffold(
-      backgroundColor: Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
           'onboard_new_client'.tr,
-          style: TextStyle(
-            color: Color(0xFF1E293B),
+          style: context.typography.cardTitle.copyWith(
+            color: const Color(0xFF1E293B),
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft, color: Color(0xFF1E293B)),
+          icon: const Icon(LucideIcons.arrowLeft, color: Color(0xFF1E293B)),
           onPressed: () => Get.back(),
         ),
         bottom: PreferredSize(
@@ -51,7 +54,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                   border: Border.all(color: Colors.grey.shade200),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -116,7 +119,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                   border: Border.all(color: Colors.grey.shade200),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -129,9 +132,9 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                     const SizedBox(height: 8),
                     Obx(
                       () => DropdownButtonFormField<String>(
-                        value: controller.selectedPlan.value,
+                        initialValue: controller.selectedPlan.value,
                         decoration: _inputDecoration(),
-                        icon: Icon(LucideIcons.chevronDown, size: 16),
+                        icon: const Icon(LucideIcons.chevronDown, size: 16),
                         items: [
                           DropdownMenuItem(
                             value: 'basic',
@@ -192,10 +195,10 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                                 DateFormat(
                                   'dd-MM-yyyy',
                                 ).format(controller.validUntil.value),
-                                style: TextStyle(
+                                style: context.typography.cardTitle.copyWith(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF1F2937),
+                                  color: const Color(0xFF1F2937),
                                 ),
                               ),
                               const Spacer(),
@@ -254,7 +257,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                   border: Border.all(color: Colors.grey.shade200),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -294,7 +297,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                         ? null
                         : controller.submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF2563EB),
+                      backgroundColor: const Color(0xFF2563EB),
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -311,7 +314,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                           )
                         : Text(
                             'create_company_allocate_system'.tr,
-                            style: TextStyle(
+                            style: context.typography.cardTitle.copyWith(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
@@ -332,10 +335,10 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
+          style: context.typography.inputText.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w900,
-            color: Color(0xFF2563EB),
+            color: const Color(0xFF2563EB),
             letterSpacing: 0.5,
           ),
         ),
@@ -358,7 +361,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
         ],
         Text(
           label,
-          style: TextStyle(
+          style: context.typography.helperText.copyWith(
             fontSize: 12,
             fontWeight: FontWeight.bold,
             color: Colors.grey.shade600,
@@ -399,7 +402,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
   InputDecoration _inputDecoration([String? hint]) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(
+      hintStyle: context.typography.inputText.copyWith(
         color: Colors.grey.shade400,
         fontWeight: FontWeight.w500,
       ),
@@ -416,7 +419,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Color(0xFF2563EB), width: 2),
+        borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
       ),
     );
   }
@@ -437,7 +440,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
             boxShadow: isPrimary
                 ? [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
@@ -450,10 +453,10 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
           alignment: Alignment.center,
           child: Text(
             text,
-            style: TextStyle(
+            style: context.typography.inputText.copyWith(
               fontSize: 13,
               fontWeight: FontWeight.bold,
-              color: isPrimary ? Color(0xFF2563EB) : Colors.grey.shade600,
+              color: isPrimary ? const Color(0xFF2563EB) : Colors.grey.shade600,
             ),
           ),
         ),
@@ -469,7 +472,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Color(0xFFF8FAFC),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.grey.shade200),
       ),
@@ -481,7 +484,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
+                style: context.typography.helperText.copyWith(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey.shade500,
@@ -491,10 +494,10 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
               Obx(
                 () => Text(
                   value.value.toUpperCase(),
-                  style: TextStyle(
+                  style: context.typography.cardTitle.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
-                    color: Color(0xFF4338CA),
+                    color: const Color(0xFF4338CA),
                   ),
                 ),
               ),
@@ -502,15 +505,15 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
           ),
           OutlinedButton.icon(
             onPressed: onChange,
-            icon: Icon(
+            icon: const Icon(
               LucideIcons.edit,
               size: 14,
               color: Color(0xFF374151),
             ),
             label: Text(
               'change'.tr,
-              style: TextStyle(
-                color: Color(0xFF374151),
+              style: context.typography.inputText.copyWith(
+                color: const Color(0xFF374151),
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -533,7 +536,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
         'value': 'standard',
         'title': 'STANDARD',
         'subtitle': 'Professional B&W',
-        'header': Color(0xFF1E293B),
+        'header': const Color(0xFF1E293B),
         'bg': Colors.grey.shade100,
         'accent': Colors.grey.shade300,
       },
@@ -541,7 +544,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
         'value': 'modern',
         'title': 'MODERN',
         'subtitle': 'Clean Gray & Blue',
-        'header': Color(0xFF475569),
+        'header': const Color(0xFF475569),
         'bg': Colors.blueGrey.shade50,
         'accent': Colors.blueGrey.shade200,
       },
@@ -557,7 +560,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
         'value': 'classic',
         'title': 'CLASSIC',
         'subtitle': 'Warm Serif',
-        'header': Color(0xFF92400E),
+        'header': const Color(0xFF92400E),
         'bg': Colors.amber.shade50,
         'accent': Colors.amber.shade200,
       },
@@ -573,8 +576,8 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
         'value': 'elegant',
         'title': 'ELEGANT',
         'subtitle': 'Premium Gold & Dark',
-        'header': Color(0xFF1C1917),
-        'bg': Color(0xFFFAFAF9),
+        'header': const Color(0xFF1C1917),
+        'bg': const Color(0xFFFAFAF9),
         'accent': Colors.orange.shade700,
       },
       {
@@ -593,7 +596,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
@@ -612,16 +615,16 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                         children: [
                           Text(
                             'select_theme_layout'.tr,
-                            style: TextStyle(
+                            style: context.typography.screenTitle.copyWith(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
-                              color: Color(0xFF111827),
+                              color: const Color(0xFF111827),
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             'choose_a_professional_design_for_your_do'.tr,
-                            style: TextStyle(
+                            style: context.typography.inputText.copyWith(
                               color: Colors.grey.shade500,
                               fontSize: 13,
                             ),
@@ -647,7 +650,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
 
               // Horizontal Scroll View for Templates
               Container(
-                color: Color(0xFFF8FAFC),
+                color: const Color(0xFFF8FAFC),
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: SizedBox(
                   height: 240,
@@ -704,7 +707,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: context.colorSchemeExtension.cardBackground,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                   color: isSelected ? Colors.blue.shade500 : Colors.transparent,
@@ -712,7 +715,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -744,7 +747,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                                     width: 6,
                                     height: 6,
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.5),
+                                      color: Colors.white.withValues(alpha: 0.5),
                                       shape: BoxShape.circle,
                                     ),
                                   ),
@@ -825,19 +828,19 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                           children: [
                             Text(
                               title,
-                              style: TextStyle(
+                              style: context.typography.inputText.copyWith(
                                 fontWeight: FontWeight.w900,
                                 fontSize: 13,
                                 color: isSelected
                                     ? Colors.white
-                                    : Color(0xFF1E293B),
+                                    : const Color(0xFF1E293B),
                                 letterSpacing: 0.5,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               subtitle,
-                              style: TextStyle(
+                              style: context.typography.helperText.copyWith(
                                 fontSize: 11,
                                 color: isSelected
                                     ? Colors.blue.shade100
@@ -858,7 +861,7 @@ class SuperAdminAddCompanyScreen extends StatelessWidget {
                 right: -1,
                 child: Container(
                   padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),

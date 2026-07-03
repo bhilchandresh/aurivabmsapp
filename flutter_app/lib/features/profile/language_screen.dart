@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/theme/app_extensions.dart';
 
 class LanguageModel {
   final String name;
@@ -110,6 +111,44 @@ class _LanguageScreenState extends State<LanguageScreen> {
       orElse: () => _languages.first,
     );
 
+    // Show loading overlay
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardTheme.color,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 20,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(color: context.colorScheme.primary),
+                const SizedBox(height: 16),
+                Text(
+                  'Please wait...',
+                  style: context.typography.inputText.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+
     const storage = FlutterSecureStorage();
     await storage.write(key: 'app_lang_code', value: selectedLang.code);
     await storage.write(
@@ -119,12 +158,19 @@ class _LanguageScreenState extends State<LanguageScreen> {
 
     final newLocale = Locale(selectedLang.code, selectedLang.countryCode);
     AppTheme.currentLocale = newLocale;
+    
+    // Slight delay before changing theme/locale to let the dialog render smoothly
+    await Future.delayed(const Duration(milliseconds: 100));
+    
     Get.updateLocale(newLocale);
-
-    // Also change theme to re-evaluate the global fontFamily based on the new locale
-    // We import AppTheme to access the theme configurations
     Get.changeTheme(Get.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme);
 
+    // Wait for 1.5 seconds to mask the font/theme change glitch
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    // Close dialog
+    Get.back();
+    // Close screen
     Get.back();
   }
 
@@ -135,14 +181,14 @@ class _LanguageScreenState extends State<LanguageScreen> {
       appBar: AppBar(
         title: Text(
           'Language',
-          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+          style: context.typography.topBarTitle.copyWith(fontWeight: FontWeight.w600, fontSize: 20),
         ),
         backgroundColor: Colors.transparent,
         foregroundColor: Theme.of(context).textTheme.displayLarge?.color,
         elevation: 0,
         centerTitle: false,
         leading: IconButton(
-          icon: Icon(LucideIcons.chevronLeft, size: 28),
+          icon: const Icon(LucideIcons.chevronLeft, size: 28),
           onPressed: () => Get.back(),
         ),
       ),
@@ -155,17 +201,17 @@ class _LanguageScreenState extends State<LanguageScreen> {
             child: ElevatedButton.icon(
               onPressed: _saveLanguage,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor: context.colorScheme.primary,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 4,
               ),
-              icon: Icon(LucideIcons.save),
+              icon: const Icon(LucideIcons.save),
               label: Text(
                 'save_and_exit'.tr,
-                style: TextStyle(
+                style: context.typography.buttonText.copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -202,7 +248,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                 boxShadow: [
                   if (!isSelected)
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -217,13 +263,13 @@ class _LanguageScreenState extends State<LanguageScreen> {
                       shape: BoxShape.circle,
                       color: isSelected
                           ? AppColors.primary
-                          : AppColors.primary.withOpacity(0.1),
+                          : AppColors.primary.withValues(alpha: 0.1),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: Center(
                       child: Text(
                         lang.flag,
-                        style: TextStyle(
+                        style: context.typography.inputText.copyWith(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: isSelected ? Colors.white : AppColors.primary,
@@ -234,12 +280,14 @@ class _LanguageScreenState extends State<LanguageScreen> {
                   const SizedBox(width: 16),
                   Text(
                     lang.name,
-                    style: TextStyle(
+                    style: context.typography.sectionTitle.copyWith(
                       fontSize: 16,
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.w400,
-                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                      color: isSelected
+                          ? AppColors.primary
+                          : Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                 ],
