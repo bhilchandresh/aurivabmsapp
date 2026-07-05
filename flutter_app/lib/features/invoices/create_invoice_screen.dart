@@ -1,4 +1,4 @@
-// ignore_for_file: unused_element, unused_local_variable, use_build_context_synchronously
+// ignore_for_file: unused_element, unused_local_variable, use_build_context_synchronously, unused_import
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
@@ -325,7 +325,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       _total = _subtotal - _discountAmount;
     }
 
-    final double advancePaid = double.tryParse(_advancePaidController.text) ?? 0.0;
+    final double advancePaid =
+        double.tryParse(_advancePaidController.text) ?? 0.0;
     _balanceDue = _total - advancePaid;
 
     setState(() {});
@@ -346,7 +347,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             colorScheme: ColorScheme.light(
               primary: AppColors.primary,
               onPrimary: Colors.white,
-              onSurface: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+              onSurface:
+                  (Theme.of(context).textTheme.displayLarge?.color ??
+                  Colors.black),
             ),
           ),
           child: child!,
@@ -1475,7 +1478,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 style: TextStyle(
                   fontSize: 9,
                   fontStyle: FontStyle.italic,
-                  color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                  color:
+                      (Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey),
                 ),
               ),
               Text(
@@ -1483,7 +1488,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 style: TextStyle(
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
-                  color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                  color:
+                      (Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey),
                 ),
               ),
             ],
@@ -1511,8 +1518,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               fontSize: isGrandTotal ? 12 : 11,
               fontWeight: isGrandTotal ? FontWeight.bold : FontWeight.normal,
               color: isInclusiveGst || isDiscount
-                  ? (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)
-                  : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                  ? (Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey)
+                  : (Theme.of(context).textTheme.displayLarge?.color ??
+                        Colors.black),
             ),
           ),
           Text(
@@ -1524,7 +1533,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   ? AppColors.error
                   : isGrandTotal
                   ? AppColors.primary
-                  : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                  : (Theme.of(context).textTheme.displayLarge?.color ??
+                        Colors.black),
             ),
           ),
         ],
@@ -1618,10 +1628,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     };
 
     try {
+      final isEdit = widget.invoiceToEdit != null;
+      final editId = widget.invoiceToEdit?['_id']?.toString() ?? '';
+
       final http.Response response;
-      if (widget.invoiceToEdit != null) {
+      if (isEdit) {
         response = await ApiService.put(
-          '${ApiConstants.invoices}/${widget.invoiceToEdit!['_id']}',
+          '${ApiConstants.invoices}/$editId',
           payload,
         );
       } else {
@@ -1635,7 +1648,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         final responseData = jsonDecode(response.body);
         final inv = responseData['data'] ?? {};
         final clientObj = inv['client'] ?? {};
-        final String clientName = clientObj['name'] ?? 'Unknown';
+        final String clientNameStr = clientObj['name'] ?? 'Unknown';
         final String invoiceNum =
             inv['invoiceNumber'] ?? inv['id'] ?? 'Invoice';
         final double totalAmt = (inv['totalAmount'] ?? inv['grandTotal'] ?? 0.0)
@@ -1647,66 +1660,72 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           decimalDigits: 0,
         ).format(totalAmt);
 
-        final isEdit = widget.invoiceToEdit != null;
-
         if (!context.mounted) return;
         CustomNotificationOverlay.show(
           context: context,
-          title: isEdit ? "Invoice Updated" : "Invoice Created",
+          title: isEdit ? 'Invoice Updated' : 'Invoice Created',
           message: isEdit
-              ? "$formattedAmount updated for $clientName"
-              : "$formattedAmount saved for $clientName",
+              ? '$formattedAmount updated for $clientNameStr'
+              : '$formattedAmount saved for $clientNameStr',
           amount: formattedAmount,
-          invoiceNumber: "Invoice $invoiceNum",
+          invoiceNumber: 'Invoice $invoiceNum',
           type: 'invoice',
         );
 
         await _clientsController.fetchClients();
+
         if (isEdit) {
           if (!context.mounted) return;
           Navigator.pop(context);
         } else {
-          final String name = clientObj['name'] ?? 'Unknown';
           final String email = clientObj['email'] ?? '';
-          final String phone =
-              clientObj['phone'] ?? clientObj['phoneNumber'] ?? '';
+          final String phone = clientObj['phone'] ?? '';
           final String address = clientObj['address'] ?? '';
-          final String gst = clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
+          final String gst = clientObj['gstNumber'] ?? '';
 
           if (!context.mounted) return;
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => InvoiceDetailsScreen(
-                invoiceId: inv['invoiceNumber'] ?? inv['id'] ?? '',
-                dbId: inv['_id'] ?? inv['id'] ?? '',
-                clientName: name,
-                amount: totalAmt,
-                date: inv['date'] ?? inv['createdAt'] ?? '',
-                status: inv['status'] ?? 'Pending',
-                items: List<Map<String, dynamic>>.from(
-                  (inv['items'] ?? []).map((x) => Map<String, dynamic>.from(x)),
+
+          final clientsController = Get.isRegistered<ClientsController>()
+              ? Get.find<ClientsController>()
+              : Get.put(ClientsController());
+          clientsController.fetchInvoices();
+
+          final shouldShowDialog = false; // Always navigate
+          if (!shouldShowDialog) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => InvoiceDetailsScreen(
+                  invoiceId: inv['invoiceNumber'] ?? inv['id'] ?? '',
+                  dbId: inv['_id'] ?? inv['id'] ?? '',
+                  clientName: clientNameStr,
+                  amount: totalAmt,
+                  date: inv['date'] ?? inv['createdAt'] ?? '',
+                  status: inv['status'] ?? 'Pending',
+                  items: List<Map<String, dynamic>>.from(
+                    (inv['items'] ?? []).map(
+                      (x) => Map<String, dynamic>.from(x),
+                    ),
+                  ),
+                  dueDate: inv['dueDate'],
+                  placeOfSupply: inv['placeOfSupply'],
+                  discountPercentage: (inv['discountPercentage'] ?? 0.0)
+                      .toDouble(),
+                  gstEnabled: inv['gstEnabled'] ?? false,
+                  taxType: inv['taxType'] ?? 'exclusive',
+                  clientEmail: email,
+                  clientPhone: phone,
+                  clientAddress: address,
+                  clientGst: gst,
+                  advancePayment: (inv['advancePayment'] ?? 0.0).toDouble(),
                 ),
-                dueDate: inv['dueDate'],
-                placeOfSupply: inv['placeOfSupply'],
-                discountPercentage: (inv['discountPercentage'] ?? 0.0)
-                    .toDouble(),
-                gstEnabled: inv['gstEnabled'] ?? false,
-                taxType: inv['taxType'] ?? 'exclusive',
-                clientEmail: email,
-                clientPhone: phone,
-                clientAddress: address,
-                clientGst: gst,
-                advancePayment: (inv['advancePayment'] ?? 0.0).toDouble(),
               ),
-            ),
-          );
+            );
+          }
         }
       } else {
-        final responseData = jsonDecode(response.body);
-        final errMsg = responseData['message'] ?? 'Failed to save invoice';
         Fluttertoast.showToast(
-          msg: errMsg,
+          msg: isEdit ? 'Failed to update invoice' : 'Failed to create invoice',
           backgroundColor: AppColors.error,
           textColor: Colors.white,
         );
@@ -1715,7 +1734,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       if (!context.mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
       Fluttertoast.showToast(
-        msg: "Error connecting to server: $e",
+        msg: 'Error saving invoice: $e',
         backgroundColor: AppColors.error,
         textColor: Colors.white,
       );
@@ -1750,7 +1769,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -1780,7 +1801,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     style: context.typography.categoryHeader.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
                     ),
                   ),
                 ],
@@ -1802,7 +1825,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             borderRadius: BorderRadius.circular(4),
             child: Stack(
               children: [
-                Container(height: 6, color: Theme.of(context).scaffoldBackgroundColor),
+                Container(
+                  height: 6,
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                ),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.easeOut,
@@ -1838,13 +1864,20 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         title: Text(
           'new_invoice'.tr,
           style: context.typography.invoiceTitle.copyWith(
-            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+            color:
+                (Theme.of(context).textTheme.displayLarge?.color ??
+                Colors.black),
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft, color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color:
+                (Theme.of(context).textTheme.displayLarge?.color ??
+                Colors.black),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
@@ -1966,7 +1999,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           style: context.typography.categoryHeader.copyWith(
             fontSize: 13,
             fontWeight: FontWeight.bold,
-            color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            color:
+                (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
             letterSpacing: 1.2,
           ),
         ),
@@ -2023,8 +2057,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
                 itemCount: _filteredClients.length,
-                separatorBuilder: (context, index) =>
-                    Divider(height: 1, color: Theme.of(context).colorScheme.outline),
+                separatorBuilder: (context, index) => Divider(
+                  height: 1,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
                 itemBuilder: (context, index) {
                   final client = _filteredClients[index];
                   return ListTile(
@@ -2033,14 +2069,19 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       client.name,
                       style: context.typography.clientName.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black),
                       ),
                     ),
                     subtitle: Text(
                       client.email.isNotEmpty
                           ? client.email
                           : 'No email address',
-                      style: context.typography.clientCompany.copyWith(fontSize: 11, color: Colors.grey),
+                      style: context.typography.clientCompany.copyWith(
+                        fontSize: 11,
+                        color: Colors.grey,
+                      ),
                     ),
                     trailing: const Icon(
                       LucideIcons.arrowUpLeft,
@@ -2238,7 +2279,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         activeThumbColor: Colors.white,
                         activeTrackColor: AppColors.primary,
                         inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                        inactiveTrackColor: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.5),
                         trackOutlineColor: WidgetStateProperty.all(
                           Colors.transparent,
                         ),
@@ -2413,12 +2456,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               children: [
                                 Text(
                                   'gst_rate_percent'.tr,
-                                  style: context.typography.categoryHeader.copyWith(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey,
-                                    letterSpacing: 0.5,
-                                  ),
+                                  style: context.typography.categoryHeader
+                                      .copyWith(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey,
+                                        letterSpacing: 0.5,
+                                      ),
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
@@ -2427,10 +2471,15 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                     horizontal: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    color: Theme.of(
+                                      context,
+                                    ).scaffoldBackgroundColor,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(
-                                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline
+                                          .withValues(alpha: 0.5),
                                     ),
                                   ),
                                   child: DropdownButtonHideUnderline(
@@ -2451,35 +2500,40 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                           value: '0',
                                           child: Text(
                                             '0_exempt'.tr,
-                                            style: context.typography.tableCell.copyWith(fontSize: 12),
+                                            style: context.typography.tableCell
+                                                .copyWith(fontSize: 12),
                                           ),
                                         ),
                                         DropdownMenuItem(
                                           value: '5',
                                           child: Text(
                                             '5%',
-                                            style: context.typography.tableCell.copyWith(fontSize: 12),
+                                            style: context.typography.tableCell
+                                                .copyWith(fontSize: 12),
                                           ),
                                         ),
                                         DropdownMenuItem(
                                           value: '12',
                                           child: Text(
                                             '12%',
-                                            style: context.typography.tableCell.copyWith(fontSize: 12),
+                                            style: context.typography.tableCell
+                                                .copyWith(fontSize: 12),
                                           ),
                                         ),
                                         DropdownMenuItem(
                                           value: '18',
                                           child: Text(
                                             '18%',
-                                            style: context.typography.tableCell.copyWith(fontSize: 12),
+                                            style: context.typography.tableCell
+                                                .copyWith(fontSize: 12),
                                           ),
                                         ),
                                         DropdownMenuItem(
                                           value: '28',
                                           child: Text(
                                             '28%',
-                                            style: context.typography.tableCell.copyWith(fontSize: 12),
+                                            style: context.typography.tableCell
+                                                .copyWith(fontSize: 12),
                                           ),
                                         ),
                                       ],
@@ -2505,12 +2559,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               children: [
                                 Text(
                                   'tax_amount_caps'.tr,
-                                  style: context.typography.categoryHeader.copyWith(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
-                                    letterSpacing: 0.5,
-                                  ),
+                                  style: context.typography.categoryHeader
+                                      .copyWith(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue,
+                                        letterSpacing: 0.5,
+                                      ),
                                 ),
                                 const SizedBox(height: 6),
                                 Container(
@@ -2552,11 +2607,12 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                       }
                                       return Text(
                                         formatCurrency.format(taxAmt),
-                                        style: context.typography.invoiceAmount.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 13,
-                                          color: Colors.blue,
-                                        ),
+                                        style: context.typography.invoiceAmount
+                                            .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 13,
+                                              color: Colors.blue,
+                                            ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       );
@@ -2591,12 +2647,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                             children: [
                               Text(
                                 'amount_caps'.tr,
-                                style: context.typography.categoryHeader.copyWith(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey,
-                                  letterSpacing: 0.5,
-                                ),
+                                style: context.typography.categoryHeader
+                                    .copyWith(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey,
+                                      letterSpacing: 0.5,
+                                    ),
                               ),
                               const SizedBox(height: 6),
                               Container(
@@ -2606,10 +2663,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                   horizontal: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outline.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
-                                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                    color: Theme.of(context).colorScheme.outline
+                                        .withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Text(
@@ -2624,7 +2684,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
-                                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                    color:
+                                        (Theme.of(
+                                          context,
+                                        ).textTheme.displayLarge?.color ??
+                                        Colors.black),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -2735,7 +2799,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.normal,
-              color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+              color:
+                  (Theme.of(context).textTheme.displayLarge?.color ??
+                  Colors.black),
             ),
             decoration: InputDecoration(
               hintText: 'add_terms_and_conditions'.tr,
@@ -2752,11 +2818,19 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                borderSide: BorderSide(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.5),
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                borderSide: BorderSide(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.5),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
@@ -2781,7 +2855,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           style: context.typography.categoryHeader.copyWith(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            color:
+                (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
           ),
         ),
         const SizedBox(height: 6),
@@ -2831,14 +2906,20 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: ListView.separated(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         itemCount: options.length,
-                        separatorBuilder: (context, index) =>
-                            Divider(height: 1, color: Theme.of(context).colorScheme.outline),
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                         itemBuilder: (BuildContext context, int index) {
                           final InventoryItem option = options.elementAt(index);
                           return InkWell(
@@ -2853,11 +2934,16 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                 children: [
                                   Text(
                                     option.itemName,
-                                    style: context.typography.clientName.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                    ),
+                                    style: context.typography.clientName
+                                        .copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color:
+                                              (Theme.of(
+                                                context,
+                                              ).textTheme.displayLarge?.color ??
+                                              Colors.black),
+                                        ),
                                   ),
                                   const SizedBox(height: 2),
                                   Row(
@@ -2868,18 +2954,20 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                         option.sku.isNotEmpty
                                             ? option.sku
                                             : 'No SKU',
-                                        style: context.typography.clientCompany.copyWith(
-                                          fontSize: 10,
-                                          color: Colors.grey,
-                                        ),
+                                        style: context.typography.clientCompany
+                                            .copyWith(
+                                              fontSize: 10,
+                                              color: Colors.grey,
+                                            ),
                                       ),
                                       Text(
                                         '₹${option.unitPrice.toStringAsFixed(0)}',
-                                        style: context.typography.invoiceAmount.copyWith(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primary,
-                                        ),
+                                        style: context.typography.invoiceAmount
+                                            .copyWith(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primary,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -2918,7 +3006,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                    color:
+                        (Theme.of(context).textTheme.displayLarge?.color ??
+                        Colors.black),
                   ),
                   decoration: InputDecoration(
                     hintText: 'e_g_website_design'.tr,
@@ -2936,10 +3026,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       horizontal: 12,
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.3),
+                    fillColor: Theme.of(
+                      context,
+                    ).scaffoldBackgroundColor.withValues(alpha: 0.3),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -2974,14 +3068,21 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             children: [
               Text(
                 'subtotal'.tr,
-                style: context.typography.tableCell.copyWith(fontSize: 12, color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+                style: context.typography.tableCell.copyWith(
+                  fontSize: 12,
+                  color:
+                      (Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey),
+                ),
               ),
               Text(
                 formatCurrency.format(_subtotal),
                 style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                  color:
+                      (Theme.of(context).textTheme.displayLarge?.color ??
+                      Colors.black),
                 ),
               ),
             ],
@@ -2996,7 +3097,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     'discount'.tr,
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -3041,11 +3144,19 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         fillColor: Theme.of(context).scaffoldBackgroundColor,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                          borderSide: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                          borderSide: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
                         ),
                       ),
                     ),
@@ -3069,7 +3180,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               (index) => Expanded(
                 child: Container(
                   color: index % 2 == 0
-                      ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.5)
                       : Colors.transparent,
                   height: 1,
                 ),
@@ -3084,7 +3197,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 'taxable_amount'.tr,
                 style: context.typography.tableCell.copyWith(
                   fontSize: 12,
-                  color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                  color:
+                      (Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey),
                 ),
               ),
               Text(
@@ -3096,7 +3211,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                  color:
+                      (Theme.of(context).textTheme.displayLarge?.color ??
+                      Colors.black),
                 ),
               ),
             ],
@@ -3111,7 +3228,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     'igst'.tr,
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   Text(
@@ -3119,7 +3238,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
                     ),
                   ),
                 ],
@@ -3132,7 +3253,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     'cgst'.tr,
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   Text(
@@ -3140,7 +3263,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
                     ),
                   ),
                 ],
@@ -3153,7 +3278,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     'sgst'.tr,
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   Text(
@@ -3161,7 +3288,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
                     ),
                   ),
                 ],
@@ -3178,7 +3307,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     'advance_paid'.tr,
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -3221,11 +3352,19 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         fillColor: Theme.of(context).scaffoldBackgroundColor,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                          borderSide: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                          borderSide: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
                         ),
                       ),
                     ),
@@ -3243,7 +3382,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          Divider(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2), height: 1, thickness: 1),
+          Divider(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+            height: 1,
+            thickness: 1,
+          ),
           const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerRight,
@@ -3268,7 +3411,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       style: context.typography.currencyText.copyWith(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black87),
                       ),
                     ),
                     Text(
@@ -3276,7 +3421,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       style: context.typography.invoiceAmount.copyWith(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black87),
                       ),
                     ),
                   ],
@@ -3284,7 +3431,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 const SizedBox(height: 4),
                 Text(
                   '${'total_amount'.tr}: ${formatCurrency.format(_total)}',
-                  style: context.typography.cardDescription.copyWith(fontSize: 11, color: Colors.grey),
+                  style: context.typography.cardDescription.copyWith(
+                    fontSize: 11,
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
@@ -3305,7 +3455,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -3330,14 +3482,20 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   style: context.typography.cardTitle.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: iconColor ?? (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                    color:
+                        iconColor ??
+                        (Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.grey),
                   ),
                 ),
                 if (trailing != null) ...[const Spacer(), trailing],
               ],
             ),
           ),
-          Divider(height: 1, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)),
+          Divider(
+            height: 1,
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          ),
           Padding(padding: const EdgeInsets.all(14), child: child),
         ],
       ),
@@ -3383,7 +3541,11 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.3),
+            ),
           ),
           alignment: Alignment.center,
           child: DropdownButtonHideUnderline(
@@ -3393,10 +3555,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               icon: Icon(
                 LucideIcons.chevronDown,
                 size: 16,
-                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                color:
+                    (Theme.of(context).textTheme.displayLarge?.color ??
+                    Colors.black87),
               ),
               style: context.typography.inputText.copyWith(
-                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                color:
+                    (Theme.of(context).textTheme.displayLarge?.color ??
+                    Colors.black),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -3430,13 +3596,20 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       children: [
         Text(
           label,
-          style: context.typography.tableCell.copyWith(fontSize: 13, color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+          style: context.typography.tableCell.copyWith(
+            fontSize: 13,
+            color:
+                (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+          ),
         ),
         Text(
           amount,
           style: context.typography.tableCell.copyWith(
             fontWeight: FontWeight.bold,
-            color: isDiscount ? AppColors.error : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+            color: isDiscount
+                ? AppColors.error
+                : (Theme.of(context).textTheme.displayLarge?.color ??
+                      Colors.black),
           ),
         ),
       ],
@@ -3490,7 +3663,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           style: context.typography.inputText.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+            color:
+                (Theme.of(context).textTheme.displayLarge?.color ??
+                Colors.black),
           ),
           onChanged: (val) {
             if (onChanged != null) onChanged();
@@ -3514,11 +3689,19 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+              borderSide: BorderSide(
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.5),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+              borderSide: BorderSide(
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.5),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),

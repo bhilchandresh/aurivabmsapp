@@ -36,7 +36,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     final shouldShowBack = showBackButton ?? canPop;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final bgColor = Theme.of(context).appBarTheme.backgroundColor ?? Theme.of(context).cardTheme.color ?? Colors.white;
+    final bgColor =
+        Theme.of(context).appBarTheme.backgroundColor ??
+        Theme.of(context).cardTheme.color ??
+        Colors.white;
     final borderColor = Theme.of(context).colorScheme.outline;
     final titleColor = Theme.of(context).textTheme.displayLarge?.color;
     final subtitleColor = Theme.of(context).textTheme.bodyMedium?.color;
@@ -100,14 +103,15 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                               width: 6,
                               height: 6,
                               decoration: BoxDecoration(
-                                color: context.colorSchemeExtension.statusSuccess,
+                                color:
+                                    context.colorSchemeExtension.statusSuccess,
                                 shape: BoxShape.circle,
                               ),
                             ),
                             const SizedBox(width: 6),
                             Text(
                               'SYSTEM LIVE',
-                              style: context.typography.liveIndicator.copyWith(
+                              style: context.typography.topBarSubtitle.copyWith(
                                 color: subtitleColor,
                               ),
                             ),
@@ -125,10 +129,14 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Row(
@@ -160,6 +168,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   const SizedBox(width: 8),
                 ],
+
+                // Manual Sync Icon Button
+
+                const SizedBox(width: 4),
 
                 // Notification Icon
                 if (showNotification) ...[
@@ -215,12 +227,15 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Theme.of(context).cardTheme.color ?? Colors.white,
+                        color:
+                            Theme.of(context).cardTheme.color ?? Colors.white,
                         width: 2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: context.colorScheme.primary.withValues(alpha: 0.2),
+                          color: context.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),

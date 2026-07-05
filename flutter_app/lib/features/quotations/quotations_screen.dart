@@ -279,10 +279,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                 );
               }
             },
-            child: Text(
-              'convert'.tr,
-              style: context.typography.buttonText,
-            ),
+            child: Text('convert'.tr, style: context.typography.buttonText),
           ),
         ],
       ),
@@ -307,6 +304,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
             });
           }
           await _clientsController.fetchClients();
+          await _clientsController.fetchQuotations();
           if (mounted) {
             setState(() {
               _isManualRefreshing = false;
@@ -413,7 +411,8 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                           const SizedBox(width: 8),
                                           Text(
                                             'create_quotation'.tr,
-                                            style: context.typography.buttonText.copyWith(color: Colors.white),
+                                            style: context.typography.buttonText
+                                                .copyWith(color: Colors.white),
                                           ),
                                         ],
                                       ),
@@ -431,7 +430,11 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                               decoration: BoxDecoration(
                                 color: Theme.of(context).cardTheme.color,
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                                border: Border.all(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outline.withValues(alpha: 0.3),
+                                ),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.black.withValues(alpha: 0.01),
@@ -452,14 +455,16 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                       },
                                       decoration: InputDecoration(
                                         hintText: 'search_quotations'.tr,
-                                        hintStyle: context.typography.searchHint,
+                                        hintStyle:
+                                            context.typography.searchHint,
                                         prefixIcon: const Icon(
                                           LucideIcons.search,
                                           color: Colors.grey,
                                           size: 18,
                                         ),
                                         filled: true,
-                                        fillColor: Theme.of(context).scaffoldBackgroundColor
+                                        fillColor: Theme.of(context)
+                                            .scaffoldBackgroundColor
                                             .withValues(alpha: 0.5),
                                         contentPadding:
                                             const EdgeInsets.symmetric(
@@ -498,7 +503,9 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                         horizontal: 10,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
+                                        color: Theme.of(context)
+                                            .scaffoldBackgroundColor
+                                            .withValues(alpha: 0.95),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: DropdownButtonHideUnderline(
@@ -510,7 +517,15 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                             size: 14,
                                             color: Colors.grey,
                                           ),
-                                          style: context.typography.inputText.copyWith(color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)),
+                                          style: context.typography.inputText
+                                              .copyWith(
+                                                color:
+                                                    (Theme.of(context)
+                                                        .textTheme
+                                                        .displayLarge
+                                                        ?.color ??
+                                                    Colors.black),
+                                              ),
                                           items: [
                                             DropdownMenuItem(
                                               value: 'all',
@@ -585,7 +600,11 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                               decoration: BoxDecoration(
                                 color: Theme.of(context).cardTheme.color,
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                                border: Border.all(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outline.withValues(alpha: 0.3),
+                                ),
                               ),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -598,10 +617,13 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                   const SizedBox(height: 12),
                                   Text(
                                     'no_quotations_found'.tr,
-                                    style: context.typography.emptyStateDescription.copyWith(
-    fontWeight: FontWeight.w600,
-    color: Colors.grey,
-  ),
+                                    style: context
+                                        .typography
+                                        .emptyStateDescription
+                                        .copyWith(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey,
+                                        ),
                                   ),
                                 ],
                               ),
@@ -708,7 +730,10 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                             ? AppColors.primary.withValues(
                                                 alpha: 0.5,
                                               )
-                                            : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                            : Theme.of(context)
+                                                  .colorScheme
+                                                  .outline
+                                                  .withValues(alpha: 0.3),
                                         width: 1,
                                       ),
                                       boxShadow: [
@@ -764,7 +789,18 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                         Flexible(
                                                           child: Text(
                                                             qt.id,
-                                                            style: context.typography.invoiceNumber.copyWith(fontWeight: FontWeight.bold, fontSize: 13, color: context.colorScheme.primary),
+                                                            style: context
+                                                                .typography
+                                                                .invoiceNumber
+                                                                .copyWith(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  fontSize: 13,
+                                                                  color: context
+                                                                      .colorScheme
+                                                                      .primary,
+                                                                ),
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
@@ -880,11 +916,17 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                                 Text(
                                                                   qt.status
                                                                       .toUpperCase(),
-                                                                  style: context.typography.invoiceStatus.copyWith(
-                                                                    fontSize: 8,
-                                                                    fontWeight: FontWeight.bold,
-                                                                    color: statusColor,
-                                                                  ),
+                                                                  style: context
+                                                                      .typography
+                                                                      .invoiceStatus
+                                                                      .copyWith(
+                                                                        fontSize:
+                                                                            8,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                        color:
+                                                                            statusColor,
+                                                                      ),
                                                                 ),
                                                                 const SizedBox(
                                                                   width: 3,
@@ -913,7 +955,23 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                       formatCurrency.format(
                                                         qt.amount,
                                                       ),
-                                                      style: context.typography.invoiceAmount.copyWith(fontWeight: FontWeight.w900, fontSize: 15, color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black), letterSpacing: -0.5),
+                                                      style: context
+                                                          .typography
+                                                          .invoiceAmount
+                                                          .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.w900,
+                                                            fontSize: 15,
+                                                            color:
+                                                                (Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .textTheme
+                                                                    .displayLarge
+                                                                    ?.color ??
+                                                                Colors.black),
+                                                            letterSpacing: -0.5,
+                                                          ),
                                                     ),
                                                   ),
                                                 ],
@@ -921,9 +979,17 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                               const SizedBox(height: 6),
                                               Text(
                                                 qt.clientName,
-                                                style: context.typography.clientName.copyWith(
-                                                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                                ),
+                                                style: context
+                                                    .typography
+                                                    .clientName
+                                                    .copyWith(
+                                                      color:
+                                                          (Theme.of(context)
+                                                              .textTheme
+                                                              .displayLarge
+                                                              ?.color ??
+                                                          Colors.black),
+                                                    ),
                                               ),
                                               const SizedBox(height: 6),
                                               Row(
@@ -951,11 +1017,14 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                         Flexible(
                                                           child: Text(
                                                             formattedDate,
-                                                            style: context.typography.cardSubtitle.copyWith(
-                                                              color: Colors
-                                                                  .grey
-                                                                  .shade500,
-                                                            ),
+                                                            style: context
+                                                                .typography
+                                                                .cardSubtitle
+                                                                .copyWith(
+                                                                  color: Colors
+                                                                      .grey
+                                                                      .shade500,
+                                                                ),
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
@@ -1095,13 +1164,31 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                                 vertical: 4,
                                                               ),
                                                           decoration: BoxDecoration(
-                                                            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .outline
+                                                                    .withValues(
+                                                                      alpha:
+                                                                          0.1,
+                                                                    ),
                                                             borderRadius:
                                                                 BorderRadius.circular(
                                                                   6,
                                                                 ),
                                                             border: Border.all(
-                                                              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                                                              color:
+                                                                  Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .colorScheme
+                                                                      .outline
+                                                                      .withValues(
+                                                                        alpha:
+                                                                            0.3,
+                                                                      ),
                                                             ),
                                                           ),
                                                           child: Row(
@@ -1113,16 +1200,39 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                                 LucideIcons
                                                                     .checkCircle,
                                                                 size: 12,
-                                                                color: (Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Colors.grey),
+                                                                color:
+                                                                    (Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .textTheme
+                                                                        .bodyMedium
+                                                                        ?.color
+                                                                        ?.withValues(
+                                                                          alpha:
+                                                                              0.7,
+                                                                        ) ??
+                                                                    Colors
+                                                                        .grey),
                                                               ),
                                                               const SizedBox(
                                                                 width: 4,
                                                               ),
                                                               Text(
                                                                 'Converted',
-                                                                style: context.typography.liveIndicator.copyWith(
-                                                                  color: (Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Colors.grey),
-                                                                ),
+                                                                style: context
+                                                                    .typography
+                                                                    .liveIndicator
+                                                                    .copyWith(
+                                                                      color:
+                                                                          (Theme.of(
+                                                                            context,
+                                                                          ).textTheme.bodyMedium?.color?.withValues(
+                                                                            alpha:
+                                                                                0.7,
+                                                                          ) ??
+                                                                          Colors
+                                                                              .grey),
+                                                                    ),
                                                               ),
                                                             ],
                                                           ),
@@ -1168,7 +1278,8 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                               .isEmpty) ...[
                                                         Tooltip(
                                                           message:
-                                                              'edit_quotation'.tr,
+                                                              'edit_quotation'
+                                                                  .tr,
                                                           child: InkWell(
                                                             onTap: () {
                                                               final rawQuotation = _clientsController

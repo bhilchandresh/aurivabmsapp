@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field, unused_element, unused_local_variable, use_build_context_synchronously
+// ignore_for_file: unused_field, unused_element, unused_local_variable, use_build_context_synchronously, unused_import
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -357,7 +357,8 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   void _calculateTotals() {
     double sub = 0.0;
     double tax = 0.0;
-    final double disc = double.tryParse(_discountPercentageController.text) ?? 0.0;
+    final double disc =
+        double.tryParse(_discountPercentageController.text) ?? 0.0;
 
     for (var item in _itemsControllers) {
       final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
@@ -371,7 +372,8 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         if (_taxType == 'exclusive') {
           tax += itemTotal * (gstRate / 100);
         } else {
-          final double singleTax = itemTotal - (itemTotal / (1 + (gstRate / 100)));
+          final double singleTax =
+              itemTotal - (itemTotal / (1 + (gstRate / 100)));
           tax += singleTax;
         }
       }
@@ -1519,7 +1521,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
                         fontSize: 16,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -1566,7 +1570,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
                         fontSize: 18,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black),
                       ),
                     ),
                   ],
@@ -1645,7 +1651,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         ),
                         Text(
                           "${'place_of_supply'.tr}: $placeOfSupply",
-                          style: const TextStyle(fontSize: 10, color: Colors.grey),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
@@ -1663,14 +1672,18 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                    color:
+                        (Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey),
                   ),
                 ),
                 Text(
                   "${'date_colon'.tr}$quoteDate",
                   style: TextStyle(
                     fontSize: 11,
-                    color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                    color:
+                        (Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey),
                   ),
                 ),
               ],
@@ -1697,7 +1710,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.3),
+                      ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -1870,7 +1887,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 4),
                       Text(
                         "${'date_colon'.tr}$quoteDate",
-                        style: const TextStyle(fontSize: 10, color: Colors.white70),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.white70,
+                        ),
                       ),
                       Text(
                         "${'valid_until_colon'.tr}$validUntil",
@@ -1944,7 +1964,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             _clientAddressController.text.trim().isEmpty
                                 ? 'Corporate Hub, Sector V, Hitech Avenue, Suite 101'
                                 : _clientAddressController.text.trim(),
-                            style: const TextStyle(fontSize: 10, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
@@ -1969,7 +1992,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           ),
                           Text(
                             'fob_delivery'.tr,
-                            style: const TextStyle(fontSize: 10, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
                           ),
                         ],
                       ),
@@ -2170,7 +2196,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       _clientAddressController.text.trim().isEmpty
                           ? 'Corporate Hub, Sector V, Hitech Avenue, Suite 101'
                           : _clientAddressController.text.trim(),
-                      style: const TextStyle(fontSize: 10, color: Colors.black54),
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: Colors.black54,
+                      ),
                     ),
                   ],
                 ),
@@ -2215,7 +2244,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     fontFamily: AppTypography.serifFontFamily,
-                    color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                    color:
+                        (Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey),
                   ),
                 ),
                 Text(
@@ -2223,7 +2254,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   style: TextStyle(
                     fontSize: 11,
                     fontFamily: AppTypography.serifFontFamily,
-                    color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                    color:
+                        (Theme.of(context).textTheme.bodyMedium?.color ??
+                        Colors.grey),
                   ),
                 ),
               ],
@@ -2571,7 +2604,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         _clientAddressController.text.trim().isEmpty
                             ? 'Cyber Tower Complex, Hyd'
                             : _clientAddressController.text.trim(),
-                        style: const TextStyle(fontSize: 10, color: Colors.grey),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey,
+                        ),
                       ),
                     ],
                   ),
@@ -2827,7 +2863,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       const SizedBox(height: 4),
                       Text(
                         "${'date_colon'.tr}$quoteDate",
-                        style: const TextStyle(fontSize: 10, color: Colors.white70),
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: Colors.white70,
+                        ),
                       ),
                       Text(
                         "${'valid_until_colon'.tr}$validUntil",
@@ -3123,7 +3162,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       final labelStyle = TextStyle(
         fontSize: isGrandTotal ? 12 : 11,
         fontWeight: isGrandTotal ? FontWeight.bold : FontWeight.normal,
-        color: isGrandTotal ? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black) : Colors.grey,
+        color: isGrandTotal
+            ? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)
+            : Colors.grey,
         fontFamily: useSerif ? 'serif' : null,
       );
       final valueStyle = TextStyle(
@@ -3495,7 +3536,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -3525,7 +3568,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
                     ),
                   ),
                 ],
@@ -3547,7 +3592,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             borderRadius: BorderRadius.circular(4),
             child: Stack(
               children: [
-                Container(height: 6, color: Theme.of(context).scaffoldBackgroundColor),
+                Container(
+                  height: 6,
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                ),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.easeOut,
@@ -3645,23 +3693,30 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
     };
 
     try {
+      final isEdit = widget.quotationToEdit != null;
+      final editId = widget.quotationToEdit != null
+          ? (widget.quotationToEdit!['_id'] ??
+                    widget.quotationToEdit!['id'] ??
+                    '')
+                .toString()
+          : '';
+
       final http.Response response;
-      if (widget.quotationToEdit != null) {
-        final id =
-            widget.quotationToEdit!['_id'] ?? widget.quotationToEdit!['id'];
+      if (isEdit) {
         response = await ApiService.put(
-          '${ApiConstants.quotations}/$id',
+          '${ApiConstants.quotations}/$editId',
           payload,
         );
       } else {
         response = await ApiService.post(ApiConstants.quotations, payload);
       }
+
       if (!context.mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         Fluttertoast.showToast(
-          msg: widget.quotationToEdit != null
+          msg: isEdit
               ? "Quotation updated successfully!"
               : "Quotation created successfully!",
           backgroundColor: AppColors.success,
@@ -3675,56 +3730,60 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         await clientsController.fetchQuotations();
 
         final responseData = jsonDecode(response.body);
-        final qt = responseData['data'] ?? {};
-        final clientObj = qt['client'] ?? {};
+        final inv = responseData['data'] ?? {};
+        final clientObj = inv['client'] ?? {};
+
         final String name = clientObj['name'] ?? 'Unknown';
         final String email = clientObj['email'] ?? '';
-        final String phone =
-            clientObj['phone'] ?? clientObj['phoneNumber'] ?? '';
+        final String phone = clientObj['phone'] ?? '';
         final String address = clientObj['address'] ?? '';
-        final String gst = clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
+        final String gst = clientObj['gstNumber'] ?? '';
 
         if (!context.mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => QuotationDetailsScreen(
-              quotationId:
-                  qt['quotationNumber'] ??
-                  qt['quoteNumber'] ??
-                  qt['id'] ??
-                  _quoteNumberController.text.trim(),
-              dbId: qt['_id'] ?? qt['id'] ?? '',
+              quotationId: inv['quotationNumber'] ?? inv['id'] ?? 'Quotation',
+              dbId: inv['_id'] ?? inv['id'] ?? '',
               clientName: name,
-              amount: (qt['totalAmount'] ?? qt['grandTotal'] ?? _total)
+              amount: (inv['totalAmount'] ?? inv['grandTotal'] ?? 0.0)
                   .toDouble(),
-              date:
-                  qt['date'] ??
-                  qt['createdAt'] ??
-                  _quoteDateController.text.trim(),
-              status: qt['status'] ?? 'Pending',
+              date: inv['date'] ?? inv['createdAt'] ?? '',
+              status: inv['status'] ?? 'Pending',
               items: List<Map<String, dynamic>>.from(
-                (qt['items'] ?? []).map((x) => Map<String, dynamic>.from(x)),
+                (inv['items'] ?? []).map(
+                  (i) => {
+                    'productId': i['productId'] ?? '',
+                    'description': i['productName'] ?? i['description'] ?? '',
+                    'additionalDetails':
+                        i['additionalDetails'] ?? i['description'] ?? '',
+                    'quantity': i['quantity'] ?? 1,
+                    'rate': (i['price'] ?? i['rate'] ?? 0).toDouble(),
+                    'gst': (i['tax'] ?? i['gstRate'] ?? 0).toDouble(),
+                    'total': (i['total'] ?? 0).toDouble(),
+                  },
+                ),
               ),
-              validUntil: qt['validUntil'] ?? _validUntilController.text.trim(),
-              placeOfSupply:
-                  qt['placeOfSupply'] ?? _placeOfSupplyController.text.trim(),
-              discountPercentage: (qt['discountPercentage'] ?? 0.0).toDouble(),
-              gstEnabled: qt['gstEnabled'] ?? false,
-              taxType: qt['taxType'] ?? 'exclusive',
+              validUntil: inv['expiryDate'],
+              placeOfSupply: inv['placeOfSupply'],
+              discountPercentage:
+                  (inv['discountPercentage'] ?? inv['discount'] ?? 0.0)
+                      .toDouble(),
+              gstEnabled: inv['gstEnabled'] ?? false,
+              taxType: inv['taxType'] ?? 'exclusive',
               clientEmail: email,
               clientPhone: phone,
               clientAddress: address,
-              advancePayment:
-                  double.tryParse(_advanceReceivedController.text) ?? 0.0,
+              advancePayment: (inv['advancePayment'] ?? 0.0).toDouble(),
             ),
           ),
         );
       } else {
-        final responseData = jsonDecode(response.body);
-        final errMsg = responseData['message'] ?? 'Failed to save quotation';
         Fluttertoast.showToast(
-          msg: errMsg,
+          msg: isEdit
+              ? 'Failed to update quotation'
+              : 'Failed to create quotation',
           backgroundColor: AppColors.error,
           textColor: Colors.white,
         );
@@ -3733,7 +3792,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       if (!context.mounted) return;
       Navigator.pop(context); // Dismiss loading dialog
       Fluttertoast.showToast(
-        msg: "Error connecting to server: $e",
+        msg: "Error saving quotation: $e",
         backgroundColor: AppColors.error,
         textColor: Colors.white,
       );
@@ -3748,7 +3807,12 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(LucideIcons.arrowLeft, color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)),
+          icon: Icon(
+            LucideIcons.arrowLeft,
+            color:
+                (Theme.of(context).textTheme.displayLarge?.color ??
+                Colors.black),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -3761,7 +3825,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                color:
+                    (Theme.of(context).textTheme.displayLarge?.color ??
+                    Colors.black),
               ),
             ),
             Text(
@@ -3770,7 +3836,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   : 'create_new_estimate_proposal'.tr,
               style: TextStyle(
                 fontSize: 11,
-                color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                color:
+                    (Theme.of(context).textTheme.bodyMedium?.color ??
+                    Colors.grey),
               ),
             ),
           ],
@@ -3884,7 +3952,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.02),
@@ -3909,7 +3979,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: iconColor ?? (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                    color:
+                        iconColor ??
+                        (Theme.of(context).textTheme.bodyMedium?.color ??
+                            Colors.grey),
                     letterSpacing: 1.0,
                   ),
                 ),
@@ -3917,7 +3990,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               ],
             ),
           ),
-          Divider(height: 1, thickness: 1, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)),
+          Divider(
+            height: 1,
+            thickness: 1,
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          ),
           Padding(padding: const EdgeInsets.all(16.0), child: child),
         ],
       ),
@@ -3973,8 +4050,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
                 itemCount: _filteredClients.length,
-                separatorBuilder: (context, index) =>
-                    Divider(height: 1, color: Theme.of(context).colorScheme.outline),
+                separatorBuilder: (context, index) => Divider(
+                  height: 1,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
                 itemBuilder: (context, index) {
                   final client = _filteredClients[index];
                   return ListTile(
@@ -3983,7 +4062,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       client.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black),
                       ),
                     ),
                     subtitle: Text(
@@ -4157,7 +4238,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         activeThumbColor: Colors.white,
                         activeTrackColor: AppColors.primary,
                         inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                        inactiveTrackColor: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.5),
                         trackOutlineColor: WidgetStateProperty.all(
                           Colors.transparent,
                         ),
@@ -4353,10 +4436,15 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                     horizontal: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(context).scaffoldBackgroundColor,
+                                    color: Theme.of(
+                                      context,
+                                    ).scaffoldBackgroundColor,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(
-                                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .outline
+                                          .withValues(alpha: 0.5),
                                     ),
                                   ),
                                   child: DropdownButtonHideUnderline(
@@ -4377,7 +4465,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                           value: '0',
                                           child: Text(
                                             '0_exempt'.tr,
-                                            style: const TextStyle(fontSize: 12),
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                            ),
                                           ),
                                         ),
                                         const DropdownMenuItem(
@@ -4532,10 +4622,13 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                   horizontal: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).scaffoldBackgroundColor,
+                                  color: Theme.of(
+                                    context,
+                                  ).scaffoldBackgroundColor,
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
-                                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                    color: Theme.of(context).colorScheme.outline
+                                        .withValues(alpha: 0.5),
                                   ),
                                 ),
                                 child: Text(
@@ -4543,7 +4636,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
-                                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                    color:
+                                        (Theme.of(
+                                          context,
+                                        ).textTheme.displayLarge?.color ??
+                                        Colors.black),
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -4651,7 +4748,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.normal,
-              color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+              color:
+                  (Theme.of(context).textTheme.displayLarge?.color ??
+                  Colors.black),
             ),
             decoration: InputDecoration(
               hintText: 'add_terms_cond'.tr,
@@ -4668,11 +4767,19 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                borderSide: BorderSide(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.5),
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
-                borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                borderSide: BorderSide(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.5),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(6),
@@ -4698,14 +4805,21 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             children: [
               Text(
                 'subtotal'.tr,
-                style: TextStyle(fontSize: 12, color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color:
+                      (Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey),
+                ),
               ),
               Text(
                 formatCurrency.format(_subtotal),
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                  color:
+                      (Theme.of(context).textTheme.displayLarge?.color ??
+                      Colors.black),
                 ),
               ),
             ],
@@ -4720,7 +4834,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     'discount_percent'.tr,
                     style: TextStyle(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -4766,11 +4882,19 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         fillColor: Theme.of(context).scaffoldBackgroundColor,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                          borderSide: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                          borderSide: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
                         ),
                       ),
                     ),
@@ -4794,7 +4918,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               (index) => Expanded(
                 child: Container(
                   color: index % 2 == 0
-                      ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.5)
                       : Colors.transparent,
                   height: 1,
                 ),
@@ -4807,7 +4933,12 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             children: [
               Text(
                 'taxable_amount'.tr,
-                style: TextStyle(fontSize: 12, color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey)),
+                style: TextStyle(
+                  fontSize: 12,
+                  color:
+                      (Theme.of(context).textTheme.bodyMedium?.color ??
+                      Colors.grey),
+                ),
               ),
               Text(
                 formatCurrency.format(
@@ -4818,7 +4949,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                  color:
+                      (Theme.of(context).textTheme.displayLarge?.color ??
+                      Colors.black),
                 ),
               ),
             ],
@@ -4833,7 +4966,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     'igst'.tr,
                     style: TextStyle(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   Text(
@@ -4841,7 +4976,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
                     ),
                   ),
                 ],
@@ -4854,7 +4991,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     'cgst'.tr,
                     style: TextStyle(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   Text(
@@ -4862,7 +5001,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
                     ),
                   ),
                 ],
@@ -4875,7 +5016,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     'sgst'.tr,
                     style: TextStyle(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   Text(
@@ -4883,7 +5026,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
                     ),
                   ),
                 ],
@@ -4900,7 +5045,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     'advance_received'.tr,
                     style: TextStyle(
                       fontSize: 12,
-                      color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      color:
+                          (Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -4944,11 +5091,19 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         fillColor: Theme.of(context).scaffoldBackgroundColor,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                          borderSide: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                          borderSide: BorderSide(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withValues(alpha: 0.5),
+                          ),
                         ),
                       ),
                     ),
@@ -4966,7 +5121,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             ],
           ),
           const SizedBox(height: 20),
-          Divider(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2), height: 1, thickness: 1),
+          Divider(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+            height: 1,
+            thickness: 1,
+          ),
           const SizedBox(height: 20),
           Align(
             alignment: Alignment.centerRight,
@@ -4991,7 +5150,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black87),
                       ),
                     ),
                     Text(
@@ -5007,7 +5168,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black87),
                       ),
                     ),
                   ],
@@ -5058,7 +5221,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           contentPadding: EdgeInsets.zero,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.outline,
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
@@ -5078,7 +5243,8 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            color:
+                (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
           ),
         ),
         const SizedBox(height: 6),
@@ -5128,14 +5294,20 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardTheme.color,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.3),
+                        ),
                       ),
                       child: ListView.separated(
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         itemCount: options.length,
-                        separatorBuilder: (context, index) =>
-                            Divider(height: 1, color: Theme.of(context).colorScheme.outline),
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                         itemBuilder: (BuildContext context, int index) {
                           final InventoryItem option = options.elementAt(index);
                           return InkWell(
@@ -5153,7 +5325,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
-                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                      color:
+                                          (Theme.of(
+                                            context,
+                                          ).textTheme.displayLarge?.color ??
+                                          Colors.black),
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -5217,7 +5393,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                    color:
+                        (Theme.of(context).textTheme.displayLarge?.color ??
+                        Colors.black),
                   ),
                   decoration: InputDecoration(
                     hintText: 'e_g_mobile_app_development'.tr,
@@ -5235,10 +5413,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                       horizontal: 12,
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.3),
+                    fillColor: Theme.of(
+                      context,
+                    ).scaffoldBackgroundColor.withValues(alpha: 0.3),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -5303,7 +5485,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+            color:
+                (Theme.of(context).textTheme.displayLarge?.color ??
+                Colors.black),
           ),
           decoration: InputDecoration(
             hintText: hint,
@@ -5324,11 +5508,19 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+              borderSide: BorderSide(
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.5),
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+              borderSide: BorderSide(
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.5),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -5357,7 +5549,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             label,
             style: TextStyle(
               fontSize: 12,
-              color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+              color:
+                  (Theme.of(context).textTheme.bodyMedium?.color ??
+                  Colors.grey),
             ),
           ),
           Text(
@@ -5365,7 +5559,10 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: isRed ? AppColors.error : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+              color: isRed
+                  ? AppColors.error
+                  : (Theme.of(context).textTheme.displayLarge?.color ??
+                        Colors.black),
             ),
           ),
         ],
