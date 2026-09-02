@@ -9,11 +9,16 @@ const {
   getExpenses, 
   createExpense,
   deleteExpense,
-  convertQuoteToInvoice
+  convertQuoteToInvoice,
+  getDashboardStats
 } = require('../controllers/businessController');
 
 // All routes here are protected
 router.use(protect);
+
+// Dashboard Route
+router.route('/dashboard-stats')
+  .get(getDashboardStats);
 
 // Quotation Routes
 router.route('/quotations')

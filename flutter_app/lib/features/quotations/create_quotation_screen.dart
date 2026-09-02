@@ -474,6 +474,13 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
 
   // The perfect, system-aligned pixel-perfect screenshot generator
   Future<void> _exportPdfWithScreenshot(bool isPrint) async {
+    if (_placeOfSupplyController.text.trim().isEmpty || _placeOfSupplyController.text.trim() == 'select_state'.tr || _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select Place of Supply')),
+      );
+      return;
+    }
+
     if (_clientNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -3622,6 +3629,13 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   }
 
   Future<void> _saveAndShowDetails() async {
+    if (_placeOfSupplyController.text.trim().isEmpty || _placeOfSupplyController.text.trim() == 'select_state'.tr || _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select Place of Supply')),
+      );
+      return;
+    }
+    
     if (_clientNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,

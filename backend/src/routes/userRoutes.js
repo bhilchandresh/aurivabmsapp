@@ -7,7 +7,8 @@ const {
   addTeamMember, 
   deleteTeamMember, 
   updateTeamMember,
-  registerDevice
+  registerDevice,
+  completeTour
 } = require('../controllers/userController');
 
 // Protect all routes
@@ -15,6 +16,9 @@ router.use(protect);
 
 // Device Registration (Any logged-in user can register their device)
 router.post('/register-device', registerDevice);
+
+// Complete Tour (Any logged-in user)
+router.post('/complete-tour', completeTour);
 
 // Only Admins (Tenant Owners) can manage the team
 router.route('/')

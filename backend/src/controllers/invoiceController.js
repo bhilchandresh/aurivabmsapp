@@ -6,6 +6,7 @@ const InventoryTransaction = require('../models/InventoryTransaction');
 const Tenant = require('../models/Tenant');
 const logActivity = require('../utils/logger');
 const { sendInvoiceEmail, sendPaymentEmail } = require('../utils/emailService');
+const { syncLedgerForClient } = require('./clientController');
 
 const INDIAN_STATES = [
   "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
@@ -73,7 +74,12 @@ const calculateInvoiceTotals = (items, discountPercentage = 0, taxType = 'exclus
   });
 
   const discountAmount = subTotal * (Number(discountPercentage) / 100);
-  const taxableTotal = subTotal - discountAmount;
+  
+  // Calculate actual taxable value (only items with GST > 0)
+  const taxableItemsSubTotal = processedItems.reduce((sum, item) => sum + ((Number(item.gstRate) > 0) ? Number(item.taxableAmount) : 0), 0);
+  
+  // Apply proportional discount to taxable amount
+  const taxableTotal = gstEnabled ? (taxableItemsSubTotal * (1 - (Number(discountPercentage) / 100))) : (subTotal - discountAmount);
   
   // Recalculate tax if discount exists (pro-rata tax reduction)
   let finalTaxAmount = totalTaxAmount;
@@ -89,7 +95,8 @@ const calculateInvoiceTotals = (items, discountPercentage = 0, taxType = 'exclus
     finalIgst = igst * discountFactor;
   }
 
-  const totalAmount = taxableTotal + finalTaxAmount;
+  const totalAfterDiscount = subTotal - discountAmount;
+  const totalAmount = totalAfterDiscount + finalTaxAmount;
   const balanceDue = totalAmount - Number(advancePayment);
 
   return { 
@@ -235,8 +242,52 @@ exports.getInvoices = async (req, res) => {
       ];
     }
 
-    const invoices = await Invoice.find(query).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: invoices.length, data: invoices });
+    // Filter by month (YYYY-MM)
+    if (req.query.month) {
+      const startDate = new Date(`${req.query.month}-01`);
+      const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+      query.date = {
+        $gte: startDate.toISOString().split('T')[0],
+        $lte: endDate.toISOString().split('T')[0]
+      };
+    }
+
+    if (req.query.status && req.query.status !== 'all') {
+       query.status = new RegExp('^' + req.query.status + '$', 'i');
+    }
+
+    // Sorting
+    let sortObj = { createdAt: -1 };
+    if (req.query.sortBy) {
+      if (req.query.sortBy === 'newest') sortObj = { date: -1, createdAt: -1 };
+      else if (req.query.sortBy === 'oldest') sortObj = { date: 1, createdAt: 1 };
+      else if (req.query.sortBy === 'amount_high') sortObj = { totalAmount: -1 };
+      else if (req.query.sortBy === 'amount_low') sortObj = { totalAmount: 1 };
+    }
+
+    // Pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20; // Changed default to 20 since UI now supports pagination
+    const skip = (page - 1) * limit;
+
+    const invoices = await Invoice.find(query)
+      .sort(sortObj)
+      .skip(skip)
+      .limit(limit)
+      .populate('createdBy', 'name email');
+
+    const total = await Invoice.countDocuments(query);
+
+    res.status(200).json({ 
+      success: true, 
+      count: invoices.length, 
+      data: invoices,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Error getting invoices:", error);
     res.status(500).json({ success: false, message: error.message });
@@ -280,15 +331,21 @@ exports.createInvoice = async (req, res) => {
       gstRate: item.gstRate !== undefined ? Number(item.gstRate) : Number(taxRate)
     }));
 
-    // --- INVENTORY VALIDATION ---
-    for (const item of rawItems) {
+    // --- INVENTORY VALIDATION & COGS CALCULATION ---
+    let totalCogs = 0;
+    for (let i = 0; i < rawItems.length; i++) {
+       const item = rawItems[i];
        if (item.inventoryId) {
           const invItem = await Inventory.findById(item.inventoryId);
-          if (invItem && Number(item.quantity) > invItem.currentStock) {
-              return res.status(400).json({ 
-                  success: false, 
-                  message: `Insufficient stock for ${invItem.itemName}. Available: ${invItem.currentStock}, Requested: ${item.quantity}` 
-              });
+          if (invItem) {
+             if (Number(item.quantity) > invItem.currentStock) {
+                 return res.status(400).json({ 
+                     success: false, 
+                     message: `Insufficient stock for ${invItem.itemName}. Available: ${invItem.currentStock}, Requested: ${item.quantity}` 
+                 });
+             }
+             rawItems[i].purchasePrice = invItem.purchasePrice || 0;
+             totalCogs += (invItem.purchasePrice || 0) * Number(item.quantity);
           }
        }
     }
@@ -339,13 +396,38 @@ exports.createInvoice = async (req, res) => {
       };
     }
 
+    let initialStatus = 'Pending';
+    let initialRemainingAmount = financials.balanceDue;
+    if (initialRemainingAmount <= 0) {
+      initialStatus = 'Paid';
+      initialRemainingAmount = 0;
+    } else if (advancePayment > 0) {
+      initialStatus = 'Partially Paid';
+    }
+
     const invoice = await Invoice.create({
       tenantId: req.user.tenantId, invoiceNumber, client: clientData, items: financials.items,
       ...financials, discountPercentage, taxRate, gstEnabled, taxType, placeOfSupply: placeOfSupply || clientData.state, advancePayment,
       date: date || Date.now(), dueDate, notes, terms, bankDetailsSnapshot,
-      authorizedSignatoryImage, status: 'Pending', remainingAmount: financials.totalAmount, // 🔴 Set remaining amount on create
-      salesPerson: req.user._id
+      authorizedSignatoryImage, status: initialStatus, remainingAmount: initialRemainingAmount,
+      totalCogs: totalCogs, salesPerson: req.user._id, createdBy: req.user._id
     });
+
+    // --- HANDLE ADVANCE PAYMENT LEDGER SYNC ---
+    if (advancePayment > 0 && clientData && clientData.clientId) {
+      await Payment.create({
+        tenantId: req.user.tenantId,
+        clientId: clientData.clientId,
+        invoiceId: invoice._id,
+        amount: advancePayment,
+        date: date || Date.now(),
+        paymentMode: 'Other',
+        referenceNote: `Advance payment for Invoice ${invoiceNumber}`,
+        createdBy: req.user._id
+      });
+      // Run sync in the background so it doesn't block
+      syncLedgerForClient(clientData.clientId, req.user.tenantId).catch(err => console.error("Sync Ledger Failed on Create:", err));
+    }
 
     if (typeof logActivity === 'function') await logActivity(req, "CREATE_INVOICE", `Created Invoice ${invoiceNumber}`);
 
@@ -388,6 +470,7 @@ exports.updateInvoice = async (req, res) => {
         await Payment.create({
           tenantId: req.user.tenantId,
           clientId: existingInvoice.client.clientId,
+          invoiceId: existingInvoice._id,
           amount: detectedPaidAmount,
           date: Date.now(),
           paymentMode: 'Other',
@@ -426,8 +509,10 @@ exports.updateInvoice = async (req, res) => {
         gstRate: item.gstRate !== undefined ? Number(item.gstRate) : Number(taxR)
       }));
 
-      // --- INVENTORY VALIDATION FOR UPDATE ---
-      for (const item of rawItems) {
+      // --- INVENTORY VALIDATION & COGS CALCULATION FOR UPDATE ---
+      let totalCogs = 0;
+      for (let i = 0; i < rawItems.length; i++) {
+         const item = rawItems[i];
          if (item.inventoryId) {
             const invItem = await Inventory.findById(item.inventoryId);
             if (invItem) {
@@ -441,13 +526,15 @@ exports.updateInvoice = async (req, res) => {
                        message: `Insufficient stock for ${invItem.itemName}. Available: ${availablePool}, Requested: ${item.quantity}` 
                    });
                }
+               rawItems[i].purchasePrice = invItem.purchasePrice || 0;
+               totalCogs += (invItem.purchasePrice || 0) * Number(item.quantity);
             }
          }
       }
 
       const financials = calculateInvoiceTotals(rawItems, discPercent, tType, gEnabled, tenantState, pSupply, advPay);
 
-      updateData = { ...updateData, items: financials.items, ...financials };
+      updateData = { ...updateData, items: financials.items, ...financials, totalCogs };
       // Also update remainingAmount if items changed and it's not Paid
       if (updateData.status !== 'Paid') {
         updateData.remainingAmount = financials.totalAmount;
@@ -455,6 +542,35 @@ exports.updateInvoice = async (req, res) => {
     }
 
     const updatedInvoice = await Invoice.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+
+    // --- HANDLE ADVANCE PAYMENT LEDGER SYNC ON UPDATE ---
+    if (updateData.advancePayment !== undefined && updatedInvoice.client && updatedInvoice.client.clientId) {
+        if (updateData.advancePayment > 0) {
+            const existingPayment = await Payment.findOne({ invoiceId: id, tenantId: req.user.tenantId });
+            if (existingPayment) {
+                existingPayment.amount = updateData.advancePayment;
+                await existingPayment.save();
+            } else {
+                await Payment.create({
+                   tenantId: req.user.tenantId,
+                   clientId: updatedInvoice.client.clientId,
+                   invoiceId: id,
+                   amount: updateData.advancePayment,
+                   date: Date.now(),
+                   paymentMode: 'Other',
+                   referenceNote: `Advance payment for Invoice ${updatedInvoice.invoiceNumber}`
+                });
+            }
+        } else {
+            await Payment.deleteOne({ invoiceId: id, tenantId: req.user.tenantId });
+        }
+    }
+    
+    // Always sync ledger after updates to recalculate remainingAmount and status
+    if (updatedInvoice.client && updatedInvoice.client.clientId) {
+        await syncLedgerForClient(updatedInvoice.client.clientId, req.user.tenantId);
+        Object.assign(updatedInvoice, await Invoice.findById(id));
+    }
 
     // --- AUTOMATED PAYMENT EMAIL ---
     if (paymentDetected && detectedPaidAmount > 0 && updatedInvoice.client && updatedInvoice.client.email) {
@@ -498,6 +614,12 @@ exports.deleteInvoice = async (req, res) => {
   try {
     const invoice = await Invoice.findOneAndDelete({ _id: req.params.id, tenantId: req.user.tenantId });
     if (!invoice) return res.status(404).json({ success: false, message: "Invoice not found" });
+
+    // --- CLEANUP PAYMENT RECORD AND SYNC LEDGER ---
+    if (invoice.advancePayment > 0 && invoice.client && invoice.client.clientId) {
+      await Payment.deleteOne({ invoiceId: req.params.id, tenantId: req.user.tenantId });
+      syncLedgerForClient(invoice.client.clientId, req.user.tenantId).catch(err => console.error("Sync Ledger Failed on Delete:", err));
+    }
 
     // --- SYNC INVENTORY: REVERT STOCK ---
     await revertInventoryForInvoice(req.user.tenantId, req.params.id);
@@ -559,6 +681,7 @@ exports.bulkImportInvoices = async (req, res) => {
 
     let importedCount = 0;
     let skippedCount = 0;
+    const importedClientIds = new Set();
 
     for (const invData of invoicesData) {
       if (!invData.clientName || !invData.items || !Array.isArray(invData.items)) {
@@ -654,7 +777,28 @@ exports.bulkImportInvoices = async (req, res) => {
         await syncInventoryForInvoice(tenantId, financials.items, invoice._id, clientData.name);
       }
 
+      if (advancePayment > 0 && clientData && clientData.clientId) {
+          await Payment.create({
+             tenantId,
+             clientId: clientData.clientId,
+             invoiceId: invoice._id,
+             amount: advancePayment,
+             date: invData.date || Date.now(),
+             paymentMode: 'Other',
+             referenceNote: `Advance payment for imported Invoice ${invoiceNumber}`
+          });
+          importedClientIds.add(clientData.clientId.toString());
+      } else if (status === 'Paid') {
+          // If marked as Paid but no advance payment, maybe it was fully paid historically.
+          importedClientIds.add(clientData.clientId.toString());
+      }
+
       importedCount++;
+    }
+
+    // Sync ledgers for affected clients
+    for (const cid of importedClientIds) {
+       syncLedgerForClient(cid, tenantId).catch(err => console.error("Sync Ledger Failed on Bulk Import:", err));
     }
 
     if (typeof logActivity === 'function') {

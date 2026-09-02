@@ -7,6 +7,10 @@ const inventoryTransactionSchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   inventoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Inventory',

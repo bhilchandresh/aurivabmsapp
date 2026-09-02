@@ -3,6 +3,8 @@ const router = express.Router();
 const { 
   registerTenant, 
   login, 
+  forgotPassword,
+  resetPassword,
   getTenantSettings, 
   updateTenantSettings, 
   getAllTenants, 
@@ -11,7 +13,9 @@ const {
   getSystemStats,    // <--- Import
   deleteTenant,      // <--- Import
   createTenantByAdmin, // <--- Import
-  resetAdminPassword   // <--- Added
+  resetAdminPassword,  // <--- Added
+  requestAccountDeletion,
+  confirmAccountDeletion
 } = require('../controllers/authController');
 
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -20,10 +24,16 @@ const { getAuditLogs } = require('../controllers/authController');
 // Public
 router.post('/register', registerTenant);
 router.post('/login', login);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
 
 // Tenant Settings
 router.get('/settings', protect, getTenantSettings);
 router.put('/settings', protect, updateTenantSettings);
+
+// Account Deletion (Tenant Owner)
+router.post('/account/delete-request', protect, authorize('admin'), requestAccountDeletion);
+router.post('/account/delete-confirm', protect, authorize('admin'), confirmAccountDeletion);
 
 // SUPER ADMIN ROUTES
 router.get('/tenants', protect, authorize('super_admin'), getAllTenants);

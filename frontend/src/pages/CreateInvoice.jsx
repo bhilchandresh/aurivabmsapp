@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useContext, Fragment } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import api from "../utils/api";
-import toast from "react-hot-toast";
+import { toast } from 'react-hot-toast';
+import { getLocalDateString, getLocalDateStringWithOffset } from '../utils/dateUtils';
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft, Save, Plus, Trash2, Calendar, User, FileText, CreditCard, AlertCircle } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Loader2, Save, FileText, Upload, Calendar, User, CreditCard, AlertCircle } from "lucide-react";
+import { useQueryClient } from '@tanstack/react-query';
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 import ClientAutocomplete from "../components/ClientAutocomplete";
@@ -22,6 +24,7 @@ const CreateInvoice = () => {
 
    // --- CUSTOM API ERROR STATE ---
    const [apiError, setApiError] = useState(null);
+   const queryClient = useQueryClient();
 
    // --- FORM SETUP ---
    const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
@@ -30,8 +33,8 @@ const CreateInvoice = () => {
          taxRate: 18,
          discountPercentage: 0,
          advancePayment: 0,
-         date: new Date().toISOString().split('T')[0],
-         dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+         date: getLocalDateString(),
+         dueDate: getLocalDateStringWithOffset(15),
          terms: "",
          placeOfSupply: ""
       }
@@ -137,12 +140,18 @@ const CreateInvoice = () => {
 
    const subTotal = calculatedSubTotal;
    const discountAmount = subTotal * (Number(discountPercentage) / 100);
-   const taxableAmount = subTotal - discountAmount;
+   
+   // Calculate actual taxable value (only items with GST > 0)
+   const taxableItemsSubTotal = processedItems.reduce((sum, item) => sum + ((Number(item.gstRate) > 0) ? Number(item.taxable) : 0), 0);
+   
+   // Apply proportional discount to taxable amount
+   const taxableAmount = gstEnabled ? (taxableItemsSubTotal * (1 - (Number(discountPercentage) / 100))) : (subTotal - discountAmount);
    
    // Pro-rata tax reduction
    const gstAmount = calculatedTaxAmount * (1 - (Number(discountPercentage) / 100));
    
-   const grandTotal = taxableAmount + gstAmount;
+   const totalAfterDiscount = subTotal - discountAmount;
+   const grandTotal = totalAfterDiscount + gstAmount;
    const balanceDue = grandTotal - Number(advancePayment);
 
    const cgst = !isInterState ? (gstAmount / 2) : 0;
@@ -178,6 +187,8 @@ const CreateInvoice = () => {
 
       try {
          const res = await api.post(`/invoices`, payload);
+         queryClient.invalidateQueries({ queryKey: ['invoices'] });
+         queryClient.invalidateQueries({ queryKey: ['dashboard'] });
          navigate(`/invoices/${res.data.data._id}`);
       } catch (e) {
          // Replaced alert() with Custom UI Error Banner

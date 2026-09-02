@@ -44,16 +44,21 @@ const VibrantTemplate = ({ data, tenant, type = 'invoice' }) => {
 
     const formatCurrency = (amount) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(Number(amount) || 0);
 
-    const subTotal = data.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
-    const discountAmount = subTotal * ((Number(data.discountPercentage) || 0) / 100);
-    const taxableAmount = subTotal - discountAmount;
-    const taxRate = isGstEnabled ? (Number(data.taxRate) || 0) : 0;
-    const taxAmount = isGstEnabled ? (data.gstAmount !== undefined ? Number(data.gstAmount) : taxableAmount * (taxRate / 100)) : 0;
-    const total = data.totalAmount !== undefined ? Number(data.totalAmount) : (taxableAmount + taxAmount);
-    const advance = Number(data.advancePayment) || 0;
-    const balance = data.balanceDue !== undefined ? Number(data.balanceDue) : (total - advance);
+    // Use backend calculated values or fallback
+  const subTotal = Number(data.subTotal) || data.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
+  const discountPercentage = Number(data.discountPercentage) || 0;
+  const discountAmount = Number(data.discountAmount) || (subTotal * (discountPercentage / 100));
+  const taxableAmount = Number(data.taxableAmount) || (subTotal - discountAmount);
+  const taxRate = isGstEnabled ? (Number(data.taxRate) || 0) : 0;
+  const taxAmount = Number(data.gstAmount) || (taxableAmount * (taxRate / 100));
+  const cgst = data.gstBreakdown?.cgst || taxAmount / 2;
+  const sgst = data.gstBreakdown?.sgst || taxAmount / 2;
+  const igst = data.gstBreakdown?.igst || 0;
+  const total = Number(data.totalAmount) || (taxableAmount + taxAmount);
+  const advance = Number(data.advancePayment) || 0;
+  const balance = total - advance;
 
-    return (
+  return (
         <>
              <style>{`
         /* --- SMART PAGING & PRINT SETTINGS --- */
@@ -264,6 +269,7 @@ const VibrantTemplate = ({ data, tenant, type = 'invoice' }) => {
 
                                                     <th className="py-3 px-2 font-bold text-center text-[10px] w-[10%]">Qty</th>
                                                     <th className="py-3 px-2 font-bold text-right text-[10px] w-[15%]">Rate</th>
+                                       {isGstEnabled && <th className="py-3 px-2 text-center w-[10%] border-y border-gray-200">GST</th>}
                                                     <th className="py-3 px-4 font-bold text-right text-[10px] w-[20%]">Amount</th>
                                                 </tr>
                                             </thead>
@@ -281,6 +287,11 @@ const VibrantTemplate = ({ data, tenant, type = 'invoice' }) => {
 
                                                         <td className="py-4 px-2 text-center text-gray-600 font-medium text-[11px] align-top break-words border-b border-gray-200/80">{item.quantity}</td>
                                                         <td className="py-4 px-2 text-right text-gray-600 font-medium text-[11px] align-top break-words border-b border-gray-200/80">{formatCurrency(item.rate)}</td>
+                                                        {isGstEnabled && (
+                                              <td className="py-4 px-2 text-center text-gray-600 align-top break-words">
+                                                  {item.gstRate ? `${item.gstRate}%` : '-'}
+                                              </td>
+                                          )}
                                                         <td className="py-4 px-4 text-right font-black text-gray-900 text-[13px] align-top break-words border-b border-gray-200/80">{formatCurrency(Number(item.quantity) * Number(item.rate))}</td>
                                                     </tr>
                                                 ))}

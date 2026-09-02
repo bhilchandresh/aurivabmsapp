@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import '../../core/services/permission_manager.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
@@ -36,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _bankNameCtrl = TextEditingController();
   final TextEditingController _accNumCtrl = TextEditingController();
   final TextEditingController _ifscCtrl = TextEditingController();
+  final TextEditingController _stateCtrl = TextEditingController();
 
   String? _selectedState;
   bool _gstEnabled = false;
@@ -110,6 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _ifscCtrl.text = bank['ifscCode'] ?? 'SBIN0000000';
 
       _selectedState = tenant['state'];
+      _stateCtrl.text = _selectedState ?? '';
       _gstEnabled = tenant['gstEnabled'] ?? false;
       _logoBase64 = tenant['logoImage'];
     } catch (e) {
@@ -134,10 +137,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _bankNameCtrl.dispose();
     _accNumCtrl.dispose();
     _ifscCtrl.dispose();
+    _stateCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _pickLogo() async {
+    final isGranted = await PermissionManager.requestGalleryPermission();
+    if (!isGranted) return;
+    
     try {
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,
@@ -192,6 +199,87 @@ class _SettingsScreenState extends State<SettingsScreen> {
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.amber.shade600,
       colorText: Colors.white,
+    );
+  }
+
+  void _showStatePicker() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'select_state'.tr,
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(LucideIcons.x, size: 20),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: _indianStates.length,
+                  separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade100, indent: 20, endIndent: 20),
+                  itemBuilder: (context, index) {
+                    final state = _indianStates[index];
+                    final isSelected = _selectedState == state;
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          _selectedState = state;
+                          _stateCtrl.text = state;
+                        });
+                        Navigator.pop(context);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                state,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                  color: isSelected ? AppColors.primary : null,
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              const Icon(LucideIcons.check, color: AppColors.primary, size: 18),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -308,6 +396,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: _buildSectionCard(
                     index: 0,
                     title: 'company_branding'.tr,
+                    subtitle: 'Upload your logo & brand identity'.tr,
                     icon: LucideIcons.image,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,22 +541,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     onPressed: _pickLogo,
                                     icon: const Icon(
                                       LucideIcons.upload,
-                                      size: 14,
+                                      size: 16,
                                     ),
                                     label: Text(
                                       'upload_new_logo'.tr,
                                       style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 11,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
                                       ),
                                     ),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
+                                      backgroundColor: AppColors.primary.withValues(alpha: 0.9),
                                       foregroundColor: Colors.white,
                                       elevation: 0,
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 14,
-                                        vertical: 10,
+                                        horizontal: 20,
+                                        vertical: 12,
                                       ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
@@ -476,11 +565,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'logo_recommended'.tr,
+                                    'Recommended: Square image,\nPNG or JPG (Max 500KB).'.tr,
                                     style: TextStyle(
-                                      fontSize: 10,
+                                      fontSize: 11,
                                       color: Colors.grey.shade500,
                                       fontStyle: FontStyle.italic,
+                                      height: 1.4,
                                     ),
                                   ),
                                 ],
@@ -507,6 +597,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: _buildSectionCard(
                     index: 1,
                     title: 'business_info'.tr,
+                    subtitle: 'Update your company details'.tr,
                     icon: LucideIcons.building,
                     child: Column(
                       children: [
@@ -558,53 +649,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        // Dropdown State selection
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: 4,
-                                bottom: 4,
-                              ),
-                              child: Text(
-                                'state_ut_star'.tr,
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                            DropdownButtonFormField<String>(
-                              initialValue: _selectedState,
-                              hint: Text(
-                                'select_state'.tr,
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              items: _indianStates.map((state) {
-                                return DropdownMenuItem<String>(
-                                  value: state,
-                                  child: Text(
-                                    state,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              onChanged: (val) {
-                                setState(() {
-                                  _selectedState = val;
-                                });
-                              },
-                              validator: (val) =>
-                                  val == null ? 'Please select state' : null,
-                              decoration: const InputDecoration(),
-                            ),
-                          ],
+                        _buildTextField(
+                          label: 'state_ut_star'.tr,
+                          hintText: 'select_state'.tr,
+                          controller: _stateCtrl,
+                          readOnly: true,
+                          onTap: _showStatePicker,
+                          suffixIcon: const Icon(LucideIcons.chevronDown, size: 18, color: Colors.grey),
+                          validator: (val) {
+                            if (val == null || val.trim().isEmpty) {
+                              return 'Please select state';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 16),
                         _buildTextField(
@@ -638,26 +695,52 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: _buildSectionCard(
                     index: 2,
                     title: 'taxation_invoice_terms'.tr,
+                    subtitle: 'Manage GST registration and invoice terms'.tr,
                     icon: LucideIcons.fileText,
                     child: Column(
                       children: [
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Checkbox(
-                              value: _gstEnabled,
-                              activeColor: AppColors.primary,
-                              onChanged: (val) {
-                                setState(() {
-                                  _gstEnabled = val ?? false;
-                                });
-                              },
+                            SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: Checkbox(
+                                value: _gstEnabled,
+                                activeColor: AppColors.primary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+                                onChanged: (val) {
+                                  setState(() {
+                                    _gstEnabled = val ?? false;
+                                  });
+                                },
+                              ),
                             ),
-                            Text(
-                              'register_for_gst'.tr,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'register_for_gst'.tr,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Enable if your business is GST registered'.tr,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -686,6 +769,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           hintText: 'eg_invoice_terms'.tr,
                           controller: _termsCtrl,
                           maxLines: 4,
+                          maxLength: 500,
+                          keyboardType: TextInputType.multiline,
+                          textInputAction: TextInputAction.newline,
                         ),
                       ],
                     ),
@@ -706,7 +792,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: _buildSectionCard(
                     index: 3,
                     title: 'banking_details'.tr,
-                    icon: LucideIcons.creditCard,
+                    subtitle: 'Manage your business banking information'.tr,
+                    icon: LucideIcons.landmark,
                     child: Column(
                       children: [
                         _buildTextField(
@@ -770,6 +857,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 28),
+                _buildDangerZone(),
                 const SizedBox(height: 40),
               ],
             ),
@@ -785,21 +874,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String hintText,
     required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
+    TextInputAction? textInputAction,
     int maxLines = 1,
     bool enabled = true,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    Widget? suffixIcon,
     String? Function(String?)? validator,
+    int? maxLength,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 4),
+          padding: const EdgeInsets.only(left: 4, bottom: 6),
           child: Text(
             label.toUpperCase(),
             style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
-              color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+              color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey.shade700),
               letterSpacing: 0.5,
             ),
           ),
@@ -807,16 +901,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
+          textInputAction: textInputAction,
           maxLines: maxLines,
+          maxLength: maxLength,
           enabled: enabled,
+          readOnly: readOnly,
+          onTap: onTap,
           validator: validator,
           style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: enabled ? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black) : Colors.grey.shade400,
+            overflow: TextOverflow.ellipsis,
           ),
           decoration: InputDecoration(
             hintText: hintText,
+            suffixIcon: suffixIcon,
+            hintStyle: TextStyle(
+              color: Colors.grey.shade400,
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey.shade200),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey.shade200),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.grey.shade100),
+            ),
+            fillColor: enabled ? Colors.transparent : Colors.grey.shade50,
+            filled: !enabled,
           ),
         ),
       ],
@@ -826,6 +950,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildSectionCard({
     required int index,
     required String title,
+    required String subtitle,
     required IconData icon,
     required Widget child,
   }) {
@@ -851,15 +976,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
           border: Border.all(
             color: isHovered
                 ? AppColors.primary.withValues(alpha: 0.5)
-                : Theme.of(context).colorScheme.outline,
-            width: 1.2,
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+            width: 1,
           ),
           boxShadow: [
             BoxShadow(
               color: isHovered
                   ? AppColors.primary.withValues(alpha: 0.05)
-                  : Colors.black.withValues(alpha: 0.01),
-              blurRadius: isHovered ? 16 : 8,
+                  : Colors.black.withValues(alpha: 0.02),
+              blurRadius: isHovered ? 16 : 10,
               offset: const Offset(0, 4),
             ),
           ],
@@ -869,40 +994,399 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Row(
               children: [
-                Icon(
-                  icon,
-                  size: 18,
-                  color: isHovered
-                      ? AppColors.primary
-                      : (Theme.of(context).brightness == Brightness.dark
-                          ? Colors.white70
-                          : Colors.grey.shade700),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: isHovered
+                        ? AppColors.primary.withValues(alpha: 0.15)
+                        : Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    size: 20,
                     color: isHovered
                         ? AppColors.primary
-                        : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        : Colors.blue.shade600,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isHovered
+                              ? AppColors.primary
+                              : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Divider(
+                height: 1,
                 color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.white.withValues(alpha: 0.12)
-                    : Colors.black.withValues(alpha: 0.08),
+                    : Colors.black.withValues(alpha: 0.06),
               ),
             ),
             child,
           ],
         ),
       ),
+    );
+  }
+  Widget _buildDangerZone() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF2F2), // tailwind rose-50
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFFFECDD3), // tailwind rose-200
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                LucideIcons.alertTriangle,
+                color: Color(0xFFDC2626), // tailwind red-600
+                size: 20,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Danger Zone',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: Color(0xFF991B1B), // tailwind red-800
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Permanently deleting your account will revoke access to all your business data, invoices, and settings. This action cannot be undone.',
+            style: TextStyle(
+              fontSize: 13,
+              color: Color(0xFFB91C1C), // tailwind red-700
+            ),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            onPressed: _showDeleteConfirmationDialog,
+            icon: const Icon(LucideIcons.trash2, size: 16),
+            label: const Text(
+              'Request Account Deletion',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog() {
+    bool isRequestingOTP = false;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return Dialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFEE2E2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(LucideIcons.alertTriangle, color: Color(0xFFDC2626), size: 24),
+                        ),
+                        const SizedBox(width: 16),
+                        const Text(
+                          'Delete Account',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFDC2626),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Are you absolutely sure you want to delete your account? A 6-digit OTP will be sent to your email to verify your identity.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFBEB), // amber-50
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFFDE68A)), // amber-200
+                      ),
+                      child: RichText(
+                        text: const TextSpan(
+                          style: TextStyle(fontSize: 13, color: Color(0xFF92400E)), // amber-800
+                          children: [
+                            TextSpan(
+                              text: 'Note: ',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text: 'Since business data is crucial, we retain your data securely for ',
+                            ),
+                            TextSpan(
+                              text: '30 days ',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text: 'after deletion. If you wish to recover your account during this period, please contact the AurivaBMS team.',
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (!isRequestingOTP)
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: isRequestingOTP
+                              ? null
+                              : () async {
+                                  setStateDialog(() => isRequestingOTP = true);
+                                  final authCtrl = Get.find<AuthController>();
+                                  final bool success = await authCtrl.requestAccountDeletion();
+                                  if (mounted && context.mounted) {
+                                    setStateDialog(() => isRequestingOTP = false);
+                                    if (success) {
+                                      Navigator.pop(context);
+                                      _showOTPVerificationDialog();
+                                    }
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFDC2626),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          ),
+                          child: isRequestingOTP
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                )
+                              : const Text(
+                                  'Yes, Send OTP',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showOTPVerificationDialog() {
+    final TextEditingController otpCtrl = TextEditingController();
+    bool isDeleting = false;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            final isOtpValid = otpCtrl.text.trim().length == 6;
+            
+            return Dialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFEE2E2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(LucideIcons.alertTriangle, color: Color(0xFFDC2626), size: 24),
+                        ),
+                        const SizedBox(width: 16),
+                        const Text(
+                          'Delete Account',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFDC2626),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Enter the 6-digit verification code sent to your email to confirm deletion.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade200),
+                      ),
+                      child: TextField(
+                        controller: otpCtrl,
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        maxLength: 6,
+                        onChanged: (val) {
+                          setStateDialog(() {}); // trigger rebuild to update button state
+                        },
+                        style: const TextStyle(fontSize: 24, letterSpacing: 8, fontWeight: FontWeight.bold),
+                        decoration: InputDecoration(
+                          counterText: "",
+                          border: InputBorder.none,
+                          hintText: "- - - - - -",
+                          hintStyle: TextStyle(color: Colors.grey.shade400, letterSpacing: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if (!isDeleting)
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: (isOtpValid && !isDeleting)
+                              ? () async {
+                                  setStateDialog(() => isDeleting = true);
+                                  final authCtrl = Get.find<AuthController>();
+                                  final bool success = await authCtrl.confirmAccountDeletion(otpCtrl.text.trim());
+                                  if (mounted && context.mounted) {
+                                    setStateDialog(() => isDeleting = false);
+                                    if (success) {
+                                      Navigator.pop(context);
+                                    }
+                                  }
+                                }
+                              : null,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isOtpValid ? const Color(0xFFDC2626) : const Color(0xFFF87171),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            disabledBackgroundColor: const Color(0xFFF87171),
+                            disabledForegroundColor: Colors.white,
+                          ),
+                          child: isDeleting
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                )
+                              : const Text(
+                                  'Permanently Delete',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

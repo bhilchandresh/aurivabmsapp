@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_extensions.dart';
 
 class AppInputField extends StatelessWidget {
-  final String label;
+  final String? label;
   final String hintText;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
@@ -10,12 +10,13 @@ class AppInputField extends StatelessWidget {
   final TextInputType keyboardType;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
+  final void Function(String)? onChanged;
   final bool enabled;
   final int maxLines;
 
   const AppInputField({
     super.key,
-    required this.label,
+    this.label,
     required this.hintText,
     this.prefixIcon,
     this.suffixIcon,
@@ -23,6 +24,7 @@ class AppInputField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.controller,
     this.validator,
+    this.onChanged,
     this.enabled = true,
     this.maxLines = 1,
   });
@@ -34,18 +36,20 @@ class AppInputField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 4),
-          child: Text(
-            label.toUpperCase(),
-            style: context.typography.inputLabel.copyWith(
-              fontWeight: FontWeight.bold,
-              color: bodyMediumColor,
-              letterSpacing: 0.5,
+        if (label != null && label!.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(left: 4, bottom: 4),
+            child: Text(
+              label!.toUpperCase(),
+              style: context.typography.inputLabel.copyWith(
+                fontWeight: FontWeight.bold,
+                color: bodyMediumColor,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
-        ),
         TextFormField(
+          onChanged: onChanged,
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,

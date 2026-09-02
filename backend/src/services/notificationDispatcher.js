@@ -53,6 +53,17 @@ exports.dispatchNotification = async ({ tenantId, type, message, actionLink, met
       }).catch(err => console.error("Push dispatcher error:", err));
     }
 
+    // 5. Emit Socket.io event for real-time web/mobile clients
+    try {
+      const socketIO = require('../utils/socket');
+      const io = socketIO.getIO();
+      if (io) {
+        io.to(`tenant_${tenantId}`).emit('new_notification', notification);
+      }
+    } catch (socketErr) {
+      console.error("Socket emit error:", socketErr.message);
+    }
+
     return notification;
   } catch (error) {
     console.error("dispatchNotification Error:", error);

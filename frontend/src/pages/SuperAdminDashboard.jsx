@@ -7,13 +7,8 @@ import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 import TemplatePicker from "../components/TemplatePicker"; 
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, Legend } from 'recharts';
-import { 
-  Calendar, CheckCircle, AlertCircle, Clock, 
-  IndianRupee, Building2, Users, TrendingUp, 
-  Search, X, Save, Trash2, Edit, Plus, ArrowRight, RotateCcw,
-  History, ShieldCheck, Mail, Lock, Globe, Bell,
-  Settings, LifeBuoy, MessageSquare, FileText, Package, Truck
-} from "lucide-react";
+import { ShieldAlert, Users, TrendingUp, Building2, CheckCircle, XCircle, Search, Trash2, Edit, Calendar, AlertCircle, Clock, IndianRupee, ArrowRight, RotateCcw, History, ShieldCheck, Mail, Lock, Globe, Bell, Settings, LifeBuoy, MessageSquare, FileText, Package, Truck, X, Save, Plus } from "lucide-react";
+import { getLocalDateString } from "../utils/dateUtils";
 
 const SuperAdminDashboard = () => {
   // --- STATE ---
@@ -29,8 +24,13 @@ const SuperAdminDashboard = () => {
   const [usageStats, setUsageStats] = useState(null); 
   const [activeTemplateModal, setActiveTemplateModal] = useState(null);
   const [showNotificationModal, setShowNotificationModal] = useState(false);
-  const [notificationForm, setNotificationForm] = useState({ message: '', type: 'info', target: 'all_admins' });
-  const [systemSettings, setSystemSettings] = useState({ SMTP_HOST: '', SMTP_PORT: '', SMTP_USER: '', SMTP_PASS: '' });
+  const [notificationForm, setNotificationForm] = useState({ message: '', type: 'info', target: 'all_admins', sendEmail: false, subject: '', tenantId: '' });
+  const [systemSettings, setSystemSettings] = useState({ SMTP_HOST: '', SMTP_PORT: '', SMTP_USER: '', SMTP_PASS: '', terms_and_conditions: '', privacy_policy: '' });
+  const [settingsTab, setSettingsTab] = useState('smtp');
+  const [contactMessages, setContactMessages] = useState([]);
+  const [blockedIPs, setBlockedIPs] = useState([]);
+  const [activeTraffic, setActiveTraffic] = useState([]);
+  const [socForm, setSocForm] = useState({ ipAddress: '', reason: '' });
 
   const { token } = useContext(AuthContext);
   const location = useLocation();
@@ -99,10 +99,47 @@ const SuperAdminDashboard = () => {
 
   const loadSettings = async () => {
     try {
-      const res = await api.get('/settings');
-      setSystemSettings(res.data.data || { SMTP_HOST: '', SMTP_PORT: '', SMTP_USER: '', SMTP_PASS: '' });
+      const [resSettings, resContacts] = await Promise.all([
+        api.get('/settings'),
+        api.get('/settings/contact-messages')
+      ]);
+      setSystemSettings(resSettings.data.data || { SMTP_HOST: '', SMTP_PORT: '', SMTP_USER: '', SMTP_PASS: '', terms_and_conditions: '', privacy_policy: '' });
+      setContactMessages(resContacts.data.data || []);
       setViewMode('settings');
+      setSettingsTab('smtp');
     } catch (e) { toast.error("Failed to load settings"); }
+  };
+
+  const loadSecurityData = async () => {
+    try {
+      const [resBlocked, resTraffic] = await Promise.all([
+        api.get('/security/blocked-ips'),
+        api.get('/security/active-traffic')
+      ]);
+      setBlockedIPs(resBlocked.data.data || []);
+      setActiveTraffic(resTraffic.data.data || []);
+      setViewMode('security');
+    } catch (e) { toast.error("Failed to load SOC data"); }
+  };
+
+  const handleBlockIP = async (e) => {
+    e.preventDefault();
+    if (!socForm.ipAddress) return toast.error("IP Address is required");
+    try {
+      await api.post('/security/block-ip', socForm);
+      toast.success("IP successfully blocked");
+      setSocForm({ ipAddress: '', reason: '' });
+      loadSecurityData();
+    } catch (e) { toast.error(e.response?.data?.message || "Failed to block IP"); }
+  };
+
+  const handleUnblockIP = async (ip) => {
+    if (!window.confirm(`Are you sure you want to unblock ${ip}?`)) return;
+    try {
+      await api.delete(`/security/unblock-ip/${encodeURIComponent(ip)}`);
+      toast.success("IP successfully unblocked");
+      loadSecurityData();
+    } catch (e) { toast.error("Failed to unblock IP"); }
   };
   
   useEffect(() => {
@@ -110,6 +147,8 @@ const SuperAdminDashboard = () => {
       setViewMode('analytics');
     } else if (location.pathname === '/super-admin/settings') {
       loadSettings();
+    } else if (location.pathname === '/super-admin/security') {
+      loadSecurityData();
     } else {
       setViewMode('list');
     }
@@ -129,7 +168,7 @@ const SuperAdminDashboard = () => {
             subscriptionPlan: editingTenant.subscriptionPlan,
             subscriptionEnd: editingTenant.subscriptionEnd 
                 ? new Date(editingTenant.subscriptionEnd).toISOString().split('T')[0] 
-                : new Date().toISOString().split('T')[0],
+                : getLocalDateString(),
             templatePreference: editingTenant.templatePreference || 'standard',
             quotationTemplate: editingTenant.quotationTemplate || 'standard'
         });
@@ -204,6 +243,16 @@ const SuperAdminDashboard = () => {
       toast.success("Password updated successfully!");
     } catch (e) {
       toast.error(e.response?.data?.message || "Failed to reset password");
+    }
+  };
+
+  const handleSendResetPasswordEmail = async () => {
+    if (!window.confirm(`Send a password reset email to ${editingTenant?.email}?`)) return;
+    try {
+      await api.post('/auth/forgot-password', { email: editingTenant.email });
+      toast.success("Password reset email sent to " + editingTenant.email);
+    } catch (e) {
+      toast.error(e.response?.data?.message || "Failed to send reset email");
     }
   };
 
@@ -340,7 +389,9 @@ const SuperAdminDashboard = () => {
                           <td className="p-4">
                              {t.status === 'active' 
                                 ? <span className="text-green-600 font-bold text-xs flex items-center gap-1"><CheckCircle className="w-4 h-4"/> Active</span>
-                                : <span className="text-red-600 font-bold text-xs flex items-center gap-1"><AlertCircle className="w-4 h-4"/> Suspended</span>
+                                : t.status === 'deleted'
+                                ? <span className="text-red-600 font-bold text-xs flex items-center gap-1"><Trash2 className="w-4 h-4"/> Deleted</span>
+                                : <span className="text-orange-600 font-bold text-xs flex items-center gap-1"><AlertCircle className="w-4 h-4"/> Suspended</span>
                              }
                           </td>
                           <td className="p-4 text-right pr-6">
@@ -490,16 +541,21 @@ const SuperAdminDashboard = () => {
 
                         <div className="bg-orange-50 p-6 rounded-xl border border-orange-200 shadow-sm">
                             <h4 className="text-sm font-bold text-orange-800 uppercase mb-4 flex items-center gap-2"><Lock className="w-4 h-4"/> Security</h4>
-                            <button type="button" onClick={handleResetPassword} className="w-full py-3 bg-white text-orange-700 font-bold rounded-lg border-2 border-orange-200 hover:bg-orange-100 transition shadow-sm flex items-center justify-center gap-2">
-                               <RotateCcw className="w-4 h-4"/> Reset Admin Password
-                            </button>
-                            <p className="text-[10px] text-orange-600 mt-2 font-medium">This will override the current admin's password.</p>
+                            <div className="flex flex-col gap-3">
+                              <button type="button" onClick={handleResetPassword} className="w-full py-3 bg-white text-orange-700 font-bold rounded-lg border-2 border-orange-200 hover:bg-orange-100 transition shadow-sm flex items-center justify-center gap-2">
+                                 <RotateCcw className="w-4 h-4"/> Manual Reset Password
+                              </button>
+                              <button type="button" onClick={handleSendResetPasswordEmail} className="w-full py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition shadow-sm flex items-center justify-center gap-2">
+                                 <Mail className="w-4 h-4"/> Send Reset Password Email
+                              </button>
+                            </div>
+                            <p className="text-[10px] text-orange-600 mt-3 font-medium">Reset password manually or send a reset link to the admin.</p>
                         </div>
 
                         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                             <h4 className="text-sm font-bold text-gray-900 uppercase mb-4 flex items-center gap-2"><CheckCircle className="w-4 h-4 text-blue-500"/> Account Status</h4>
                             <div className="grid grid-cols-2 gap-4">
-                                <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label><select {...registerEdit("status")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="active">Active</option><option value="suspended">Suspended</option></select></div>
+                                <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label><select {...registerEdit("status")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="active">Active</option><option value="suspended">Suspended</option><option value="deleted">Deleted</option></select></div>
                                 <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Plan</label><select {...registerEdit("subscriptionPlan")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="basic">Freelancer</option><option value="premium">Pro (Popular)</option><option value="enterprise">Business</option></select></div>
                             </div>
                         </div>
@@ -607,6 +663,28 @@ const SuperAdminDashboard = () => {
                 <button onClick={() => setViewMode('list')} className="text-gray-500 hover:text-black font-bold text-sm bg-white border px-4 py-2 rounded-lg">Back</button>
             </div>
             <div className="p-8 space-y-6">
+                <div className="flex items-center gap-2 mb-2 border-b pb-4">
+                    <input 
+                        type="checkbox" 
+                        id="sendEmail" 
+                        className="w-4 h-4 text-blue-600 rounded"
+                        checked={notificationForm.sendEmail}
+                        onChange={(e) => setNotificationForm({...notificationForm, sendEmail: e.target.checked})}
+                    />
+                    <label htmlFor="sendEmail" className="text-sm font-bold text-gray-700">Also send as Email Broadcast to all Tenants</label>
+                </div>
+                {notificationForm.sendEmail && (
+                    <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest">Email Subject</label>
+                        <input 
+                            type="text"
+                            className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold"
+                            placeholder="e.g., Bug Fix Update: Application is now faster!"
+                            value={notificationForm.subject}
+                            onChange={(e) => setNotificationForm({...notificationForm, subject: e.target.value})}
+                        />
+                    </div>
+                )}
                 <div>
                     <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest">Message Content</label>
                     <textarea 
@@ -633,25 +711,39 @@ const SuperAdminDashboard = () => {
                     <div>
                         <label className="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-widest">Target Audience</label>
                         <select 
-                            className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold disabled:opacity-50"
-                            disabled
+                            className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold mb-3"
                             value={notificationForm.target}
+                            onChange={(e) => setNotificationForm({...notificationForm, target: e.target.value, tenantId: ''})}
                         >
-                            <option value="all_admins">All Admins</option>
+                            <option value="all_admins">All Tenants (Broadcast)</option>
+                            <option value="specific_tenant">Specific Tenant</option>
                         </select>
+                        {notificationForm.target === 'specific_tenant' && (
+                            <select 
+                                className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-bold"
+                                value={notificationForm.tenantId}
+                                onChange={(e) => setNotificationForm({...notificationForm, tenantId: e.target.value})}
+                            >
+                                <option value="">-- Select a Tenant --</option>
+                                {tenants.filter(t => t.slug !== 'platform-admin').map(t => (
+                                    <option key={t._id} value={t._id}>{t.name} ({t.email})</option>
+                                ))}
+                            </select>
+                        )}
                     </div>
                 </div>
                 <div className="pt-4">
                     <button 
                         onClick={async () => {
                             if(!notificationForm.message) return toast.error("Message is required");
+                            if(notificationForm.target === 'specific_tenant' && !notificationForm.tenantId) return toast.error("Please select a specific tenant");
                             try {
                                 await api.post('/notifications', notificationForm);
-                                toast.success("Notification broadcasted successfully!");
-                                setNotificationForm({ message: '', type: 'info', target: 'all_admins' });
+                                toast.success("Notification sent successfully!");
+                                setNotificationForm({ message: '', type: 'info', target: 'all_admins', sendEmail: false, subject: '', tenantId: '' });
                                 setViewMode('list');
                             } catch (e) {
-                                toast.error("Failed to broadcast");
+                                toast.error("Failed to send notification");
                             }
                         }}
                         className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition transform hover:-translate-y-1 flex items-center justify-center gap-3"
@@ -776,40 +868,221 @@ const SuperAdminDashboard = () => {
         )}
 
         {viewMode === 'settings' && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 max-w-2xl mx-auto overflow-hidden mb-10">
-            <div className="px-8 py-6 border-b flex justify-between items-center bg-gray-50">
+          <div className="max-w-5xl mx-auto mb-10">
+            <div className="flex justify-between items-center mb-6">
               <div>
-                  <h2 className="text-2xl font-extrabold text-gray-900">Email Config (SMTP)</h2>
-                  <p className="text-sm text-gray-500 mt-1">Configure global outgoing email server.</p>
+                  <h2 className="text-2xl font-extrabold text-gray-900">System Settings</h2>
+                  <p className="text-sm text-gray-500 mt-1">Manage global configurations and legal documents.</p>
               </div>
               <button onClick={() => navigate('/super-admin')} className="text-gray-500 hover:text-black font-bold text-sm bg-white border px-4 py-2 rounded-lg">Back</button>
             </div>
-            <div className="p-8 space-y-6">
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Host</label>
-                  <input value={systemSettings.SMTP_HOST} onChange={e => setSystemSettings({...systemSettings, SMTP_HOST: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="smtp.gmail.com" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Port</label>
-                  <input value={systemSettings.SMTP_PORT} onChange={e => setSystemSettings({...systemSettings, SMTP_PORT: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="465" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Username</label>
-                  <input value={systemSettings.SMTP_USER} onChange={e => setSystemSettings({...systemSettings, SMTP_USER: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="billing@domain.com" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Password</label>
-                  <input type="password" value={systemSettings.SMTP_PASS} onChange={e => setSystemSettings({...systemSettings, SMTP_PASS: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="App Password" />
-                </div>
-                <button onClick={async () => {
-                  try {
-                    await api.put('/settings', systemSettings);
-                    toast.success("SMTP settings saved!");
-                  } catch(e) { toast.error("Failed to save settings"); }
-                }} className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition flex justify-center gap-2">
-                  <Save className="w-5 h-5"/> Save Configuration
-                </button>
+            
+            <div className="flex border-b border-gray-200 mb-6 gap-6">
+               <button onClick={() => setSettingsTab('smtp')} className={`pb-3 text-sm font-bold border-b-2 transition-colors ${settingsTab === 'smtp' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Email Config (SMTP)</button>
+               <button onClick={() => setSettingsTab('legal')} className={`pb-3 text-sm font-bold border-b-2 transition-colors ${settingsTab === 'legal' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Legal Documents</button>
+               <button onClick={() => setSettingsTab('contact')} className={`pb-3 text-sm font-bold border-b-2 transition-colors ${settingsTab === 'contact' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>Contact Messages</button>
             </div>
+
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+               {settingsTab === 'smtp' && (
+                 <div className="p-8 space-y-6">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Host</label>
+                      <input value={systemSettings.SMTP_HOST} onChange={e => setSystemSettings({...systemSettings, SMTP_HOST: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="smtp.gmail.com" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Port</label>
+                      <input value={systemSettings.SMTP_PORT} onChange={e => setSystemSettings({...systemSettings, SMTP_PORT: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="465" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Username</label>
+                      <input value={systemSettings.SMTP_USER} onChange={e => setSystemSettings({...systemSettings, SMTP_USER: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="billing@domain.com" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">SMTP Password</label>
+                      <input type="password" value={systemSettings.SMTP_PASS} onChange={e => setSystemSettings({...systemSettings, SMTP_PASS: e.target.value})} className="w-full border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-bold" placeholder="App Password" />
+                    </div>
+                    <button onClick={async () => {
+                      try {
+                        await api.put('/settings', systemSettings);
+                        toast.success("SMTP settings saved!");
+                      } catch(e) { toast.error("Failed to save settings"); }
+                    }} className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition flex justify-center gap-2">
+                      <Save className="w-5 h-5"/> Save Configuration
+                    </button>
+                 </div>
+               )}
+
+               {settingsTab === 'legal' && (
+                 <div className="p-8 space-y-6">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Terms & Conditions</label>
+                      <textarea value={systemSettings.terms_and_conditions || ''} onChange={e => setSystemSettings({...systemSettings, terms_and_conditions: e.target.value})} className="w-full border p-4 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-medium min-h-[250px]" placeholder="Enter terms and conditions text..." />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Privacy Policy</label>
+                      <textarea value={systemSettings.privacy_policy || ''} onChange={e => setSystemSettings({...systemSettings, privacy_policy: e.target.value})} className="w-full border p-4 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 font-medium min-h-[250px]" placeholder="Enter privacy policy text..." />
+                    </div>
+                    <button onClick={async () => {
+                      try {
+                        await api.put('/settings', systemSettings);
+                        toast.success("Legal documents saved!");
+                      } catch(e) { toast.error("Failed to save documents"); }
+                    }} className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-blue-200 hover:bg-blue-700 transition flex justify-center gap-2">
+                      <Save className="w-5 h-5"/> Save Documents
+                    </button>
+                 </div>
+               )}
+
+               {settingsTab === 'contact' && (
+                 <div className="p-0">
+                    {contactMessages.length === 0 ? (
+                       <div className="p-10 text-center text-gray-500 font-bold">No contact messages received yet.</div>
+                    ) : (
+                       <div className="overflow-x-auto">
+                         <table className="w-full text-left">
+                           <thead className="bg-gray-50 border-b border-gray-200">
+                             <tr>
+                               <th className="p-4 text-xs font-bold uppercase text-gray-500">Date</th>
+                               <th className="p-4 text-xs font-bold uppercase text-gray-500">From</th>
+                               <th className="p-4 text-xs font-bold uppercase text-gray-500">Subject</th>
+                               <th className="p-4 text-xs font-bold uppercase text-gray-500">Message</th>
+                             </tr>
+                           </thead>
+                           <tbody className="divide-y divide-gray-100">
+                             {contactMessages.map(msg => (
+                               <tr key={msg._id} className="hover:bg-gray-50">
+                                 <td className="p-4 text-sm text-gray-500 whitespace-nowrap">{new Date(msg.createdAt).toLocaleDateString()}</td>
+                                 <td className="p-4 text-sm font-bold">
+                                   <div>{msg.name}</div>
+                                   <div className="text-xs text-gray-500 font-normal">{msg.email}</div>
+                                 </td>
+                                 <td className="p-4 text-sm text-gray-800 font-medium">{msg.subject}</td>
+                                 <td className="p-4 text-sm text-gray-600 max-w-xs truncate" title={msg.message}>{msg.message}</td>
+                               </tr>
+                             ))}
+                           </tbody>
+                         </table>
+                       </div>
+                    )}
+                 </div>
+               )}
+            </div>
+          </div>
+        )}
+
+         {viewMode === 'security' && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 max-w-6xl mx-auto overflow-hidden animate-in fade-in">
+             <div className="px-8 py-6 border-b flex justify-between items-center bg-gray-50">
+                <div>
+                    <h2 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2"><ShieldCheck className="w-6 h-6 text-red-500"/> Security Operations Center (SOC)</h2>
+                    <p className="text-sm text-gray-500 mt-1">Monitor live traffic, manage blocked IP addresses, and secure your application.</p>
+                </div>
+                <button onClick={() => navigate('/super-admin')} className="text-gray-500 hover:text-black font-bold text-sm bg-white border px-4 py-2 rounded-lg">Back to Dashboard</button>
+             </div>
+             
+             <div className="p-8 grid lg:grid-cols-3 gap-8">
+                {/* LEFT COL: Live Traffic & Manual Block */}
+                <div className="lg:col-span-1 space-y-6">
+                   
+                   {/* Live Traffic */}
+                   <div className="bg-blue-50 border border-blue-100 p-6 rounded-xl">
+                      <h3 className="font-bold text-blue-800 mb-4 flex items-center gap-2"><TrendingUp className="w-4 h-4"/> Active Connections (Last 15m)</h3>
+                      {activeTraffic.length === 0 ? (
+                         <div className="text-sm text-gray-500 text-center bg-white p-4 rounded-lg border border-blue-50">No active traffic.</div>
+                      ) : (
+                         <div className="max-h-60 overflow-y-auto pr-2 space-y-2">
+                            {activeTraffic.map((t, idx) => (
+                               <div key={idx} className="flex justify-between items-center bg-white p-3 rounded-lg border border-blue-50 text-sm">
+                                  <div>
+                                     <div className="font-bold font-mono text-gray-700">{t.ipAddress}</div>
+                                     <div className="text-xs text-gray-400">Last: {new Date(t.lastRequest).toLocaleTimeString()}</div>
+                                  </div>
+                                  <div className={`font-bold px-2 py-1 rounded-md ${t.count > 100 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                     {t.count} reqs
+                                  </div>
+                               </div>
+                            ))}
+                         </div>
+                      )}
+                   </div>
+
+                   {/* Manual Block Form */}
+                   <div className="bg-red-50 border border-red-100 p-6 rounded-xl">
+                      <h3 className="font-bold text-red-800 mb-4 flex items-center gap-2"><Lock className="w-4 h-4"/> Block IP Address</h3>
+                      <form onSubmit={handleBlockIP} className="space-y-4">
+                         <div>
+                            <label className="block text-xs font-bold text-red-700 uppercase mb-1">IP Address</label>
+                            <input 
+                               type="text" 
+                               required
+                               placeholder="e.g. 192.168.1.1" 
+                               value={socForm.ipAddress} 
+                               onChange={e => setSocForm({...socForm, ipAddress: e.target.value})} 
+                               className="w-full border-red-200 rounded-lg p-3 focus:ring-2 focus:ring-red-500 outline-none border bg-white font-medium" 
+                            />
+                         </div>
+                         <div>
+                            <label className="block text-xs font-bold text-red-700 uppercase mb-1">Reason</label>
+                            <input 
+                               type="text" 
+                               required
+                               placeholder="e.g. Spamming API" 
+                               value={socForm.reason} 
+                               onChange={e => setSocForm({...socForm, reason: e.target.value})} 
+                               className="w-full border-red-200 rounded-lg p-3 focus:ring-2 focus:ring-red-500 outline-none border bg-white font-medium" 
+                            />
+                         </div>
+                         <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg shadow-sm transition">
+                            Block IP
+                         </button>
+                      </form>
+                   </div>
+                </div>
+
+                {/* RIGHT COL: Blocked IPs */}
+                <div className="lg:col-span-2">
+                   <h3 className="font-bold text-gray-800 mb-4">Currently Blocked IPs ({blockedIPs.length})</h3>
+                   {blockedIPs.length === 0 ? (
+                      <div className="p-10 text-center text-gray-500 font-bold bg-gray-50 rounded-xl border border-gray-100">No IPs are currently blocked.</div>
+                   ) : (
+                      <div className="overflow-x-auto border border-gray-200 rounded-xl">
+                        <table className="w-full text-left">
+                          <thead className="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                              <th className="p-4 text-xs font-bold uppercase text-gray-500">IP Address</th>
+                              <th className="p-4 text-xs font-bold uppercase text-gray-500">Reason</th>
+                              <th className="p-4 text-xs font-bold uppercase text-gray-500 text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100">
+                            {blockedIPs.map(b => (
+                              <tr key={b._id} className={`transition ${b.autoBlocked ? 'hover:bg-orange-50' : 'hover:bg-red-50'}`}>
+                                <td className="p-4">
+                                   <div className={`font-bold font-mono ${b.autoBlocked ? 'text-orange-600' : 'text-red-600'}`}>{b.ipAddress}</div>
+                                   {b.autoBlocked && <div className="text-[10px] uppercase font-bold text-orange-500 mt-1 bg-orange-100 inline-block px-2 py-0.5 rounded">Auto Blocked</div>}
+                                </td>
+                                <td className="p-4">
+                                   <div className="text-sm font-medium text-gray-700">{b.reason}</div>
+                                   <div className="text-xs text-gray-500 mt-1">Blocked: {new Date(b.createdAt).toLocaleTimeString()}</div>
+                                   {b.expiresAt && <div className="text-xs font-bold text-gray-400 mt-1">Expires: {new Date(b.expiresAt).toLocaleTimeString()}</div>}
+                                </td>
+                                <td className="p-4 text-right">
+                                   <button 
+                                      onClick={() => handleUnblockIP(b.ipAddress)} 
+                                      className="text-xs font-bold bg-white text-gray-600 hover:text-green-600 border border-gray-300 hover:border-green-300 px-3 py-1.5 rounded-lg shadow-sm transition"
+                                   >
+                                      Unblock
+                                   </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                   )}
+                </div>
+             </div>
           </div>
         )}
 

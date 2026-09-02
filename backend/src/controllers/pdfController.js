@@ -130,19 +130,21 @@ exports.downloadPublicQuotationPDF = async (req, res) => {
 exports.emailInvoice = async (req, res) => {
     try {
         const { id } = req.params;
-        const templateName = req.query.template || 'standard';
 
-        const invoice = await Invoice.findOne({ _id: id, tenantId: req.user.tenantId });
-        if (!invoice || !invoice.client.email) return res.status(400).json({ message: "Email not found" });
-
-        const htmlContent = getTemplate(templateName, invoice);
-        const pdfBuffer = await generatePdfBuffer(htmlContent);
+        // Fetch invoice and populate tenant for white-labeled email templates
+        const invoice = await Invoice.findOne({ _id: id, tenantId: req.user.tenantId }).populate('tenantId');
+        if (!invoice || !invoice.client || !invoice.client.email) {
+            return res.status(400).json({ message: "Client email not found" });
+        }
 
         const { sendInvoiceEmail } = require('../utils/emailService');
-        await sendInvoiceEmail(invoice, pdfBuffer);
+        
+        // PDF attachment is disabled as per business requirements, skip generation.
+        await sendInvoiceEmail(invoice, null, invoice.tenantId);
 
         res.json({ success: true, message: "Email sent!" });
     } catch (error) {
+        console.error("Email API Error:", error);
         res.status(500).json({ message: "Email failed", error: error.message });
     }
 };
@@ -151,11 +153,19 @@ exports.emailInvoice = async (req, res) => {
 exports.whatsappInvoice = async (req, res) => {
     try {
         const { id } = req.params;
-        const invoice = await Invoice.findOne({ _id: id, tenantId: req.user.tenantId });
-        if (!invoice || !invoice.client.phone) return res.status(400).json({ message: "Phone missing" });
+        const invoice = await Invoice.findOne({ _id: id, tenantId: req.user.tenantId }).populate('tenantId');
+        if (!invoice || !invoice.client || !invoice.client.phone) return res.status(400).json({ message: "Phone missing" });
         
-        const phone = invoice.client.phone.replace(/\D/g, ''); 
-        const link = `https://wa.me/${phone}?text=Invoice%20${invoice.invoiceNumber}`;
+        const phone = invoice.client.phone.replace(/\D/g, '');
+        const companyName = invoice.tenantId ? invoice.tenantId.name : 'Our Company';
+        
+        const frontendUrl = process.env.FRONTEND_URL || req.get('origin') || 'http://localhost:5173';
+        const publicLink = `${frontendUrl}/public/invoice/${invoice._id}`;
+        
+        const message = `Hello ${invoice.client.name},\n\nHere is your invoice ${invoice.invoiceNumber} from ${companyName} for the amount of ₹${invoice.totalAmount}.\n\nYou can view, download, or print your invoice online using the following link:\n${publicLink}\n\nThank you for your business!\n\nBest Regards,\n${companyName}`;
+
+        const encodedMessage = encodeURIComponent(message);
+        const link = `https://wa.me/${phone}?text=${encodedMessage}`;
         res.json({ success: true, whatsappUrl: link });
     } catch (error) {
         res.status(500).json({ message: "Error", error: error.message });

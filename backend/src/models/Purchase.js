@@ -11,6 +11,8 @@ const purchaseSchema = new mongoose.Schema({
     quantity: Number,
     rate: Number,
     amount: Number,
+    addToInventory: { type: Boolean, default: false },
+    sellingPrice: { type: Number, default: 0 },
     inventoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Inventory' }
   }],
   subTotal: { type: Number, default: 0 },
@@ -18,7 +20,8 @@ const purchaseSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   amountPaid: { type: Number, default: 0 },
   status: { type: String, enum: ['Unpaid', 'Partial', 'Paid'], default: 'Unpaid' },
-  notes: { type: String }
+  notes: { type: String },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Purchase', purchaseSchema);

@@ -51,7 +51,7 @@ exports.getNotifications = async (req, res) => {
 // @access  Private/SuperAdmin
 exports.createNotification = async (req, res) => {
   try {
-    const { message, type, target, tenantId, actionLink } = req.body;
+    const { message, type, target, tenantId, actionLink, sendEmail, subject } = req.body;
 
     const notification = await Notification.create({
       message,
@@ -61,6 +61,19 @@ exports.createNotification = async (req, res) => {
       actionLink,
       isSystemGenerated: false
     });
+
+    if (sendEmail) {
+      let query = { role: 'admin' };
+      if (target === 'specific_tenant' && tenantId) {
+         query.tenantId = tenantId;
+      }
+      const admins = await User.find(query).select('email name');
+      
+      if (admins && admins.length > 0) {
+        const { sendSystemBroadcastEmail } = require('../utils/emailService');
+        sendSystemBroadcastEmail(admins, subject || "System Broadcast", message).catch(err => console.log('Broadcast Email Error', err));
+      }
+    }
 
     res.status(201).json({
       success: true,

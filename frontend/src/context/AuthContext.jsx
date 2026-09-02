@@ -114,8 +114,17 @@ export const AuthProvider = ({ children }) => {
     window.location.href = '/login';
   };
 
+  // --- 5. COMPLETE TOUR HANDLER ---
+  const completeUserTour = () => {
+    if (user) {
+      const updatedUser = { ...user, hasCompletedTour: true };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, token, login, logout, loading, completeUserTour }}>
       {children}
     </AuthContext.Provider>
   );

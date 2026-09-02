@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -10,12 +11,16 @@ import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../clients/clients_controller.dart';
 import '../expenses/expenses_controller.dart';
+import '../expenses/widgets/expense_list_item.dart';
 import '../invoices/create_invoice_screen.dart';
 import '../invoices/invoice_details_screen.dart';
 import '../invoices/invoice_list_screen.dart';
 import '../clients/clients_screen.dart';
+import '../expenses/expenses_screen.dart';
+import '../clients/select_client_screen.dart';
 import '../auth/auth_controller.dart';
 import '../../navigation/main_layout.dart';
+import 'dashboard_controller.dart';
 
 // Tailwind color constants matching web aesthetics
 const Color tailwindEmerald = Color(0xFF10B981);
@@ -57,6 +62,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final AuthController authController = Get.isRegistered<AuthController>()
       ? Get.find<AuthController>()
       : Get.put(AuthController(), permanent: true);
+  final DashboardController dashboardController = Get.put(DashboardController());
 
   // Quick Payment form variables
   String? _selectedClientId;
@@ -66,6 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   // Chart state
   String _chartView = 'monthly'; // 'monthly' or 'yearly'
+  String _globalFilter = 'Lifetime';
   bool _isManualRefreshing = false;
 
   @override
@@ -75,6 +82,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     clientsController.fetchClients();
     expensesController.fetchExpenses();
     authController.fetchTenantSettings();
+    dashboardController.fetchDashboardStats();
   }
 
   @override
@@ -200,6 +208,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return null;
   }
 
+  bool _isDateInFilter(DateTime? date, String filter) {
+    if (filter == 'Lifetime' || date == null) return true;
+    final now = DateTime.now();
+    if (filter == 'This Year') {
+      return date.year == now.year;
+    } else if (filter == 'This Month') {
+      return date.year == now.year && date.month == now.month;
+    } else if (filter == 'Today') {
+      return date.year == now.year && date.month == now.month && date.day == now.day;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -208,12 +229,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'dashboard'.tr,
-        subtitle: 'overview_insights'.tr,
+        subtitle: null,
         showMenu: false,
         showProfile: true,
-        showBadge: true,
+        showBadge: false,
         showNotification: true,
         showBackButton: false,
+        showBorder: false,
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -225,6 +247,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           await clientsController.fetchClients();
           await expensesController.fetchExpenses();
           await authController.fetchTenantSettings();
+          await dashboardController.fetchDashboardStats();
           if (mounted) {
             setState(() {
               _isManualRefreshing = false;
@@ -237,28 +260,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
           child: Obx(() {
-            final isLoading =
-                clientsController.isLoading.value ||
-                expensesController.isLoading.value;
-            final isFirstLoad =
-                clientsController.clients.isEmpty &&
-                expensesController.expenses.isEmpty;
-            final showSkeleton =
-                isLoading && (isFirstLoad || _isManualRefreshing);
+            final isLoading = dashboardController.isLoading.value;
+            final showSkeleton = isLoading;
             final bool useDummy = showSkeleton;
 
-            // --- Calculate Real-time stats ---
-            final allInvoices = <Map<String, dynamic>>[];
-            double totalRevenue = 0.0;
-            double totalPendingAmount = 0.0;
-            int paidCount = 0;
-            int pendingCount = 0;
-            List<Map<String, dynamic>> recentInvoices = [];
-            double totalExpenses = 0.0;
-            double netProfit = 0.0;
-            int totalInvoices = 0;
-            int successRate = 0;
-
+            // --- Real-time stats from Backend API ---
+            double totalRevenue = dashboardController.totalRevenue.value;
+            double totalPendingAmount = dashboardController.totalPendingAmount.value;
+            int totalInvoices = dashboardController.totalInvoices.value;
+            int paidCount = dashboardController.paidInvoices.value;
+            int pendingCount = dashboardController.pendingCount.value;
+            double totalExpenses = dashboardController.totalExpenses.value;
+            double netProfit = dashboardController.netProfit.value;
+            double totalReceived = totalRevenue - totalPendingAmount;
+            int successRate = totalInvoices > 0 ? ((paidCount / totalInvoices) * 100).round() : 0;
+            
+            // Note: recentInvoices extraction remains similar but from dashboardController if needed. We'll leave it out for this simplified stat UI as the backend provides it natively.
+            
             if (useDummy) {
               totalRevenue = 250000.0;
               totalExpenses = 85000.0;
@@ -268,214 +286,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               paidCount = 12;
               pendingCount = 4;
               successRate = 75;
-
-              recentInvoices = List.generate(3, (idx) {
-                final inv = ClientInvoice(
-                  id: 'loading_id_$idx',
-                  invoiceNumber: 'INV-2026-000$idx',
-                  totalAmount: 25000.0,
-                  remainingAmount: idx == 0 ? 0.0 : 25000.0,
-                  date: '2026-06-10T00:00:00Z',
-                  status: idx == 0 ? 'Paid' : 'Pending',
-                );
-                final client = Client(
-                  id: 'loading_client_$idx',
-                  name: 'Placeholder Client Name',
-                  email: 'client@example.com',
-                  phone: '9876543210',
-                  gstin: '07AAAAA0000A1Z0',
-                  state: 'Delhi',
-                  address: 'Placeholder Address',
-                  totalBilled: 25000.0,
-                  balance: idx == 0 ? 0.0 : 25000.0,
-                );
-                return {'invoice': inv, 'client': client};
-              });
-            } else {
-              for (var item in clientsController.allInvoices) {
-                final Map<String, dynamic> invMap = Map<String, dynamic>.from(
-                  item,
-                );
-                final inv = ClientInvoice.fromJson(invMap);
-
-                final clientObj = invMap['client'] ?? {};
-                final String clientId =
-                    clientObj['clientId'] ??
-                    clientObj['id'] ??
-                    clientObj['_id'] ??
-                    '';
-
-                final client = clientsController.clients.firstWhere(
-                  (c) => c.id == clientId,
-                  orElse: () => Client(
-                    id: clientId,
-                    name: clientObj['name'] ?? 'Unknown',
-                    email: clientObj['email'] ?? '',
-                    phone: clientObj['phone'] ?? '',
-                    gstin: clientObj['gstin'] ?? clientObj['gstNumber'] ?? '',
-                    state: clientObj['state'] ?? '',
-                    address: clientObj['address'] ?? '',
-                    totalBilled: (clientObj['totalBilled'] ?? 0).toDouble(),
-                    balance: (clientObj['balance'] ?? 0).toDouble(),
-                  ),
-                );
-
-                allInvoices.add({'invoice': inv, 'client': client});
-
-                totalRevenue += inv.totalAmount;
-                final statusLower = inv.status.toLowerCase();
-                if (statusLower == 'pending' || statusLower == 'overdue') {
-                  totalPendingAmount += inv.totalAmount;
-                }
-
-                if (statusLower == 'paid') {
-                  paidCount++;
-                } else if (statusLower == 'pending' ||
-                    statusLower == 'overdue') {
-                  pendingCount++;
-                }
-              }
-
-              // Sort invoices by date desc
-              allInvoices.sort((a, b) {
-                final invA = a['invoice'] as ClientInvoice;
-                final invB = b['invoice'] as ClientInvoice;
-                final dateA = _parseDate(invA.date) ?? DateTime(2000);
-                final dateB = _parseDate(invB.date) ?? DateTime(2000);
-                return dateB.compareTo(dateA);
-              });
-
-              // Take recent 5
-              recentInvoices = allInvoices.take(5).toList();
-
-              totalExpenses = expensesController.totalAllTimeSpent;
-              netProfit = totalRevenue - totalExpenses;
-              totalInvoices = allInvoices.length;
-              successRate = totalInvoices > 0
-                  ? ((paidCount / totalInvoices) * 100).round()
-                  : 0;
+              totalReceived = totalRevenue - totalPendingAmount;
             }
 
-            // --- Dynamic Monthly & Yearly Chart Grouping ---
-            final monthNames = [
-              "Jan",
-              "Feb",
-              "Mar",
-              "Apr",
-              "May",
-              "Jun",
-              "Jul",
-              "Aug",
-              "Sep",
-              "Oct",
-              "Nov",
-              "Dec",
-            ];
-
-            // Generate last 6 months in chronological order
-            final List<Map<String, dynamic>> monthlyData = [];
-            final Map<String, int> monthToIndex = {};
-            final now = DateTime.now();
-            final currentYear = DateTime.now().year;
-
-            if (useDummy) {
-              for (int i = 5; i >= 0; i--) {
-                final d = DateTime(now.year, now.month - i, 1);
-                final mName = monthNames[d.month - 1];
-                monthlyData.add({
-                  'name': mName,
-                  'income': 50000.0 + (i * 10000.0),
-                  'expense': 20000.0 + (i * 5000.0),
-                });
-              }
-            } else {
-              for (int i = 5; i >= 0; i--) {
-                final d = DateTime(now.year, now.month - i, 1);
-                final mName = monthNames[d.month - 1];
-                monthlyData.add({'name': mName, 'income': 0.0, 'expense': 0.0});
-                monthToIndex[mName] = monthlyData.length - 1;
-              }
-
-              // Group invoices into monthlyData
-              for (var item in allInvoices) {
-                final inv = item['invoice'] as ClientInvoice;
-                final date = _parseDate(inv.date);
-                if (date != null) {
-                  final mName = monthNames[date.month - 1];
-                  if (monthToIndex.containsKey(mName)) {
-                    final idx = monthToIndex[mName]!;
-                    monthlyData[idx]['income'] =
-                        (monthlyData[idx]['income'] as double) +
-                        inv.totalAmount;
-                  }
-                }
-              }
-
-              // Group expenses into monthlyData
-              for (var exp in expensesController.expenses) {
-                final date = _parseDate(exp.date);
-                if (date != null) {
-                  final mName = monthNames[date.month - 1];
-                  if (monthToIndex.containsKey(mName)) {
-                    final idx = monthToIndex[mName]!;
-                    monthlyData[idx]['expense'] =
-                        (monthlyData[idx]['expense'] as double) + exp.amount;
-                  }
-                }
-              }
-            }
-
-            // Generate last 5 years
-            final List<Map<String, dynamic>> yearlyData = [];
-            final Map<String, int> yearToIndex = {};
-
-            if (useDummy) {
-              for (int i = 4; i >= 0; i--) {
-                final yName = (currentYear - i).toString();
-                yearlyData.add({
-                  'name': yName,
-                  'income': 500000.0 + (i * 100000.0),
-                  'expense': 200000.0 + (i * 50000.0),
-                });
-              }
-            } else {
-              for (int i = 4; i >= 0; i--) {
-                final yName = (currentYear - i).toString();
-                yearlyData.add({'name': yName, 'income': 0.0, 'expense': 0.0});
-                yearToIndex[yName] = yearlyData.length - 1;
-              }
-
-              // Group invoices into yearlyData
-              for (var item in allInvoices) {
-                final inv = item['invoice'] as ClientInvoice;
-                final date = _parseDate(inv.date);
-                if (date != null) {
-                  final yName = date.year.toString();
-                  if (yearToIndex.containsKey(yName)) {
-                    final idx = yearToIndex[yName]!;
-                    yearlyData[idx]['income'] =
-                        (yearlyData[idx]['income'] as double) + inv.totalAmount;
-                  }
-                }
-              }
-
-              // Group expenses into yearlyData
-              for (var exp in expensesController.expenses) {
-                final date = _parseDate(exp.date);
-                if (date != null) {
-                  final yName = date.year.toString();
-                  if (yearToIndex.containsKey(yName)) {
-                    final idx = yearToIndex[yName]!;
-                    yearlyData[idx]['expense'] =
-                        (yearlyData[idx]['expense'] as double) + exp.amount;
-                  }
-                }
-              }
-            }
-
-            final chartData = _chartView == 'monthly'
-                ? monthlyData
-                : yearlyData;
+            // Chart grouping removed as requested
 
             return Skeletonizer(
               enabled: showSkeleton,
@@ -490,115 +304,197 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         final isSmallScreen = headerConstraints.maxWidth < 450;
 
                         Widget buildWelcomeHeader() {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
-                                children: [
-                                  Text(
-                                    'welcome_back'.tr,
-                                    style: context.typography.screenTitle.copyWith(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.normal,
-                                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                          return Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.04),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 10,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(20),
+                                              border: Border.all(
+                                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                                              ),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(
+                                                  LucideIcons.hexagon,
+                                                  size: 12,
+                                                  color: Theme.of(context).colorScheme.primary,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Obx(() {
+                                                  final role = authController.userRole.value.toUpperCase();
+                                                  String displayRole = 'USER';
+                                                  if (role.isNotEmpty) {
+                                                    displayRole = role.replaceAll('_', ' ');
+                                                  }
+                                                  return Text(
+                                                    displayRole,
+                                                    style: context.typography.roleBadgeText.copyWith(
+                                                      color: context.colorScheme.primary,
+                                                      fontSize: 10,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  );
+                                                }),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'welcome_back'.tr,
+                                            style: context.typography.screenTitle.copyWith(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
+                                              color: Theme.of(context).textTheme.bodyMedium?.color,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Wrap(
+                                            crossAxisAlignment: WrapCrossAlignment.center,
+                                            children: [
+                                              Text(
+                                                authController.userName.value.isNotEmpty
+                                                    ? authController.userName.value
+                                                    : 'Admin',
+                                                style: context.typography.screenTitle.copyWith(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: const Color(0xFF4F46E5), // Match the primary color
+                                                ),
+                                              ),
+                                              Text(
+                                                ' 👋',
+                                                style: context.typography.screenTitle.copyWith(
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    authController.userName.value.isNotEmpty
-                                        ? authController.userName.value
-                                        : 'Admin',
-                                    style: context.typography.screenTitle.copyWith(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: context.colorScheme.primary,
+                                    Lottie.asset(
+                                      'assets/lottie/business_analytics.json',
+                                      height: 110,
+                                      fit: BoxFit.contain,
                                     ),
-                                  ),
-                                  Text(
-                                    ' 👋',
-                                    style: context.typography.screenTitle.copyWith(
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              // Subscription Badge
-                              Obx(() {
-                                final tenant = authController.tenantInfo.value;
-                                if (tenant == null ||
-                                    tenant['subscriptionEnd'] == null) {
-                                  return const SizedBox.shrink();
-                                }
-                                final plan =
-                                    tenant['subscriptionPlan'] as String?;
-                                final endDateStr =
-                                    tenant['subscriptionEnd'] as String?;
-                                final daysLeft = getDaysLeft(endDateStr);
-                                final planName = getPlanName(plan);
-                                final isWarning = daysLeft <= 15;
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                // Subscription Badge
+                                Obx(() {
+                                  final tenant = authController.tenantInfo.value;
+                                  if (tenant == null ||
+                                      tenant['subscriptionEnd'] == null) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  final plan =
+                                      tenant['subscriptionPlan'] as String?;
+                                  final endDateStr =
+                                      tenant['subscriptionEnd'] as String?;
+                                  final daysLeft = getDaysLeft(endDateStr);
+                                  final planName = getPlanName(plan);
+                                  final isWarning = daysLeft <= 15;
 
-                                return Container(
-                                  margin: const EdgeInsets.only(top: 6),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: isWarning
-                                        ? Colors.red.withValues(alpha: 0.08)
-                                        : const Color(
-                                            0xFFE0F2FE,
-                                          ), // light blue-50
-                                    borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(
-                                      color: isWarning
-                                          ? Colors.red.withValues(alpha: 0.15)
-                                          : const Color(0xFFBAE6FD),
-                                      width: 1,
+                                  return FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 6,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isWarning
+                                            ? Colors.red.withValues(alpha: 0.08)
+                                            : const Color(0xFFF0F9FF), // lighter blue
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: isWarning
+                                              ? Colors.red.withValues(alpha: 0.15)
+                                              : const Color(0xFFE0F2FE),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            LucideIcons.crown,
+                                            size: 14,
+                                            color: isWarning ? Colors.red : const Color(0xFF0284C7),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            planName.toUpperCase(),
+                                            style: context.typography.roleBadgeText.copyWith(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: isWarning
+                                                  ? Colors.red
+                                                  : const Color(0xFF0284C7),
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Container(
+                                            width: 4,
+                                            height: 4,
+                                            decoration: BoxDecoration(
+                                              color: isWarning
+                                                  ? Colors.red
+                                                  : const Color(0xFF0284C7),
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            daysLeft > 0
+                                                ? '$daysLeft ${'days_left'.tr}'
+                                                : 'expired'.tr,
+                                            style: context.typography.statusLabel.copyWith(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                              color: isWarning
+                                                  ? Colors.red
+                                                  : const Color(0xFF0284C7),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(
-                                        planName.toUpperCase(),
-                                        style: context.typography.roleBadgeText.copyWith(
-                                          fontSize: 9,
-                                          color: isWarning
-                                              ? Colors.red
-                                              : const Color(0xFF0369A1),
-                                          letterSpacing: 0.5,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Container(
-                                        width: 4,
-                                        height: 4,
-                                        decoration: BoxDecoration(
-                                          color: isWarning
-                                              ? Colors.red
-                                              : const Color(0xFF0369A1),
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        daysLeft > 0
-                                            ? '$daysLeft ${'days_left'.tr}'
-                                            : 'expired'.tr,
-                                        style: context.typography.statusLabel.copyWith(
-                                          fontSize: 9,
-                                          color: isWarning
-                                              ? Colors.red
-                                              : const Color(0xFF0284C7),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }),
-                            ],
+                                  );
+                                }),
+                              ],
+                            ),
                           );
                         }
 
@@ -659,13 +555,78 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           );
                         }
 
+                        Widget buildFilterDropdown({bool isFullWidth = false}) {
+                          return Container(
+                            width: isFullWidth ? double.infinity : null,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardColor,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                                width: 1,
+                              ),
+                            ),
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<String>(
+                                value: _globalFilter,
+                                isDense: true,
+                                icon: const Icon(LucideIcons.chevronDown, size: 16),
+                                isExpanded: isFullWidth,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                                ),
+                                items: ['Lifetime', 'This Year', 'This Month', 'Today']
+                                    .map((String value) {
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Text(value),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) async {
+                                  if (newValue != null && newValue != _globalFilter) {
+                                    setState(() {
+                                      _globalFilter = newValue;
+                                      _isManualRefreshing = true;
+                                    });
+                                    await Future.wait([
+                                      clientsController.fetchClients(),
+                                      expensesController.fetchExpenses(),
+                                      Future.delayed(const Duration(milliseconds: 600)),
+                                    ]);
+                                    if (mounted) {
+                                      setState(() {
+                                        _isManualRefreshing = false;
+                                      });
+                                    }
+                                  }
+                                },
+                              ),
+                            ),
+                          );
+                        }
+
                         if (isSmallScreen) {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               buildWelcomeHeader(),
                               const SizedBox(height: 16),
-                              buildNewInvoiceButton(isFullWidth: true),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    flex: 35,
+                                    child: buildFilterDropdown(isFullWidth: true),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    flex: 65,
+                                    child: buildNewInvoiceButton(isFullWidth: true),
+                                  ),
+                                ],
+                              ),
                             ],
                           );
                         } else {
@@ -675,7 +636,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             children: [
                               Expanded(child: buildWelcomeHeader()),
                               const SizedBox(width: 12),
-                              buildNewInvoiceButton(isFullWidth: false),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  buildFilterDropdown(),
+                                  const SizedBox(width: 12),
+                                  buildNewInvoiceButton(isFullWidth: false),
+                                ],
+                              ),
                             ],
                           );
                         }
@@ -690,14 +658,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: context.width < 360
-                          ? 1
-                          : (context.width < 600 ? 2 : 3),
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: context.width < 360
-                          ? 2.5
-                          : (context.width < 600 ? 1.15 : 1.35),
+                      crossAxisCount: context.width < 600 ? 2 : 3,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      childAspectRatio: context.width < 600 ? 1.15 : 1.35,
                     ),
                     itemCount: 6,
                     itemBuilder: (context, index) {
@@ -725,13 +689,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           );
                         case 2:
                           return _buildStatCard(
-                            title: 'net_profit'.tr,
+                            title: 'NET PROFIT',
                             value: formatCurrency.format(netProfit),
-                            subtitle: 'bottom_line'.tr,
+                            subtitle: 'Rev - (Exp + Purchases)',
                             icon: LucideIcons.trendingUp,
                             color: context.colorScheme.primary,
                             bgColor: AppColors.primary.withValues(alpha: 0.1),
-                            isFeatured: false,
+                            isFeatured: true,
                             delay: 150,
                           );
                         case 3:
@@ -757,9 +721,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         case 5:
                         default:
                           return _buildStatCard(
-                            title: 'success'.tr,
-                            value: '$successRate%',
-                            subtitle: 'invoices_paid'.tr,
+                            title: 'RECEIVED',
+                            value: formatCurrency.format(totalReceived),
+                            subtitle: 'Payment collected',
                             icon: LucideIcons.checkCircle,
                             color: tailwindPurple,
                             bgColor: tailwindPurpleLight,
@@ -770,44 +734,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  // --- MAIN LAYOUT RESPONSIVE COLUMNS (Chart + Side panels) ---
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final isWide = constraints.maxWidth > 950;
-
-                      final chartSection = _buildChartSection(
-                        chartData,
-                        isDark,
-                      );
-                      final sideSection = Column(
-                        children: [
-                          _buildRecentInvoices(recentInvoices, isDark),
-                          const SizedBox(height: 16),
-                          _buildQuickCollectPayment(isDark),
-                          const SizedBox(height: 16),
-                          _buildQuickActions(isDark),
-                        ],
-                      );
-
-                      if (isWide) {
-                        return Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(flex: 3, child: chartSection),
-                            const SizedBox(width: 16),
-                            Expanded(flex: 2, child: sideSection),
-                          ],
-                        );
-                      } else {
-                        return Column(
-                          children: [
-                            chartSection,
-                            const SizedBox(height: 16),
-                            sideSection,
-                          ],
-                        );
-                      }
-                    },
+                  // --- MAIN LAYOUT (Recent Invoices & Quick Actions) ---
+                  Column(
+                    children: [
+                      _buildRecentInvoices(dashboardController.recentInvoices, isDark),
+                      const SizedBox(height: 16),
+                      _buildRecentExpenses(dashboardController.recentExpenses, isDark),
+                      const SizedBox(height: 16),
+                      _buildQuickCollectPayment(isDark),
+                      const SizedBox(height: 16),
+                      _buildQuickActions(isDark),
+                    ],
                   ),
                 ],
               ),
@@ -861,8 +798,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: isSmall ? 12.0 : 16.0,
-                    vertical: isSmall ? 8.0 : 12.0,
+                    horizontal: isSmall ? 6.0 : 10.0,
+                    vertical: isSmall ? 4.0 : 8.0,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -937,266 +874,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildChartSection(List<Map<String, dynamic>> chartData, bool isDark) {
-    // Find maximum Y value for nice scaling
-    double maxY = 100000.0;
-    for (var m in chartData) {
-      final inc = m['income'] as double;
-      final exp = m['expense'] as double;
-      if (inc > maxY) maxY = inc;
-      if (exp > maxY) maxY = exp;
-    }
-    // Round to next nice number
-    maxY = (maxY * 1.15).ceilToDouble();
-    if (maxY == 0) maxY = 1000.0;
-
-    return FadeInUp(
-      delay: const Duration(milliseconds: 350),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.01),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'revenue_overview'.tr,
-                      style: context.typography.cardTitle.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'income_expense_comparison'.tr,
-                      style: context.typography.cardSubtitle.copyWith(
-                        fontSize: 11,
-                        color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).scaffoldBackgroundColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Theme.of(context).colorScheme.outline),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _chartView,
-                      onChanged: (val) {
-                        if (val != null) {
-                          setState(() {
-                            _chartView = val;
-                          });
-                        }
-                      },
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                      ),
-                      icon: const Icon(LucideIcons.chevronDown, size: 14),
-                      items: [
-                        DropdownMenuItem(
-                          value: 'monthly',
-                          child: Text('last_6_months'.tr),
-                        ),
-                        DropdownMenuItem(
-                          value: 'yearly',
-                          child: Text('last_5_years'.tr),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 28),
-            // Legends
-            Row(
-              children: [
-                _buildLegendItem('income'.tr, AppColors.primary),
-                const SizedBox(width: 16),
-                _buildLegendItem('expense'.tr, tailwindRose),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Chart wrapper
-            SizedBox(
-              height: 280,
-              child: BarChart(
-                BarChartData(
-                  alignment: BarChartAlignment.spaceEvenly,
-                  maxY: maxY,
-                  barGroups: chartData.asMap().entries.map((entry) {
-                    final idx = entry.key;
-                    final m = entry.value;
-                    final inc = m['income'] as double;
-                    final exp = m['expense'] as double;
-
-                    return BarChartGroupData(
-                      x: idx,
-                      barRods: [
-                        BarChartRodData(
-                          toY: inc,
-                          color: context.colorScheme.primary,
-                          width: 10,
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(4),
-                          ),
-                        ),
-                        BarChartRodData(
-                          toY: exp,
-                          color: tailwindRose,
-                          width: 10,
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(4),
-                          ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                  titlesData: FlTitlesData(
-                    show: true,
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 30,
-                        getTitlesWidget: (val, meta) {
-                          final idx = val.toInt();
-                          if (idx >= 0 && idx < chartData.length) {
-                            return SideTitleWidget(
-                              axisSide: meta.axisSide,
-                              child: Text(
-                                chartData[idx]['name'] as String,
-                                style: context.typography.chartLabel.copyWith(
-                                  color: Colors.grey.shade500,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        },
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 45,
-                        getTitlesWidget: (val, meta) {
-                          String label = '';
-                          if (val >= 1000000) {
-                            label = '₹${(val / 1000000).toStringAsFixed(1)}M';
-                          } else if (val >= 1000) {
-                            label = '₹${(val / 1000).toStringAsFixed(0)}k';
-                          } else {
-                            label = '₹${val.toStringAsFixed(0)}';
-                          }
-                          return SideTitleWidget(
-                            axisSide: meta.axisSide,
-                            child: Text(
-                              label,
-                              style: context.typography.chartLabel.copyWith(
-                                color: Colors.grey.shade400,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 9,
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  gridData: FlGridData(
-                    show: true,
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (value) =>
-                        FlLine(color: Colors.grey.shade100, strokeWidth: 1),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  barTouchData: BarTouchData(
-                    enabled: true,
-                    touchTooltipData: BarTouchTooltipData(
-                      getTooltipColor: (group) => const Color(0xFF0F172A),
-                      tooltipRoundedRadius: 8,
-                      getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                        final title = rodIndex == 0
-                            ? 'income'.tr
-                            : 'expense'.tr;
-                        return BarTooltipItem(
-                          '$title\n${formatCurrency.format(rod.toY)}',
-                          context.typography.chartValue.copyWith(
-                            color: rodIndex == 0
-                                ? Colors.blue.shade200
-                                : Colors.red.shade200,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 11,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLegendItem(String name, Color color) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          name,
-          style: context.typography.chartLabel.copyWith(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: Colors.grey.shade600,
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildRecentInvoices(
     List<Map<String, dynamic>> recentInvoices,
@@ -1205,10 +882,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return FadeInUp(
       delay: const Duration(milliseconds: 400),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         decoration: BoxDecoration(
           color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
           boxShadow: [
             BoxShadow(
@@ -1221,29 +898,40 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header Row
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'recent_invoices'.tr,
-                      style: context.typography.cardTitle.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: context.colorScheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(LucideIcons.fileText, color: context.colorScheme.primary, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Recent Invoices',
+                        style: context.typography.cardTitle.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'latest_billing_activities'.tr,
-                      style: context.typography.cardSubtitle.copyWith(
-                        fontSize: 11,
-                        color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Latest billing activities',
+                        style: context.typography.cardSubtitle.copyWith(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -1256,18 +944,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Get.to(() => const InvoiceListScreen());
                     }
                   },
-                  child: Text(
-                    'view_all'.tr,
-                    style: context.typography.buttonText.copyWith(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w900,
-                      color: context.colorScheme.primary,
-                    ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'View All',
+                        style: context.typography.buttonText.copyWith(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: context.colorScheme.primary,
+                        ),
+                      ),
+                      Icon(LucideIcons.chevronRight, size: 14, color: context.colorScheme.primary),
+                    ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
+            
             if (recentInvoices.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -1288,24 +983,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: recentInvoices.length,
-                separatorBuilder: (context, idx) =>
-                    Divider(height: 12, color: Theme.of(context).colorScheme.outline),
+                separatorBuilder: (context, idx) => const SizedBox(height: 10),
                 itemBuilder: (context, idx) {
-                  final entry = recentInvoices[idx];
-                  final inv = entry['invoice'] as ClientInvoice;
-                  final client = entry['client'] as Client;
-                  final isPaid = inv.status.toLowerCase() == 'paid';
+                  final Map<String, dynamic> inv = recentInvoices[idx];
+                  final clientObj = inv['client'] ?? {};
+                  final String clientName = clientObj['name'] ?? 'Unknown Client';
+                  final String status = inv['status'] ?? 'Pending';
+                  final bool isPaid = status.toLowerCase() == 'paid';
+                  
+                  final double totalAmount = (inv['totalAmount'] ?? 0).toDouble();
+                  final String invoiceNumber = inv['invoiceNumber'] ?? '';
+                  final String rawDate = inv['date'] ?? '';
+                  final String id = inv['_id'] ?? inv['id'] ?? '';
 
-                  String displayDate = inv.date;
-                  final parsedDate = _parseDate(inv.date);
+                  String displayDate = rawDate;
+                  final parsedDate = _parseDate(rawDate);
                   if (parsedDate != null) {
                     displayDate = DateFormat('dd MMM yyyy').format(parsedDate);
                   } else if (displayDate.contains('T')) {
                     displayDate = displayDate.split('T')[0];
                   } else if (displayDate.contains(' ')) {
-                    // Try to split only if it looks like a standard datetime, not '10 Jun 2026'
                     if (displayDate.split(' ').length > 2) {
-                      // Probably already formatted or something else
+                      // Probably already formatted
                     } else {
                       displayDate = displayDate.split(' ')[0];
                     }
@@ -1313,22 +1012,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   return ScaleOnPress(
                     onTap: () {
-                      final rawInvoice = clientsController.allInvoices
-                          .firstWhere(
-                            (json) =>
-                                (json['invoiceNumber'] == inv.invoiceNumber) ||
-                                (json['_id'] ?? json['id']) == inv.id,
-                            orElse: () => null,
-                          );
-                      if (rawInvoice != null) {
-                        final clientObj = rawInvoice['client'] ?? {};
-                        final String clientEmail = clientObj['email'] ?? '';
-                        final String clientAddress = clientObj['address'] ?? '';
+                      final rawInvoice = clientsController.allInvoices.firstWhere(
+                        (json) =>
+                            (json['invoiceNumber'] == invoiceNumber) ||
+                            (json['_id'] ?? json['id']) == id,
+                        orElse: () => {},
+                      );
+                      if (rawInvoice.isNotEmpty) {
+                        final rawClientObj = rawInvoice['client'] ?? {};
+                        final String clientEmail = rawClientObj['email'] ?? '';
+                        final String clientAddress = rawClientObj['address'] ?? '';
                         final String clientGst =
-                            clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
+                            rawClientObj['gstin'] ?? rawClientObj['gstNumber'] ?? '';
                         final String placeOfSupply =
                             rawInvoice['placeOfSupply'] ??
-                            clientObj['state'] ??
+                            rawClientObj['state'] ??
                             '';
                         final List<dynamic> rawItems =
                             rawInvoice['items'] ?? [];
@@ -1339,14 +1037,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                         Get.to(
                           () => InvoiceDetailsScreen(
-                            invoiceId: inv.invoiceNumber.isNotEmpty
-                                ? inv.invoiceNumber
-                                : inv.id,
-                            dbId: inv.id,
-                            clientName: client.name,
-                            amount: inv.totalAmount,
-                            date: inv.date,
-                            status: inv.status,
+                            invoiceId: invoiceNumber.isNotEmpty ? invoiceNumber : id,
+                            dbId: id,
+                            clientName: clientName,
+                            amount: totalAmount,
+                            date: rawDate,
+                            status: status,
                             items: items,
                             dueDate: rawInvoice['dueDate'],
                             placeOfSupply: placeOfSupply,
@@ -1363,101 +1059,312 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       } else {
                         Get.to(
                           () => InvoiceDetailsScreen(
-                            invoiceId: inv.invoiceNumber.isNotEmpty
-                                ? inv.invoiceNumber
-                                : inv.id,
-                            dbId: inv.id,
-                            clientName: client.name,
-                            amount: inv.totalAmount,
-                            date: inv.date,
-                            status: inv.status,
+                            invoiceId: invoiceNumber.isNotEmpty ? invoiceNumber : id,
+                            dbId: id,
+                            clientName: clientName,
+                            amount: totalAmount,
+                            date: rawDate,
+                            status: status,
                           ),
                         );
                       }
                     },
                     child: Container(
-                      color: Colors.transparent,
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: isPaid
-                                  ? tailwindEmeraldLight
-                                  : tailwindAmberLight,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              isPaid ? LucideIcons.check : LucideIcons.clock,
-                              size: 16,
-                              color: isPaid ? tailwindEmerald : tailwindAmber,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  client.name,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: context.typography.clientName.copyWith(
-                                    fontSize: 13,
-                                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '${inv.invoiceNumber} • $displayDate',
-                                  style: context.typography.invoiceNumber.copyWith(
-                                    fontSize: 10,
-                                    color: Colors.grey.shade400,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              left: BorderSide(
+                                color: isPaid ? tailwindEmerald : tailwindAmber,
+                                width: 4,
+                              ),
                             ),
                           ),
-                          const SizedBox(width: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                          child: Row(
                             children: [
-                              Text(
-                                formatCurrency.format(inv.totalAmount),
-                                style: context.typography.invoiceAmount.copyWith(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w900,
-                                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: isPaid ? tailwindEmeraldLight : tailwindAmberLight,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  isPaid ? LucideIcons.check : LucideIcons.clock,
+                                  size: 16,
+                                  color: isPaid ? tailwindEmerald : tailwindAmber,
                                 ),
                               ),
-                              const SizedBox(height: 2),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      clientName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: context.typography.clientName.copyWith(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
+                                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: context.colorScheme.primary.withValues(alpha: 0.1),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: Text(
+                                            invoiceNumber,
+                                            style: TextStyle(
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.bold,
+                                              color: context.colorScheme.primary,
+                                            ),
+                                          ),
+                                        ),
+                                        if (inv['createdBy'] != null) ...[
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: context.colorScheme.primary.withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(LucideIcons.user, size: 9, color: context.colorScheme.primary),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  inv['createdBy']['name'] ?? 'User',
+                                                  style: TextStyle(
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: context.colorScheme.primary,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      displayDate,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.grey.shade500,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                decoration: BoxDecoration(
-                                  color: isPaid
-                                      ? tailwindEmeraldLight
-                                      : tailwindAmberLight,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  inv.status,
-                                  style: context.typography.invoiceStatus.copyWith(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w900,
-                                    color: isPaid
-                                        ? tailwindEmerald
-                                        : tailwindAmber,
+                              ),
+                              const SizedBox(width: 8),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    formatCurrency.format(totalAmount),
+                                    style: context.typography.invoiceAmount.copyWith(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w900,
+                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                    ),
                                   ),
-                                ),
+                                  const SizedBox(height: 4),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isPaid
+                                          ? tailwindEmeraldLight
+                                          : tailwindAmberLight,
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      status,
+                                      style: context.typography.invoiceStatus.copyWith(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.w900,
+                                        color: isPaid
+                                            ? tailwindEmerald
+                                            : tailwindAmber,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
+                        ),
                       ),
+                    ),
+                  );
+                },
+              ),
+            
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecentExpenses(
+    List<Map<String, dynamic>> recentExpenses,
+    bool isDark,
+  ) {
+    return FadeInUp(
+      delay: const Duration(milliseconds: 450),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(
+          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.01),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header Row
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Recent Expenses',
+                          style: context.typography.cardTitle.copyWith(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Latest expense activities',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final mainCtrl = Get.isRegistered<MainLayoutController>()
+                        ? Get.find<MainLayoutController>()
+                        : null;
+                    if (mainCtrl != null && mainCtrl.screens.length > 2) {
+                      // Check if Expenses is actually at index 2 or handled differently
+                      // We'll navigate directly using Get.to to ensure it opens
+                      Get.to(() => const ExpensesScreen());
+                    } else {
+                      Get.to(() => const ExpensesScreen());
+                    }
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'View All',
+                        style: context.typography.buttonText.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      Icon(
+                        LucideIcons.chevronRight,
+                        size: 16,
+                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            
+            if (recentExpenses.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Center(
+                  child: Text(
+                    'No expenses yet',
+                    style: context.typography.emptyStateDescription.copyWith(
+                      fontSize: 13,
+                      color: Colors.grey.shade400,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: recentExpenses.length,
+                separatorBuilder: (context, idx) => const SizedBox(height: 8),
+                itemBuilder: (context, idx) {
+                  final Map<String, dynamic> exp = recentExpenses[idx];
+                  
+                  String title = exp['description'] ?? '';
+                  if (title.trim().isEmpty) {
+                    title = exp['category'] ?? 'Expense';
+                  }
+                  final double amount = (exp['amount'] ?? 0).toDouble();
+                  final String rawDate = exp['date'] ?? '';
+                  final String user = (exp['createdBy'] != null) ? (exp['createdBy']['name'] ?? '') : '';
+
+                  final expense = Expense(
+                    id: exp['_id']?.toString() ?? exp['id']?.toString() ?? idx.toString(),
+                    category: exp['category'] ?? '',
+                    amount: amount,
+                    description: exp['description'] ?? '',
+                    date: rawDate,
+                    user: user,
+                  );
+
+                  return ExpenseListItem(
+                    expense: expense,
+                    isDark: Theme.of(context).brightness == Brightness.dark,
+                    onTap: () {}, // Optional details tap for dashboard
+                    onDelete: () => Future.value(false), // Optional or disabled delete
+                    currencyFormat: NumberFormat.currency(
+                      locale: 'en_IN',
+                      symbol: '₹',
+                      decimalDigits: 0,
                     ),
                   );
                 },
@@ -1525,50 +1432,71 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(height: 16),
 
-            // Dropdown Client Selection
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).scaffoldBackgroundColor,
+            // Custom Client Selection Button
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () async {
+                  final result = await Get.to(() => const SelectClientScreen());
+                  if (result != null && result is String) {
+                    setState(() {
+                      _selectedClientId = result;
+                    });
+                  }
+                },
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
-                ),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  style: context.typography.inputText.copyWith(
-                    fontSize: 13,
-                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                    fontFamily: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.fontFamily,
-                  ),
-                  hint: Text(
-                    'select_client'.tr,
-                    style: context.typography.searchHint.copyWith(
-                      fontSize: 13,
-                      color: Colors.grey,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.outline.withValues(alpha: _selectedClientId != null ? 0.8 : 0.4),
                     ),
                   ),
-                  isExpanded: true,
-                  onChanged: (val) {
-                    setState(() {
-                      _selectedClientId = val;
-                    });
-                  },
-                  items: clientsController.clients.map((c) {
-                    return DropdownMenuItem(
-                      value: c.id,
-                      child: Text(
-                        c.name,
-                        style: context.typography.inputText.copyWith(
-                          fontSize: 13,
-                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                        ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: _selectedClientId == null || activeClient == null
+                            ? Text(
+                                'select_client'.tr,
+                                style: context.typography.searchHint.copyWith(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    activeClient.name,
+                                    style: context.typography.inputText.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                    ),
+                                  ),
+                                  if (activeClient.phone.isNotEmpty) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      activeClient.phone,
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        fontSize: 11,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
                       ),
-                    );
-                  }).toList(),
+                      Icon(
+                        _selectedClientId != null ? LucideIcons.edit3 : LucideIcons.chevronDown,
+                        size: 16,
+                        color: _selectedClientId != null ? context.colorScheme.primary : Colors.grey.shade400,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

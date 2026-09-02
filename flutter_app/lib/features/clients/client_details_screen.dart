@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/theme/app_text_styles.dart';
 import '../../shared/widgets/app_input_field.dart';
@@ -1606,57 +1605,31 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
           ),
           actions: [
             TextButton.icon(
-              onPressed: () async {
+              onPressed: () {
                 Navigator.pop(context);
-                final status = await Permission.sms.request();
-                if (status.isGranted || status.isLimited) {
-                  final balanceText = balance > 0
-                      ? 'outstanding_due_rs'.tr +
-                            NumberFormat.decimalPattern('en_IN').format(balance)
-                      : balance < 0
-                      ? 'advance_rs'.tr +
-                            NumberFormat.decimalPattern(
-                              'en_IN',
-                            ).format(balance.abs())
-                      : 'outstanding_nil'.tr;
-                  final message =
-                      '${'hello_greeting'.tr}${client.name},\nHere is your account summary:\nTotal Billed: Rs.${NumberFormat.decimalPattern('en_IN').format(billed)}\nTotal Paid: Rs.${NumberFormat.decimalPattern('en_IN').format(paid)}\n$balanceText\n\nRegards,\nAuriva BMS';
-                  final cleanPhone = client.phone.replaceAll(
-                    RegExp(r'[^0-9+]'),
-                    '',
-                  );
-
-                  try {
-                    const platform = MethodChannel(
-                      'com.aurivabms.app/communications',
-                    );
-                    await platform.invokeMethod('sendSMS', {
-                      'phone': cleanPhone,
-                      'message': message,
-                    });
-                    Get.snackbar(
-                      'success'.tr,
-                      'sms_sent_success'.tr + cleanPhone,
-                      backgroundColor: AppColors.success.withValues(alpha: 0.1),
-                      colorText: AppColors.success,
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
-                  } catch (e) {
-                    Get.snackbar(
-                      'Error',
-                      'sms_send_error'.tr + e.toString(),
-                      backgroundColor: AppColors.error.withValues(alpha: 0.1),
-                      colorText: AppColors.error,
-                    );
-                  }
-                } else {
-                  Get.snackbar(
-                    'Permission Denied',
-                    'sms_permission_denied'.tr,
-                    backgroundColor: AppColors.error.withValues(alpha: 0.1),
-                    colorText: AppColors.error,
-                  );
-                }
+                final balanceText = balance > 0
+                    ? 'outstanding_due_rs'.tr +
+                          NumberFormat.decimalPattern('en_IN').format(balance)
+                    : balance < 0
+                    ? 'advance_rs'.tr +
+                          NumberFormat.decimalPattern(
+                            'en_IN',
+                          ).format(balance.abs())
+                    : 'outstanding_nil'.tr;
+                final message =
+                    '${'hello_greeting'.tr}${client.name},\nHere is your account summary:\nTotal Billed: Rs.${NumberFormat.decimalPattern('en_IN').format(billed)}\nTotal Paid: Rs.${NumberFormat.decimalPattern('en_IN').format(paid)}\n$balanceText\n\nRegards,\nAuriva BMS';
+                final cleanPhone = client.phone.replaceAll(
+                  RegExp(r'[^0-9+]'),
+                  '',
+                );
+                final uri = Uri(
+                  scheme: 'sms',
+                  path: cleanPhone,
+                  queryParameters: <String, String>{
+                    'body': message,
+                  },
+                );
+                _launchURL(uri.toString(), message);
               },
               icon: const Icon(LucideIcons.messageCircle, color: Colors.blue),
               label: Text(
@@ -1668,37 +1641,14 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
               ),
             ),
             ElevatedButton.icon(
-              onPressed: () async {
+              onPressed: () {
                 Navigator.pop(context);
-                final status = await Permission.phone.request();
-                if (status.isGranted || status.isLimited) {
-                  final cleanPhone = client.phone.replaceAll(
-                    RegExp(r'[^0-9+]'),
-                    '',
-                  );
-                  try {
-                    const platform = MethodChannel(
-                      'com.aurivabms.app/communications',
-                    );
-                    await platform.invokeMethod('makeCall', {
-                      'phone': cleanPhone,
-                    });
-                  } catch (e) {
-                    Get.snackbar(
-                      'Error',
-                      'direct_call_error'.tr + e.toString(),
-                      backgroundColor: AppColors.error.withValues(alpha: 0.1),
-                      colorText: AppColors.error,
-                    );
-                  }
-                } else {
-                  Get.snackbar(
-                    'Permission Denied',
-                    'phone_permission_denied'.tr,
-                    backgroundColor: AppColors.error.withValues(alpha: 0.1),
-                    colorText: AppColors.error,
-                  );
-                }
+                final cleanPhone = client.phone.replaceAll(
+                  RegExp(r'[^0-9+]'),
+                  '',
+                );
+                final uri = Uri(scheme: 'tel', path: cleanPhone);
+                _launchURL(uri.toString(), '');
               },
               icon: const Icon(LucideIcons.phone, size: 18),
               label: Text(

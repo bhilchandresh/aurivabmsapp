@@ -10,6 +10,7 @@ class Expense {
   final double amount;
   final String description;
   final String date; // Format: yyyy-MM-dd
+  final String user;
 
   Expense({
     required this.id,
@@ -17,6 +18,7 @@ class Expense {
     required this.amount,
     required this.description,
     required this.date,
+    this.user = '',
   });
 
   Expense copyWith({
@@ -25,6 +27,7 @@ class Expense {
     double? amount,
     String? description,
     String? date,
+    String? user,
   }) {
     return Expense(
       id: id ?? this.id,
@@ -32,6 +35,7 @@ class Expense {
       amount: amount ?? this.amount,
       description: description ?? this.description,
       date: date ?? this.date,
+      user: user ?? this.user,
     );
   }
 
@@ -43,12 +47,21 @@ class Expense {
     } else {
       formattedDate = rawDate;
     }
+    
+    String userName = '';
+    if (json['createdBy'] is Map) {
+      userName = json['createdBy']['name']?.toString() ?? '';
+    } else if (json['createdBy'] != null) {
+      userName = json['createdBy'].toString();
+    }
+
     return Expense(
       id: json['_id'] ?? json['id'] ?? '',
       category: json['category'] ?? '',
       amount: (json['amount'] ?? 0.0).toDouble(),
       description: json['description'] ?? '',
       date: formattedDate,
+      user: userName,
     );
   }
 }
@@ -56,6 +69,8 @@ class Expense {
 class ExpensesController extends GetxController {
   var expenses = <Expense>[].obs;
   var filterMonth = ''.obs; // Format: yyyy-MM
+  var filterCategory = ''.obs;
+  var searchQuery = ''.obs;
   var sortBy = 'date-desc'.obs;
   var isLoading = false.obs;
 
@@ -96,6 +111,24 @@ class ExpensesController extends GetxController {
     if (filterMonth.value.isNotEmpty) {
       list = list
           .where((exp) => exp.date.startsWith(filterMonth.value))
+          .toList();
+    }
+
+    // Filter by Search Query
+    if (searchQuery.value.trim().isNotEmpty) {
+      final query = searchQuery.value.trim().toLowerCase();
+      list = list.where((exp) {
+        return exp.description.toLowerCase().contains(query) ||
+               exp.category.toLowerCase().contains(query) ||
+               exp.user.toLowerCase().contains(query) ||
+               exp.amount.toString().contains(query);
+      }).toList();
+    }
+
+    // Filter by Category
+    if (filterCategory.value.isNotEmpty && filterCategory.value != 'All Categories') {
+      list = list
+          .where((exp) => exp.category.trim().toLowerCase() == filterCategory.value.toLowerCase())
           .toList();
     }
 

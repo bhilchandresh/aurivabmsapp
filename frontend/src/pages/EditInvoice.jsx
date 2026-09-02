@@ -4,6 +4,7 @@ import api from "../utils/api";
 import toast from "react-hot-toast";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Save, Plus, Trash2, Calendar, FileText, User, CreditCard, AlertCircle } from "lucide-react";
+import { useQueryClient } from '@tanstack/react-query';
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 import ClientAutocomplete from "../components/ClientAutocomplete";
@@ -23,6 +24,7 @@ const EditInvoice = () => {
 
    // --- CUSTOM API ERROR STATE ---
    const [apiError, setApiError] = useState(null);
+   const queryClient = useQueryClient();
 
    // Form Setup
    const { register, control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm({
@@ -153,11 +155,17 @@ const EditInvoice = () => {
 
    const subTotal = calculatedSubTotal;
    const discountAmount = subTotal * (Number(discountPercentage) / 100);
-   const taxableAmount = subTotal - discountAmount;
+   
+   // Calculate actual taxable value (only items with GST > 0)
+   const taxableItemsSubTotal = processedItems.reduce((sum, item) => sum + ((Number(item.gstRate) > 0) ? Number(item.taxable) : 0), 0);
+   
+   // Apply proportional discount to taxable amount
+   const taxableAmount = gstEnabled ? (taxableItemsSubTotal * (1 - (Number(discountPercentage) / 100))) : (subTotal - discountAmount);
    
    const gstAmount = calculatedTaxAmount * (1 - (Number(discountPercentage) / 100));
    
-   const grandTotal = taxableAmount + gstAmount;
+   const totalAfterDiscount = subTotal - discountAmount;
+   const grandTotal = totalAfterDiscount + gstAmount;
    const balanceDue = grandTotal - Number(advancePayment);
 
    const cgst = !isInterState ? (gstAmount / 2) : 0;
@@ -192,6 +200,8 @@ const EditInvoice = () => {
 
       try {
          await api.put(`/invoices/${id}`, payload);
+         queryClient.invalidateQueries({ queryKey: ['invoices'] });
+         queryClient.invalidateQueries({ queryKey: ['dashboard'] });
          navigate(`/invoices/${id}`);
       } catch (e) {
          setApiError(e.response?.data?.message || e.message || "Failed to update invoice. Please try again.");

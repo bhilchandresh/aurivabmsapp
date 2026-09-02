@@ -46,18 +46,42 @@ const getPlanLimits = (planName) => {
 
 // --- HELPER FUNCTION: Sync Inventory for Purchase ---
 const syncInventoryForPurchase = async (tenantId, items, purchaseId, supplierName) => {
-    for (const item of items) {
-        if (item.inventoryId) {
+    for (let item of items) {
+        if (item.addToInventory) {
             const quantity = Number(item.quantity);
-            // Update Stock
-            await Inventory.findByIdAndUpdate(item.inventoryId, {
-                $inc: { currentStock: quantity }
-            });
+            let invId = item.inventoryId;
+            
+            if (invId) {
+                // Update Stock and Prices
+                await Inventory.findByIdAndUpdate(invId, {
+                    $inc: { currentStock: quantity },
+                    $set: { 
+                        purchasePrice: Number(item.rate),
+                        unitPrice: Number(item.sellingPrice)
+                    }
+                });
+            } else {
+                // Create New Inventory Item
+                const newInv = await Inventory.create({
+                    tenantId,
+                    itemName: item.description || 'Unknown Item',
+                    purchasePrice: Number(item.rate),
+                    unitPrice: Number(item.sellingPrice),
+                    currentStock: quantity
+                });
+                invId = newInv._id;
+                
+                // Also update the purchase bill item with this new inventoryId
+                await Purchase.updateOne(
+                    { _id: purchaseId, "items._id": item._id },
+                    { $set: { "items.$.inventoryId": invId } }
+                );
+            }
 
             // Create Transaction Record
             await InventoryTransaction.create({
                 tenantId,
-                inventoryId: item.inventoryId,
+                inventoryId: invId,
                 type: 'Purchase',
                 quantity: quantity,
                 referenceId: purchaseId,
@@ -83,8 +107,27 @@ const revertInventoryForPurchase = async (tenantId, purchaseId) => {
 // --- SUPPLIERS --- //
 exports.getSuppliers = async (req, res) => {
     try {
-        const suppliers = await Supplier.find({ tenantId: req.user.tenantId }).sort({ createdAt: -1 });
-        res.json({ success: true, count: suppliers.length, data: suppliers });
+        const suppliers = await Supplier.find({ tenantId: req.user.tenantId })
+            .sort({ createdAt: -1 })
+            .populate('createdBy', 'name email')
+            .lean();
+        
+        const enhancedSuppliers = await Promise.all(suppliers.map(async (sup) => {
+            const purchases = await Purchase.find({ supplierId: sup._id, tenantId: req.user.tenantId });
+            const payments = await SupplierPayment.find({ supplierId: sup._id, tenantId: req.user.tenantId });
+            
+            const totalPurchased = purchases.reduce((sum, p) => sum + (p.totalAmount || 0), 0);
+            const totalPaid = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+            
+            return {
+                ...sup,
+                totalPurchased,
+                totalPaid,
+                balance: totalPurchased - totalPaid
+            };
+        }));
+        
+        res.json({ success: true, count: enhancedSuppliers.length, data: enhancedSuppliers });
     } catch (e) {
         res.status(500).json({ success: false, message: e.message });
     }
@@ -103,7 +146,7 @@ exports.createSupplier = async (req, res) => {
             return res.status(403).json({ success: false, message: `Supplier limit reached (${limits.maxSuppliers}). Please upgrade.` });
         }
         
-        const supp = await Supplier.create({ ...req.body, tenantId: req.user.tenantId });
+        const supp = await Supplier.create({ ...req.body, tenantId: req.user.tenantId, createdBy: req.user._id });
         if(typeof logActivity === 'function') await logActivity(req, 'CREATE_SUPPLIER', `Added supplier: ${supp.name}`);
         res.status(201).json({ success: true, data: supp });
     } catch (e) {
@@ -147,7 +190,7 @@ exports.getPurchases = async (req, res) => {
         const { supplierId } = req.query;
         let query = { tenantId: req.user.tenantId };
         if (supplierId) query.supplierId = supplierId;
-        const bills = await Purchase.find(query).populate('supplierId', 'name email phone').sort({ date: -1 });
+        const bills = await Purchase.find(query).populate('supplierId', 'name email phone').populate('createdBy', 'name email').sort({ date: -1 });
         res.json({ success: true, data: bills });
     } catch (e) {
         res.status(500).json({ success: false, message: e.message });
@@ -160,12 +203,12 @@ exports.createPurchase = async (req, res) => {
         const supplier = await Supplier.findById(supplierId);
         if (!supplier) return res.status(404).json({ success: false, message: "Supplier not found" });
 
-        const bill = await Purchase.create({ ...req.body, tenantId: req.user.tenantId });
+        const bill = await Purchase.create({ ...req.body, tenantId: req.user.tenantId, createdBy: req.user._id });
         await syncPurchaseStatus(bill.supplierId, req.user.tenantId);
 
         // --- SYNC INVENTORY ---
-        if (items && Array.isArray(items)) {
-            await syncInventoryForPurchase(req.user.tenantId, items, bill._id, supplier.name);
+        if (bill.items && Array.isArray(bill.items)) {
+            await syncInventoryForPurchase(req.user.tenantId, bill.items, bill._id, supplier.name);
         }
 
         res.status(201).json({ success: true, data: bill });
@@ -194,7 +237,7 @@ exports.deletePurchase = async (req, res) => {
 exports.getPayments = async (req, res) => {
     try {
         const { supplierId } = req.params;
-        const payments = await SupplierPayment.find({ supplierId, tenantId: req.user.tenantId }).sort({ paymentDate: -1 });
+        const payments = await SupplierPayment.find({ supplierId, tenantId: req.user.tenantId }).sort({ paymentDate: -1 }).populate('createdBy', 'name email');
         res.json({ success: true, data: payments });
     } catch (e) {
         res.status(500).json({ success: false, message: e.message });
@@ -203,7 +246,7 @@ exports.getPayments = async (req, res) => {
 
 exports.createPayment = async (req, res) => {
     try {
-        const pay = await SupplierPayment.create({ ...req.body, supplierId: req.params.supplierId, tenantId: req.user.tenantId });
+        const pay = await SupplierPayment.create({ ...req.body, supplierId: req.params.supplierId, tenantId: req.user.tenantId, createdBy: req.user._id });
         await syncPurchaseStatus(req.params.supplierId, req.user.tenantId);
         res.status(201).json({ success: true, data: pay });
     } catch (e) {

@@ -38,42 +38,6 @@ class MainActivity : FlutterActivity() {
                 result.notImplemented()
             }
         }
-
-        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.aurivabms.app/communications").setMethodCallHandler { call, result ->
-            when (call.method) {
-                "sendSMS" -> {
-                    val phone = call.argument<String>("phone")
-                    val message = call.argument<String>("message")
-                    if (phone != null && message != null) {
-                        try {
-                            val smsManager = android.telephony.SmsManager.getDefault()
-                            smsManager.sendTextMessage(phone, null, message, null, null)
-                            result.success(true)
-                        } catch (e: Exception) {
-                            result.error("SMS_FAILED", e.message, null)
-                        }
-                    } else {
-                        result.error("INVALID_ARGS", "Phone or message is null", null)
-                    }
-                }
-                "makeCall" -> {
-                    val phone = call.argument<String>("phone")
-                    if (phone != null) {
-                        try {
-                            val intent = android.content.Intent(android.content.Intent.ACTION_CALL)
-                            intent.data = android.net.Uri.parse("tel:$phone")
-                            startActivity(intent)
-                            result.success(true)
-                        } catch (e: Exception) {
-                            result.error("CALL_FAILED", e.message, null)
-                        }
-                    } else {
-                        result.error("INVALID_ARGS", "Phone is null", null)
-                    }
-                }
-                else -> result.notImplemented()
-            }
-        }
     }
 
     private fun showCustomNotification(title: String, body: String, chipText: String?, illustrationPath: String?, notificationId: Int) {

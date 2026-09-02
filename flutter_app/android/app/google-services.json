@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "819064312384",
+    "project_id": "aurivabms-app",
+    "storage_bucket": "aurivabms-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819064312384:android:f68b194079f5c0d30d85a5",
+        "android_client_info": {
+          "package_name": "com.aurivabms.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9pBlwCMo0y2PWoJQPrKBHrKcX47Urtf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

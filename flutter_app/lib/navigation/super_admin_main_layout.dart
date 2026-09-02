@@ -8,6 +8,7 @@ import '../features/super_admin/broadcast/super_admin_broadcast_screen.dart';
 import '../features/super_admin/companies/super_admin_add_company_screen.dart';
 import '../features/super_admin/profile/super_admin_profile_screen.dart';
 import '../features/super_admin/analytics/super_admin_analytics_screen.dart';
+import '../core/services/permission_manager.dart';
 
 class SuperAdminMainLayoutController extends GetxController {
   var currentIndex = 0.obs;
@@ -20,7 +21,18 @@ class SuperAdminMainLayoutController extends GetxController {
     const SuperAdminProfileScreen(),
   ];
 
+  @override
+  void onInit() {
+    super.onInit();
+    Future.delayed(const Duration(seconds: 1), () {
+      PermissionManager.requestNotificationWithExplanationDialog();
+    });
+  }
+
   void changeIndex(int index) {
+    if (index == 0) {
+      PermissionManager.requestNotificationWithExplanationDialog();
+    }
     if (index == 3) {
       Get.to(() => const SuperAdminAddCompanyScreen());
       return;

@@ -3,13 +3,17 @@ import api from "../utils/api";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
+import ConfirmModal from "../components/ConfirmModal";
 import { AuthContext } from "../context/AuthContext";
 import { useForm } from "react-hook-form";
 import {
   Search, Plus, Mail, Phone, MapPin, ArrowRight,
-  Wallet, TrendingDown, CheckCircle
+  Wallet, TrendingDown, CheckCircle, AlertTriangle
 } from "lucide-react";
 import { INDIAN_STATES } from "../utils/constants";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Pagination from "../components/Pagination";
+
 
 const Clients = () => {
   const { token } = useContext(AuthContext);
@@ -21,43 +25,48 @@ const Clients = () => {
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  
+  // Confirm Modal State
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, data: null });
 
   const { register, handleSubmit, reset } = useForm();
 
 
 
-  const fetchClients = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get('/clients');
-      setClients(res.data.data);
-      setFilteredClients(res.data.data);
-    } catch (err) { console.error(err); toast.error("Failed to load clients"); }
-    finally { setLoading(false); }
-  };
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
 
-  useEffect(() => { if (token) fetchClients(); }, [token]);
+  const queryClient = useQueryClient();
 
-  // --- FILTER & SORT LOGIC ---
+  const { data: fetchedData, isLoading: queryLoading, isFetching } = useQuery({
+    queryKey: ['clients', page, searchTerm, sortBy],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('page', page);
+      params.append('limit', 20);
+      if (searchTerm) params.append('search', searchTerm);
+      if (sortBy) params.append('sortBy', sortBy);
+
+      const res = await api.get(`/clients?${params.toString()}`);
+      return res.data;
+    },
+    enabled: !!token,
+    keepPreviousData: true
+  });
+
   useEffect(() => {
-    let result = [...clients];
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter(c =>
-        c.name?.toLowerCase().includes(term) ||
-        c.email?.toLowerCase().includes(term) ||
-        c.phone?.includes(term)
-      );
+    if (fetchedData) {
+      setClients(fetchedData.data || []);
+      setFilteredClients(fetchedData.data || []);
+      if (fetchedData.pagination) setPagination(fetchedData.pagination);
+      setLoading(false);
     }
+  }, [fetchedData]);
 
-    if (sortBy === "newest") result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    else if (sortBy === "oldest") result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    else if (sortBy === "alpha_asc") result.sort((a, b) => a.name.localeCompare(b.name));
-    else if (sortBy === "dues_high") result.sort((a, b) => (b.balance || 0) - (a.balance || 0));
-
-    setFilteredClients(result);
-  }, [searchTerm, sortBy, clients]);
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, sortBy]);
 
   const onSubmit = async (data) => {
     try {
@@ -65,22 +74,26 @@ const Clients = () => {
       setShowModal(false);
       reset();
       toast.success("Client added successfully");
-      fetchClients();
+      queryClient.invalidateQueries({ queryKey: ['clients'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch (error) { toast.error(error.response?.data?.message || "Error adding client"); }
   };
 
-  const handleSendEmail = async (clientId, clientEmail, clientName) => {
+  const handleSendEmailClick = (clientId, clientEmail, clientName) => {
     if (!clientEmail) return toast.error("Client email not found!");
-    if (!window.confirm(`Send professional update email to ${clientName}?`)) return;
+    setConfirmModal({
+      isOpen: true,
+      data: { clientId, clientName }
+    });
+  };
 
+  const executeSendEmail = async () => {
+    const { clientId } = confirmModal.data;
     try {
-      await api.post(`/clients/${clientId}/mail`, {
-        subject: "Professional Update from Auriva",
-        message: `Hi ${clientName},\n\nHope you're doing well.\n\nThis is a quick update regarding your account.`
-      });
-      toast.success("Professional email sent!");
+      await api.post(`/clients/${clientId}/send-summary`);
+      toast.success("Account summary sent successfully!");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to send email.");
+      toast.error(error.response?.data?.message || "Failed to send account summary.");
     }
   };
 
@@ -147,19 +160,29 @@ const Clients = () => {
                       <div className="h-14 w-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-black text-2xl shadow-inner">
                         {client.name.charAt(0).toUpperCase()}
                       </div>
-                      {(client.gstin || client.gstNumber) && <span className="bg-purple-50 text-purple-600 px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest border border-purple-100">GST Reg</span>}
+                      <div className="flex flex-col items-end gap-1">
+                        {(client.gstin || client.gstNumber) && <span className="bg-purple-50 text-purple-600 px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest border border-purple-100">GST Reg</span>}
+                        <span className="text-[10px] text-gray-500 font-medium">By: {client.creator?.name || 'System'}</span>
+                      </div>
                     </div>
                     <h3 className="font-black text-xl text-gray-900 tracking-tight truncate mb-1" title={client.name}>{client.name}</h3>
                     <div className="space-y-1.5 mt-3">
-                      <p className="text-xs text-gray-500 font-medium flex items-center gap-2 truncate"><Mail size={12} className="text-blue-400" /> {client.email || "No email added"}</p>
+                      <div className="flex items-center gap-2 truncate">
+                        <p className="text-xs text-gray-500 font-medium flex items-center gap-2 truncate"><Mail size={12} className="text-blue-400" /> {client.email || "No email added"}</p>
+                        {client.emailDeliveryStatus === 'bounced' && (
+                           <span className="text-[10px] font-bold text-red-600 flex items-center gap-1 bg-red-50 px-1.5 py-0.5 rounded border border-red-100">
+                             <AlertTriangle size={10} /> Failed
+                           </span>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-500 font-medium flex items-center gap-2"><Phone size={12} className="text-green-500" /> {client.phone || "No phone added"}</p>
                       
                       {/* EMAIL QUICK ACTION */}
                       <button 
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleSendEmail(client._id, client.email, client.name); }}
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleSendEmailClick(client._id, client.email, client.name); }}
                         className="mt-2 text-[10px] font-black uppercase text-blue-600 hover:text-blue-700 flex items-center gap-1 bg-blue-50 px-2 py-1 rounded-lg"
                       >
-                        <Mail size={10} /> Send Update Mail
+                        <Wallet size={10} /> Send Account Summary
                       </button>
                     </div>
                   </div>
@@ -206,6 +229,19 @@ const Clients = () => {
             )}
           </div>
         )}
+        
+        {!loading && <Pagination pagination={pagination} setPage={setPage} />}
+
+        {/* MODALS */}
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal({ isOpen: false, data: null })}
+          onConfirm={executeSendEmail}
+          title="Send Account Summary"
+          message={`Are you sure you want to send the Account Summary & Ledger to ${confirmModal.data?.clientName}?`}
+          confirmText="Yes, Send"
+          type="info"
+        />
 
         {/* MODAL: ADD CLIENT */}
         {showModal && (

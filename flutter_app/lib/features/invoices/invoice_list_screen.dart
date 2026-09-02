@@ -9,87 +9,11 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/api_constants.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../../core/utils/file_exporter.dart';
-import '../clients/clients_controller.dart';
+import 'invoice_controller.dart';
 import 'create_invoice_screen.dart';
 import 'invoice_details_screen.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../core/theme/app_extensions.dart';
-
-class Invoice {
-  final String dbId;
-  final String id; // This is the invoiceNumber
-  final String clientName;
-  final String clientEmail;
-  final String clientPhone;
-  final String clientAddress;
-  final String clientGst;
-  final double amount;
-  final double subtotal;
-  final double discountPercentage;
-  final double taxAmount;
-  final String date;
-  final String dueDate;
-  final String status;
-  final bool gstEnabled;
-  final String taxType;
-  final String placeOfSupply;
-  final List<dynamic> items;
-  final double advancePayment;
-
-  Invoice({
-    required this.dbId,
-    required this.id,
-    required this.clientName,
-    required this.clientEmail,
-    required this.clientPhone,
-    required this.clientAddress,
-    required this.clientGst,
-    required this.amount,
-    required this.subtotal,
-    required this.discountPercentage,
-    required this.taxAmount,
-    required this.date,
-    required this.dueDate,
-    required this.status,
-    required this.gstEnabled,
-    required this.taxType,
-    required this.placeOfSupply,
-    required this.items,
-    this.advancePayment = 0.0,
-  });
-
-  factory Invoice.fromJson(Map<String, dynamic> json) {
-    final clientObj = json['client'] ?? {};
-    final String name = clientObj['name'] ?? 'Unknown';
-    final String email = clientObj['email'] ?? '';
-    final String phone = clientObj['phone'] ?? clientObj['phoneNumber'] ?? '';
-    final String address = clientObj['address'] ?? '';
-    final String gst = clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
-    final String state = clientObj['state'] ?? '';
-
-    return Invoice(
-      dbId: json['_id'] ?? json['id'] ?? '',
-      id: json['invoiceNumber'] ?? '',
-      clientName: name,
-      clientEmail: email,
-      clientPhone: phone,
-      clientAddress: address,
-      clientGst: gst,
-      amount: (json['totalAmount'] ?? 0.0).toDouble(),
-      subtotal: (json['subTotal'] ?? 0.0).toDouble(),
-      discountPercentage: (json['discountPercentage'] ?? 0.0).toDouble(),
-      taxAmount: (json['gstAmount'] ?? 0.0).toDouble(),
-      date: json['date'] ?? '',
-      dueDate: json['dueDate'] ?? '',
-      status: json['status'] ?? 'Pending',
-      gstEnabled: json['gstEnabled'] ?? false,
-      taxType: json['taxType'] ?? 'exclusive',
-      placeOfSupply: json['placeOfSupply'] ?? state,
-      items: json['items'] ?? [],
-      advancePayment: (json['advancePayment'] ?? 0.0).toDouble(),
-    );
-  }
-}
 
 class InvoiceListScreen extends StatefulWidget {
   const InvoiceListScreen({super.key});
@@ -105,27 +29,29 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     symbol: '₹',
     decimalDigits: 0,
   );
-  final ClientsController _clientsController =
-      Get.isRegistered<ClientsController>()
-      ? Get.find<ClientsController>()
-      : Get.put(ClientsController());
+  final InvoiceController _invoiceController =
+      Get.isRegistered<InvoiceController>()
+      ? Get.find<InvoiceController>()
+      : Get.put(InvoiceController());
 
   String _searchQuery = '';
   String _selectedStatus = 'all';
   String _selectedMonth = 'all';
+  String _sortBy = 'newest';
   int? _hoveredIndex;
   bool _isManualRefreshing = false;
 
   @override
   void initState() {
     super.initState();
-    _clientsController.fetchClients();
+    // Fetch happens in the controller's onInit, but we can ensure it here if needed
+    if (_invoiceController.invoices.isEmpty && !_invoiceController.isLoading.value) {
+      _invoiceController.fetchInvoices();
+    }
   }
 
   List<Invoice> get _invoices {
-    return _clientsController.allInvoices.map<Invoice>((json) {
-      return Invoice.fromJson(Map<String, dynamic>.from(json));
-    }).toList();
+    return _invoiceController.invoices;
   }
 
   List<String> get _availableMonths {
@@ -146,21 +72,42 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   List<Invoice> get _filteredInvoices {
-    return _invoices.where((inv) {
-      final matchesSearch =
-          inv.id.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          inv.clientName.toLowerCase().contains(_searchQuery.toLowerCase());
-      final matchesStatus =
-          _selectedStatus == 'all' ||
-          inv.status.toLowerCase() == _selectedStatus.toLowerCase();
+    List<Invoice> result = List.from(_invoices);
 
-      bool matchesMonth = _selectedMonth == 'all';
-      if (_selectedMonth != 'all' && inv.date.isNotEmpty) {
-        matchesMonth = inv.date.startsWith(_selectedMonth);
-      }
+    // Filter by search
+    if (_searchQuery.isNotEmpty) {
+      result = result.where((inv) {
+        return inv.id.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+               inv.clientName.toLowerCase().contains(_searchQuery.toLowerCase());
+      }).toList();
+    }
 
-      return matchesSearch && matchesStatus && matchesMonth;
-    }).toList();
+    // Filter by status
+    if (_selectedStatus != 'all') {
+      result = result.where((inv) {
+        return inv.status.toLowerCase() == _selectedStatus.toLowerCase();
+      }).toList();
+    }
+
+    // Filter by month
+    if (_selectedMonth != 'all') {
+      result = result.where((inv) {
+        return inv.date.startsWith(_selectedMonth);
+      }).toList();
+    }
+
+    // Sort
+    if (_sortBy == 'newest') {
+      result.sort((a, b) => b.date.compareTo(a.date));
+    } else if (_sortBy == 'oldest') {
+      result.sort((a, b) => a.date.compareTo(b.date));
+    } else if (_sortBy == 'amount_high') {
+      result.sort((a, b) => b.amount.compareTo(a.amount));
+    } else if (_sortBy == 'amount_low') {
+      result.sort((a, b) => a.amount.compareTo(b.amount));
+    }
+
+    return result;
   }
 
   Color _getStatusColor(String status) {
@@ -207,7 +154,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
           TextButton(
             onPressed: () async {
               Navigator.pop(context);
-              final success = await _clientsController.deleteInvoice(inv.dbId);
+              final success = await _invoiceController.deleteInvoice(inv.dbId);
               if (success) {
                 Fluttertoast.showToast(
                   msg: "Invoice deleted successfully!",
@@ -230,7 +177,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
   }
 
   void _changeStatus(Invoice inv, String newStatus) async {
-    final success = await _clientsController.updateInvoiceStatus(
+    final success = await _invoiceController.updateInvoiceStatus(
       inv.dbId,
       newStatus,
     );
@@ -292,7 +239,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
               _isManualRefreshing = true;
             });
           }
-          await _clientsController.fetchClients();
+          await _invoiceController.fetchInvoices();
           if (mounted) {
             setState(() {
               _isManualRefreshing = false;
@@ -300,8 +247,8 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
           }
         },
         child: Obx(() {
-          final isLoading = _clientsController.isLoading.value;
-          final isFirstLoad = _clientsController.allInvoices.isEmpty;
+          final isLoading = _invoiceController.isLoading.value;
+          final isFirstLoad = _invoiceController.invoices.isEmpty;
           final showSkeleton =
               isLoading && (isFirstLoad || _isManualRefreshing);
           final listItems = showSkeleton
@@ -725,7 +672,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                             const CreateInvoiceScreen(),
                                       ),
                                     );
-                                    _clientsController.fetchClients();
+                                    _invoiceController.fetchInvoices();
                                   },
                                   icon: const Icon(LucideIcons.plus, size: 16),
                                   label: Text('create_invoice'.tr),
@@ -923,6 +870,66 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                               if (val != null) {
                                                 setState(() {
                                                   _selectedMonth = val;
+                                                });
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).scaffoldBackgroundColor
+                                              .withValues(alpha: 0.5),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        child: DropdownButtonHideUnderline(
+                                          child: DropdownButton<String>(
+                                            isExpanded: true,
+                                            value: _sortBy,
+                                            icon: const Icon(
+                                              LucideIcons.arrowDownUp,
+                                              size: 14,
+                                              color: Colors.grey,
+                                            ),
+                                            style: context.typography.inputText.copyWith(
+                                              color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyMedium
+                                                  ?.fontFamily,
+                                            ),
+                                            items: [
+                                              DropdownMenuItem(
+                                                value: 'newest',
+                                                child: Text('New'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'oldest',
+                                                child: Text('Old'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'amount_high',
+                                                child: Text('Highest'),
+                                              ),
+                                              DropdownMenuItem(
+                                                value: 'amount_low',
+                                                child: Text('Lowest'),
+                                              ),
+                                            ],
+                                            onChanged: (val) {
+                                              if (val != null) {
+                                                setState(() {
+                                                  _sortBy = val;
                                                 });
                                               }
                                             },
@@ -1435,33 +1442,61 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                   child: InkWell(
                                                     onTap: () {
                                                       final rawInvoice =
-                                                          _clientsController
-                                                              .allInvoices
+                                                          _invoiceController
+                                                              .invoices
                                                               .firstWhere(
-                                                                (json) =>
-                                                                    (json['_id'] ??
-                                                                        json['id']) ==
+                                                                (model) =>
+                                                                    model.dbId ==
                                                                     inv.dbId,
                                                                 orElse: () =>
-                                                                    null,
+                                                                    inv,
                                                               );
-                                                      if (rawInvoice != null) {
+                                                      
+                                                      // To edit, we still need the original map representation or modify CreateInvoiceScreen to accept Invoice model
+                                                      // For now, we will fetch the raw map or modify CreateInvoiceScreen to accept the Invoice model. 
+                                                      // Since we know CreateInvoiceScreen expects a Map<String,dynamic>, let's just use the current model to pass data or refetch
+                                                      
+                                                      // Convert Invoice model back to JSON for CreateInvoiceScreen
+                                                      final Map<String, dynamic> invoiceJson = {
+                                                        '_id': rawInvoice.dbId,
+                                                        'id': rawInvoice.id,
+                                                        'invoiceNumber': rawInvoice.id,
+                                                        'client': {
+                                                          'name': rawInvoice.clientName,
+                                                          'email': rawInvoice.clientEmail,
+                                                          'phone': rawInvoice.clientPhone,
+                                                          'address': rawInvoice.clientAddress,
+                                                          'gstin': rawInvoice.clientGst,
+                                                        },
+                                                        'totalAmount': rawInvoice.amount,
+                                                        'subTotal': rawInvoice.subtotal,
+                                                        'discountPercentage': rawInvoice.discountPercentage,
+                                                        'gstAmount': rawInvoice.taxAmount,
+                                                        'date': rawInvoice.date,
+                                                        'dueDate': rawInvoice.dueDate,
+                                                        'status': rawInvoice.status,
+                                                        'gstEnabled': rawInvoice.gstEnabled,
+                                                        'taxType': rawInvoice.taxType,
+                                                        'placeOfSupply': rawInvoice.placeOfSupply,
+                                                        'items': rawInvoice.items,
+                                                        'advancePayment': rawInvoice.advancePayment,
+                                                      };
+
                                                         Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
                                                             builder: (context) =>
                                                                 CreateInvoiceScreen(
-                                                                  invoiceToEdit:
-                                                                      rawInvoice,
+                                                                  invoiceToEdit: invoiceJson,
                                                                 ),
                                                           ),
                                                         ).then(
                                                           (
                                                             _,
-                                                          ) => _clientsController
-                                                              .fetchClients(),
+                                                          ) => _invoiceController
+                                                              .fetchInvoices(),
                                                         );
-                                                      }
+                                                      
                                                     },
                                                     borderRadius:
                                                         BorderRadius.circular(

@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import '../../core/services/permission_manager.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
@@ -49,6 +50,9 @@ class _TeamScreenState extends State<TeamScreen> {
 
   // --- PICKS IMAGE AND CONVERTS TO BASE64 ---
   Future<void> _pickSignature(String memberId) async {
+    final isGranted = await PermissionManager.requestGalleryPermission();
+    if (!isGranted) return;
+    
     try {
       final XFile? pickedFile = await _imagePicker.pickImage(
         source: ImageSource.gallery,

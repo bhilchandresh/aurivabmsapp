@@ -6,7 +6,6 @@ import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_input_field.dart';
 import 'auth_controller.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -56,22 +55,13 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   void _handleLogin() async {
+    if (_authController.isLoading.value) return;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _errorMessage = null;
     });
 
-    // Request permissions at login
-    try {
-      await [
-        Permission.camera,
-        Permission.storage,
-        Permission.photos,
-      ].request();
-    } catch (e) {
-      debugPrint('Permission request error: $e');
-    }
 
     final success = await _authController.login(
       _emailController.text.trim(),

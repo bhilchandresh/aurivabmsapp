@@ -976,7 +976,7 @@ class SuperAdminEditCompanyScreen extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (headerAction != null) headerAction,
+              ?headerAction,
             ],
           ),
           const SizedBox(height: 16),

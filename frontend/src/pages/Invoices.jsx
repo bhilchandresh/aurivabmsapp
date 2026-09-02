@@ -9,6 +9,9 @@ import {
 } from "lucide-react";
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Pagination from "../components/Pagination";
+
 
 const StatusDropdown = ({ inv, statusStyle, isUpdating, handleStatusChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,62 +66,44 @@ const Invoices = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [filterMonth, setFilterMonth] = useState("");
   const [sortBy, setSortBy] = useState("newest");
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
 
+  const queryClient = useQueryClient();
 
+  const { data: fetchedData, isLoading: queryLoading, isFetching } = useQuery({
+    queryKey: ['invoices', page, searchTerm, statusFilter, filterMonth, sortBy],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('page', page);
+      params.append('limit', 20);
+      if (searchTerm) params.append('search', searchTerm);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (filterMonth) params.append('month', filterMonth);
+      if (sortBy) params.append('sortBy', sortBy);
+
+      const res = await api.get(`/invoices?${params.toString()}`);
+      return res.data;
+    },
+    enabled: !!token,
+    keepPreviousData: true
+  });
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const res = await api.get("/invoices");
-        setInvoices(res.data?.data || []);
-        setFilteredInvoices(res.data?.data || []);
-      } catch (err) {
-        console.error("Error fetching invoices:", err);
-        toast.error("Failed to load invoices");
-      } finally {
-        setLoading(false);
+    if (fetchedData) {
+      setInvoices(fetchedData.data || []);
+      setFilteredInvoices(fetchedData.data || []);
+      if (fetchedData.pagination) {
+        setPagination(fetchedData.pagination);
       }
-    };
-    if (token) fetchInvoices();
-  }, [token]);
+      setLoading(false);
+    }
+  }, [fetchedData]);
 
+  // Reset page when filters change
   useEffect(() => {
-    let result = Array.isArray(invoices) ? [...invoices] : [];
-
-    if (searchTerm) {
-      const lowerTerm = searchTerm.toLowerCase();
-      result = result.filter(inv =>
-        inv.invoiceNumber.toLowerCase().includes(lowerTerm) ||
-        inv.client?.name.toLowerCase().includes(lowerTerm)
-      );
-    }
-
-    if (statusFilter !== "all") {
-      result = result.filter(inv => inv.status.toLowerCase() === statusFilter.toLowerCase());
-    }
-
-    if (filterMonth) {
-      result = result.filter(inv => inv.date.startsWith(filterMonth));
-    }
-
-    if (sortBy === "newest") {
-      result.sort((a, b) => {
-        const dateDiff = new Date(b.date).setHours(0,0,0,0) - new Date(a.date).setHours(0,0,0,0);
-        if (dateDiff !== 0) return dateDiff;
-        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-      });
-    } else if (sortBy === "oldest") {
-      result.sort((a, b) => {
-        const dateDiff = new Date(a.date).setHours(0,0,0,0) - new Date(b.date).setHours(0,0,0,0);
-        if (dateDiff !== 0) return dateDiff;
-        return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
-      });
-    }
-    else if (sortBy === "amount_high") result.sort((a, b) => b.totalAmount - a.totalAmount);
-    else if (sortBy === "amount_low") result.sort((a, b) => a.totalAmount - b.totalAmount);
-
-    setFilteredInvoices(result);
-  }, [searchTerm, statusFilter, filterMonth, sortBy, invoices]);
+    setPage(1);
+  }, [searchTerm, statusFilter, filterMonth, sortBy]);
 
   const handleExport = () => {
     if (filteredInvoices.length === 0) return toast.error("No invoices to export");
@@ -172,6 +157,8 @@ const Invoices = () => {
       );
       setInvoices(updatedList);
       toast.success("Status updated");
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch (error) {
       console.error("Status update failed:", error);
       toast.error("Failed to update status.");
@@ -187,6 +174,8 @@ const Invoices = () => {
       const updatedList = invoices.filter(i => i._id !== id);
       setInvoices(updatedList);
       toast.success("Invoice deleted");
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch (e) { toast.error("Delete failed"); }
   };
 
@@ -284,7 +273,17 @@ const Invoices = () => {
                       return (
                         <tr key={inv._id} className="hover:bg-gray-50 transition-colors duration-150 group">
                           <td className="px-6 py-4 font-bold text-blue-600">#{inv.invoiceNumber}</td>
-                          <td className="px-6 py-4"><div className="font-medium text-gray-900">{inv.client?.name || "Unknown"}</div></td>
+                          <td className="px-6 py-4">
+                             <div className="font-medium text-gray-900 mb-1">{inv.client?.name || "Unknown"}</div>
+                             {inv.createdBy && (
+                                <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-gray-200">
+                                   <div className="w-3 h-3 rounded-full bg-gray-200 flex items-center justify-center text-[7px] text-gray-600">
+                                      {inv.createdBy.name.charAt(0).toUpperCase()}
+                                   </div>
+                                   {inv.createdBy.name.split(' ')[0]}
+                                </span>
+                             )}
+                          </td>
                           <td className="px-6 py-4 text-gray-500 text-sm">{new Date(inv.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                           <td className="px-6 py-4 font-bold text-gray-900">{formatCurrency(inv.totalAmount)}</td>
                           <td className="px-6 py-4">
@@ -299,7 +298,7 @@ const Invoices = () => {
                             <div className="flex items-center justify-end gap-2">
                               <button 
                                 onClick={() => {
-                                  const url = `${window.location.origin}/public/invoice/${inv._id}`;
+                                  const url = `https://app.aurivabms.in/public/invoice/${inv._id}`;
                                   navigator.clipboard.writeText(url);
                                   toast.success("Link copied!");
                                 }}
@@ -331,6 +330,8 @@ const Invoices = () => {
             </div>
           )}
         </div>
+
+        <Pagination pagination={pagination} setPage={setPage} />
       </div>
     </Layout>
   );

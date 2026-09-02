@@ -229,6 +229,7 @@ module.exports = (invoice) => {
                             <th width="45%">Description</th>
                             <th class="text-center">Qty</th>
                             <th class="text-right">Rate</th>
+                                       ${isGstEnabled ? '<th class="py-3 px-2 text-center w-[10%] border-y border-gray-200">GST</th>' : ''}
                             <th class="text-right">Amount</th>
                         </tr>
                     </thead>
@@ -254,15 +255,20 @@ module.exports = (invoice) => {
                         <div class="total-box">
                             <div class="total-row">
                                 <span>Subtotal</span>
-                                <span>${formatCurrency(subTotal)}</span>
+                                <span>${formatCurrency(invoice.subTotal)}</span>
                             </div>
                             ${discountAmount > 0 ? `
                             <div class="total-row" style="color: #ef4444;">
                                 <span>Discount (${invoice.discountPercentage}%)</span>
                                 <span>- ${formatCurrency(discountAmount)}</span>
                             </div>` : ''}
+                            
                             ${invoice.gstEnabled ? `
                             <div style="border-top: 1px dashed #cbd5e1; margin: 8px 0; padding-top: 8px;">
+                                <div class="total-row" style="margin-bottom: 5px; color: #444;">
+                                    <span>Total GST (${invoice.taxType || 'exclusive'})</span>
+                                    <span>+ ${formatCurrency(invoice.gstAmount)}</span>
+                                </div>
                                 ${invoice.gstBreakdown ? `
                                     ${invoice.gstBreakdown.cgst > 0 ? `
                                         <div class="total-row" style="font-size: 11px;">
@@ -285,22 +291,23 @@ module.exports = (invoice) => {
                                 ` : `
                                     <div class="total-row">
                                         <span>GST (${invoice.taxRate}%)</span>
-                                        <span>${formatCurrency(taxAmount)}</span>
+                                        <span>${formatCurrency(invoice.gstAmount)}</span>
                                     </div>
                                 `}
                             </div>
                             ` : ''}
-                            
-                            <div class="grand-total">
-                                <span>Total</span>
-                                <span>${formatCurrency(total)}</span>
-                            </div>
 
-                            ${advance > 0 ? `
-                            <div class="balance-due">
-                                <span>Balance Due</span>
-                                <span>${formatCurrency(balance)}</span>
+                            ${invoice.advancePayment > 0 ? `
+                            <div class="total-row" style="margin-top:5px; font-style:italic; font-size:12px; color:#64748b;">
+                                <span>Advance Paid</span>
+                                <span>- ${formatCurrency(invoice.advancePayment)}</span>
                             </div>` : ''}
+                        </div>
+                        
+                        <!-- 2. Final Amount Box -->
+                        <div class="grand-total-box">
+                            <span>Total Payable</span>
+                            <span>${formatCurrency(invoice.totalAmount - (invoice.advancePayment || 0))}</span>
                         </div>
 
                         <!-- 2. Signature Box (Placed Directly Below Totals) -->

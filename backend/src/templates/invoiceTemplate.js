@@ -79,6 +79,7 @@ module.exports = (invoice) => {
                     <th width="50%">Item Description</th>
                     <th class="text-right">Qty</th>
                     <th class="text-right">Rate</th>
+                                       ${isGst ? '<th class="text-right">GST</th>' : ''}
                     <th class="text-right">Total</th>
                 </tr>
             </thead>
@@ -91,6 +92,10 @@ module.exports = (invoice) => {
                     </td>
                     <td class="text-right">${item.quantity}</td>
                     <td class="text-right">${formatCurrency(item.rate)}</td>
+                                       ${isGst ? `
+                                       <td class="text-right">
+                                          ${item.gstRate ? item.gstRate + '%' : '-'}
+                                       </td>` : ''}
                     <td class="text-right">${formatCurrency(item.quantity * item.rate)}</td>
                 </tr>
                 `).join('')}
@@ -105,9 +110,13 @@ module.exports = (invoice) => {
                 </tr>
                 <tr>
                     <td>Discount (${invoice.discountPercentage || 0}%):</td>
-                    <td class="text-right" style="color: #ef4444;">- ${formatCurrency(invoice.discountAmount || 0)}</td>
+                    <td class="text-right text-red-500">- ${formatCurrency(invoice.discountAmount || 0)}</td>
                 </tr>
                 ${isGst ? `
+                    <tr>
+                        <td style="color: #444;">Total GST (${invoice.taxType || 'exclusive'}):</td>
+                        <td class="text-right">+ ${formatCurrency(invoice.gstAmount)}</td>
+                    </tr>
                     ${invoice.gstBreakdown ? `
                         ${invoice.gstBreakdown.cgst > 0 ? `
                         <tr>
@@ -127,19 +136,14 @@ module.exports = (invoice) => {
                             <td class="text-right">${formatCurrency(invoice.gstBreakdown.igst)}</td>
                         </tr>
                         ` : ''}
-                    ` : `
-                    <tr>
-                        <td>GST (${invoice.taxRate}%):</td>
-                        <td class="text-right">${formatCurrency(invoice.gstAmount)}</td>
-                    </tr>
-                    `}
+                    ` : ''}
                 ` : ''}
                 <tr>
                     <td>Advance Paid:</td>
                     <td class="text-right">- ${formatCurrency(invoice.advancePayment || 0)}</td>
                 </tr>
                 <tr class="grand-total-row">
-                    <td>Total Due:</td>
+                    <td>Total Payable:</td>
                     <td class="text-right">${formatCurrency(invoice.totalAmount - (invoice.advancePayment || 0))}</td>
                 </tr>
             </table>

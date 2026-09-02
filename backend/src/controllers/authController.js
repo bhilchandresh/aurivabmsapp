@@ -10,10 +10,94 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const logActivity = require('../utils/logger');
+const crypto = require('crypto');
 
 // ==========================================
-// PUBLIC ROUTES (Register & Login)
+// PUBLIC ROUTES (Register & Login & Reset Password)
 // ==========================================
+
+// @desc    Forgot Password
+exports.forgotPassword = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'There is no user with that email' });
+    }
+
+    // Get reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+
+    // Hash token and set to resetPasswordToken field
+    user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    // Set expire
+    user.resetPasswordExpire = Date.now() + 60 * 60 * 1000; // 1 hour
+
+    await user.save({ validateBeforeSave: false });
+
+    // Send email
+    const baseUrl = 'https://app.aurivabms.in';
+    const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
+
+    const { sendPasswordResetEmail } = require('../utils/emailService');
+    const tenant = await Tenant.findById(user.tenantId);
+
+    try {
+      await sendPasswordResetEmail(user, resetUrl, tenant);
+      res.status(200).json({ success: true, message: 'Password reset email sent' });
+    } catch (err) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+      await user.save({ validateBeforeSave: false });
+      return res.status(500).json({ success: false, message: 'Email could not be sent' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Reset Password
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res.status(400).json({ success: false, message: 'Token and password are required' });
+    }
+
+    // Get hashed token
+    const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired token' });
+    }
+
+    // Set new password
+    const salt = await bcrypt.genSalt(10);
+    user.passwordHash = await bcrypt.hash(password, salt);
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Password reset successful' });
+
+    // Send Success Email (Fire and forget)
+    try {
+      const { sendPasswordResetSuccessEmail } = require('../utils/emailService');
+      const tenant = await require('../models/Tenant').findById(user.tenantId);
+      await sendPasswordResetSuccessEmail(user, tenant);
+    } catch (emailErr) {
+      console.error("Failed to send password reset success email:", emailErr);
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 // @desc    Register a new Tenant (Public Sign Up)
 exports.registerTenant = async (req, res) => {
@@ -64,6 +148,16 @@ exports.registerTenant = async (req, res) => {
       ip: req.ip
     }, "REGISTER_TENANT", `New Company Registered: ${companyName}`);
 
+    // Send Welcome Email
+    try {
+      const { sendWelcomeWithPasswordEmail } = require('../utils/emailService');
+      const baseUrl = 'https://app.aurivabms.in';
+      const resetUrl = `${baseUrl}/forgot-password`;
+      await sendWelcomeWithPasswordEmail(user[0], password, resetUrl, tenant[0]);
+    } catch (err) {
+      console.error("Failed to send welcome email:", err);
+    }
+
     await session.commitTransaction();
     session.endSession();
 
@@ -97,6 +191,9 @@ exports.login = async (req, res) => {
     const tenant = await Tenant.findById(user.tenantId);
     if (tenant && tenant.status === 'suspended') {
       return res.status(403).json({ success: false, message: 'Your company account is suspended. Contact Support.' });
+    }
+    if (tenant && tenant.status === 'deleted') {
+      return res.status(403).json({ success: false, message: 'Your account has been deleted. Please contact the AurivaBMS team to recover it.' });
     }
 
     // ==========================================
@@ -141,16 +238,6 @@ exports.login = async (req, res) => {
     req.user = user;
     await logActivity(req, "LOGIN", `${user.name} logged in successfully`);
 
-    // --- AUTOMATED IN-APP / PUSH NOTIFICATION ---
-    const { dispatchNotification } = require('../services/notificationDispatcher');
-    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
-    dispatchNotification({
-      tenantId: user.tenantId,
-      type: 'security_alert',
-      message: `🔐 New login detected for ${user.name} from IP: ${ip}.`,
-      preferenceKey: 'newDeviceLogin',
-      metadata: { entityId: user._id, entityModel: 'User' }
-    });
 
     // 6. Send Response
     res.status(200).json({
@@ -162,7 +249,8 @@ exports.login = async (req, res) => {
         email: user.email,
         role: user.role,
         signatureImage: user.signatureImage,
-        tenantId: user.tenantId
+        tenantId: user.tenantId,
+        hasCompletedTour: user.hasCompletedTour
       },
       subscription: {
         plan: tenant?.subscriptionPlan || 'basic',
@@ -271,7 +359,7 @@ exports.createTenantByAdmin = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    await User.create([{
+    const user = await User.create([{
       tenantId: tenant[0]._id,
       name,
       email,
@@ -280,6 +368,16 @@ exports.createTenantByAdmin = async (req, res) => {
     }], { session });
 
     await logActivity(req, "ADMIN_CREATE_COMPANY", `Super Admin created company: ${companyName}`);
+
+    // Send Welcome Email
+    try {
+      const { sendWelcomeWithPasswordEmail } = require('../utils/emailService');
+      const baseUrl = 'https://app.aurivabms.in';
+      const resetUrl = `${baseUrl}/forgot-password`;
+      await sendWelcomeWithPasswordEmail(user[0], password, resetUrl, tenant[0]);
+    } catch (err) {
+      console.error("Failed to send welcome email:", err);
+    }
 
     await session.commitTransaction();
     session.endSession();
@@ -319,13 +417,28 @@ exports.updateTenantBySuperAdmin = async (req, res) => {
       updateData.subscriptionEnd = new Date(subscriptionEnd);
     }
 
+    // Fetch old tenant to check if status changed
+    const oldTenant = await Tenant.findById(req.params.id);
+    if (!oldTenant) return res.status(404).json({ success: false, message: "Tenant not found" });
+
     const tenant = await Tenant.findByIdAndUpdate(
       req.params.id,
       updateData,
       { new: true, runValidators: true }
     );
 
-    if (!tenant) return res.status(404).json({ success: false, message: "Tenant not found" });
+    // If status changed, send email
+    if (status && oldTenant.status !== status) {
+      try {
+        const user = await User.findOne({ tenantId: tenant._id, role: 'admin' });
+        if (user) {
+          const { sendAccountStatusChangeEmail } = require('../utils/emailService');
+          await sendAccountStatusChangeEmail(user, tenant, status);
+        }
+      } catch (emailErr) {
+        console.error("Failed to send status change email:", emailErr);
+      }
+    }
 
     await logActivity(req, "ADMIN_UPDATE_COMPANY", `Updated settings for ${tenant.name}`);
 
@@ -410,7 +523,7 @@ exports.getSystemStats = async (req, res) => {
     // --- NEW: PLATFORM KPIs ---
     const platformInvoicesCount = await Invoice.countDocuments();
     const platformClientsCount = await Client.countDocuments();
-    
+
     // Calculate Platform GMV (Gross Merchandise Value)
     const gmvAggr = await Invoice.aggregate([
       { $group: { _id: null, totalGMV: { $sum: "$totalAmount" } } }
@@ -428,13 +541,15 @@ exports.getSystemStats = async (req, res) => {
 
     const tenantsAggr = await Tenant.aggregate([
       { $match: { createdAt: { $gte: sixMonthsAgo } } },
-      { $group: {
+      {
+        $group: {
           _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
           count: { $sum: 1 },
           starters: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "basic"] }, 1, 0] } },
           pros: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "premium"] }, 1, 0] } },
           businesses: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "enterprise"] }, 1, 0] } }
-      }},
+        }
+      },
       { $sort: { "_id.year": 1, "_id.month": 1 } }
     ]);
 
@@ -526,6 +641,92 @@ exports.getTenantUsage = async (req, res) => {
         supplierCount
       }
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ==========================================
+// ACCOUNT DELETION (TENANT OWNER)
+// ==========================================
+
+// @desc    Request Account Deletion (Sends OTP)
+exports.requestAccountDeletion = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Only account administrators can request deletion' });
+    }
+
+    const tenant = await Tenant.findById(user.tenantId);
+    if (!tenant) return res.status(404).json({ success: false, message: 'Tenant not found' });
+
+    // Generate 6-digit OTP
+    const crypto = require('crypto');
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Hash OTP
+    user.deletionOtp = crypto.createHash('sha256').update(otp).digest('hex');
+    user.deletionOtpExpire = Date.now() + 15 * 60 * 1000; // 15 mins
+    await user.save({ validateBeforeSave: false });
+
+    // Send Email
+    const { sendDeletionOtpEmail } = require('../utils/emailService');
+    await sendDeletionOtpEmail(user, otp, tenant);
+
+    res.status(200).json({ success: true, message: 'OTP sent to your email' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Confirm Account Deletion (Verify OTP & Soft Delete)
+exports.confirmAccountDeletion = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    if (!otp) {
+      return res.status(400).json({ success: false, message: 'OTP is required' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Only account administrators can confirm deletion' });
+    }
+
+    // Verify OTP
+    const crypto = require('crypto');
+    const hashedOtp = crypto.createHash('sha256').update(otp).digest('hex');
+
+    if (user.deletionOtp !== hashedOtp || user.deletionOtpExpire < Date.now()) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+    }
+
+    const tenant = await Tenant.findById(user.tenantId);
+    if (!tenant) return res.status(404).json({ success: false, message: 'Tenant not found' });
+
+    // Protect Super Admin
+    if (tenant.slug === 'super-admin-system') {
+      return res.status(403).json({ success: false, message: "Super Admin system cannot be deleted" });
+    }
+
+    // Perform Soft Delete
+    tenant.status = 'deleted';
+    await tenant.save();
+
+    // Clear OTP
+    user.deletionOtp = undefined;
+    user.deletionOtpExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    // Send Deletion Confirmation Email
+    const { sendAccountDeletionConfirmationEmail } = require('../utils/emailService');
+    try {
+      await sendAccountDeletionConfirmationEmail(user, tenant);
+    } catch (err) {
+      console.error("Failed to send account deletion confirmation email:", err);
+    }
+
+    res.status(200).json({ success: true, message: 'Your account has been successfully deleted.' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

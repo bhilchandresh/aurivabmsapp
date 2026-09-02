@@ -1,7 +1,7 @@
 const Quotation = require('../models/Quotation');
 const Expense = require('../models/Expense');
 const Invoice = require('../models/Invoice'); // <--- Import Invoice Model at the top
-
+const Purchase = require('../models/Purchase');
 // --- QUOTATIONS ---
 
 // @desc    Get all quotations
@@ -86,8 +86,53 @@ exports.updateQuotationStatus = async (req, res) => {
 
 exports.getExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find({ tenantId: req.user.tenantId }).sort({ date: -1 });
-    res.status(200).json({ success: true, data: expenses });
+    let query = { tenantId: req.user.tenantId };
+    
+    // Filter by category
+    if (req.query.category && req.query.category !== 'All') {
+      query.category = req.query.category;
+    }
+
+    // Filter by month (YYYY-MM)
+    if (req.query.month) {
+      const startDate = new Date(`${req.query.month}-01`);
+      const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+      query.date = {
+        $gte: startDate.toISOString().split('T')[0],
+        $lte: endDate.toISOString().split('T')[0]
+      };
+    }
+
+    // Sorting
+    let sortObj = { date: -1, createdAt: -1 }; // default date-desc
+    if (req.query.sortBy) {
+      if (req.query.sortBy === 'date-asc') sortObj = { date: 1, createdAt: 1 };
+      else if (req.query.sortBy === 'amount-desc') sortObj = { amount: -1 };
+      else if (req.query.sortBy === 'amount-asc') sortObj = { amount: 1 };
+    }
+
+    // Pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 1000;
+    const skip = (page - 1) * limit;
+
+    const expenses = await Expense.find(query)
+      .sort(sortObj)
+      .skip(skip)
+      .limit(limit)
+      .populate('createdBy', 'name email');
+
+    const total = await Expense.countDocuments(query);
+
+    res.status(200).json({ 
+      success: true, 
+      data: expenses,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -97,6 +142,7 @@ exports.createExpense = async (req, res) => {
   try {
     const expense = await Expense.create({
       tenantId: req.user.tenantId,
+      createdBy: req.user._id,
       ...req.body
     });
     res.status(201).json({ success: true, data: expense });
@@ -150,6 +196,131 @@ exports.convertQuoteToInvoice = async (req, res) => {
     await quote.save();
 
     res.status(201).json({ success: true, data: newInvoice });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get aggregated dashboard stats
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const tenantId = req.user.tenantId;
+
+    // 1. Fetch recent invoices and expenses (limit 5)
+    const recentInvoices = await Invoice.find({ tenantId })
+      .populate('client', 'name')
+      .populate('createdBy', 'name email')
+      .sort({ date: -1 })
+      .limit(5);
+
+    const recentExpenses = await Expense.find({ tenantId })
+      .populate('createdBy', 'name email')
+      .sort({ date: -1 })
+      .limit(5);
+
+    // 2. Aggregate totals
+    const invoices = await Invoice.find({ tenantId });
+    const expenses = await Expense.find({ tenantId });
+    const purchases = await Purchase.find({ tenantId });
+
+    let totalRevenue = 0;
+    let totalPendingAmount = 0;
+    let totalCogs = 0;
+    let paidInvoices = 0;
+    let pendingCount = 0;
+
+    invoices.forEach(inv => {
+      totalRevenue += (inv.totalAmount || 0);
+      totalCogs += (inv.totalCogs || 0);
+      if (inv.status === 'Pending' || inv.status === 'Overdue') {
+        totalPendingAmount += (inv.totalAmount || 0);
+        pendingCount++;
+      }
+      if (inv.status === 'Paid') {
+        paidInvoices++;
+      }
+    });
+
+    let totalExpenses = 0;
+    expenses.forEach(exp => {
+      totalExpenses += (Number(exp.amount) || 0);
+    });
+
+    let totalPurchases = 0;
+    purchases.forEach(p => {
+      totalPurchases += (p.totalAmount || 0);
+    });
+
+    const netProfit = totalRevenue - totalExpenses - totalCogs;
+
+    // 3. Month and Year chart aggregation (simple map-reduce in memory since arrays are retrieved)
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = {};
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        const m = monthNames[d.getMonth()];
+        months[m] = { name: m, income: 0, expense: 0 };
+    }
+
+    invoices.forEach(inv => {
+      if (!inv.date) return;
+      const m = monthNames[new Date(inv.date).getMonth()];
+      if (months[m]) months[m].income += (inv.totalAmount || 0);
+    });
+
+    expenses.forEach(exp => {
+      if (!exp.date) return;
+      const m = monthNames[new Date(exp.date).getMonth()];
+      if (months[m]) months[m].expense += (Number(exp.amount) || 0);
+    });
+
+    const chartDataMonthly = Object.values(months);
+
+    const yearNames = [];
+    for (let i = 4; i >= 0; i--) {
+        yearNames.push((new Date().getFullYear() - i).toString());
+    }
+    const years = {};
+    yearNames.forEach(y => years[y] = { name: y, income: 0, expense: 0 });
+
+    invoices.forEach(inv => {
+      if (!inv.date) return;
+      const y = new Date(inv.date).getFullYear().toString();
+      if (years[y]) years[y].income += (inv.totalAmount || 0);
+    });
+
+    expenses.forEach(exp => {
+      if (!exp.date) return;
+      const y = new Date(exp.date).getFullYear().toString();
+      if (years[y]) years[y].expense += (Number(exp.amount) || 0);
+    });
+
+    const chartDataYearly = Object.values(years);
+
+    // 4. Extract unique expense categories
+    const expenseCategories = [...new Set(expenses.map(exp => exp.category).filter(Boolean))].sort();
+
+    res.status(200).json({
+      success: true,
+      data: {
+        stats: {
+          totalRevenue,
+          totalExpenses,
+          totalPurchases,
+          netProfit,
+          totalPendingAmount,
+          totalInvoices: invoices.length,
+          paidInvoices,
+          pendingCount
+        },
+        recentInvoices,
+        recentExpenses,
+        expenseCategories,
+        chartDataMonthly,
+        chartDataYearly
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

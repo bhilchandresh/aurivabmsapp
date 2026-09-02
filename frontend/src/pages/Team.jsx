@@ -243,13 +243,27 @@ const Team = () => {
                     </div>
                   </td>
                   <td className="p-4 px-6 text-right">
-                    {member._id !== user._id ? (
-                      <button onClick={() => handleDelete(member._id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Remove User">
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    ) : (
-                      <span className="text-xs text-gray-400 font-medium italic mr-2">It's You</span>
-                    )}
+                    <div className="flex justify-end items-center gap-1">
+                      {user?.role === 'admin' && (
+                        <button 
+                          onClick={() => {
+                            setEditData({ id: member._id, name: member.name });
+                            setIsEditModalOpen(true);
+                          }} 
+                          className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" 
+                          title="Edit User Name"
+                        >
+                          <Edit2 className="w-5 h-5" />
+                        </button>
+                      )}
+                      {member._id !== user._id ? (
+                        <button onClick={() => handleDelete(member._id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Remove User">
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-400 font-medium italic pr-2">It's You</span>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

@@ -44,18 +44,30 @@ const QuotationSchema = new mongoose.Schema({
       hsnCode: { type: String },
       quantity: { type: Number, required: true },
       rate: { type: Number, required: true },
+      gstRate: { type: Number, default: 0 }, // per item GST
+      taxAmount: { type: Number, default: 0 }, // per item tax
       total: { type: Number }
     }
   ],
 
   // --- FINANCIALS ---
   subTotal: { type: Number, default: 0 },
+  taxableAmount: { type: Number, default: 0 }, // Amount on which tax is calculated
   discountPercentage: { type: Number, default: 0 },
 
   // Added gstEnabled flag for better UI handling
   gstEnabled: { type: Boolean, default: false },
-  taxRate: { type: Number, default: 0 },
-  taxAmount: { type: Number, default: 0 }, // If GST is enabled
+  taxType: { type: String, enum: ['exclusive', 'inclusive'], default: 'exclusive' },
+  taxRate: { type: Number, default: 0 }, // Global/Override rate
+  gstAmount: { type: Number, default: 0 }, // Total GST Amount
+
+  // Breakdown
+  gstBreakdown: {
+    cgst: { type: Number, default: 0 },
+    sgst: { type: Number, default: 0 },
+    igst: { type: Number, default: 0 }
+  },
+  placeOfSupply: { type: String },
 
   totalAmount: { type: Number, required: true, default: 0 },
   advancePayment: { type: Number, default: 0 },

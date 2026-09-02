@@ -8,6 +8,8 @@ import {
 } from "lucide-react"; 
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Pagination from "../components/Pagination";
 
 const StatusDropdown = ({ q, statusStyle, isUpdating, handleStatusChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,57 +66,41 @@ const Quotations = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
 
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
 
-  // --- 1. FETCH ---
+  const queryClient = useQueryClient();
+
+  const { data: fetchedData, isLoading: queryLoading, isFetching } = useQuery({
+    queryKey: ['quotations', page, searchTerm, statusFilter, sortBy],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('page', page);
+      params.append('limit', 20);
+      if (searchTerm) params.append('search', searchTerm);
+      if (statusFilter !== 'all') params.append('status', statusFilter);
+      if (sortBy) params.append('sortBy', sortBy);
+
+      const res = await api.get(`/quotations?${params.toString()}`);
+      return res.data;
+    },
+    enabled: !!token,
+    keepPreviousData: true
+  });
+
   useEffect(() => {
-    const fetchQuotations = async () => {
-      try {
-        const res = await api.get("/quotations");
-        setQuotations(res.data.data);
-        setFilteredQuotations(res.data.data);
-      } catch (err) { 
-        console.error("Error fetching quotations:", err); 
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (token) fetchQuotations();
-  }, [token]);
+    if (fetchedData) {
+      setQuotations(fetchedData.data || []);
+      setFilteredQuotations(fetchedData.data || []);
+      if (fetchedData.pagination) setPagination(fetchedData.pagination);
+      setLoading(false);
+    }
+  }, [fetchedData]);
 
-  // --- 2. FILTER ---
+  // Reset page on filter changes
   useEffect(() => {
-    let result = [...quotations];
-
-    if (searchTerm) {
-      const lowerTerm = searchTerm.toLowerCase();
-      result = result.filter(q => 
-        q.quotationNumber.toLowerCase().includes(lowerTerm) || 
-        q.client?.name.toLowerCase().includes(lowerTerm)
-      );
-    }
-
-    if (statusFilter !== "all") {
-      result = result.filter(q => q.status.toLowerCase() === statusFilter.toLowerCase());
-    }
-
-    if (sortBy === "newest") {
-      result.sort((a, b) => {
-        const dateDiff = new Date(b.date).setHours(0,0,0,0) - new Date(a.date).setHours(0,0,0,0);
-        if (dateDiff !== 0) return dateDiff;
-        return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-      });
-    } else if (sortBy === "oldest") {
-      result.sort((a, b) => {
-        const dateDiff = new Date(a.date).setHours(0,0,0,0) - new Date(b.date).setHours(0,0,0,0);
-        if (dateDiff !== 0) return dateDiff;
-        return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
-      });
-    } else if (sortBy === "amount_high") {
-      result.sort((a, b) => (b.totalAmount || b.grandTotal || 0) - (a.totalAmount || a.grandTotal || 0));
-    }
-
-    setFilteredQuotations(result);
-  }, [searchTerm, statusFilter, sortBy, quotations]);
+    setPage(1);
+  }, [searchTerm, statusFilter, sortBy]);
 
   // --- 3. CONVERT TO INVOICE ---
   const handleConvertToInvoice = async (id) => {
@@ -147,6 +133,8 @@ const Quotations = () => {
       );
       setQuotations(updatedList);
       toast.success("Status updated");
+      queryClient.invalidateQueries({ queryKey: ['quotations'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch (error) {
       toast.error("Failed to update status.");
     } finally {
@@ -161,6 +149,8 @@ const Quotations = () => {
       await api.delete(`/quotations/${id}`);
       setQuotations(prev => prev.filter(q => q._id !== id));
       toast.success("Deleted successfully.");
+      queryClient.invalidateQueries({ queryKey: ['quotations'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch(e) { toast.error("Delete failed"); }
   };
 
@@ -222,7 +212,17 @@ const Quotations = () => {
                   {filteredQuotations.map(q => (
                     <tr key={q._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-bold text-blue-600">#{q.quotationNumber}</td>
-                      <td className="px-6 py-4">{q.client?.name}</td>
+                      <td className="px-6 py-4">
+                         <div className="mb-1">{q.client?.name}</div>
+                         {q.createdBy && (
+                            <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-gray-200">
+                               <div className="w-3 h-3 rounded-full bg-gray-200 flex items-center justify-center text-[7px] text-gray-600">
+                                  {q.createdBy.name.charAt(0).toUpperCase()}
+                               </div>
+                               {q.createdBy.name.split(' ')[0]}
+                            </span>
+                         )}
+                      </td>
                       <td className="px-6 py-4 text-sm text-gray-500">{new Date(q.date).toLocaleDateString()}</td>
                       <td className="px-6 py-4 font-bold">
                         {(() => {
@@ -254,7 +254,7 @@ const Quotations = () => {
                       <td className="px-6 py-4 text-right flex justify-end items-center gap-2">
                          <button 
                             onClick={() => {
-                              const url = `${window.location.origin}/public/quotation/${q._id}`;
+                              const url = `https://app.aurivabms.in/public/quotation/${q._id}`;
                               navigator.clipboard.writeText(url);
                               toast.success("Link copied!");
                             }}
@@ -301,6 +301,8 @@ const Quotations = () => {
             </div>
           )}
         </div>
+
+        <Pagination pagination={pagination} setPage={setPage} />
       </div>
     </Layout>
   );

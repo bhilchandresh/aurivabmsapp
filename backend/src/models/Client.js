@@ -13,6 +13,11 @@ const clientSchema = new mongoose.Schema({
   email: {
     type: String
   },
+  emailDeliveryStatus: {
+    type: String,
+    enum: ['valid', 'bounced', 'unknown'],
+    default: 'unknown'
+  },
   phone: {
     type: String
   },
@@ -27,7 +32,10 @@ const clientSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
 createdAt: {
      type: Date, default: Date.now }
 }, { timestamps: true });

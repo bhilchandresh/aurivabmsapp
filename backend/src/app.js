@@ -20,12 +20,22 @@ const businessRoutes = require('./routes/businessRoutes');
 const userRoutes = require('./routes/userRoutes');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
+const employeeRoutes = require('./routes/employeeRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const publicRoutes = require('./routes/publicRoutes');
+const securityRoutes = require('./routes/securityRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
+const ipBlocker = require('./middleware/ipBlocker');
+const { trafficMonitor } = require('./middleware/trafficMonitor');
+const BlockedIP = require('./models/BlockedIP');
 const app = express();
+app.set('trust proxy', 1);
 
 // --- 2. Middleware ---
+app.use(ipBlocker); // Apply IP blocker globally before any routes
+app.use(trafficMonitor); // Track live IP traffic
 app.use(helmet());
 app.use(compression());
 app.use(morgan('dev')); // Structured HTTP Logging
@@ -56,10 +66,33 @@ app.use(cors({
 // Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500, // 🔴 Thoda badha diya taaki heavy use me block na ho
+  max: 2000, // 🔴 Thoda badha diya taaki heavy use me block na ho
   standardHeaders: true,
   legacyHeaders: false,
-  message: "Too many requests, please try again after 15 minutes."
+  message: "Too many requests, please try again after 15 minutes.",
+  handler: async (req, res, next, options) => {
+    try {
+      const clientIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.ip;
+      const cleanIp = clientIp.includes('::ffff:') ? clientIp.split('::ffff:')[1] : clientIp;
+      
+      // Save to database as auto-blocked
+      await BlockedIP.updateOne(
+        { ipAddress: cleanIp }, 
+        { 
+          $set: { 
+            ipAddress: cleanIp, 
+            reason: 'Auto-blocked by Rate Limiter (Exceeded 500 req/15min)',
+            autoBlocked: true,
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000)
+          } 
+        }, 
+        { upsert: true }
+      );
+    } catch (err) {
+      console.error('Rate Limiter Auto-Block Log Error:', err);
+    }
+    res.status(options.statusCode).send(options.message);
+  }
 });
 app.use('/api', limiter);
 
@@ -72,9 +105,13 @@ app.use('/api/v1/business', businessRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/inventory', inventoryRoutes);
 app.use('/api/v1/suppliers', supplierRoutes);
+app.use('/api/v1/employees', employeeRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/payments', paymentRoutes);
 app.use('/api/v1/settings', settingsRoutes);
+app.use('/api/v1/public', publicRoutes);
+app.use('/api/v1/security', securityRoutes);
+app.use('/api/v1/webhooks', webhookRoutes);
 // --- 4. Base Route ---
 app.get('/', (req, res) => {
   res.send('AurivaBMS API is running securely...');
@@ -99,9 +136,11 @@ app.use((err, req, res, next) => {
 // --- 6. Database & Server ---
 const connectDB = async () => {
   try {
-    // 🔴 Added options for better connection stability
+    // 🔴 Added options for better connection stability and high load
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      serverSelectionTimeoutMS: 5000
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 500
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
@@ -110,14 +149,21 @@ const connectDB = async () => {
   }
 };
 
+const http = require('http');
+const socketIO = require('./utils/socket');
+
 const PORT = process.env.PORT || 5001;
+const server = http.createServer(app);
+
+// Initialize Socket.io
+socketIO.init(server);
 
 connectDB().then(() => {
   // Initialize Cron Jobs
   const cronService = require('./services/cronService');
   cronService.initCronJobs();
 
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Server running securely on port ${PORT}`);
   });
 });

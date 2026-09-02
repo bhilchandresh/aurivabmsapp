@@ -53,6 +53,7 @@ module.exports = (invoice) => {
                     <th>Description</th>
                     <th class="text-right">Qty</th>
                     <th class="text-right">Rate</th>
+                                       ${isGst ? '<th class="text-right">GST</th>' : ''}
                     <th class="text-right">Total</th>
                 </tr>
             </thead>
@@ -62,6 +63,10 @@ module.exports = (invoice) => {
                     <td>${item.description}</td>
                     <td class="text-right">${item.quantity}</td>
                     <td class="text-right">${formatCurrency(item.rate)}</td>
+                                       ${isGst ? `
+                                       <td class="text-right">
+                                          ${item.gstRate ? item.gstRate + '%' : '-'}
+                                       </td>` : ''}
                     <td class="text-right">${formatCurrency(item.quantity * item.rate)}</td>
                 </tr>`).join('')}
             </tbody>
@@ -72,15 +77,16 @@ module.exports = (invoice) => {
             ${invoice.discountAmount > 0 ? `<div class="total-row">Discount: - ${formatCurrency(invoice.discountAmount)}</div>` : ''}
             
             ${invoice.gstEnabled ? `
+                <div class="total-row">Total GST (${invoice.taxType || 'exclusive'}): + ${formatCurrency(invoice.gstAmount)}</div>
                 ${invoice.gstBreakdown ? `
                     ${invoice.gstBreakdown.cgst > 0 ? `<div class="total-row">CGST: ${formatCurrency(invoice.gstBreakdown.cgst)}</div>` : ''}
                     ${invoice.gstBreakdown.sgst > 0 ? `<div class="total-row">SGST: ${formatCurrency(invoice.gstBreakdown.sgst)}</div>` : ''}
                     ${invoice.gstBreakdown.igst > 0 ? `<div class="total-row">IGST: ${formatCurrency(invoice.gstBreakdown.igst)}</div>` : ''}
-                ` : `<div class="total-row">GST: ${formatCurrency(invoice.gstAmount)}</div>`}
+                ` : ''}
             ` : ''}
             
-            <div class="grand-total">Total: ${formatCurrency(invoice.totalAmount)}</div>
-            ${invoice.advancePayment > 0 ? `<div class="total-row">Balance Due: ${formatCurrency(invoice.totalAmount - invoice.advancePayment)}</div>` : ''}
+            ${invoice.advancePayment > 0 ? `<div class="total-row">Advance Paid: - ${formatCurrency(invoice.advancePayment)}</div>` : ''}
+            <div class="grand-total">Total Payable: ${formatCurrency(invoice.totalAmount - (invoice.advancePayment || 0))}</div>
         </div>
 
         <div class="signature-section">

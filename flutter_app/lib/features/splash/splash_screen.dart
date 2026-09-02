@@ -42,6 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // The auth controller will determine where to navigate after a delay
     _authController.determineInitialRoute();
+
   }
 
   @override

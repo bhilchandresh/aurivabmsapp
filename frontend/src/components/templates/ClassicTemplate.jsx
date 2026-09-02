@@ -49,12 +49,17 @@ const ClassicTemplate = ({ data, tenant, type = 'invoice' }) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(Number(amount) || 0);
   };
 
-  const subTotal = data.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
-  const discountAmount = subTotal * (Number(data.discountPercentage) / 100);
-  const taxableAmount = subTotal - discountAmount;
+  // Use backend calculated values or fallback
+  const subTotal = Number(data.subTotal) || data.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
+  const discountPercentage = Number(data.discountPercentage) || 0;
+  const discountAmount = Number(data.discountAmount) || (subTotal * (discountPercentage / 100));
+  const taxableAmount = Number(data.taxableAmount) || (subTotal - discountAmount);
   const taxRate = isGstEnabled ? (Number(data.taxRate) || 0) : 0;
-  const taxAmount = taxableAmount * (taxRate / 100);
-  const total = taxableAmount + taxAmount;
+  const taxAmount = Number(data.gstAmount) || (taxableAmount * (taxRate / 100));
+  const cgst = data.gstBreakdown?.cgst || taxAmount / 2;
+  const sgst = data.gstBreakdown?.sgst || taxAmount / 2;
+  const igst = data.gstBreakdown?.igst || 0;
+  const total = Number(data.totalAmount) || (taxableAmount + taxAmount);
   const advance = Number(data.advancePayment) || 0;
   const balance = total - advance;
 
@@ -239,6 +244,7 @@ const ClassicTemplate = ({ data, tenant, type = 'invoice' }) => {
 
                           <th className="py-3 px-2 text-center border-r border-black w-[10%] font-bold uppercase tracking-wider text-[10px]">Qty</th>
                           <th className="py-3 px-2 text-right border-r border-black w-[15%] font-bold uppercase tracking-wider text-[10px]">Rate</th>
+                                       {isGstEnabled && <th className="py-3 px-2 text-center w-[10%] border-y border-gray-200">GST</th>}
                           <th className="py-3 px-2 text-right w-[20%] font-bold uppercase tracking-wider text-[10px]">Amount</th>
                         </tr>
                       </thead>
@@ -259,6 +265,11 @@ const ClassicTemplate = ({ data, tenant, type = 'invoice' }) => {
 
                             <td className="py-4 px-2 text-center border-r border-black font-medium align-top break-words">{item.quantity}</td>
                             <td className="py-4 px-2 text-right border-r border-black font-medium align-top break-words">{formatCurrency(item.rate)}</td>
+                            {isGstEnabled && (
+                                              <td className="py-4 px-2 text-center text-gray-600 align-top break-words">
+                                                  {item.gstRate ? `${item.gstRate}%` : '-'}
+                                              </td>
+                                          )}
                             <td className="py-4 px-2 text-right font-bold align-top break-words">{formatCurrency(Number(item.quantity) * Number(item.rate))}</td>
                           </tr>
                         ))}

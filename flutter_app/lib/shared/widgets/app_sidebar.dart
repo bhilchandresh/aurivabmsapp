@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/theme/app_extensions.dart';
+import '../../features/auth/auth_controller.dart';
 
 class AppSidebar extends StatelessWidget {
   final String currentRoute;
@@ -10,6 +11,8 @@ class AppSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAdmin = Get.find<AuthController>().userRole.value.toLowerCase().contains('admin');
+
     return Drawer(
       backgroundColor: const Color(0xFF1E293B), // slate-800
       child: Column(
@@ -118,27 +121,29 @@ class AppSidebar extends StatelessWidget {
                   LucideIcons.wallet,
                 ),
                 const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: Text(
-                    'admin'.tr,
-                    style: context.typography.categoryHeader.copyWith(
-                      color: Colors.grey,
+                if (isAdmin) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    child: Text(
+                      'admin'.tr,
+                      style: context.typography.categoryHeader.copyWith(
+                        color: Colors.grey,
+                      ),
                     ),
                   ),
-                ),
-                _buildMenuItem(
-                  context,
-                  'Team & Access',
-                  '/team',
-                  LucideIcons.shieldCheck,
-                ),
-                _buildMenuItem(
-                  context,
-                  'Settings',
-                  '/settings',
-                  LucideIcons.settings,
-                ),
+                  _buildMenuItem(
+                    context,
+                    'Team & Access',
+                    '/team',
+                    LucideIcons.shieldCheck,
+                  ),
+                  _buildMenuItem(
+                    context,
+                    'Settings',
+                    '/settings',
+                    LucideIcons.settings,
+                  ),
+                ],
               ],
             ),
           ),

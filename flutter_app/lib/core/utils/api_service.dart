@@ -57,13 +57,26 @@ class ApiService {
     }
   }
 
+  static bool _isPublicEndpoint(String endpoint) {
+    return endpoint == ApiConstants.login || 
+           endpoint == ApiConstants.register ||
+           endpoint.startsWith('/public/') ||
+           endpoint == '/users/register-device'; // If register device is public
+  }
+
   static Future<http.Response> get(String endpoint) async {
     final headers = await _getHeaders();
+    if (!headers.containsKey('Authorization') && !_isPublicEndpoint(endpoint)) {
+      throw Exception('Unauthorized local check: No token');
+    }
     return _processRequest(() => http.get(Uri.parse(ApiConstants.baseUrl + endpoint), headers: headers));
   }
 
   static Future<http.Response> post(String endpoint, dynamic body) async {
     final headers = await _getHeaders();
+    if (!headers.containsKey('Authorization') && !_isPublicEndpoint(endpoint)) {
+      throw Exception('Unauthorized local check: No token');
+    }
     return _processRequest(() => http.post(
       Uri.parse(ApiConstants.baseUrl + endpoint),
       headers: headers,
@@ -73,6 +86,9 @@ class ApiService {
 
   static Future<http.Response> put(String endpoint, dynamic body) async {
     final headers = await _getHeaders();
+    if (!headers.containsKey('Authorization') && !_isPublicEndpoint(endpoint)) {
+      throw Exception('Unauthorized local check: No token');
+    }
     return _processRequest(() => http.put(
       Uri.parse(ApiConstants.baseUrl + endpoint),
       headers: headers,
@@ -82,6 +98,9 @@ class ApiService {
 
   static Future<http.Response> delete(String endpoint) async {
     final headers = await _getHeaders();
+    if (!headers.containsKey('Authorization') && !_isPublicEndpoint(endpoint)) {
+      throw Exception('Unauthorized local check: No token');
+    }
     return _processRequest(() => http.delete(Uri.parse(ApiConstants.baseUrl + endpoint), headers: headers));
   }
 

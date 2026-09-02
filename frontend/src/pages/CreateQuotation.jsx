@@ -1,9 +1,11 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import api from "../utils/api";
-import toast from "react-hot-toast";
+import { toast } from 'react-hot-toast';
+import { getLocalDateString, getLocalDateStringWithOffset } from '../utils/dateUtils';
 import { useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Save, Plus, Trash2, Calendar, User, FileText, CreditCard, AlertCircle } from "lucide-react";
+import { useQueryClient } from '@tanstack/react-query';
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 import ClientAutocomplete from "../components/ClientAutocomplete";
@@ -19,16 +21,19 @@ const CreateQuotation = () => {
 
    // --- CUSTOM API ERROR STATE ---
    const [apiError, setApiError] = useState(null);
+   const queryClient = useQueryClient();
 
    // --- FORM SETUP ---
    const { register, control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
       defaultValues: {
-         items: [{ description: "", additionalDetails: "", hsnCode: "", quantity: 1, rate: 0 }],
+         items: [{ description: "", additionalDetails: "", hsnCode: "", gstRate: 18, quantity: 1, rate: 0 }],
+         taxType: 'exclusive',
+         placeOfSupply: "",
          taxRate: 18,
          discountPercentage: 0,
          advancePayment: 0,
-         date: new Date().toISOString().split('T')[0],
-         validUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+         date: getLocalDateString(),
+         validUntil: getLocalDateStringWithOffset(7),
          terms: ""
       }
    });
@@ -38,9 +43,13 @@ const CreateQuotation = () => {
    // Watch values
    const items = watch("items");
    const taxRate = watch("taxRate");
+   const taxType = watch("taxType");
+   const placeOfSupply = watch("placeOfSupply");
    const discountPercentage = watch("discountPercentage");
    const advancePayment = watch("advancePayment");
    const selectedClientId = watch("clientId");
+
+   const [tenantState, setTenantState] = useState("");
 
 
    // 1. FETCH CLIENTS & DEFAULT SETTINGS
@@ -55,6 +64,10 @@ const CreateQuotation = () => {
 
             setClients(resClients.data.data);
             setInventoryItems(resInventory.data.data);
+
+            if (resSettings.data.data.tenant && resSettings.data.data.tenant.state) {
+               setTenantState(resSettings.data.data.tenant.state);
+            }
 
             // --- PRE-FILL DEFAULT TERMS ---
             if (resSettings.data.data.defaultTerms) {
@@ -78,6 +91,9 @@ const CreateQuotation = () => {
          setValue("client.gstNumber", client.gstNumber);
          setValue("client.phone", client.phone);
          setValue("clientId", client._id);
+         if (client.state) {
+            setValue("placeOfSupply", client.state);
+         }
 
          // Clear client name error if it was triggered
          if (errors?.client?.name) {
@@ -87,12 +103,58 @@ const CreateQuotation = () => {
    };
 
    // 3. CALCULATIONS
-   const subTotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
+   const isInterState = useMemo(() => {
+      if (!tenantState || !placeOfSupply) return false;
+      return tenantState.trim().toLowerCase() !== placeOfSupply.trim().toLowerCase();
+   }, [tenantState, placeOfSupply]);
+
+   let calculatedSubTotal = 0;
+   let calculatedTaxAmount = 0;
+
+   const processedItems = items ? items.map(item => {
+      const qty = Number(item.quantity) || 0;
+      const rate = Number(item.rate) || 0;
+      const itemGstRate = gstEnabled ? (Number(item.gstRate) || 0) : 0;
+      
+      let lineTotal = qty * rate;
+      let taxable = lineTotal;
+      let tax = 0;
+
+      if (gstEnabled) {
+         if (taxType === 'inclusive') {
+            taxable = lineTotal / (1 + (itemGstRate / 100));
+            tax = lineTotal - taxable;
+         } else {
+            tax = lineTotal * (itemGstRate / 100);
+            lineTotal = lineTotal + tax;
+         }
+      }
+      
+      calculatedSubTotal += taxable;
+      calculatedTaxAmount += tax;
+      
+      return { ...item, taxable, tax, lineTotal };
+   }) : [];
+
+   const subTotal = calculatedSubTotal;
    const discountAmount = subTotal * (Number(discountPercentage) / 100);
-   const taxableAmount = subTotal - discountAmount;
-   const gstAmount = gstEnabled ? (taxableAmount * (Number(taxRate) / 100)) : 0;
-   const totalAmount = taxableAmount + gstAmount;
+   
+   // Calculate actual taxable value (only items with GST > 0)
+   const taxableItemsSubTotal = processedItems.reduce((sum, item) => sum + ((Number(item.gstRate) > 0) ? Number(item.taxable) : 0), 0);
+   
+   // Apply proportional discount to taxable amount
+   const taxableAmount = gstEnabled ? (taxableItemsSubTotal * (1 - (Number(discountPercentage) / 100))) : (subTotal - discountAmount);
+   
+   // Pro-rata tax reduction
+   const gstAmount = calculatedTaxAmount * (1 - (Number(discountPercentage) / 100));
+   
+   const totalAfterDiscount = subTotal - discountAmount;
+   const totalAmount = totalAfterDiscount + gstAmount;
    const balanceDue = totalAmount - Number(advancePayment);
+
+   const cgst = !isInterState ? (gstAmount / 2) : 0;
+   const sgst = !isInterState ? (gstAmount / 2) : 0;
+   const igst = isInterState ? gstAmount : 0;
 
    // 4. SUBMIT FORM
    const onSubmit = async (data) => {
@@ -107,13 +169,15 @@ const CreateQuotation = () => {
       const payload = {
          ...data,
          gstEnabled,
-         taxRate: gstEnabled ? Number(data.taxRate) : 0,
+         taxType,
+         taxRate: Number(data.taxRate),
          discountPercentage: Number(data.discountPercentage),
          advancePayment: Number(data.advancePayment),
          items: data.items.map(item => ({
             ...item,
             quantity: Number(item.quantity),
             rate: Number(item.rate),
+            gstRate: gstEnabled ? Number(item.gstRate) : 0,
             hsnCode: gstEnabled ? item.hsnCode : "",
             additionalDetails: item.additionalDetails
          }))
@@ -121,6 +185,8 @@ const CreateQuotation = () => {
 
       try {
          const res = await api.post(`/quotations`, payload);
+         queryClient.invalidateQueries({ queryKey: ['quotations'] });
+         queryClient.invalidateQueries({ queryKey: ['dashboard'] });
          navigate(`/quotations/${res.data.data._id}`);
       } catch (e) {
          // NO MORE alert() - setting custom state instead
@@ -258,16 +324,55 @@ const CreateQuotation = () => {
                            {errors.validUntil && <p className="text-red-500 text-xs mt-1 font-medium">{errors.validUntil.message}</p>}
                         </div>
 
-                        {/* GST TOGGLE */}
-                        <div className="pt-4 border-t mt-2">
-                           <label className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-100 cursor-pointer hover:bg-blue-100 transition">
+                        {/* PLACE OF SUPPLY */}
+                        <div>
+                           <label className="block text-xs font-bold text-gray-500 mb-1">Place of Supply <span className="text-red-500">*</span></label>
+                           <select
+                              {...register("placeOfSupply", { required: "Required" })}
+                              className={`w-full border p-2 rounded outline-none text-sm bg-gray-50 ${errors.placeOfSupply ? 'border-red-400 focus:ring-2 focus:ring-red-500' : 'focus:ring-2 focus:ring-purple-500'}`}
+                           >
+                              <option value="">Select State</option>
+                              {[
+                                  "Andaman and Nicobar Islands", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", 
+                                  "Chandigarh", "Chhattisgarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Goa", 
+                                  "Gujarat", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Jharkhand", "Karnataka", 
+                                  "Kerala", "Ladakh", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", 
+                                  "Mizoram", "Nagaland", "Odisha", "Puducherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", 
+                                  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"
+                              ].map(s => <option key={s} value={s}>{s}</option>)}
+                           </select>
+                           {errors.placeOfSupply && <p className="text-red-500 text-xs mt-1 font-medium">{errors.placeOfSupply.message}</p>}
+                        </div>
+
+                        {/* GST TOGGLE & TYPE */}
+                        <div className="pt-4 border-t mt-2 space-y-3">
+                           <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg border border-blue-100 cursor-pointer hover:bg-blue-100 transition" onClick={() => setGstEnabled(!gstEnabled)}>
                               <span className="text-sm font-bold text-blue-800 flex items-center gap-2">
                                  <CreditCard className="h-4 w-4" /> Enable GST
                               </span>
-                              <div className={`w-10 h-6 flex items-center bg-gray-300 rounded-full p-1 duration-300 ease-in-out ${gstEnabled ? 'bg-blue-600' : ''}`} onClick={() => setGstEnabled(!gstEnabled)}>
+                              <div className={`w-10 h-6 flex items-center bg-gray-300 rounded-full p-1 duration-300 ease-in-out ${gstEnabled ? 'bg-blue-600' : ''}`}>
                                  <div className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${gstEnabled ? 'translate-x-4' : ''}`}></div>
                               </div>
-                           </label>
+                           </div>
+                           
+                           {gstEnabled && (
+                              <div className="flex gap-2">
+                                 <button 
+                                   type="button"
+                                   onClick={() => setValue('taxType', 'exclusive')}
+                                   className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg border-2 transition-all ${taxType === 'exclusive' ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-white border-gray-200 text-gray-400'}`}
+                                 >
+                                   Tax Exclusive
+                                 </button>
+                                 <button 
+                                   type="button"
+                                   onClick={() => setValue('taxType', 'inclusive')}
+                                   className={`flex-1 py-2 text-[10px] font-black uppercase rounded-lg border-2 transition-all ${taxType === 'inclusive' ? 'bg-blue-600 border-blue-600 text-white shadow-md' : 'bg-white border-gray-200 text-gray-400'}`}
+                                 >
+                                   Tax Inclusive
+                                 </button>
+                              </div>
+                           )}
                         </div>
                      </div>
                   </div>
@@ -350,15 +455,29 @@ const CreateQuotation = () => {
                            {/* 4. Rate (Col Span 2) */}
                            <div className="md:col-span-2">
                               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1 block text-right">Rate <span className="text-red-500">*</span></label>
-                              <input
-                                 type="number"
-                                 step="0.01"
-                                 {...register(`items.${index}.rate`, {
-                                    required: "Required",
-                                    min: { value: 0, message: "Invalid" }
-                                 })}
-                                 className={`w-full border p-2 rounded text-right outline-none font-medium ${errors.items?.[index]?.rate ? 'border-red-400 focus:ring-2 focus:ring-red-500' : 'border-gray-300 focus:ring-2 focus:ring-blue-500'}`}
-                              />
+                              <div className="space-y-2">
+                                 <input
+                                    type="number"
+                                    step="0.01"
+                                    {...register(`items.${index}.rate`, {
+                                       required: "Required",
+                                       min: { value: 0, message: "Invalid" }
+                                    })}
+                                    className={`w-full border p-2 rounded text-right outline-none font-medium ${errors.items?.[index]?.rate ? 'border-red-400 focus:ring-2 focus:ring-red-500' : 'border-gray-300 focus:ring-2 focus:ring-blue-500'}`}
+                                 />
+                                 {gstEnabled && (
+                                    <div className="flex items-center gap-1 justify-end">
+                                       <span className="text-[9px] font-bold text-gray-400">GST %</span>
+                                       <select {...register(`items.${index}.gstRate`)} className="w-16 bg-white border border-blue-100 p-1 rounded text-xs font-bold text-blue-700 outline-none">
+                                          <option value="0">0%</option>
+                                          <option value="5">5%</option>
+                                          <option value="12">12%</option>
+                                          <option value="18">18%</option>
+                                          <option value="28">28%</option>
+                                       </select>
+                                    </div>
+                                 )}
+                              </div>
                               {errors.items?.[index]?.rate && <p className="text-red-500 text-[10px] mt-1 text-right font-medium">{errors.items[index].rate.message}</p>}
                            </div>
 
@@ -381,7 +500,7 @@ const CreateQuotation = () => {
 
                      <button
                         type="button"
-                        onClick={() => append({ description: "", additionalDetails: "", hsnCode: "", quantity: 1, rate: 0 })}
+                        onClick={() => append({ description: "", additionalDetails: "", hsnCode: "", gstRate: 18, quantity: 1, rate: 0 })}
                         className="mt-2 text-blue-600 font-bold text-sm hover:underline flex items-center gap-1"
                      >
                         <Plus className="h-4 w-4" /> Add New Item Line
@@ -425,17 +544,31 @@ const CreateQuotation = () => {
                         </div>
 
                         {gstEnabled && (
-                           <div className="flex justify-between items-center text-blue-600 bg-blue-50 p-2 rounded mt-2">
-                              <div className="flex items-center gap-2">
-                                 <span className="text-sm font-bold">GST Rate</span>
-                                 <select {...register("taxRate")} className="border-0 bg-transparent font-bold text-sm focus:ring-0 cursor-pointer text-blue-700 outline-none">
-                                    <option value="5">5%</option>
-                                    <option value="12">12%</option>
-                                    <option value="18">18%</option>
-                                    <option value="28">28%</option>
-                                 </select>
+                           <div className="bg-blue-50 p-3 rounded-lg mt-2 border border-blue-100">
+                              <div className="flex justify-between items-center text-blue-800 font-bold mb-2 pb-2 border-b border-blue-200">
+                                 <span className="text-sm">Total GST ({taxType})</span>
+                                 <span>+ {gstAmount.toFixed(2)}</span>
                               </div>
-                              <span className="font-bold">+ {gstAmount.toFixed(2)}</span>
+                              <div className="space-y-1">
+                                 {cgst > 0 && (
+                                    <div className="flex justify-between text-xs text-blue-600">
+                                       <span>CGST</span>
+                                       <span>{cgst.toFixed(2)}</span>
+                                    </div>
+                                 )}
+                                 {sgst > 0 && (
+                                    <div className="flex justify-between text-xs text-blue-600">
+                                       <span>SGST</span>
+                                       <span>{sgst.toFixed(2)}</span>
+                                    </div>
+                                 )}
+                                 {igst > 0 && (
+                                    <div className="flex justify-between text-xs text-blue-600">
+                                       <span>IGST</span>
+                                       <span>{igst.toFixed(2)}</span>
+                                    </div>
+                                 )}
+                              </div>
                            </div>
                         )}
 

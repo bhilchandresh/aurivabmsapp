@@ -7,6 +7,10 @@ const inventorySchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   itemName: {
     type: String,
     required: [true, 'Item name is required'],
@@ -21,6 +25,11 @@ const inventorySchema = new mongoose.Schema({
     type: String,
     trim: true,
     default: ''
+  },
+  purchasePrice: {
+    type: Number,
+    min: 0,
+    default: 0
   },
   unitPrice: {
     type: Number,

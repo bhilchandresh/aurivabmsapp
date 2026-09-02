@@ -37,11 +37,14 @@ const invoiceSchema = new mongoose.Schema({
     rate: { type: Number, required: true, min: 0 },
     gstRate: { type: Number, default: 0 }, // per item GST
     taxAmount: { type: Number, default: 0 }, // per item tax
+    purchasePrice: { type: Number, default: 0 }, // For COGS calculation
     inventoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Inventory' }
   }],
 
   // --- FINANCIALS ---
   subTotal: { type: Number, default: 0 },
+  taxableAmount: { type: Number, default: 0 }, // Amount on which tax is calculated
+  totalCogs: { type: Number, default: 0 }, // Cost of Goods Sold for accurate profit tracking
 
   // Discount
   discountPercentage: { type: Number, default: 0 },
@@ -83,8 +86,16 @@ const invoiceSchema = new mongoose.Schema({
   notes: { type: String },
   terms: { type: String },
 
+  // Email Delivery Tracking
+  emailDeliveryStatus: {
+    type: String,
+    enum: ['sent', 'delivered', 'bounced', 'none'],
+    default: 'none'
+  },
+
   // Tracking
-  salesPerson: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  salesPerson: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 
 }, {
   timestamps: true // <--- ✅ AUTO-HANDLES createdAt & updatedAt

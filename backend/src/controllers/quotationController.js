@@ -8,18 +8,93 @@ const getTemplate = require('../templates/index');
 const nodemailer = require('nodemailer');
 
 // --- HELPER: Calculate Totals ---
-const calculateTotals = (items, discountPercentage = 0, taxRate = 0, gstEnabled = false) => {
+const calculateTotals = (items, discountPercentage = 0, taxType = 'exclusive', gstEnabled = false, tenantState = '', clientState = '', advancePayment = 0) => {
   if (!Array.isArray(items)) return {};
 
-  const subTotal = items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate || item.price || 0)), 0);
+  let subTotal = 0;
+  let totalTaxAmount = 0;
+  let cgst = 0;
+  let sgst = 0;
+  let igst = 0;
+
+  const isInterState = tenantState && clientState && tenantState.trim().toLowerCase() !== clientState.trim().toLowerCase();
+
+  const processedItems = items.map(item => {
+    const qty = Number(item.quantity) || 0;
+    const rate = Number(item.rate || item.price) || 0;
+    const itemGstRate = Number(item.gstRate) || 0;
+    
+    let lineTotal = qty * rate;
+    let taxableAmount = lineTotal;
+    let taxAmount = 0;
+
+    if (gstEnabled) {
+      if (taxType === 'inclusive') {
+        taxableAmount = lineTotal / (1 + (itemGstRate / 100));
+        taxAmount = lineTotal - taxableAmount;
+      } else {
+        taxAmount = lineTotal * (itemGstRate / 100);
+        lineTotal = lineTotal + taxAmount;
+      }
+
+      if (isInterState) {
+        igst += taxAmount;
+      } else {
+        cgst += taxAmount / 2;
+        sgst += taxAmount / 2;
+      }
+    }
+
+    subTotal += taxableAmount;
+    totalTaxAmount += taxAmount;
+
+    return {
+      ...item,
+      taxableAmount: Number(taxableAmount.toFixed(2)),
+      taxAmount: Number(taxAmount.toFixed(2)),
+      total: Number(lineTotal.toFixed(2))
+    };
+  });
 
   const discountAmount = subTotal * (Number(discountPercentage) / 100);
-  const taxableAmount = subTotal - discountAmount;
+  
+  // Calculate actual taxable value (only items with GST > 0)
+  const taxableItemsSubTotal = processedItems.reduce((sum, item) => sum + ((Number(item.gstRate) > 0) ? Number(item.taxableAmount) : 0), 0);
+  
+  // Apply proportional discount to taxable amount
+  const taxableTotal = gstEnabled ? (taxableItemsSubTotal * (1 - (Number(discountPercentage) / 100))) : (subTotal - discountAmount);
 
-  const taxAmount = gstEnabled ? taxableAmount * (Number(taxRate) / 100) : 0;
-  const totalAmount = taxableAmount + taxAmount;
+  let finalTaxAmount = totalTaxAmount;
+  let finalCgst = cgst;
+  let finalSgst = sgst;
+  let finalIgst = igst;
 
-  return { subTotal, discountAmount, taxableAmount, taxAmount, totalAmount };
+  if (discountPercentage > 0) {
+    const discountFactor = (1 - Number(discountPercentage) / 100);
+    finalTaxAmount = totalTaxAmount * discountFactor;
+    finalCgst = cgst * discountFactor;
+    finalSgst = sgst * discountFactor;
+    finalIgst = igst * discountFactor;
+  }
+
+  const totalAfterDiscount = subTotal - discountAmount;
+  const totalAmount = totalAfterDiscount + finalTaxAmount;
+  const balanceDue = totalAmount - Number(advancePayment);
+
+  return { 
+    items: processedItems,
+    subTotal: Number(subTotal.toFixed(2)), 
+    discountAmount: Number(discountAmount.toFixed(2)), 
+    taxableAmount: Number(taxableTotal.toFixed(2)), 
+    gstAmount: Number(finalTaxAmount.toFixed(2)), 
+    gstBreakdown: {
+      cgst: Number(finalCgst.toFixed(2)),
+      sgst: Number(finalSgst.toFixed(2)),
+      igst: Number(finalIgst.toFixed(2))
+    },
+    totalAmount: Number(totalAmount.toFixed(2)), 
+    balanceDue: Number(balanceDue.toFixed(2)) 
+  };
 };
 
 // --- HELPER: Generate PDF using Playwright ---
@@ -68,8 +143,49 @@ exports.getQuotations = async (req, res) => {
       ];
     }
 
-    const quotations = await Quotation.find(query).sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: quotations.length, data: quotations });
+    if (req.query.status && req.query.status !== 'all') {
+      query.status = new RegExp('^' + req.query.status + '$', 'i');
+    }
+
+    if (req.query.month) {
+      const startDate = new Date(`${req.query.month}-01`);
+      const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
+      query.date = {
+        $gte: startDate.toISOString().split('T')[0],
+        $lte: endDate.toISOString().split('T')[0]
+      };
+    }
+
+    let sortObj = { createdAt: -1 };
+    if (req.query.sortBy) {
+      if (req.query.sortBy === 'newest') sortObj = { date: -1, createdAt: -1 };
+      else if (req.query.sortBy === 'oldest') sortObj = { date: 1, createdAt: 1 };
+      else if (req.query.sortBy === 'amount_high') sortObj = { totalAmount: -1 };
+      else if (req.query.sortBy === 'amount_low') sortObj = { totalAmount: 1 };
+    }
+
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20;
+    const skip = (page - 1) * limit;
+
+    const quotations = await Quotation.find(query)
+      .sort(sortObj)
+      .skip(skip)
+      .limit(limit)
+      .populate('createdBy', 'name email');
+
+    const total = await Quotation.countDocuments(query);
+
+    res.status(200).json({ 
+      success: true, 
+      count: quotations.length, 
+      data: quotations,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Get Quotes Error:", error);
     res.status(500).json({ success: false, message: error.message });
@@ -98,8 +214,10 @@ exports.createQuotation = async (req, res) => {
       clientId,
       items,
       discountPercentage = 0,
+      taxType = 'exclusive',
       taxRate = 0,
       gstEnabled = false,
+      placeOfSupply,
       date,
       validUntil,
       notes,
@@ -109,6 +227,8 @@ exports.createQuotation = async (req, res) => {
     } = req.body;
 
     const currentUser = await User.findById(req.user.id);
+    const Tenant = require('../models/Tenant');
+    const tenant = await Tenant.findById(req.user.tenantId);
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ success: false, message: "At least one item is required." });
@@ -121,10 +241,26 @@ exports.createQuotation = async (req, res) => {
       hsnCode: item.hsnCode || "", // ✅ NEW: Capture HSN Code
       quantity: Number(item.quantity),
       rate: Number(item.rate || item.price || 0),
+      gstRate: Number(item.gstRate || 0),
       total: Number(item.quantity) * Number(item.rate || item.price || 0)
     }));
 
-    const financials = calculateTotals(calculatedItems, discountPercentage, taxRate, gstEnabled);
+    // If client is string, assume it's state, but normally we look up existingClient
+    let tempClientState = client && client.state ? client.state : '';
+    if (clientId) {
+      const dbClient = await Client.findById(clientId);
+      if (dbClient) tempClientState = dbClient.state || '';
+    }
+
+    const financials = calculateTotals(
+      calculatedItems, 
+      discountPercentage, 
+      taxType, 
+      gstEnabled, 
+      tenant?.state || '', 
+      placeOfSupply || tempClientState, 
+      advancePayment
+    );
     const advance = Number(advancePayment) || 0;
     const balanceDue = financials.totalAmount - advance;
 
@@ -175,11 +311,12 @@ exports.createQuotation = async (req, res) => {
       quoteNumber: generatedNumber,
       quotationNumber: generatedNumber,
       client: clientData,
-      items: calculatedItems, // ✅ Uses items with HSN
-      ...financials,
+      ...financials, // includes items with tax amounts
       discountPercentage,
+      taxType,
       taxRate,
       gstEnabled,
+      placeOfSupply: placeOfSupply || tempClientState,
       advancePayment: advance,
       balanceDue: balanceDue,
       date: date || Date.now(),
@@ -219,13 +356,29 @@ exports.updateQuotation = async (req, res) => {
         hsnCode: item.hsnCode || "", // ✅ NEW: Capture HSN Code on Update
         quantity: Number(item.quantity),
         rate: Number(item.rate || item.price || 0),
+        gstRate: Number(item.gstRate || 0),
         total: Number(item.quantity) * Number(item.rate || item.price || 0)
       }));
+      
+      const Tenant = require('../models/Tenant');
+      const tenant = await Tenant.findById(req.user.tenantId);
+
       const discPercent = updateData.discountPercentage !== undefined ? updateData.discountPercentage : existingQuotation.discountPercentage;
-      const taxR = updateData.taxRate !== undefined ? updateData.taxRate : existingQuotation.taxRate;
+      const tType = updateData.taxType !== undefined ? updateData.taxType : existingQuotation.taxType;
       const gEnabled = updateData.gstEnabled !== undefined ? updateData.gstEnabled : existingQuotation.gstEnabled;
-      const financials = calculateTotals(calculatedItems, discPercent, taxR, gEnabled);
-      updateData = { ...updateData, items: calculatedItems, ...financials };
+      const pos = updateData.placeOfSupply !== undefined ? updateData.placeOfSupply : existingQuotation.placeOfSupply;
+      const advPayment = updateData.advancePayment !== undefined ? updateData.advancePayment : existingQuotation.advancePayment;
+      
+      const financials = calculateTotals(
+        calculatedItems, 
+        discPercent, 
+        tType, 
+        gEnabled, 
+        tenant?.state || '', 
+        pos || existingQuotation.client?.state || '', 
+        advPayment
+      );
+      updateData = { ...updateData, ...financials };
     }
 
     const updatedQuotation = await Quotation.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
@@ -289,13 +442,18 @@ exports.convertToInvoice = async (req, res) => {
         hsnCode: item.hsnCode, // ✅ NEW: Carry over HSN to Invoice
         quantity: item.quantity,
         rate: item.rate,
+        gstRate: item.gstRate,
+        taxAmount: item.taxAmount,
         total: item.total
       })),
       subTotal: quote.subTotal,
       discountPercentage: quote.discountPercentage,
+      taxType: quote.taxType,
       taxRate: quote.taxRate,
-      gstAmount: quote.taxAmount,
+      gstAmount: quote.gstAmount,
       gstEnabled: quote.gstEnabled,
+      gstBreakdown: quote.gstBreakdown,
+      placeOfSupply: quote.placeOfSupply,
       totalAmount: quote.totalAmount,
       advancePayment: 0,
       balanceDue: quote.totalAmount,
@@ -399,15 +557,19 @@ exports.emailQuotation = async (req, res) => {
 exports.whatsappQuotation = async (req, res) => {
   try {
     const { id } = req.params;
-    const quotation = await Quotation.findOne({ _id: id, tenantId: req.user.tenantId });
+    const quotation = await Quotation.findOne({ _id: id, tenantId: req.user.tenantId }).populate('tenantId');
 
-    if (!quotation || !quotation.client.phone) {
+    if (!quotation || !quotation.client || !quotation.client.phone) {
       return res.status(400).json({ message: "Client phone not found" });
     }
 
     const phone = quotation.client.phone.replace(/\D/g, '');
+    const companyName = quotation.tenantId ? quotation.tenantId.name : 'Our Company';
+    
+    const frontendUrl = process.env.FRONTEND_URL || req.get('origin') || 'http://localhost:5173';
+    const publicLink = `${frontendUrl}/public/quotation/${quotation._id}`;
 
-    const text = `*QUOTATION #${quotation.quotationNumber}*\n\nHello ${quotation.client.name},\nHere is the quotation you requested.\n\n*Total Amount: ₹${quotation.totalAmount}*\nValid Until: ${new Date(quotation.validUntil).toLocaleDateString()}\n\nPlease check your email for the PDF.\n\nRegards,\nAuriva Solutions`;
+    const text = `Hello ${quotation.client.name},\n\nHere is your quotation ${quotation.quotationNumber} from ${companyName} for the amount of ₹${quotation.totalAmount}.\nValid Until: ${new Date(quotation.validUntil).toLocaleDateString()}\n\nYou can view, download, or print your quotation online using the following link:\n${publicLink}\n\nThank you for your business!\n\nBest Regards,\n${companyName}`;
 
     const link = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
 

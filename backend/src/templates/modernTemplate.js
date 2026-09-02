@@ -113,7 +113,7 @@ module.exports = (invoice) => {
             <div class="totals-container">
                 <table class="totals-table">
                     <tr>
-                        <td>Taxable Value</td>
+                        <td>Subtotal</td>
                         <td class="text-right">${formatCurrency(invoice.subTotal)}</td>
                     </tr>
                     ${invoice.discountAmount > 0 ? `
@@ -121,8 +121,12 @@ module.exports = (invoice) => {
                         <td>Discount</td>
                         <td class="text-right" style="color:#ef4444;">- ${formatCurrency(invoice.discountAmount || 0)}</td>
                     </tr>` : ''}
-                    
+
                     ${invoice.gstEnabled ? `
+                        <tr>
+                            <td>Total GST (${invoice.taxType || 'exclusive'})</td>
+                            <td class="text-right">+ ${formatCurrency(invoice.gstAmount)}</td>
+                        </tr>
                         ${invoice.gstBreakdown ? `
                             ${invoice.gstBreakdown.cgst > 0 ? `
                                 <tr>
@@ -150,11 +154,11 @@ module.exports = (invoice) => {
                         `}` : ''}
                     
                     <tr>
-                        <td>Advance Payment</td>
+                        <td>Advance Paid</td>
                         <td class="text-right">- ${formatCurrency(invoice.advancePayment || 0)}</td>
                     </tr>
                     <tr class="last-row">
-                        <td>Balance Due</td>
+                        <td>Total Payable</td>
                         <td class="text-right">${formatCurrency(invoice.totalAmount - (invoice.advancePayment || 0))}</td>
                     </tr>
                 </table>

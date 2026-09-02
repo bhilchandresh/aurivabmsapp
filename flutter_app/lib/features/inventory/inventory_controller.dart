@@ -9,7 +9,8 @@ class InventoryItem {
   final String id;
   final String sku;
   final String itemName;
-  final double unitPrice;
+  final double purchasePrice;
+  final double unitPrice; // Selling Price
   final int currentStock;
   final String description;
 
@@ -17,6 +18,7 @@ class InventoryItem {
     required this.id,
     required this.sku,
     required this.itemName,
+    required this.purchasePrice,
     required this.unitPrice,
     required this.currentStock,
     required this.description,
@@ -26,6 +28,7 @@ class InventoryItem {
     String? id,
     String? sku,
     String? itemName,
+    double? purchasePrice,
     double? unitPrice,
     int? currentStock,
     String? description,
@@ -34,6 +37,7 @@ class InventoryItem {
       id: id ?? this.id,
       sku: sku ?? this.sku,
       itemName: itemName ?? this.itemName,
+      purchasePrice: purchasePrice ?? this.purchasePrice,
       unitPrice: unitPrice ?? this.unitPrice,
       currentStock: currentStock ?? this.currentStock,
       description: description ?? this.description,
@@ -45,6 +49,7 @@ class InventoryItem {
       id: json['_id'] ?? json['id'] ?? '',
       sku: json['sku'] ?? '',
       itemName: json['itemName'] ?? '',
+      purchasePrice: (json['purchasePrice'] ?? 0.0).toDouble(),
       unitPrice: (json['unitPrice'] ?? 0.0).toDouble(),
       currentStock: (json['currentStock'] ?? 0).toInt(),
       description: json['description'] ?? '',
@@ -222,6 +227,7 @@ class InventoryController extends GetxController {
   Future<bool> addItem(
     String name,
     String sku,
+    double purchasePrice,
     double price,
     int stock,
     String description,
@@ -232,6 +238,7 @@ class InventoryController extends GetxController {
       final response = await ApiService.post(ApiConstants.inventory, {
         'itemName': name,
         'sku': sku.isNotEmpty ? sku : 'SKU-${1000 + items.length + 1}',
+        'purchasePrice': purchasePrice,
         'unitPrice': price,
         'currentStock': stock,
         'description': description,
@@ -253,6 +260,7 @@ class InventoryController extends GetxController {
     String id,
     String name,
     String sku,
+    double purchasePrice,
     double price,
     String description,
   ) async {
@@ -261,6 +269,7 @@ class InventoryController extends GetxController {
       final response = await ApiService.put('${ApiConstants.inventory}/$id', {
         'itemName': name,
         'sku': sku,
+        'purchasePrice': purchasePrice,
         'unitPrice': price,
         'description': description,
       });

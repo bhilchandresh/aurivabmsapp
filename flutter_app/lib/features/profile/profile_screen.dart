@@ -14,7 +14,10 @@ import '../settings/settings_screen.dart';
 import '../import_data/import_data_screen.dart';
 import '../notifications/notification_screen.dart';
 import 'your_information_screen.dart';
+import '../support/contact_screen.dart';
+import '../support/info_screen.dart';
 import '../../core/theme/theme_service.dart';
+import '../../navigation/main_layout.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -184,6 +187,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final AuthController authController = Get.isRegistered<AuthController>()
         ? Get.find<AuthController>()
         : Get.put(AuthController(), permanent: true);
+        
+    final isAdmin = authController.userRole.value.toLowerCase().contains('admin');
 
 //     final NotificationController notificationController =
 //         Get.isRegistered<NotificationController>()
@@ -199,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Code-generated Logo Header matching Super Admin Profile
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.only(top: 40, bottom: 40),
+                padding: const EdgeInsets.only(top: 16, bottom: 40),
                 decoration: const BoxDecoration(
                   color: Color(0xFF1E293B), // Dark background from screenshot
                   borderRadius: BorderRadius.only(
@@ -209,6 +214,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Column(
                   children: [
+                    // Back Button
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: IconButton(
+                          icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+                          onPressed: () {
+                            if (Get.isRegistered<MainLayoutController>()) {
+                              Get.find<MainLayoutController>().changeIndex(0);
+                            } else {
+                              Get.back();
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                     // App Icon (White square, blue hexagon)
                     Container(
                       width: 64,
@@ -425,17 +448,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Section: Administration
-                    _buildSectionHeader('administration'.tr),
+                    // Section: Support & Info
+                    _buildSectionHeader('support_info'.tr),
                     const SizedBox(height: 8),
 
-                    // Animated Block 2
+                    // Animated Block for Support
                     TweenAnimationBuilder<double>(
-                      duration: const Duration(milliseconds: 400),
+                      duration: const Duration(milliseconds: 300),
                       tween: Tween<double>(begin: 0.0, end: 1.0),
                       builder: (context, value, child) {
                         return Transform.translate(
-                          offset: Offset(0, 20 * (1.0 - value)),
+                          offset: Offset(0, 10 * (1.0 - value)),
                           child: Opacity(opacity: value, child: child),
                         );
                       },
@@ -446,42 +469,118 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           border: Border.all(
                               color: Theme.of(context).colorScheme.outline,
                               width: 1),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.01),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
                         ),
                         child: Column(
                           children: [
                             _buildMenuRow(
                               context,
-                              index: 3,
-                              title: 'team_access'.tr,
-                              subtitle: 'team_access_sub'.tr,
-                              icon: LucideIcons.shieldCheck,
-                              iconColor: Colors.purple.shade600,
-                              iconBg: Colors.purple.shade50,
-                              onTap: () => Get.to(() => const TeamScreen()),
+                              index: 20,
+                              title: 'contact_us'.tr,
+                              subtitle: 'contact_us_sub'.tr,
+                              icon: LucideIcons.mail,
+                              iconColor: Colors.blue.shade600,
+                              iconBg: Colors.blue.shade50,
+                              onTap: () => Get.to(() => const ContactScreen()),
                             ),
                             _buildDivider(),
                             _buildMenuRow(
                               context,
-                              index: 4,
-                              title: 'settings'.tr,
-                              subtitle: 'settings_sub'.tr,
-                              icon: LucideIcons.settings,
-                              iconColor: Colors.blueGrey.shade600,
-                              iconBg: Colors.blueGrey.shade50,
-                              onTap: () => Get.to(() => const SettingsScreen()),
+                              index: 21,
+                              title: 'privacy_policy'.tr,
+                              subtitle: 'privacy_policy_sub'.tr,
+                              icon: LucideIcons.shield,
+                              iconColor: Colors.green.shade600,
+                              iconBg: Colors.green.shade50,
+                              onTap: () => Get.to(() => InfoScreen(
+                                title: 'privacy_policy'.tr,
+                                endpoint: '/public/legal/privacy_policy',
+                                headerColor: const Color(0xFF0F9D58),
+                                icon: LucideIcons.shieldCheck,
+                                fallbackText: 'Auriva BMS ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our web application and mobile application.\n\n1. Information We Collect\nWe collect personal information that you voluntarily provide to us when you register on the Service, such as your name, email address, phone number, and company details.\n\n2. How We Use Your Information\nWe use the information we collect primarily to provide, maintain, and improve our Service.',
+                              )),
+                            ),
+                            _buildDivider(),
+                            _buildMenuRow(
+                              context,
+                              index: 22,
+                              title: 'terms_conditions'.tr,
+                              subtitle: 'terms_conditions_sub'.tr,
+                              icon: LucideIcons.fileText,
+                              iconColor: Colors.blue.shade600,
+                              iconBg: Colors.blue.shade50,
+                              onTap: () => Get.to(() => InfoScreen(
+                                title: 'terms_conditions'.tr,
+                                endpoint: '/public/legal/terms_conditions',
+                                headerColor: const Color(0xFF2563EB),
+                                icon: LucideIcons.fileText,
+                                fallbackText: 'Welcome to Auriva BMS. By accessing or using our Business Management System, web application, and mobile application (collectively, the "Service"), you agree to be bound by these Terms and Conditions.\n\n1. General Usage\nAuriva BMS provides a software-as-a-service (SaaS) platform for invoicing, quotation management, and business tracking.\n\n2. User Responsibilities\nYou are responsible for maintaining the confidentiality of your account credentials. Any activity occurring under your account is your sole responsibility.',
+                              )),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 20),
+
+                    if (isAdmin) ...[
+                      // Section: Administration
+                      _buildSectionHeader('administration'.tr),
+                      const SizedBox(height: 8),
+
+                      // Animated Block 2
+                      TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 400),
+                        tween: Tween<double>(begin: 0.0, end: 1.0),
+                        builder: (context, value, child) {
+                          return Transform.translate(
+                            offset: Offset(0, 20 * (1.0 - value)),
+                            child: Opacity(opacity: value, child: child),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardTheme.color,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.outline,
+                                width: 1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.01),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              _buildMenuRow(
+                                context,
+                                index: 3,
+                                title: 'team_access'.tr,
+                                subtitle: 'team_access_sub'.tr,
+                                icon: LucideIcons.shieldCheck,
+                                iconColor: Colors.purple.shade600,
+                                iconBg: Colors.purple.shade50,
+                                onTap: () => Get.to(() => const TeamScreen()),
+                              ),
+                              _buildDivider(),
+                              _buildMenuRow(
+                                context,
+                                index: 4,
+                                title: 'settings'.tr,
+                                subtitle: 'settings_sub'.tr,
+                                icon: LucideIcons.settings,
+                                iconColor: Colors.blueGrey.shade600,
+                                iconBg: Colors.blueGrey.shade50,
+                                onTap: () => Get.to(() => const SettingsScreen()),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
 
                     // Stylish Custom Logout Button with Soft Shadow
                     TweenAnimationBuilder<double>(

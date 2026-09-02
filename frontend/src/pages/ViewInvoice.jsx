@@ -9,6 +9,7 @@ import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 import TemplateSelector from "../components/TemplateSelector";
 import A4Wrapper from "../components/A4Wrapper";
+import ConfirmModal from "../components/ConfirmModal";
 
 const ViewInvoice = () => {
   const { id } = useParams();
@@ -22,6 +23,7 @@ const ViewInvoice = () => {
   const [selectedTemplate, setSelectedTemplate] = useState('standard');
   const [downloading, setDownloading] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailModalOpen, setEmailModalOpen] = useState(false);
 
   const invoiceRef = useRef(null);
 
@@ -188,9 +190,12 @@ const ViewInvoice = () => {
     }
   };
 
-  const handleEmail = async () => {
+  const handleEmailClick = () => {
     if (!invoice.client?.email) return toast.error("Client email not found.");
-    if (!window.confirm(`Send invoice to ${invoice.client.email}?`)) return;
+    setEmailModalOpen(true);
+  };
+
+  const executeEmail = async () => {
     setSendingEmail(true);
     try {
       await api.post(`/invoices/${id}/email?template=${selectedTemplate}`);
@@ -232,14 +237,17 @@ const ViewInvoice = () => {
 
           <div className="flex gap-2 flex-wrap">
             <button onClick={handleWhatsApp} className="px-4 py-2 bg-green-50 text-green-700 rounded-xl flex items-center gap-2 font-bold text-xs hover:bg-green-100 border border-green-100"><MessageCircle size={16} /> WhatsApp</button>
-            <button onClick={handleEmail} disabled={sendingEmail} className="px-4 py-2 bg-blue-50 text-blue-600 rounded-xl flex items-center gap-2 font-bold text-xs hover:bg-blue-100 border border-blue-100 disabled:opacity-50">
-              {sendingEmail ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />} Email
+            <button 
+              onClick={handleEmailClick}
+              disabled={sendingEmail}
+              className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-all shadow-sm"
+            >  {sendingEmail ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />} Email
             </button>
             <div className="hidden lg:block w-[1px] bg-slate-200 mx-1"></div>
             
             <button 
               onClick={() => {
-                const url = `${window.location.origin}/public/invoice/${id}`;
+                const url = `https://app.aurivabms.in/public/invoice/${id}`;
                 navigator.clipboard.writeText(url);
                 toast.success("Public link copied to clipboard!");
               }}
@@ -268,6 +276,16 @@ const ViewInvoice = () => {
           </A4Wrapper>
         </div>
       </div>
+      
+      <ConfirmModal
+        isOpen={emailModalOpen}
+        onClose={() => setEmailModalOpen(false)}
+        onConfirm={executeEmail}
+        title="Send Invoice Email"
+        message={`Are you sure you want to send this invoice to ${invoice?.client?.email}?`}
+        confirmText="Yes, Send"
+        type="info"
+      />
     </Layout>
   );
 };

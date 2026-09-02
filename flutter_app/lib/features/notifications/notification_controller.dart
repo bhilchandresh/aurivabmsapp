@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../core/utils/api_service.dart';
 import '../../core/constants/api_constants.dart';
 import 'notification_model.dart';
@@ -80,23 +80,23 @@ class NotificationController extends GetxController {
 
   Future<void> _showLocalNotificationsForUnread() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final box = GetStorage();
 
       // Implement daily reset logic
       final today = DateTime.now().toIso8601String().substring(
         0,
         10,
       ); // "YYYY-MM-DD"
-      final lastShownDate = prefs.getString('last_notification_shown_date');
+      final lastShownDate = box.read('last_notification_shown_date');
 
       if (lastShownDate != today) {
         // First time opening app today: clear previously shown IDs
-        await prefs.remove('shown_local_notifications');
-        await prefs.setString('last_notification_shown_date', today);
+        box.remove('shown_local_notifications');
+        box.write('last_notification_shown_date', today);
       }
 
-      final List<String> shownIds =
-          prefs.getStringList('shown_local_notifications') ?? [];
+      final List<dynamic> rawIds = box.read('shown_local_notifications') ?? [];
+      final List<String> shownIds = rawIds.cast<String>();
 
       bool updated = false;
 //       int localIdCounter = 1000; // start id offset to avoid collision
@@ -149,7 +149,7 @@ class NotificationController extends GetxController {
       }
 
       if (updated) {
-        await prefs.setStringList('shown_local_notifications', shownIds);
+        box.write('shown_local_notifications', shownIds);
       }
     } catch (e) {
       debugPrint('Error showing local notification: $e');

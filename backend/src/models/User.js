@@ -34,10 +34,18 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  hasCompletedTour: {
+    type: Boolean,
+    default: false
+  },
   deviceTokens: [{
     token: { type: String, required: true },
     platform: { type: String, enum: ['android', 'ios', 'web'], default: 'android' }
-  }]
+  }],
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
+  deletionOtp: String,
+  deletionOtpExpire: Date
 }, { timestamps: true });
 
 

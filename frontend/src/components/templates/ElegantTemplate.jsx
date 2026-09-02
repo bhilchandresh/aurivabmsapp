@@ -51,19 +51,21 @@ const ElegantTemplate = ({ data, tenant, type = 'invoice' }) => {
         return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(Number(amount) || 0);
     };
 
-    const subTotal = data.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
-    const discountPercentage = Number(data.discountPercentage) || 0;
-    const discountAmount = subTotal * (discountPercentage / 100);
-    const taxableAmount = subTotal - discountAmount;
-    const taxRate = isGstEnabled ? (Number(data.taxRate) || 0) : 0;
-    const taxAmount = taxableAmount * (taxRate / 100);
-    const total = taxableAmount + taxAmount;
-    const cgst = taxAmount / 2;
-    const sgst = taxAmount / 2;
-    const advance = Number(data.advancePayment) || 0;
-    const balance = total - advance;
+    // Use backend calculated values or fallback
+  const subTotal = Number(data.subTotal) || data.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
+  const discountPercentage = Number(data.discountPercentage) || 0;
+  const discountAmount = Number(data.discountAmount) || (subTotal * (discountPercentage / 100));
+  const taxableAmount = Number(data.taxableAmount) || (subTotal - discountAmount);
+  const taxRate = isGstEnabled ? (Number(data.taxRate) || 0) : 0;
+  const taxAmount = Number(data.gstAmount) || (taxableAmount * (taxRate / 100));
+  const cgst = data.gstBreakdown?.cgst || taxAmount / 2;
+  const sgst = data.gstBreakdown?.sgst || taxAmount / 2;
+  const igst = data.gstBreakdown?.igst || 0;
+  const total = Number(data.totalAmount) || (taxableAmount + taxAmount);
+  const advance = Number(data.advancePayment) || 0;
+  const balance = total - advance;
 
-    return (
+  return (
         <>
             <style>{`
         /* --- SMART PAGING & PRINT SETTINGS --- */
@@ -285,6 +287,11 @@ const ElegantTemplate = ({ data, tenant, type = 'invoice' }) => {
 
                                                         <td className="py-3 px-2 text-center text-gray-600 border-b border-gray-100 align-top break-words pt-3">{item.quantity}</td>
                                                         <td className="py-3 px-2 text-right text-gray-600 border-b border-gray-100 align-top break-words pt-3">{formatCurrency(item.rate)}</td>
+                                                        {isGstEnabled && (
+                                              <td className="py-4 px-2 text-center text-gray-600 align-top break-words">
+                                                  {item.gstRate ? `${item.gstRate}%` : '-'}
+                                              </td>
+                                          )}
                                                         <td className="py-3 px-2 text-right font-bold text-gray-900 border-b border-gray-100 align-top break-words pt-3">{formatCurrency(Number(item.quantity) * Number(item.rate))}</td>
                                                     </tr>
                                                 ))}
@@ -320,7 +327,7 @@ const ElegantTemplate = ({ data, tenant, type = 'invoice' }) => {
 
                                                     {(isGstEnabled || discountAmount > 0) && (
                                                         <div className="flex justify-between text-gray-400 text-[10px] uppercase tracking-wider pt-1 border-t border-dashed border-gray-200">
-                                                            <span>Taxable Value</span> <span>{formatCurrency(taxableAmount)}</span>
+                                                            <span>Total Tax (GST)</span> <span>{formatCurrency(taxAmount)}</span>
                                                         </div>
                                                     )}
 

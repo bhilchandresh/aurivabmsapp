@@ -70,6 +70,17 @@ exports.addTeamMember = async (req, res) => {
       signatureImage: signatureImage || null
     });
 
+    // 6. Send Welcome Email
+    try {
+      const { sendWelcomeWithPasswordEmail } = require('../utils/emailService');
+      const tenantInfo = req.tenant || await Tenant.findById(req.user.tenantId);
+      const baseUrl = 'https://app.aurivabms.in';
+      const resetUrl = `${baseUrl}/forgot-password`;
+      await sendWelcomeWithPasswordEmail(user, password, resetUrl, tenantInfo);
+    } catch (err) {
+      console.error("Failed to send welcome email:", err);
+    }
+
     res.status(201).json({ 
       success: true, 
       data: { _id: user._id, name: user.name, email: user.email, role: user.role } 
@@ -162,6 +173,22 @@ exports.registerDevice = async (req, res) => {
     }
 
     res.status(200).json({ success: true, message: "Device registered for push notifications" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Mark the system tour as completed for the current user
+// @route   POST /api/v1/users/complete-tour
+exports.completeTour = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    user.hasCompletedTour = true;
+    await user.save();
+    res.status(200).json({ success: true, message: "Tour completed" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

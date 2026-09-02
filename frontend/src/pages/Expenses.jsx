@@ -2,15 +2,17 @@ import { useState, useEffect, useContext, useMemo } from "react";
 import api from "../utils/api";
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
+import { getLocalDateString } from "../utils/dateUtils";
 import { 
   Wallet, Plus, Trash2, Calendar, Tag, FileText, 
   TrendingDown, Loader2, Filter, ChevronDown, ChevronUp, BarChart3, Download 
-} from "lucide-react"; // <--- Added Download Icon
+} from "lucide-react"; 
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, CartesianGrid 
 } from "recharts";
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
+import Pagination from "../components/Pagination";
 
 const Expenses = () => {
   const { token } = useContext(AuthContext);
@@ -24,15 +26,31 @@ const Expenses = () => {
   // UI States
   const [showAll, setShowAll] = useState(false);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
-  const [filterMonth, setFilterMonth] = useState(new Date().toISOString().slice(0, 7)); 
+  const [filterMonth, setFilterMonth] = useState(getLocalDateString().slice(0, 7)); 
+  const [filterCategory, setFilterCategory] = useState("All");
   const [sortBy, setSortBy] = useState("date-desc");
 
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, pages: 1 });
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [filterMonth, filterCategory, sortBy]);
 
   // --- 1. FETCH EXPENSES ---
   const fetchExpenses = async () => {
     try {
-      const res = await api.get("/business/expenses");
+      const params = new URLSearchParams();
+      params.append('page', page);
+      params.append('limit', 20);
+      if (filterMonth) params.append('month', filterMonth);
+      if (filterCategory !== "All") params.append('category', filterCategory);
+      if (sortBy) params.append('sortBy', sortBy);
+
+      const res = await api.get(`/business/expenses?${params.toString()}`);
       setExpenses(res.data.data);
+      if (res.data.pagination) setPagination(res.data.pagination);
     } catch (error) {
       console.error("Error fetching expenses", error);
       toast.error("Failed to load expenses");
@@ -41,7 +59,7 @@ const Expenses = () => {
     }
   };
 
-  useEffect(() => { if(token) fetchExpenses(); }, [token]);
+  useEffect(() => { if(token) fetchExpenses(); }, [token, page, filterMonth, filterCategory, sortBy]);
 
   // --- 2. ADD EXPENSE ---
   const onSubmit = async (data) => {
@@ -50,7 +68,7 @@ const Expenses = () => {
       const payload = {
         ...data,
         amount: Number(data.amount),
-        date: data.date || new Date().toISOString()
+        date: data.date || getLocalDateString()
       };
       await api.post("/business/expenses", payload);
       reset(); 
@@ -77,38 +95,21 @@ const Expenses = () => {
     }
   };
 
-  // --- 4. DATA PROCESSING (Filter & Sort) ---
-  const processedData = useMemo(() => {
-    let data = [...expenses];
-
-    // Filter by Month
-    if (filterMonth) {
-      data = data.filter(exp => exp.date.startsWith(filterMonth));
-    }
-
-    // Sort
-    data.sort((a, b) => {
-      if (sortBy === "date-desc") return new Date(b.date) - new Date(a.date);
-      if (sortBy === "date-asc") return new Date(a.date) - new Date(b.date);
-      if (sortBy === "amount-desc") return b.amount - a.amount;
-      if (sortBy === "amount-asc") return a.amount - b.amount;
-      return 0;
-    });
-
-    return data;
-  }, [expenses, filterMonth, sortBy]);
-
-  const visibleExpenses = showAll ? processedData : processedData.slice(0, 10);
+  // --- 4. DATA PROCESSING ---
+  const uniqueCategories = useMemo(() => {
+    const categories = expenses.map(exp => exp.category).filter(Boolean);
+    return [...new Set(categories)].sort();
+  }, [expenses]);
 
   // --- 5. EXPORT TO EXCEL (CSV) FUNCTION ---
   const handleExport = () => {
-    if (processedData.length === 0) return toast.error("No data to export");
+    if (expenses.length === 0) return toast.error("No data to export");
 
     // 1. Headers
     const headers = ["Date,Category,Amount,Description"];
 
     // 2. Map Data to CSV Format
-    const rows = processedData.map(item => {
+    const rows = expenses.map(item => {
       const date = new Date(item.date).toLocaleDateString('en-IN');
       const category = `"${item.category}"`; // Wrap in quotes to handle commas in text
       const amount = item.amount;
@@ -131,10 +132,10 @@ const Expenses = () => {
     document.body.removeChild(link);
   };
 
-  // --- 6. CHART DATA ---
+  // --- 5. CHART DATA ---
   const chartData = useMemo(() => {
     const categories = {};
-    processedData.forEach(exp => {
+    expenses.forEach(exp => {
       const cat = exp.category.charAt(0).toUpperCase() + exp.category.slice(1);
       categories[cat] = (categories[cat] || 0) + Number(exp.amount);
     });
@@ -144,9 +145,9 @@ const Expenses = () => {
       value: categories[key],
       color: ["#3B82F6", "#EF4444", "#10B981", "#F59E0B", "#8B5CF6", "#EC4899"][index % 6]
     }));
-  }, [processedData]);
+  }, [expenses]);
 
-  const totalFilteredSpent = processedData.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+  const totalFilteredSpent = expenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
   const totalAllTimeSpent = expenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
 
   const formatCurrency = (amount) => {
@@ -158,16 +159,16 @@ const Expenses = () => {
       <div className="max-w-7xl mx-auto pb-20">
         
         {/* --- HEADER --- */}
-        <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
-              <Wallet className="h-8 w-8 text-blue-600" /> Expense Dashboard
+              <Wallet className="h-8 w-8 text-blue-600 shrink-0" /> Expense Dashboard
             </h1>
             <p className="text-sm text-gray-500 mt-1">Track and manage your business outflows</p>
           </div>
           
-          <div className="flex gap-4">
-              <div className="bg-white px-6 py-3 rounded-xl shadow-sm border border-blue-100 flex flex-col items-end min-w-[180px]">
+          <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+              <div className="bg-white px-6 py-3 rounded-xl shadow-sm border border-blue-100 flex flex-col items-start sm:items-end min-w-[180px] w-full sm:w-auto">
                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
                     {filterMonth ? 'Monthly Total' : 'Total Filtered'}
                  </p>
@@ -175,7 +176,7 @@ const Expenses = () => {
               </div>
               
               {filterMonth && (
-                 <div className="bg-gray-50 px-6 py-3 rounded-xl border border-gray-200 flex flex-col items-end min-w-[150px] hidden md:flex">
+                 <div className="bg-gray-50 px-6 py-3 rounded-xl border border-gray-200 flex flex-col items-start sm:items-end min-w-[150px] w-full sm:w-auto md:flex">
                     <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">All Time</p>
                     <p className="text-xl font-bold text-gray-600">{formatCurrency(totalAllTimeSpent)}</p>
                  </div>
@@ -198,7 +199,18 @@ const Expenses = () => {
                     <label className="text-xs font-bold text-gray-500 mb-1 block">Category</label>
                     <div className="relative">
                       <Tag className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-                      <input {...register("category", { required: true })} placeholder="e.g. Rent, Server" className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                      <input 
+                        list="expense-categories"
+                        {...register("category", { required: true })} 
+                        placeholder="Select or type new..." 
+                        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" 
+                        autoComplete="off"
+                      />
+                      <datalist id="expense-categories">
+                        {uniqueCategories.map(cat => (
+                           <option key={cat} value={cat} />
+                        ))}
+                      </datalist>
                     </div>
                   </div>
 
@@ -237,7 +249,7 @@ const Expenses = () => {
           <div className="lg:col-span-8 space-y-6">
              
              {/* CHART */}
-             {processedData.length > 0 && (
+             {expenses.length > 0 && (
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="font-bold text-gray-700 flex items-center gap-2">
@@ -271,29 +283,41 @@ const Expenses = () => {
              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[400px]">
                 
                 {/* --- FILTERS & EXPORT BAR --- */}
-                <div className="bg-gray-50 px-6 py-3 border-b border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="bg-gray-50 px-6 py-3 border-b border-gray-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                    
                    {/* Left: Filters Label */}
-                   <div className="flex items-center gap-2">
-                       <Filter className="w-4 h-4 text-gray-500" />
-                       <span className="text-xs font-bold text-gray-500 uppercase">Filters:</span>
+                   <div className="flex items-center gap-2 hidden md:flex">
+                       <Filter className="w-4 h-4 text-gray-500 shrink-0" />
+                       <span className="text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Filters:</span>
                    </div>
                    
                    {/* Right: Controls */}
-                   <div className="flex flex-wrap md:flex-nowrap gap-3 w-full md:w-auto items-center">
+                   <div className="grid grid-cols-2 sm:flex sm:flex-nowrap gap-3 w-full md:w-auto items-center">
                        {/* Month */}
                        <input 
                           type="month" 
                           value={filterMonth}
                           onChange={(e) => setFilterMonth(e.target.value)}
-                          className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                          className="col-span-1 bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 w-full"
                        />
+                       
+                       {/* Category Filter */}
+                       <select 
+                          value={filterCategory} 
+                          onChange={(e) => setFilterCategory(e.target.value)}
+                          className="col-span-1 bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 w-full truncate"
+                       >
+                          <option value="All">All Categories</option>
+                          {uniqueCategories.map(cat => (
+                             <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                       </select>
                        
                        {/* Sort */}
                        <select 
                           value={sortBy} 
                           onChange={(e) => setSortBy(e.target.value)}
-                          className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2"
+                          className="col-span-1 sm:col-span-auto bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 w-full"
                        >
                           <option value="date-desc">Newest First</option>
                           <option value="date-asc">Oldest First</option>
@@ -304,10 +328,10 @@ const Expenses = () => {
                        {/* EXPORT BUTTON */}
                        <button 
                          onClick={handleExport}
-                         className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center gap-1 transition-colors shadow-sm ml-2"
+                         className="col-span-1 sm:col-span-auto bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-2.5 px-3 rounded-lg flex justify-center items-center gap-1 transition-colors shadow-sm sm:ml-2 w-full sm:w-auto whitespace-nowrap"
                          title="Export Filtered Data"
                        >
-                          <Download className="w-4 h-4" /> Export CSV
+                          <Download className="w-4 h-4 shrink-0" /> Export
                        </button>
                    </div>
                 </div>
@@ -318,7 +342,7 @@ const Expenses = () => {
                       <Loader2 className="w-8 h-8 animate-spin mb-2 text-blue-600" />
                       <p className="text-sm">Loading expenses...</p>
                    </div>
-                ) : processedData.length === 0 ? (
+                ) : expenses.length === 0 ? (
                    <div className="flex flex-col items-center justify-center h-64 text-gray-400">
                       <div className="bg-gray-50 p-4 rounded-full mb-3">
                          <Wallet className="w-8 h-8 text-gray-300" />
@@ -327,26 +351,36 @@ const Expenses = () => {
                       {filterMonth && <button onClick={() => setFilterMonth("")} className="text-blue-600 text-xs font-bold mt-2 hover:underline">Clear Filters</button>}
                    </div>
                 ) : (
-                   <div>
-                      <table className="w-full text-left border-collapse">
-                         <thead className="bg-white border-b border-gray-100">
-                           <tr>
-                             <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase">Date</th>
-                             <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase">Category / Desc</th>
-                             <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase text-right">Amount</th>
-                             <th className="px-6 py-3 w-10"></th>
-                           </tr>
-                         </thead>
+                    <div className="overflow-x-auto">
+                       <table className="w-full text-left border-collapse">
+                          <thead className="bg-white border-b border-gray-100">
+                            <tr>
+                              <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Date</th>
+                              <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase whitespace-nowrap">Category / Desc</th>
+                              <th className="px-6 py-3 text-xs font-bold text-gray-500 uppercase text-right whitespace-nowrap">Amount</th>
+                              <th className="px-6 py-3 w-10 whitespace-nowrap"></th>
+                            </tr>
+                          </thead>
                          <tbody className="divide-y divide-gray-50">
-                           {visibleExpenses.map(exp => (
+                           {expenses.map(exp => (
                              <tr key={exp._id} className="hover:bg-gray-50 transition-colors group">
-                               <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
-                                 {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                               </td>
-                               <td className="px-6 py-3">
-                                 <span className="inline-block bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 border border-blue-100">
-                                    {exp.category}
-                                 </span>
+                                <td className="px-6 py-3 text-sm text-gray-500 whitespace-nowrap">
+                                  {new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                </td>
+                                <td className="px-6 py-3">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <span className="inline-block bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-100">
+                                       {exp.category}
+                                    </span>
+                                    {exp.createdBy && (
+                                       <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-gray-200">
+                                          <div className="w-3 h-3 rounded-full bg-gray-200 flex items-center justify-center text-[7px] text-gray-600">
+                                             {exp.createdBy.name.charAt(0).toUpperCase()}
+                                          </div>
+                                          {exp.createdBy.name.split(' ')[0]}
+                                       </span>
+                                    )}
+                                 </div>
                                  {exp.description && (
                                     <p className="text-xs text-gray-500 truncate max-w-[200px]">{exp.description}</p>
                                  )}
@@ -364,23 +398,9 @@ const Expenses = () => {
                              </tr>
                            ))}
                          </tbody>
-                      </table>
-
-                      {processedData.length > 10 && (
-                          <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 text-center">
-                              <button 
-                                onClick={() => setShowAll(!showAll)}
-                                className="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center justify-center gap-1 mx-auto transition-all"
-                              >
-                                {showAll ? (
-                                    <>Show Less <ChevronUp className="w-4 h-4" /></>
-                                ) : (
-                                    <>View All {processedData.length} Records <ChevronDown className="w-4 h-4" /></>
-                                )}
-                              </button>
-                          </div>
-                      )}
-                   </div>
+                       </table>
+                       <Pagination pagination={pagination} setPage={setPage} />
+                    </div>
                 )}
              </div>
 

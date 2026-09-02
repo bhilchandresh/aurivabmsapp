@@ -1,15 +1,28 @@
 import { useState, useEffect, useContext } from "react";
 import api from "../utils/api";
 import toast from "react-hot-toast";
-import { Save, Building, CreditCard, FileText, Upload, Trash2, Image as ImageIcon } from "lucide-react";
+import { Save, Building, CreditCard, FileText, Upload, Trash2, Image as ImageIcon, AlertTriangle } from "lucide-react";
 import Layout from "../components/Layout";
 import { AuthContext } from "../context/AuthContext";
 import { INDIAN_STATES } from "../utils/constants";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Settings = () => {
   const { token } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteOtp, setDeleteOtp] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const queryParams = new URLSearchParams(location.search);
+  const isOnboarding = queryParams.get("onboarding") === "true";
   
   const [formData, setFormData] = useState({
     name: "",
@@ -83,10 +96,25 @@ const Settings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // If onboarding, enforce phone and address
+    if (isOnboarding) {
+       if (!formData.phone || !formData.address) {
+          return toast.error("Phone number and Business Address are required to continue!");
+       }
+    }
+
     setLoading(true);
     try {
       await api.put("/auth/settings", formData);
       toast.success("Settings Updated Successfully!");
+      
+      // Clear cache completely so dashboard gets fresh data and doesn't use stale data to redirect back
+      queryClient.removeQueries({ queryKey: ['dashboard'] });
+      
+      if (isOnboarding) {
+         navigate('/dashboard');
+      }
     } catch (err) {
       toast.error("Failed to update settings");
     } finally {
@@ -94,9 +122,51 @@ const Settings = () => {
     }
   };
 
+  const handleRequestDelete = async () => {
+    try {
+      setDeleting(true);
+      await api.post("/auth/account/delete-request");
+      setOtpSent(true);
+      toast.success("OTP sent to your email!");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteOtp) return toast.error("Please enter OTP");
+    try {
+      setDeleting(true);
+      await api.post("/auth/account/delete-confirm", { otp: deleteOtp });
+      toast.success("Account deleted successfully");
+      // Log out
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Invalid OTP");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <Layout>
        <div className="max-w-5xl mx-auto pb-20 px-4">
+          {isOnboarding && (
+             <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 mb-8 rounded-2xl shadow-2xl shadow-blue-500/30 flex items-start gap-4 animate-[bounce_1s_ease-in-out_1]">
+                <div className="bg-white/20 p-3 rounded-xl shrink-0 animate-pulse">
+                   <AlertTriangle className="text-white" size={24} />
+                </div>
+                <div>
+                   <h3 className="text-xl font-black tracking-tight text-white mb-1">Welcome to Auriva BMS! Let's get started.</h3>
+                   <p className="text-blue-100 text-sm leading-relaxed">Before exploring the system, we need some basic details. Please fill out your <strong>Phone Number</strong> and <strong>Business Address</strong> below to continue.</p>
+                </div>
+             </div>
+          )}
+
           <h1 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
              <Building className="text-blue-600"/> Company Settings
           </h1>
@@ -253,7 +323,76 @@ const Settings = () => {
                 </button>
              </div>
 
+             {/* --- DANGER ZONE --- */}
+             <div className="bg-red-50 p-6 rounded-xl shadow-sm border border-red-200 mt-10">
+                <h3 className="font-bold text-lg mb-2 text-red-700 flex items-center gap-2">
+                  <AlertTriangle size={18} /> Danger Zone
+                </h3>
+                <p className="text-sm text-red-600 mb-4">
+                  Permanently deleting your account will revoke access to all your business data, invoices, and settings. This action cannot be undone.
+                </p>
+                <button 
+                  type="button" 
+                  onClick={() => setShowDeleteModal(true)}
+                  className="bg-red-600 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-red-700 transition flex items-center gap-2"
+                >
+                  <Trash2 size={16} /> Request Account Deletion
+                </button>
+             </div>
           </form>
+
+          {/* Delete Account Modal */}
+          {showDeleteModal && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl">
+                <div className="flex items-center gap-3 text-red-600 mb-4">
+                  <div className="bg-red-100 p-3 rounded-full">
+                    <AlertTriangle size={24} />
+                  </div>
+                  <h2 className="text-xl font-bold">Delete Account</h2>
+                </div>
+                
+                {!otpSent ? (
+                  <>
+                    <p className="text-gray-600 mb-4 text-sm">
+                      Are you absolutely sure you want to delete your account? A 6-digit OTP will be sent to your email to verify your identity.
+                    </p>
+                    <div className="bg-orange-50 border border-orange-200 p-3 rounded-lg mb-6">
+                      <p className="text-orange-800 text-xs font-medium">
+                        <strong>Note:</strong> Since business data is crucial, we retain your data securely for <strong>30 days</strong> after deletion. If you wish to recover your account during this period, please contact the AurivaBMS team.
+                      </p>
+                    </div>
+                    <div className="flex justify-end gap-3">
+                      <button onClick={() => setShowDeleteModal(false)} className="px-4 py-2 font-bold text-gray-500 hover:bg-gray-100 rounded-lg">Cancel</button>
+                      <button onClick={handleRequestDelete} disabled={deleting} className="px-4 py-2 font-bold bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
+                        {deleting ? "Sending OTP..." : "Yes, Send OTP"}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-gray-600 mb-4 text-sm">
+                      Enter the 6-digit verification code sent to your email to confirm deletion.
+                    </p>
+                    <input 
+                      type="text" 
+                      maxLength="6"
+                      placeholder="------"
+                      className="w-full border p-3 rounded-xl mb-6 text-center text-2xl font-black tracking-[0.5em] outline-none focus:ring-2 focus:ring-red-500 bg-gray-50"
+                      value={deleteOtp}
+                      onChange={e => setDeleteOtp(e.target.value.replace(/\D/g, ''))}
+                    />
+                    <div className="flex justify-end gap-3">
+                      <button onClick={() => {setShowDeleteModal(false); setOtpSent(false); setDeleteOtp("");}} className="px-4 py-2 font-bold text-gray-500 hover:bg-gray-100 rounded-lg">Cancel</button>
+                      <button onClick={handleConfirmDelete} disabled={deleting || deleteOtp.length !== 6} className="px-4 py-2 font-bold bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">
+                        {deleting ? "Deleting..." : "Permanently Delete"}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
        </div>
     </Layout>
   );

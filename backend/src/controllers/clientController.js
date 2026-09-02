@@ -20,6 +20,11 @@ exports.getClients = async (req, res) => {
       ];
     }
 
+    // Pagination
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 1000;
+    const skip = (page - 1) * limit;
+
     const clients = await Client.aggregate([
       { $match: matchQuery },
 
@@ -54,17 +59,59 @@ exports.getClients = async (req, res) => {
           balance: { $subtract: ["$totalBilled", "$totalPaid"] }
         }
       },
-      // 5. Faltu data hata do taaki API fast rahe
-      { $project: { invoicesData: 0, paymentsData: 0 } },
-      { $sort: { createdAt: -1 } }
+      // 5. User kisne banaya uska data lao
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'createdBy',
+          foreignField: '_id',
+          as: 'creator'
+        }
+      },
+      {
+        $unwind: {
+          path: '$creator',
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      // 6. Faltu data hata do taaki API fast rahe
+      { 
+        $project: { 
+          invoicesData: 0, 
+          paymentsData: 0,
+          'creator.password': 0,
+          'creator.role': 0
+        } 
+      },
+      { $sort: getSortObj(req.query.sortBy) },
+      { $skip: skip },
+      { $limit: limit }
     ]);
 
-    res.status(200).json({ success: true, count: clients.length, data: clients });
+    const total = await Client.countDocuments(matchQuery);
+
+    res.status(200).json({ 
+      success: true, 
+      count: clients.length, 
+      data: clients,
+      pagination: {
+        total,
+        page,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error("Get Clients Error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+function getSortObj(sortBy) {
+  if (sortBy === 'oldest') return { createdAt: 1 };
+  if (sortBy === 'alpha_asc') return { name: 1 };
+  if (sortBy === 'dues_high') return { balance: -1 };
+  return { createdAt: -1 }; // default newest
+}
 
 // Get Single Client
 exports.getClientById = async (req, res) => {
@@ -87,7 +134,10 @@ exports.createClient = async (req, res) => {
       if (existing) return res.status(400).json({ success: false, message: "Client with this email already exists" });
     }
 
-    const client = await Client.create({ tenantId: req.user.tenantId, name, email, phone, address, gstin, state });
+    const client = await Client.create({ 
+      tenantId: req.user.tenantId, name, email, phone, address, gstin, state, 
+      createdBy: req.user._id 
+    });
     if (typeof logActivity === 'function') await logActivity(req, "CREATE_CLIENT", `Added client: ${name}`);
     res.status(201).json({ success: true, data: client });
   } catch (error) {
@@ -133,7 +183,8 @@ exports.bulkImportClients = async (req, res) => {
         phone: client.phone || '',
         address: client.address || '',
         gstin: client.gstin || '',
-        state: client.state || ''
+        state: client.state || '',
+        createdBy: req.user._id
       });
       importedCount++;
     }
@@ -176,6 +227,75 @@ exports.deleteClient = async (req, res) => {
   }
 };
 
+const syncLedgerForClient = async (clientId, tenantId) => {
+  const allPayments = await Payment.find({ clientId, tenantId });
+  
+  // Separate tied payments and generic payments
+  let genericPool = 0;
+  const tiedPaymentsMap = {}; // invoiceId -> sum of tied payments
+
+  for (let p of allPayments) {
+    if (p.invoiceId) {
+      const invIdStr = p.invoiceId.toString();
+      tiedPaymentsMap[invIdStr] = (tiedPaymentsMap[invIdStr] || 0) + Number(p.amount);
+    } else {
+      genericPool += Number(p.amount);
+    }
+  }
+
+  const allInvoices = await Invoice.find({
+    'client.clientId': clientId,
+    tenantId,
+    status: { $ne: 'Cancelled' }
+  }).sort({ date: 1, createdAt: 1 }); // Sort by date, then createdAt for stable sorting
+
+  // Step 1: Apply tied payments first
+  for (let inv of allInvoices) {
+    const invIdStr = inv._id.toString();
+    const billAmount = Number(inv.totalAmount);
+    const tiedAmount = tiedPaymentsMap[invIdStr] || 0;
+
+    if (tiedAmount >= billAmount) {
+      // Overpaid or perfectly paid by tied payments
+      inv.remainingAmount = 0;
+      inv.status = 'Paid';
+      // Spill over excess to generic pool
+      genericPool += (tiedAmount - billAmount);
+    } else {
+      // Partially paid by tied payments
+      inv.remainingAmount = billAmount - tiedAmount;
+      inv.status = tiedAmount > 0 ? 'Partially Paid' : 'Pending';
+    }
+  }
+
+  // Step 2: Apply generic pool (FIFO) to remaining amounts
+  for (let inv of allInvoices) {
+    if (inv.remainingAmount > 0) {
+      if (genericPool >= inv.remainingAmount) {
+        genericPool -= inv.remainingAmount;
+        inv.remainingAmount = 0;
+        inv.status = 'Paid';
+      } else if (genericPool > 0) {
+        inv.remainingAmount -= genericPool;
+        inv.status = 'Partially Paid';
+        genericPool = 0;
+      }
+    }
+    
+    // Fallback status check
+    if (inv.remainingAmount > 0 && inv.status === 'Paid') {
+      inv.status = 'Partially Paid';
+    }
+    if (inv.remainingAmount === Number(inv.totalAmount) && inv.status === 'Partially Paid') {
+      inv.status = 'Pending';
+    }
+    
+    await inv.save();
+  }
+};
+
+exports.syncLedgerForClient = syncLedgerForClient;
+
 // Record Payment & Auto-Settle Invoices
 // 🔴 SMART FIFO PAYMENT LOGIC
 // 🔴 THE REAL FIX FOR FIFO STATUS UPDATE
@@ -185,55 +305,16 @@ exports.addPayment = async (req, res) => {
   try {
     const { amount, date, paymentMode, referenceNote } = req.body;
 
-    // 1. सबसे पहले नया पेमेंट डेटाबेस में सेव करें
     const newPayment = await Payment.create({
       tenantId: req.user.tenantId,
       clientId: req.params.id,
       amount: Number(amount),
-      date, paymentMode, referenceNote
+      date, paymentMode, referenceNote,
+      createdBy: req.user._id
     });
 
-    // 2. 🔴 MASTER SYNC: क्लाइंट का 'आज तक का सारा पैसा' (Total Pool) जोड़ लें
-    const allPayments = await Payment.find({
-      clientId: req.params.id,
-      tenantId: req.user.tenantId
-    });
-
-    let totalPaidPool = allPayments.reduce((sum, p) => sum + Number(p.amount), 0);
-
-    // 3. क्लाइंट के 'आज तक के सारे बिल' निकालें (Cancelled को छोड़कर), पुराने सबसे पहले
-    const allInvoices = await Invoice.find({
-      'client.clientId': req.params.id,
-      tenantId: req.user.tenantId,
-      status: { $ne: 'Cancelled' }
-    }).sort({ date: 1 });
-
-    // 4. पूरे लेजर को शुरू से रीसेट (Recalculate) करें
-    for (let inv of allInvoices) {
-      const billAmount = Number(inv.totalAmount);
-
-      if (totalPaidPool >= billAmount) {
-        // अगर हमारे पास पूल में बिल से ज़्यादा या बराबर पैसा है -> FULL PAID
-        inv.remainingAmount = 0;
-        inv.status = 'Paid';
-        totalPaidPool -= billAmount; // पूल में से बिल का पैसा काट लें
-
-      } else if (totalPaidPool > 0) {
-        // पूल में पैसा तो है, लेकिन पूरे बिल के लिए काफी नहीं है -> PARTIALLY PAID
-        inv.remainingAmount = billAmount - totalPaidPool;
-        inv.status = 'Partially Paid';
-        totalPaidPool = 0; // पूल अब खाली हो गया
-
-      } else {
-        // पूल में पैसा जीरो हो चुका है -> UNPAID
-        inv.remainingAmount = billAmount;
-        // अगर आपके सिस्टम में डिफ़ॉल्ट 'Pending' है तो 'Pending' लिखें, वर्ना 'Unpaid'
-        inv.status = 'Pending';
-      }
-
-      // अपडेटेड बिल को सेव करें
-      await inv.save();
-    }
+    // 2. 🔴 MASTER SYNC: रन करें
+    await syncLedgerForClient(req.params.id, req.user.tenantId);
 
     res.status(201).json({ success: true, data: newPayment });
   } catch (error) {
@@ -248,35 +329,7 @@ exports.syncClientLedger = async (req, res) => {
     const clientId = req.params.id;
     const tenantId = req.user.tenantId;
 
-    // 1. Total Paid Pool nikaalo
-    const allPayments = await Payment.find({ clientId, tenantId });
-    let totalPaidPool = allPayments.reduce((sum, p) => sum + Number(p.amount), 0);
-
-    // 2. Saare Invoices nikaalo (Oldest First)
-    const allInvoices = await Invoice.find({
-      'client.clientId': clientId,
-      tenantId,
-      status: { $ne: 'Cancelled' }
-    }).sort({ date: 1 });
-
-    // 3. FIFO Logic Run Karo
-    for (let inv of allInvoices) {
-      const billAmount = Number(inv.totalAmount);
-
-      if (totalPaidPool >= billAmount) {
-        inv.remainingAmount = 0;
-        inv.status = 'Paid';
-        totalPaidPool -= billAmount;
-      } else if (totalPaidPool > 0) {
-        inv.remainingAmount = billAmount - totalPaidPool;
-        inv.status = 'Partially Paid';
-        totalPaidPool = 0;
-      } else {
-        inv.remainingAmount = billAmount;
-        inv.status = 'Pending';
-      }
-      await inv.save();
-    }
+    await syncLedgerForClient(clientId, tenantId);
 
     res.status(200).json({ success: true, message: "Ledger Synced Successfully!" });
   } catch (error) {
@@ -291,7 +344,7 @@ exports.getClientPayments = async (req, res) => {
     const payments = await Payment.find({
       tenantId: req.user.tenantId,
       clientId: req.params.id
-    }).sort({ date: -1 });
+    }).sort({ date: -1 }).populate('createdBy', 'name email');
     res.status(200).json({ success: true, data: payments });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

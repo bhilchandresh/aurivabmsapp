@@ -52,15 +52,17 @@ const StandardTemplate = ({ data, tenant, type = 'invoice' }) => {
       return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2 }).format(Number(amount) || 0);
    };
 
-   const subTotal = data.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
+   // Use backend calculated values or fallback
+   const subTotal = Number(data.subTotal) || data.items.reduce((sum, item) => sum + (Number(item.quantity) * Number(item.rate)), 0);
    const discountPercentage = Number(data.discountPercentage) || 0;
-   const discountAmount = subTotal * (discountPercentage / 100);
-   const taxableAmount = subTotal - discountAmount;
+   const discountAmount = Number(data.discountAmount) || (subTotal * (discountPercentage / 100));
+   const taxableAmount = Number(data.taxableAmount) || (subTotal - discountAmount);
    const taxRate = isGstEnabled ? (Number(data.taxRate) || 0) : 0;
-   const taxAmount = taxableAmount * (taxRate / 100);
-   const cgst = taxAmount / 2;
-   const sgst = taxAmount / 2;
-   const total = taxableAmount + taxAmount;
+   const taxAmount = Number(data.gstAmount) || (taxableAmount * (taxRate / 100));
+   const cgst = data.gstBreakdown?.cgst || taxAmount / 2;
+   const sgst = data.gstBreakdown?.sgst || taxAmount / 2;
+   const igst = data.gstBreakdown?.igst || 0;
+   const total = Number(data.totalAmount) || (taxableAmount + taxAmount);
    const advance = Number(data.advancePayment) || 0;
    const balance = total - advance;
 
@@ -295,6 +297,7 @@ const StandardTemplate = ({ data, tenant, type = 'invoice' }) => {
                                        {showHsn && <th className="py-3 px-2 text-center w-[15%] border-y border-gray-200">HSN/SAC</th>}
                                        <th className="py-3 px-2 text-center w-[10%] border-y border-gray-200">Qty</th>
                                        <th className="py-3 px-2 text-right w-[15%] border-y border-gray-200">Rate</th>
+                                       {isGstEnabled && <th className="py-3 px-2 text-center w-[10%] border-y border-gray-200">GST</th>}
                                        <th className="py-3 px-2 text-right w-[20%] border-y border-gray-200">Amount</th>
                                     </tr>
                                  </thead>
@@ -311,6 +314,11 @@ const StandardTemplate = ({ data, tenant, type = 'invoice' }) => {
                                           {showHsn && <td className="py-4 px-2 text-center text-gray-500 font-mono text-xs align-top break-words">{item.hsnCode || "-"}</td>}
                                           <td className="py-4 px-2 text-center text-gray-600 align-top break-words">{item.quantity}</td>
                                           <td className="py-4 px-2 text-right text-gray-600 align-top break-words">{formatCurrency(item.rate)}</td>
+                                          {isGstEnabled && (
+                                              <td className="py-4 px-2 text-center text-gray-600 align-top break-words">
+                                                  {item.gstRate ? `${item.gstRate}%` : '-'}
+                                              </td>
+                                          )}
                                           <td className="py-4 px-2 text-right font-bold text-gray-900 align-top break-words">{formatCurrency(Number(item.quantity) * Number(item.rate))}</td>
                                        </tr>
                                     ))}

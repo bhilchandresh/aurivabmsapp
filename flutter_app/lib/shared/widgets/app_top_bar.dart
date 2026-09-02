@@ -7,6 +7,7 @@ import '../../core/theme/app_extensions.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/notifications/notification_controller.dart';
 import '../../features/notifications/notification_screen.dart';
+import '../../navigation/main_layout.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -17,6 +18,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showNotification;
   final bool? showBackButton;
   final VoidCallback? onBack;
+  final bool showBorder;
 
   const AppTopBar({
     super.key,
@@ -28,6 +30,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.showNotification = false,
     this.showBackButton,
     this.onBack,
+    this.showBorder = true,
   });
 
   @override
@@ -49,11 +52,11 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       child: Container(
         decoration: BoxDecoration(
           color: bgColor,
-          border: Border(bottom: BorderSide(color: borderColor)),
+          border: showBorder ? Border(bottom: BorderSide(color: borderColor)) : null,
         ),
         child: SafeArea(
           child: SizedBox(
-            height: 80,
+            height: 60,
             child: Row(
               children: [
                 // Dynamic Leading Icon based on pop state & showMenu override
@@ -84,10 +87,12 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                         title,
                         style: context.typography.topBarTitle.copyWith(
                           color: titleColor,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      if (subtitle != null)
+                      if (subtitle != null && subtitle!.isNotEmpty)
                         Text(
                           subtitle!,
                           maxLines: 1,
@@ -96,7 +101,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                             color: subtitleColor,
                           ),
                         )
-                      else
+                      else if (subtitle == null)
                         Row(
                           children: [
                             Container(
@@ -113,6 +118,9 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                               'SYSTEM LIVE',
                               style: context.typography.topBarSubtitle.copyWith(
                                 color: subtitleColor,
+                                fontSize: 8,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.5,
                               ),
                             ),
                           ],
@@ -215,11 +223,18 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
                 // Profile Avatar (Only shown if showProfile is true)
                 if (showProfile) ...[
-                  Container(
-                    height: 40,
-                    width: 40,
-                    margin: const EdgeInsets.only(right: 16),
-                    decoration: BoxDecoration(
+                  GestureDetector(
+                    onTap: () {
+                      if (Get.isRegistered<MainLayoutController>()) {
+                        Get.until((route) => route.isFirst);
+                        Get.find<MainLayoutController>().changeIndex(4);
+                      }
+                    },
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      margin: const EdgeInsets.only(right: 16),
+                      decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
                         begin: Alignment.topRight,
@@ -264,6 +279,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       }),
                     ),
                   ),
+                  ),
                 ] else ...[
                   const SizedBox(width: 16),
                 ],
@@ -276,5 +292,5 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(80);
+  Size get preferredSize => const Size.fromHeight(60);
 }

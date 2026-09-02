@@ -11,6 +11,11 @@ import '../features/quotations/quotations_screen.dart';
 import '../features/clients/clients_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/auth/auth_controller.dart';
+import '../core/services/permission_manager.dart';
+import '../features/invoices/create_invoice_screen.dart';
+import '../features/quotations/create_quotation_screen.dart';
+import 'app_routes.dart';
+import 'widgets/auriva_expandable_fab.dart';
 
 class MainLayoutController extends GetxController {
   var currentIndex = 0.obs;
@@ -24,7 +29,18 @@ class MainLayoutController extends GetxController {
     const ProfileScreen(),
   ];
 
+  @override
+  void onInit() {
+    super.onInit();
+    Future.delayed(const Duration(seconds: 1), () {
+      PermissionManager.requestNotificationWithExplanationDialog();
+    });
+  }
+
   void changeIndex(int index) {
+    if (index == 0) {
+      PermissionManager.requestNotificationWithExplanationDialog();
+    }
     currentIndex.value = index;
   }
 }
@@ -90,42 +106,116 @@ class MainLayout extends StatelessWidget {
 
   Widget _buildMobileLayout(BuildContext context, Widget activeScreen, MainLayoutController controller) {
     final screenHeight = MediaQuery.of(context).size.height;
-    // 7.5% of screen height, clamped 58–72px — compact on all phones
+    // 7.5% of screen height, clamped 60-74px
     final barHeight = (screenHeight * 0.078).clamp(60.0, 74.0);
-
-    return Scaffold(
-      body: activeScreen,
-      bottomNavigationBar: SafeArea(
+    // Add extra padding for the bottom bar so content isn't obscured
+    final isProfileTab = controller.currentIndex.value == 4;
+    final paddedScreen = Padding(
+      padding: EdgeInsets.only(bottom: isProfileTab ? 0 : barHeight),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeIn,
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
         child: Container(
-          height: barHeight,
-          margin: const EdgeInsets.fromLTRB(14, 6, 14, 12),
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-          decoration: BoxDecoration(
-            color: const Color(0xFF1E293B),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: const Color(0xFF334155), width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.25),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildBottomNavItem(context, 0, LucideIcons.layoutDashboard, 'Home', controller, barHeight),
-              _buildBottomNavItem(context, 1, LucideIcons.fileText, 'Invoices', controller, barHeight),
-              _buildBottomNavItem(context, 2, LucideIcons.file, 'Quotes', controller, barHeight),
-              _buildBottomNavItem(context, 3, LucideIcons.users, 'Clients', controller, barHeight),
-              _buildBottomNavItem(context, 4, LucideIcons.user, 'Profile', controller, barHeight),
-            ],
-          ),
+          key: ValueKey<int>(controller.currentIndex.value),
+          child: activeScreen,
         ),
       ),
     );
+
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Main content
+          paddedScreen,
+          
+          // Floating Bottom Navigation Bar
+          if (!isProfileTab)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: SafeArea(
+                child: Container(
+                  height: barHeight,
+                  margin: EdgeInsets.zero,
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 20,
+                        offset: const Offset(0, -4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildBottomNavItem(context, 0, LucideIcons.layoutGrid, 'Dashboard', controller, barHeight),
+                      _buildBottomNavItem(context, 1, LucideIcons.fileText, 'Invoice', controller, barHeight),
+                      // Space for FAB
+                      const SizedBox(width: 76),
+                      _buildBottomNavItem(context, 2, LucideIcons.file, 'Quote', controller, barHeight),
+                      _buildBottomNavItem(context, 4, LucideIcons.user, 'Profile', controller, barHeight),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          
+          // Center Expandable FAB overlay
+          if (!isProfileTab)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              top: 0,
+              child: SafeArea(
+                child: AurivaExpandableFab(
+                  distance: 130.0,
+                  actions: [
+                    AurivaFabAction(
+                      icon: LucideIcons.filePlus,
+                      label: 'New Invoice',
+                      onPressed: () => Get.to(() => const CreateInvoiceScreen()),
+                    ),
+                    AurivaFabAction(
+                      icon: LucideIcons.tag,
+                      label: 'New Quote',
+                      onPressed: () => Get.to(() => const CreateQuotationScreen()),
+                    ),
+                    AurivaFabAction(
+                      icon: LucideIcons.users,
+                      label: 'Client',
+                      onPressed: () => Get.to(() => const ClientsScreen()),
+                    ),
+                    AurivaFabAction(
+                      icon: LucideIcons.wallet,
+                      label: 'Expenses',
+                      onPressed: () => Get.toNamed(AppRoutes.expenses),
+                    ),
+                    AurivaFabAction(
+                      icon: LucideIcons.package,
+                      label: 'Inventory',
+                      onPressed: () => Get.toNamed(AppRoutes.inventory),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
+
 
   Widget _buildTabletLayout(BuildContext context, Widget activeScreen, MainLayoutController controller) {
     final theme = Theme.of(context);
@@ -177,73 +267,57 @@ class MainLayout extends StatelessWidget {
     MainLayoutController controller,
     double barHeight,
   ) {
-    return GestureDetector(
-      onTap: () => controller.changeIndex(index),
-      behavior: HitTestBehavior.opaque,
-      child: Obx(() {
-        final isSelected = controller.currentIndex.value == index;
-        // Scale icon/font proportionally with barHeight
-        final iconSize = (barHeight * 0.33).clamp(18.0, 24.0);
-        final fontSize = (barHeight * 0.165).clamp(10.0, 13.0);
-        final pillH = (barHeight * 0.68).clamp(38.0, 52.0);
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => controller.changeIndex(index),
+        behavior: HitTestBehavior.opaque,
+        child: Obx(() {
+          final isSelected = controller.currentIndex.value == index;
+          // Keep icon and font sizes proportional but clean
+          final iconSize = (barHeight * 0.32).clamp(18.0, 22.0);
+          final fontSize = (barHeight * 0.16).clamp(10.0, 12.0);
 
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 280),
-          curve: Curves.easeInOutCubic,
-          height: pillH,
-          padding: EdgeInsets.symmetric(
-            horizontal: isSelected ? 14 : 10,
-            vertical: 0,
-          ),
-          decoration: BoxDecoration(
-            color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.18) : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              AnimatedScale(
-                scale: isSelected ? 1.1 : 1.0,
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeOut,
-                child: Icon(
-                  icon,
-                  color: isSelected ? Theme.of(context).colorScheme.primary : const Color(0xFF64748B),
-                  size: iconSize,
-                ),
+          return Container(
+            alignment: Alignment.center,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 280),
+              curve: Curves.easeInOutCubic,
+              width: isSelected ? 76 : 60, // Fixed width that gives breathing room to the text
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), // Generous padding so it doesn't look glued
+              decoration: BoxDecoration(
+                color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12) : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
               ),
-              // Animated gap + label appear for selected only
-              AnimatedSize(
-                duration: const Duration(milliseconds: 250),
-                curve: Curves.easeInOut,
-                child: isSelected
-                    ? Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(width: isSelected ? 6 : 0),
-                          AnimatedOpacity(
-                            opacity: isSelected ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 200),
-                            child: Text(
-                              label,
-                              style: context.typography.navigationLabel.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: fontSize,
-                                letterSpacing: 0.2,
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedScale(
+                    scale: isSelected ? 1.05 : 1.0,
+                    duration: const Duration(milliseconds: 280),
+                    curve: Curves.easeOut,
+                    child: Icon(
+                      icon,
+                      color: isSelected ? Theme.of(context).colorScheme.primary : const Color(0xFF64748B),
+                      size: iconSize,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 280),
+                    style: context.typography.navigationLabel.copyWith(
+                      color: isSelected ? Theme.of(context).colorScheme.primary : const Color(0xFF64748B),
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      fontSize: fontSize,
+                    ),
+                    child: Text(label, maxLines: 1, overflow: TextOverflow.visible),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-      }),
+            ),
+          );
+        }),
+      ),
     );
   }
 

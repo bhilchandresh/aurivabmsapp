@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import {
   Mail, Lock, Eye, EyeOff, Loader2, Hexagon, ArrowRight, AlertCircle
 } from "lucide-react";
@@ -148,6 +148,11 @@ const Login = () => {
           </form>
 
           <div className="mt-8 text-center border-t pt-6 select-none">
+            <div className="flex justify-center space-x-4 mb-4 text-xs text-gray-500 font-medium">
+              <Link to="/contact" className="hover:text-blue-600 transition-colors">Contact Us</Link>
+              <Link to="/terms" className="hover:text-blue-600 transition-colors">Terms of Service</Link>
+              <Link to="/privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</Link>
+            </div>
             <p className="text-xs text-gray-400">
               Protected by Enterprise Security. <br />
               © {new Date().getFullYear()} Auriva Solutions.

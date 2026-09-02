@@ -7,6 +7,7 @@ import {
   Truck, Plus, Search, Lock, ArrowRight, Trash2,
   AlertTriangle, X, User, Phone, Mail, MapPin, Hash, CheckCircle
 } from "lucide-react";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const StarterLock = () => (
   <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -112,24 +113,31 @@ export default function Suppliers() {
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
 
-  const fetchData = useCallback(async () => {
-    try {
+  const queryClient = useQueryClient();
+
+  const { data: fetchedSuppliers, isLoading: queryLoading } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: async () => {
       const [resSup, resSettings] = await Promise.all([
         api.get("/suppliers"),
         api.get("/auth/settings")
       ]);
-      setSuppliers(resSup.data.data);
-      const p = resSettings.data.data.subscriptionPlan || "basic";
+      return {
+        suppliers: resSup.data.data,
+        plan: resSettings.data.data.subscriptionPlan || "basic"
+      };
+    }
+  });
+
+  useEffect(() => {
+    if (fetchedSuppliers) {
+      setSuppliers(fetchedSuppliers.suppliers);
+      const p = fetchedSuppliers.plan;
       setPlan(p);
       setMaxSuppliers(p === "basic" ? 0 : p === "premium" ? 50 : Infinity);
-    } catch (err) {
-      toast.error("Failed to load suppliers");
-    } finally {
       setLoading(false);
     }
-  }, []);
-
-  useEffect(() => { fetchData(); }, [fetchData]);
+  }, [fetchedSuppliers]);
 
   const handleDelete = async (id, name) => {
     if (!window.confirm(`Delete "${name}" and all their purchase records?`)) return;
@@ -137,6 +145,8 @@ export default function Suppliers() {
       await api.delete(`/suppliers/${id}`);
       setSuppliers(prev => prev.filter(s => s._id !== id));
       toast.success("Supplier deleted");
+      queryClient.invalidateQueries({ queryKey: ['suppliers'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     } catch (err) {
       toast.error("Failed to delete");
     }
@@ -225,7 +235,14 @@ export default function Suppliers() {
                         </div>
                         {(s.gstin || s.gstNumber) && <span className="bg-purple-50 text-purple-600 px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest border border-purple-100">GST Reg</span>}
                       </div>
-                      <h3 className="font-black text-xl text-gray-900 tracking-tight truncate mb-1" title={s.name}>{s.name}</h3>
+                      <div>
+                         <h3 className="font-black text-xl text-gray-900 tracking-tight truncate mb-1" title={s.name}>{s.name}</h3>
+                         {s.createdBy && (
+                            <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-slate-200">
+                               {s.createdBy.name.split(' ')[0]}
+                            </span>
+                         )}
+                      </div>
                       <div className="space-y-1.5 mt-3">
                         <p className="text-xs text-gray-500 font-medium flex items-center gap-2 truncate"><Mail size={12} className="text-blue-400" /> {s.email || "No email added"}</p>
                         <p className="text-xs text-gray-500 font-medium flex items-center gap-2"><Phone size={12} className="text-green-500" /> {s.phone || "No phone added"}</p>

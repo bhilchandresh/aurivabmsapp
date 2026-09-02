@@ -364,6 +364,15 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   }
 
   Future<void> _exportPdfWithScreenshot(bool isPrint) async {
+    if (_placeOfSupplyController.text.trim().isEmpty || _placeOfSupplyController.text.trim() == 'select_state'.tr || _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+      Fluttertoast.showToast(
+        msg: 'Please select Place of Supply',
+        backgroundColor: AppColors.error,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
     if (_clientNameController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_client'.tr,
@@ -1543,6 +1552,15 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   }
 
   void _saveAndShowBill() async {
+    if (_placeOfSupplyController.text.trim().isEmpty || _placeOfSupplyController.text.trim() == 'select_state'.tr || _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+      Fluttertoast.showToast(
+        msg: 'Please select Place of Supply',
+        backgroundColor: AppColors.error,
+        textColor: Colors.white,
+      );
+      return;
+    }
+
     if (_clientNameController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_client'.tr,

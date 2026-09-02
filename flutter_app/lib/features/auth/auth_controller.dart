@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
 import '../../core/constants/api_constants.dart';
 import '../../core/services/notification_service.dart';
 import '../../navigation/app_routes.dart';
@@ -126,6 +126,15 @@ class AuthController extends GetxController {
         final authToken = data['token'];
         final user = data['user'];
 
+        // Save locally for persistence FIRST
+        await _storage.write(key: 'auth_token', value: authToken);
+        await _storage.write(key: 'user_name', value: user['name'] ?? '');
+        await _storage.write(key: 'user_email', value: user['email'] ?? '');
+        await _storage.write(key: 'user_role', value: user['role'] ?? '');
+        await _storage.write(key: 'user_id', value: user['_id'] ?? '');
+        await _storage.write(key: 'user_signature', value: user['signatureImage'] ?? '');
+
+        // Then update observables (this triggers listeners like NotificationController)
         token.value = authToken;
         userName.value = user['name'] ?? '';
         userEmail.value = user['email'] ?? '';
@@ -133,33 +142,12 @@ class AuthController extends GetxController {
         userId.value = user['_id'] ?? '';
         userSignature.value = user['signatureImage'] ?? '';
 
-        // Save locally for persistence
-        await _storage.write(key: 'auth_token', value: authToken);
-        await _storage.write(key: 'user_name', value: user['name'] ?? '');
-        await _storage.write(key: 'user_email', value: user['email'] ?? '');
-        await _storage.write(key: 'user_role', value: user['role'] ?? '');
-        await _storage.write(key: 'user_id', value: userId.value);
-        await _storage.write(key: 'user_signature', value: userSignature.value);
-
         await fetchTenantSettings();
 
         // Register Device for Push Notifications
         NotificationService.registerDeviceWithBackend();
         NotificationService.setExternalIdAndTags(userId.value, userEmail.value);
 
-        // Request essential permissions on login
-        try {
-          await [
-            Permission.notification,
-            Permission.camera,
-            Permission.storage,
-            Permission.sms,
-            Permission.phone,
-            Permission.contacts,
-          ].request();
-        } catch (e) {
-          debugPrint('Error requesting permissions: $e');
-        }
 
         Fluttertoast.showToast(
           msg: "Welcome back, ${user['name']}!",
@@ -207,12 +195,7 @@ class AuthController extends GetxController {
   }
 
   Future<void> logout() async {
-    token.value = '';
-    userName.value = '';
-    userEmail.value = '';
-    userRole.value = '';
-    userId.value = '';
-    userSignature.value = '';
+    // Delete local storage FIRST
     await _storage.delete(key: 'auth_token');
     await _storage.delete(key: 'user_name');
     await _storage.delete(key: 'user_email');
@@ -222,13 +205,110 @@ class AuthController extends GetxController {
     await _storage.delete(key: 'app_lang_code');
     await _storage.delete(key: 'app_country_code');
 
+    // Then update observables
+    token.value = '';
+    userName.value = '';
+    userEmail.value = '';
+    userRole.value = '';
+    userId.value = '';
+    userSignature.value = '';
+
     // Reset locale to English
     Get.updateLocale(const Locale('en', 'US'));
 
     // Log out from OneSignal
-    OneSignal.logout();
+    if (!kIsWeb) {
+      OneSignal.logout();
+    }
 
     Get.offAllNamed(AppRoutes.login);
+  }
+
+  Future<bool> requestAccountDeletion() async {
+    try {
+      isLoading.value = true;
+      final response = await http
+          .post(
+            Uri.parse(ApiConstants.baseUrl + ApiConstants.requestAccountDeletion),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ${token.value}',
+            },
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        Fluttertoast.showToast(
+          msg: data['message'] ?? 'OTP sent to your email.',
+          backgroundColor: const Color(0xFF10B981),
+          textColor: Colors.white,
+        );
+        return true;
+      } else {
+        Fluttertoast.showToast(
+          msg: data['message'] ?? 'Failed to request account deletion.',
+          backgroundColor: const Color(0xFFEF4444),
+          textColor: Colors.white,
+        );
+        return false;
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Connection Failed: Could not request deletion.",
+        backgroundColor: const Color(0xFFEF4444),
+        textColor: Colors.white,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<bool> confirmAccountDeletion(String otp) async {
+    try {
+      isLoading.value = true;
+      final response = await http
+          .post(
+            Uri.parse(ApiConstants.baseUrl + ApiConstants.confirmAccountDeletion),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ${token.value}',
+            },
+            body: jsonEncode({'otp': otp}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200 && data['success'] == true) {
+        Fluttertoast.showToast(
+          msg: data['message'] ?? 'Account deleted successfully.',
+          backgroundColor: const Color(0xFF10B981),
+          textColor: Colors.white,
+        );
+        // Automatically logout on success
+        await logout();
+        return true;
+      } else {
+        Fluttertoast.showToast(
+          msg: data['message'] ?? 'Failed to confirm account deletion.',
+          backgroundColor: const Color(0xFFEF4444),
+          textColor: Colors.white,
+        );
+        return false;
+      }
+    } catch (e) {
+      Fluttertoast.showToast(
+        msg: "Connection Failed: Could not verify OTP.",
+        backgroundColor: const Color(0xFFEF4444),
+        textColor: Colors.white,
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   Future<void> updateSignatureLocal(String signatureBase64) async {

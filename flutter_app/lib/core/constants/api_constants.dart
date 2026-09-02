@@ -41,9 +41,14 @@ class ApiConstants {
   static const String quotations = '/quotations';
   static const String invoices = '/invoices';
   static const String expenses = '/business/expenses';
+  static const String dashboardStats = '/business/dashboard-stats';
   static const String clients = '/clients';
   static const String inventory = '/inventory';
   static const String suppliers = '/suppliers';
   static const String users = '/users';
   static const String notifications = '/notifications';
+  
+  // Account Deletion
+  static const String requestAccountDeletion = '/auth/account/delete-request';
+  static const String confirmAccountDeletion = '/auth/account/delete-confirm';
 }

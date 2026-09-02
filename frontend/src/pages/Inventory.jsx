@@ -5,6 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 import Layout from "../components/Layout";
 import toast from "react-hot-toast";
 import { Package, Plus, Edit, Trash2, Search, Lock, AlertTriangle, ArrowRight, History, X, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const Inventory = () => {
     const { token } = useContext(AuthContext);
@@ -16,7 +17,7 @@ const Inventory = () => {
     // Modal States
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
-    const [formData, setFormData] = useState({ itemName: '', sku: '', description: '', unitPrice: '', currentStock: '' });
+    const [formData, setFormData] = useState({ itemName: '', sku: '', description: '', purchasePrice: '', unitPrice: '', currentStock: '' });
     const [historyItem, setHistoryItem] = useState(null);
     const [historyData, setHistoryData] = useState([]);
     const [loadingHistory, setLoadingHistory] = useState(false);
@@ -26,39 +27,44 @@ const Inventory = () => {
     const [restockItem, setRestockItem] = useState(null);
     const [restockQuantity, setRestockQuantity] = useState('');
 
-    const fetchData = async () => {
-        setLoading(true);
-        try {
+    const queryClient = useQueryClient();
+
+    const { data: fetchedData, isLoading: queryLoading } = useQuery({
+        queryKey: ['inventory'],
+        queryFn: async () => {
             const [resItems, resSettings] = await Promise.all([
                 api.get("/inventory"),
                 api.get("/auth/settings")
             ]);
-            setItems(resItems.data.data);
-            setPlanDetails({ 
-                plan: resSettings.data.data.subscriptionPlan || 'basic', 
-                usage: resItems.data.data.length 
-            });
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setLoading(false);
-        }
-    };
+            return {
+                items: resItems.data.data,
+                plan: resSettings.data.data.subscriptionPlan || 'basic'
+            };
+        },
+        enabled: !!token
+    });
 
     useEffect(() => {
-        if(token) fetchData();
-    }, [token]);
+        if (fetchedData) {
+            setItems(fetchedData.items);
+            setPlanDetails({ 
+                plan: fetchedData.plan, 
+                usage: fetchedData.items.length 
+            });
+            setLoading(false);
+        }
+    }, [fetchedData]);
 
     const handleOpenModal = (item = null) => {
         if (item) {
             setEditingItem(item);
             setFormData({
                 itemName: item.itemName, sku: item.sku, description: item.description,
-                unitPrice: item.unitPrice, currentStock: item.currentStock
+                purchasePrice: item.purchasePrice, unitPrice: item.unitPrice, currentStock: item.currentStock
             });
         } else {
             setEditingItem(null);
-            setFormData({ itemName: '', sku: '', description: '', unitPrice: '', currentStock: '' });
+            setFormData({ itemName: '', sku: '', description: '', purchasePrice: '', unitPrice: '', currentStock: '' });
         }
         setIsModalOpen(true);
     };
@@ -74,7 +80,8 @@ const Inventory = () => {
                 toast.success("Item added successfully!");
             }
             setIsModalOpen(false);
-            fetchData();
+            queryClient.invalidateQueries({ queryKey: ['inventory'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         } catch (err) {
             toast.error(err.response?.data?.message || "Operation failed");
         }
@@ -85,7 +92,8 @@ const Inventory = () => {
         try {
             await api.delete(`/inventory/${id}`);
             toast.success("Item deleted successfully!");
-            fetchData();
+            queryClient.invalidateQueries({ queryKey: ['inventory'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         } catch (err) {
             toast.error("Delete failed");
         }
@@ -115,7 +123,7 @@ const Inventory = () => {
             });
             toast.success(`Successfully restocked ${restockQuantity} units!`);
             setIsRestockModalOpen(false);
-            fetchData();
+            queryClient.invalidateQueries({ queryKey: ['inventory'] });
         } catch (err) {
             toast.error(err.response?.data?.message || "Restock failed");
         }
@@ -233,8 +241,18 @@ const Inventory = () => {
 
                             {/* Middle Row: Name & Price */}
                             <div className="flex justify-between items-start gap-4">
-                                <h3 className="text-base font-bold text-slate-900 leading-tight">{item.itemName}</h3>
-                                <span className="text-base font-black text-slate-900">₹{item.unitPrice.toLocaleString('en-IN')}</span>
+                                <div>
+                                   <h3 className="text-base font-bold text-slate-900 leading-tight mb-1">{item.itemName}</h3>
+                                   {item.createdBy && (
+                                       <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-slate-200">
+                                          {item.createdBy.name.split(' ')[0]}
+                                       </span>
+                                    )}
+                                </div>
+                                <div className="text-right flex flex-col items-end">
+                                    <span className="text-xs font-bold text-slate-400">Buy: ₹{item.purchasePrice?.toLocaleString('en-IN') || 0}</span>
+                                    <span className="text-base font-black text-slate-900">Sell: ₹{item.unitPrice?.toLocaleString('en-IN') || 0}</span>
+                                </div>
                             </div>
 
                             {/* Description */}
@@ -302,11 +320,20 @@ const Inventory = () => {
                                         <input required type="number" min="0" value={formData.currentStock} onChange={e => setFormData({...formData, currentStock: e.target.value})} className="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex gap-1">Unit Price (₹) <span className="text-rose-500">*</span></label>
-                                    <div className="relative">
-                                        <span className="absolute left-3.5 top-3 text-slate-400 font-black">₹</span>
-                                        <input required type="number" min="0" value={formData.unitPrice} onChange={e => setFormData({...formData, unitPrice: e.target.value})} className="w-full border border-slate-200 py-3 pl-8 pr-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
+                                <div className="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex gap-1">Purchase Price (₹)</label>
+                                        <div className="relative">
+                                            <span className="absolute left-3.5 top-3 text-slate-400 font-black">₹</span>
+                                            <input type="number" min="0" value={formData.purchasePrice} onChange={e => setFormData({...formData, purchasePrice: e.target.value})} className="w-full border border-slate-200 py-3 pl-8 pr-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex gap-1">Selling Price (₹) <span className="text-rose-500">*</span></label>
+                                        <div className="relative">
+                                            <span className="absolute left-3.5 top-3 text-slate-400 font-black">₹</span>
+                                            <input required type="number" min="0" value={formData.unitPrice} onChange={e => setFormData({...formData, unitPrice: e.target.value})} className="w-full border border-slate-200 py-3 pl-8 pr-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
+                                        </div>
                                     </div>
                                 </div>
                                 <div>
@@ -390,7 +417,14 @@ const Inventory = () => {
                                                             {tx.type}
                                                         </span>
                                                     </td>
-                                                    <td className="p-4 text-slate-600">{tx.description}</td>
+                                                    <td className="p-4">
+                                                        <div className="text-slate-600 mb-1">{tx.description}</div>
+                                                        {tx.createdBy && (
+                                                            <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-slate-200">
+                                                                {tx.createdBy.name.split(' ')[0]}
+                                                            </span>
+                                                        )}
+                                                    </td>
                                                     <td className={`p-4 text-right font-black ${tx.quantity < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
                                                         {tx.quantity > 0 ? '+' : ''}{tx.quantity}
                                                     </td>

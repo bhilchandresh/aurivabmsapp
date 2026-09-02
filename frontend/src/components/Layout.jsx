@@ -1,34 +1,106 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { 
-  LayoutDashboard, FileText, FileStack, Users, Wallet, 
-  ShieldCheck, Settings, LogOut, BarChart3, Menu, X, 
+import {
+  LayoutDashboard, FileText, FileStack, Users, Wallet,
+  ShieldCheck, Settings, LogOut, BarChart3, Menu, X,
   ChevronRight, Hexagon, Shield, Package, Truck, Database, LifeBuoy, TrendingUp
-} from "lucide-react"; 
+} from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
 import NotificationBell from "./NotificationBell";
 import ExpiryPopup from "./ExpiryPopup";
+import { Joyride, STATUS } from 'react-joyride';
+import api from "../utils/api";
 
 const Layout = ({ children }) => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, completeUserTour } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isTourActive, setIsTourActive] = useState(!sessionStorage.getItem('tour_closed'));
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  // BACKGROUND TOUR COMPLETION
+  // If the tour is rendering for the very first time, we immediately tell the backend 
+  // to mark it as completed. This guarantees it will NEVER show up on a future login.
+  useEffect(() => {
+    if (user && !user.hasCompletedTour && location.pathname === '/dashboard' && user.role !== 'super_admin') {
+      api.post('/users/complete-tour').catch(e => console.error("Auto-complete tour error", e));
+    }
+    
+    // If they navigate away from the dashboard, kill the tour permanently
+    if (location.pathname !== '/dashboard' && !sessionStorage.getItem('tour_closed')) {
+       sessionStorage.setItem('tour_closed', 'true');
+       setIsTourActive(false);
+       completeUserTour();
+    }
+  }, [user?.hasCompletedTour, location.pathname]);
+
+  // --- TOUR LOGIC ---
+  const tourSteps = [
+    {
+      target: '.tour-nav-dashboard',
+      content: 'Welcome to Auriva BMS! This is your dashboard where you can see your business overview, revenue, and quick stats.',
+      disableBeacon: true,
+    },
+    {
+      target: '.tour-nav-settings',
+      content: 'You just completed your Business Profile here. You can always come back to update your GST, branding, and terms.',
+      disableBeacon: true,
+    },
+    {
+      target: '.tour-nav-invoices',
+      content: 'Create professional GST/Non-GST invoices here. Track unpaid invoices and send them to clients.',
+      disableBeacon: true,
+    },
+    {
+      target: '.tour-nav-quotations',
+      content: 'Send estimates or quotations to your prospects. Once approved, you can convert them to invoices in one click.',
+      disableBeacon: true,
+    },
+    {
+      target: '.tour-nav-clients',
+      content: 'Manage your customer directory. View their ledger balances and transaction history.',
+      disableBeacon: true,
+    },
+    {
+      target: '.tour-nav-inventory',
+      content: 'Keep track of your products and stock levels automatically when you generate invoices.',
+      disableBeacon: true,
+    },
+    {
+      target: '.tour-nav-suppliers',
+      content: 'Manage your vendors, record purchases, and track outgoing payments.',
+      disableBeacon: true,
+    }
+  ];
+
+  const handleJoyrideCallback = async (data) => {
+    const { status, action } = data;
+    const finishedStatuses = [STATUS.FINISHED, STATUS.SKIPPED];
+    
+    // If they finish, skip, or close it, we update the local state so it vanishes instantly
+    if (finishedStatuses.includes(status) || action === 'close') {
+      sessionStorage.setItem('tour_closed', 'true');
+      setIsTourActive(false);
+      completeUserTour(); 
+    }
+  };
+
+
   const getMenuItems = (role) => {
     if (role === 'super_admin') {
       return [
         { name: "Master Control", path: "/super-admin", icon: BarChart3 },
         { name: "Analytics", path: "/super-admin/analytics", icon: TrendingUp },
+        { name: "SOC (Security)", path: "/super-admin/security", icon: ShieldCheck },
         { name: "SMTP Settings", path: "/super-admin/settings", icon: Settings },
       ];
     }
-    
+
     let items = [
       { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
       { name: "Invoices", path: "/invoices", icon: FileText },
@@ -37,6 +109,7 @@ const Layout = ({ children }) => {
       { name: "Inventory", path: "/inventory", icon: Package },
       { name: "Suppliers", path: "/suppliers", icon: Truck },
       { name: "Expenses", path: "/expenses", icon: Wallet },
+      { name: "Staff", path: "/staff", icon: Users },
     ];
 
     if (role === 'admin') {
@@ -55,7 +128,69 @@ const Layout = ({ children }) => {
   return (
     <div className="flex h-screen bg-[#0f172a] font-sans selection:bg-blue-500/30">
       <ExpiryPopup />
-      
+
+      {/* ONBOARDING TOUR */}
+      {user && !user.hasCompletedTour && isTourActive && location.pathname === '/dashboard' && user.role !== 'super_admin' && (
+        <Joyride
+          steps={tourSteps}
+          continuous
+          showSkipButton
+          run={true}
+          callback={handleJoyrideCallback}
+          styles={{
+            options: {
+              primaryColor: '#2563eb',
+              textColor: '#1e293b',
+              backgroundColor: '#ffffff',
+              arrowColor: '#ffffff',
+              overlayColor: 'rgba(15, 23, 42, 0.85)',
+              zIndex: 1000,
+            },
+            tooltip: {
+              borderRadius: '16px',
+              padding: '24px',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              fontFamily: 'inherit'
+            },
+            tooltipTitle: {
+              fontSize: '18px',
+              fontWeight: 'bold',
+              color: '#0f172a',
+              marginBottom: '10px'
+            },
+            tooltipContent: {
+              fontSize: '14px',
+              lineHeight: '1.6',
+              color: '#475569'
+            },
+            buttonNext: {
+              backgroundColor: '#2563eb',
+              color: '#ffffff',
+              borderRadius: '10px',
+              padding: '10px 20px',
+              fontWeight: '700',
+              fontSize: '14px',
+              border: 'none',
+              boxShadow: '0 4px 6px -1px rgba(37, 99, 235, 0.3)'
+            },
+            buttonBack: {
+              color: '#64748b',
+              fontWeight: '600',
+              fontSize: '14px',
+              marginRight: '12px'
+            },
+            buttonSkip: {
+              color: '#ef4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              borderRadius: '10px',
+              padding: '10px 16px',
+              fontWeight: '700',
+              fontSize: '14px'
+            }
+          }}
+        />
+      )}
+
       {/* MOBILE OVERLAY */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 bg-slate-950/80 z-40 lg:hidden backdrop-blur-md"
@@ -85,16 +220,17 @@ const Layout = ({ children }) => {
           {menuItems.map((item) => {
             const isActive = item.path === '/super-admin' ? location.pathname === '/super-admin' : location.pathname.startsWith(item.path);
             const Icon = item.icon;
-            
+
             return (
               <Link
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`
+                  tour-nav-${item.path.replace('/', '')}
                   group flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200
-                  ${isActive 
-                    ? "bg-[#2563eb] text-white shadow-lg shadow-blue-600/25" 
+                  ${isActive
+                    ? "bg-[#2563eb] text-white shadow-lg shadow-blue-600/25"
                     : "text-slate-400 hover:bg-slate-800 hover:text-white"
                   }
                 `}
@@ -121,7 +257,7 @@ const Layout = ({ children }) => {
 
       {/* --- MAIN CONTENT --- */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#f8fafc]">
-        
+
         {/* NAVBAR */}
         <header className="bg-white/70 backdrop-blur-xl border-b border-slate-200 h-20 flex items-center justify-between px-6 lg:px-10 sticky top-0 z-30">
           <div className="flex items-center gap-4">
@@ -129,40 +265,40 @@ const Layout = ({ children }) => {
               <Menu size={22} />
             </button>
             <div className="flex flex-col">
-                <h2 className="text-xl font-bold text-slate-900 leading-tight tracking-tight">
-                    {pageTitle}
-                </h2>
-                <div className="flex items-center gap-1.5 mt-0.5">
-                   <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                   <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">System Live</p>
-                </div>
+              <h2 className="text-xl font-bold text-slate-900 leading-tight tracking-tight">
+                {pageTitle}
+              </h2>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">System Live</p>
+              </div>
             </div>
           </div>
 
           <div className="flex items-center gap-6">
-             {user?.role === 'super_admin' ? (
-                 <div className="hidden sm:flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-[10px] font-black border border-amber-100 ring-4 ring-amber-50">
-                    <Shield size={12} />
-                    SYSTEM ROOT ACCESS
-                 </div>
-             ) : (
-                <div className="hidden sm:flex items-center gap-2 bg-blue-50 text-[#2563eb] px-3 py-1.5 rounded-full text-[10px] font-black border border-blue-100 ring-4 ring-blue-50">
-                    <Hexagon size={12} />
-                    {user?.role?.toUpperCase()}
-                </div>
-             )}
-             
-             <NotificationBell />
-             
-             <div className="flex items-center gap-3 pl-6 border-l border-slate-200">
-                <div className="text-right hidden sm:block">
-                  <p className="text-xs font-black text-slate-900 leading-none">{user?.name?.toUpperCase()}</p>
-                  <p className="text-[9px] text-slate-400 font-bold mt-1 tracking-tighter">SECURE SESSION</p>
-                </div>
-                <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-[#2563eb] to-[#3b82f6] flex items-center justify-center text-white font-black shadow-xl shadow-blue-500/20 border-2 border-white">
-                   {user?.name?.charAt(0).toUpperCase()}
-                </div>
-             </div>
+            {user?.role === 'super_admin' ? (
+              <div className="hidden sm:flex items-center gap-2 bg-amber-50 text-amber-700 px-3 py-1.5 rounded-full text-[10px] font-black border border-amber-100 ring-4 ring-amber-50">
+                <Shield size={12} />
+                SYSTEM ROOT ACCESS
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-2 bg-blue-50 text-[#2563eb] px-3 py-1.5 rounded-full text-[10px] font-black border border-blue-100 ring-4 ring-blue-50">
+                <Hexagon size={12} />
+                {user?.role?.toUpperCase()}
+              </div>
+            )}
+
+            <NotificationBell />
+
+            <div className="flex items-center gap-3 pl-6 border-l border-slate-200">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-black text-slate-900 leading-none">{user?.name?.toUpperCase()}</p>
+                <p className="text-[9px] text-slate-400 font-bold mt-1 tracking-tighter">SECURE SESSION</p>
+              </div>
+              <div className="h-11 w-11 rounded-2xl bg-gradient-to-tr from-[#2563eb] to-[#3b82f6] flex items-center justify-center text-white font-black shadow-xl shadow-blue-500/20 border-2 border-white">
+                {user?.name?.charAt(0).toUpperCase()}
+              </div>
+            </div>
           </div>
         </header>
 

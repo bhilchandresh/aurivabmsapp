@@ -7,7 +7,8 @@ const supplierSchema = new mongoose.Schema({
   phone: { type: String, trim: true },
   address: { type: String, trim: true },
   gstNumber: { type: String, trim: true, uppercase: true },
-  status: { type: String, enum: ['active', 'inactive'], default: 'active' }
+  status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Supplier', supplierSchema);

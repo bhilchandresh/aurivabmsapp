@@ -10,7 +10,9 @@ const getPlanLimits = (planName) => {
 
 exports.getItems = async (req, res) => {
   try {
-    const items = await Inventory.find({ tenantId: req.user.tenantId }).sort({ createdAt: -1 });
+    const items = await Inventory.find({ tenantId: req.user.tenantId })
+      .populate('createdBy', 'name email')
+      .sort({ createdAt: -1 });
     res.status(200).json({ success: true, count: items.length, data: items });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -35,17 +37,19 @@ exports.createItem = async (req, res) => {
 
     const newItem = await Inventory.create({
       ...req.body,
-      tenantId: req.user.tenantId
+      tenantId: req.user.tenantId,
+      createdBy: req.user._id
     });
 
     if (newItem.currentStock > 0) {
       await InventoryTransaction.create({
         tenantId: req.user.tenantId,
+        createdBy: req.user._id,
         inventoryId: newItem._id,
         type: 'Adjustment',
         quantity: newItem.currentStock,
         description: 'Initial Stock',
-        date: Date.now()
+        date: new Date()
       });
     }
 
@@ -60,13 +64,13 @@ exports.createItem = async (req, res) => {
 exports.updateItem = async (req, res) => {
   try {
     // We omit tenantId updates because it is tied to account
-    const { itemName, sku, description, unitPrice, currentStock, status, transactionDescription } = req.body;
+    const { itemName, sku, description, purchasePrice, unitPrice, currentStock, status, transactionDescription } = req.body;
     
     const oldItem = await Inventory.findOne({ _id: req.params.id, tenantId: req.user.tenantId });
 
     const item = await Inventory.findOneAndUpdate(
       { _id: req.params.id, tenantId: req.user.tenantId },
-      { itemName, sku, description, unitPrice, currentStock, status },
+      { itemName, sku, description, purchasePrice, unitPrice, currentStock, status },
       { new: true, runValidators: true }
     );
     
@@ -77,11 +81,12 @@ exports.updateItem = async (req, res) => {
       const difference = Number(currentStock) - Number(oldItem.currentStock);
       await InventoryTransaction.create({
         tenantId: req.user.tenantId,
+        createdBy: req.user._id,
         inventoryId: item._id,
         type: difference > 0 ? (transactionDescription ? 'Purchase' : 'Adjustment') : 'Adjustment',
         quantity: difference,
         description: transactionDescription || 'Manual Stock Adjustment',
-        date: Date.now()
+        date: new Date()
       });
     }
 
@@ -111,7 +116,9 @@ exports.getItemTransactions = async (req, res) => {
     const transactions = await InventoryTransaction.find({
       tenantId: req.user.tenantId,
       inventoryId: req.params.id
-    }).sort({ date: -1 });
+    })
+    .populate('createdBy', 'name email')
+    .sort({ date: -1 });
 
     res.status(200).json({ success: true, count: transactions.length, data: transactions });
   } catch (error) {
@@ -164,9 +171,11 @@ exports.bulkImportInventory = async (req, res) => {
 
       const newItem = await Inventory.create({
         tenantId,
+        createdBy: req.user._id,
         itemName: item.itemName,
         sku: item.sku || '',
         description: item.description || '',
+        purchasePrice: Number(item.purchasePrice) || 0,
         unitPrice: Number(item.unitPrice) || 0,
         currentStock: Number(item.currentStock) || 0,
         status: item.status || 'In Stock'
@@ -177,11 +186,12 @@ exports.bulkImportInventory = async (req, res) => {
       if (newItem.currentStock > 0) {
         await InventoryTransaction.create({
           tenantId,
+          createdBy: req.user._id,
           inventoryId: newItem._id,
           type: 'Adjustment',
           quantity: newItem.currentStock,
           description: 'Initial Stock (Bulk Import)',
-          date: Date.now()
+          date: new Date()
         });
       }
     }

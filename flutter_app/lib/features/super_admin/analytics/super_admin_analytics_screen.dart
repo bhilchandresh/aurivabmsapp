@@ -207,7 +207,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
                 maxY: maxTenants,
-                barTouchData: BarTouchData(enabled: true),
+                barTouchData: const BarTouchData(enabled: true),
                 titlesData: FlTitlesData(
                   show: true,
                   bottomTitles: AxisTitles(
@@ -217,7 +217,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                         final int idx = value.toInt();
                         if (idx >= 0 && idx < controller.growthData.length) {
                           return SideTitleWidget(
-                            axisSide: meta.axisSide,
+                            meta: meta,
                             child: Text(
                               controller.growthData[idx]['month'] ?? '',
                               style: context.typography.helperText.copyWith(
@@ -324,7 +324,7 @@ class SuperAdminAnalyticsScreen extends StatelessWidget {
                         final int idx = value.toInt();
                         if (idx >= 0 && idx < controller.growthData.length) {
                           return SideTitleWidget(
-                            axisSide: meta.axisSide,
+                            meta: meta,
                             child: Text(
                               controller.growthData[idx]['month'] ?? '',
                               style: context.typography.helperText.copyWith(

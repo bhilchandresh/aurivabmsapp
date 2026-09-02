@@ -86,6 +86,17 @@ class AurivaApp extends StatelessWidget {
       initialRoute: AppRoutes.splash,
       getPages: AppRoutes.pages,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        final mediaQueryData = MediaQuery.of(context);
+        final clampedTextScaler = mediaQueryData.textScaler.clamp(
+          minScaleFactor: 1.0,
+          maxScaleFactor: 1.15,
+        );
+        return MediaQuery(
+          data: mediaQueryData.copyWith(textScaler: clampedTextScaler),
+          child: child!,
+        );
+      },
     );
   }
 }

@@ -17,7 +17,7 @@ class SyncLogger {
         'level': level.name.toUpperCase(),
         'module': module,
         'action': action,
-        if (entity != null) 'entity': entity,
+        'entity': ?entity,
         'message': message,
       };
 

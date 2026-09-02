@@ -1,4 +1,5 @@
 const SystemSettings = require('../models/SystemSettings');
+const ContactMessage = require('../models/ContactMessage');
 const { refreshTransporter } = require('../utils/emailService');
 
 // @desc    Get all system settings
@@ -40,6 +41,18 @@ exports.updateSettings = async (req, res) => {
     }
 
     res.status(200).json({ success: true, message: 'Settings updated successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Get all contact messages
+// @route   GET /api/settings/contact-messages
+// @access  Private/SuperAdmin
+exports.getContactMessages = async (req, res) => {
+  try {
+    const messages = await ContactMessage.find().sort('-createdAt');
+    res.status(200).json({ success: true, data: messages });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

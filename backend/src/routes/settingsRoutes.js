@@ -1,6 +1,6 @@
 const express = require('express');
 const { protect, authorize } = require('../middleware/authMiddleware');
-const { getSettings, updateSettings } = require('../controllers/settingsController');
+const { getSettings, updateSettings, getContactMessages } = require('../controllers/settingsController');
 
 const router = express.Router();
 
@@ -11,5 +11,8 @@ router.use(authorize('super_admin'));
 router.route('/')
   .get(getSettings)
   .put(updateSettings);
+
+router.route('/contact-messages')
+  .get(getContactMessages);
 
 module.exports = router;

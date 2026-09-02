@@ -4,6 +4,8 @@ import { AuthContext } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
 
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import ClientProfile from "./pages/ClientProfile";
@@ -23,9 +25,14 @@ import Expenses from "./pages/Expenses";
 import Inventory from "./pages/Inventory"; 
 import Suppliers from "./pages/Suppliers";
 import SupplierProfile from "./pages/SupplierProfile";
+import Staff from "./pages/Staff";
+import StaffProfile from "./pages/StaffProfile";
 import ImportData from "./pages/ImportData";
 import PrivateRoute from "./components/PrivateRoute";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import ContactUs from "./pages/ContactUs";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 function App() {
   const { token, user, loading } = useContext(AuthContext);
@@ -46,7 +53,7 @@ function App() {
     <>
       <Toaster position="top-right" reverseOrder={false} />
       <Routes>
-   r  {/* --- ROOT PATH CONTROL --- */}
+      {/* --- ROOT PATH CONTROL --- */}
       <Route path="/" element={
         (!token || !user) ? (
           <Navigate to="/login" replace />
@@ -62,8 +69,19 @@ function App() {
         (token && user) ? <Navigate to="/" replace /> : <Login />
       } />
 
+      <Route path="/forgot-password" element={
+        (token && user) ? <Navigate to="/" replace /> : <ForgotPassword />
+      } />
+      
+      <Route path="/reset-password" element={
+        (token && user) ? <Navigate to="/" replace /> : <ResetPassword />
+      } />
+
       <Route path="/public/invoice/:id" element={<PublicInvoice />} />
       <Route path="/public/quotation/:id" element={<PublicQuotation />} />
+      <Route path="/contact" element={<ContactUs />} />
+      <Route path="/terms" element={<TermsAndConditions />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
       
       {/* --- TENANT ROUTES (Admin & User) --- */}
       <Route path="/dashboard" element={
@@ -118,6 +136,13 @@ function App() {
         <PrivateRoute allowedRoles={ADMIN_ACCESS}><SupplierProfile /></PrivateRoute>
       } />
 
+      <Route path="/staff" element={
+        <PrivateRoute allowedRoles={['admin']}><Staff /></PrivateRoute>
+      } />
+      <Route path="/staff/:id" element={
+        <PrivateRoute allowedRoles={['admin']}><StaffProfile /></PrivateRoute>
+      } />
+
       <Route path="/settings" element={
         <PrivateRoute allowedRoles={['admin', 'super_admin']}><Settings /></PrivateRoute>
       } />
@@ -138,6 +163,9 @@ function App() {
         <PrivateRoute allowedRoles={SUPER_ACCESS}><SuperAdminDashboard /></PrivateRoute>
       } />
       <Route path="/super-admin/settings" element={
+        <PrivateRoute allowedRoles={SUPER_ACCESS}><SuperAdminDashboard /></PrivateRoute>
+      } />
+      <Route path="/super-admin/security" element={
         <PrivateRoute allowedRoles={SUPER_ACCESS}><SuperAdminDashboard /></PrivateRoute>
       } />
 

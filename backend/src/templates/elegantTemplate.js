@@ -193,7 +193,7 @@ module.exports = (invoice) => {
                 <div class="totals-container">
                     <div class="totals-box">
                         <div class="total-row">
-                            <span>Taxable Value</span>
+                            <span>Subtotal</span>
                             <strong style="color:#111;">${formatCurrency(invoice.subTotal)}</strong>
                         </div>
                         
@@ -202,9 +202,13 @@ module.exports = (invoice) => {
                             <span>Discount</span>
                             <span>- ${formatCurrency(invoice.discountAmount)}</span>
                         </div>` : ''}
-                        
+
                         ${invoice.gstEnabled ? `
                             <div style="border-top: 1px dashed #c2a472; margin: 8px 0; padding-top: 8px;">
+                                <div class="total-row" style="margin-bottom: 5px; color: #444;">
+                                    <span>Total GST (${invoice.taxType || 'exclusive'})</span>
+                                    <span>+ ${formatCurrency(invoice.gstAmount)}</span>
+                                </div>
                                 ${invoice.gstBreakdown ? `
                                     ${invoice.gstBreakdown.cgst > 0 ? `
                                         <div class="total-row" style="font-size: 11px;">
@@ -233,19 +237,14 @@ module.exports = (invoice) => {
                             </div>
                         ` : ''}
 
-                        <div class="grand-total">
-                            <span>Total</span>
-                            <span>${formatCurrency(invoice.totalAmount)}</span>
-                        </div>
-                        
                         ${invoice.advancePayment > 0 ? `
-                        <div class="total-row" style="color:#10b981; font-weight:bold; border-bottom: 1px solid #f3f4f6; padding-bottom: 10px;">
+                        <div class="total-row" style="margin-top:5px; font-style:italic; font-size:12px; color:#555;">
                             <span>Advance Paid</span>
                             <span>- ${formatCurrency(invoice.advancePayment)}</span>
                         </div>` : ''}
                         
-                        <div class="balance-due">
-                            <span>Balance Due</span>
+                        <div class="grand-total" style="margin-top: 15px;">
+                            <span>Total Payable</span>
                             <span>${formatCurrency(invoice.totalAmount - (invoice.advancePayment || 0))}</span>
                         </div>
                     </div>

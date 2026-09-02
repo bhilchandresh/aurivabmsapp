@@ -12,6 +12,8 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   static Future<void> init() async {
+    if (kIsWeb) return;
+
     // Remove this method to stop OneSignal Debugging
     if (kDebugMode) {
       OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
@@ -33,22 +35,6 @@ class NotificationService {
       settings: initializationSettings,
     );
 
-    // Request permissions
-    await OneSignal.Notifications.requestPermission(true);
-
-    if (Platform.isAndroid) {
-      _localNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin
-          >()
-          ?.requestNotificationsPermission();
-    } else if (Platform.isIOS) {
-      _localNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin
-          >()
-          ?.requestPermissions(alert: true, badge: true, sound: true);
-    }
 
     // Optional: Add listeners for notifications
     OneSignal.Notifications.addClickListener((event) {
@@ -117,6 +103,7 @@ class NotificationService {
 
   /// Gets the OneSignal Player ID (Device Token)
   static String? getPlayerId() {
+    if (kIsWeb) return null;
     return OneSignal.User.pushSubscription.id;
   }
 
@@ -163,6 +150,8 @@ class NotificationService {
 
   /// Sets the OneSignal External ID and User Tags
   static void setExternalIdAndTags(String userId, String userEmail) {
+    if (kIsWeb) return;
+    
     if (userId.isNotEmpty) {
       OneSignal.login(userId); // Sets the External ID
     }

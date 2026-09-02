@@ -1,9 +1,9 @@
 import { useEffect, useState, useContext } from "react";
 import api from "../utils/api";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Wallet, FileText, Clock, TrendingUp, 
-  Plus, Users, ArrowRight, ArrowUpRight, CheckCircle, Loader2
+  Plus, Users, ArrowRight, ArrowUpRight, CheckCircle, Loader2, Receipt, X, Tag, Calendar
 } from "lucide-react"; // Icons
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
@@ -11,20 +11,27 @@ import {
 import { AuthContext } from "../context/AuthContext";
 import Layout from "../components/Layout";
 import toast from "react-hot-toast";
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getLocalDateString } from "../utils/dateUtils";
+
 
 const Dashboard = () => {
   const { user, token } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   
   const [stats, setStats] = useState({
     totalRevenue: 0,
     totalExpenses: 0,
+    totalPurchases: 0,
     netProfit: 0,
     totalPendingAmount: 0,
     totalInvoices: 0,
     paidInvoices: 0,
     pendingCount: 0
   });
+
+  const [globalTimeFilter, setGlobalTimeFilter] = useState("lifetime");
 
   const [tenantInfo, setTenantInfo] = useState(null);
 
@@ -35,7 +42,18 @@ const Dashboard = () => {
   };
 
   const [recentInvoices, setRecentInvoices] = useState([]);
+  const [recentExpenses, setRecentExpenses] = useState([]);
+  const [expenseCategories, setExpenseCategories] = useState([]);
   
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [expenseForm, setExpenseForm] = useState({
+    category: "",
+    amount: "",
+    date: getLocalDateString(),
+    description: ""
+  });
+  const [isSubmittingExpense, setIsSubmittingExpense] = useState(false);
+
   const [chartDataMonthly, setChartDataMonthly] = useState([]);
   const [chartDataYearly, setChartDataYearly] = useState([]);
   const [chartView, setChartView] = useState("monthly");
@@ -44,7 +62,7 @@ const Dashboard = () => {
   const [selectedClientId, setSelectedClientId] = useState("");
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentMode, setPaymentMode] = useState("Bank Transfer");
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0]);
+  const [paymentDate, setPaymentDate] = useState(getLocalDateString());
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
 
   // --- Helper: Format Currency (Indian Style) ---
@@ -56,107 +74,47 @@ const Dashboard = () => {
     }).format(amount);
   };
 
-  const fetchData = async () => {
-    try {
-      const [resInv, resExp, resClients, resTenant] = await Promise.all([
-         api.get("/invoices"),
-         api.get("/business/expenses"),
+  const queryClient = useQueryClient();
+
+  const { data, isLoading: queryLoading, error } = useQuery({
+    queryKey: ['dashboard', globalTimeFilter],
+    queryFn: async () => {
+      const [resStats, resClients, resTenant] = await Promise.all([
+         api.get(`/business/dashboard-stats?filter=${globalTimeFilter}`),
          api.get("/clients"),
          api.get("/auth/settings")
       ]);
-      
-      const invoices = resInv.data.data || [];
-      const expenses = resExp.data.data || [];
-      setClients(resClients.data.data || []);
-      setTenantInfo(resTenant.data.data || null);
-
-        // 1. Calculate Stats
-        const totalRev = invoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
-        const totalExp = expenses.reduce((sum, exp) => sum + (Number(exp.amount) || 0), 0);
-        const netProfit = totalRev - totalExp;
-        
-        // Calculate amount stuck in 'Pending' or 'Overdue'
-        const pendingAmt = invoices
-          .filter(inv => inv.status === 'Pending' || inv.status === 'Overdue')
-          .reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
-
-        const paidCount = invoices.filter(inv => inv.status === 'Paid').length;
-        const pendingCount = invoices.filter(inv => inv.status === 'Pending').length;
-
-        setStats({
-          totalRevenue: totalRev,
-          totalExpenses: totalExp,
-          netProfit: netProfit,
-          totalPendingAmount: pendingAmt,
-          totalInvoices: invoices.length,
-          paidInvoices: paidCount,
-          pendingCount: pendingCount
-        });
-
-        // 2. Recent Invoices (Last 5)
-        const sorted = [...invoices].sort((a, b) => new Date(b.date) - new Date(a.date));
-        setRecentInvoices(sorted.slice(0, 5));
-
-        // 3. Prepare Dual-Bar Chart Data (Group by Month)
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const months = {};
-        
-        // Initialize last 6 months in chronological order
-        for (let i = 5; i >= 0; i--) {
-            const d = new Date();
-            d.setMonth(d.getMonth() - i);
-            const m = monthNames[d.getMonth()];
-            months[m] = { name: m, income: 0, expense: 0 };
-        }
-
-        invoices.forEach(inv => {
-          if (!inv.date) return;
-          const m = monthNames[new Date(inv.date).getMonth()];
-          if (months[m]) months[m].income += (inv.totalAmount || 0);
-        });
-
-        expenses.forEach(exp => {
-          if (!exp.date) return;
-          const m = monthNames[new Date(exp.date).getMonth()];
-          if (months[m]) months[m].expense += (Number(exp.amount) || 0);
-        });
-
-        const chartArrayMonthly = Object.values(months);
-        setChartDataMonthly(chartArrayMonthly);
-
-        // 4. Prepare Dual-Bar Chart Data (Group by Year)
-        const yearNames = [];
-        for (let i = 4; i >= 0; i--) {
-            yearNames.push((new Date().getFullYear() - i).toString());
-        }
-        const years = {};
-        yearNames.forEach(y => years[y] = { name: y, income: 0, expense: 0 });
-
-        invoices.forEach(inv => {
-          if (!inv.date) return;
-          const y = new Date(inv.date).getFullYear().toString();
-          if (years[y]) years[y].income += (inv.totalAmount || 0);
-        });
-
-        expenses.forEach(exp => {
-          if (!exp.date) return;
-          const y = new Date(exp.date).getFullYear().toString();
-          if (years[y]) years[y].expense += (Number(exp.amount) || 0);
-        });
-
-        const chartArrayYearly = Object.values(years);
-        setChartDataYearly(chartArrayYearly);
-
-      } catch (error) {
-        console.error("Error loading dashboard data", error);
-      } finally {
-        setLoading(false);
-      }
-  };
+      return {
+        statsData: resStats.data.data,
+        clients: resClients.data.data || [],
+        tenant: resTenant.data.data || null,
+      };
+    },
+    enabled: !!token
+  });
 
   useEffect(() => {
-    if(token) fetchData();
-  }, [token]);
+    if (data) {
+      const { statsData, clients, tenant } = data;
+      setClients(clients);
+      setTenantInfo(tenant);
+
+      // Business Info Guard Check (Only on first login session)
+      if (tenant && (!tenant.phone || !tenant.address) && !sessionStorage.getItem('onboardingPrompted')) {
+         sessionStorage.setItem('onboardingPrompted', 'true');
+         navigate('/settings?onboarding=true');
+      }
+
+      setStats(statsData.stats);
+      setRecentInvoices(statsData.recentInvoices || []);
+      setRecentExpenses(statsData.recentExpenses || []);
+      setExpenseCategories(statsData.expenseCategories || []);
+      setChartDataMonthly(statsData.chartDataMonthly || []);
+      setChartDataYearly(statsData.chartDataYearly || []);
+
+      setLoading(false);
+    }
+  }, [data, navigate]);
 
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
@@ -174,11 +132,36 @@ const Dashboard = () => {
       toast.success("Payment Logged Successfully!");
       setPaymentAmount("");
       setSelectedClientId("");
-      fetchData(); // Silently refresh dashboard stats & backend data
+      queryClient.invalidateQueries(['dashboard']);
+      queryClient.invalidateQueries(['clients']);
+      queryClient.invalidateQueries(['invoices']);
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to log payment");
     } finally {
       setIsSubmittingPayment(false);
+    }
+  };
+
+  const handleExpenseSubmit = async (e) => {
+    e.preventDefault();
+    if (!expenseForm.category || !expenseForm.amount) {
+      return toast.error("Category and amount are required");
+    }
+    setIsSubmittingExpense(true);
+    try {
+      await api.post("/business/expenses", {
+        ...expenseForm,
+        amount: Number(expenseForm.amount)
+      });
+      toast.success("Expense Added Successfully!");
+      setShowExpenseModal(false);
+      setExpenseForm({ category: "", amount: "", date: getLocalDateString(), description: "" });
+      queryClient.invalidateQueries(['dashboard']);
+      queryClient.invalidateQueries(['expenses']);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to log expense");
+    } finally {
+      setIsSubmittingExpense(false);
     }
   };
 
@@ -207,10 +190,17 @@ const Dashboard = () => {
              )}
           </div>
         </div>
-        <div className="flex gap-3">
-           <Link to="/invoices/create" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-md font-medium flex items-center gap-2 transition-all">
-             <Plus className="w-5 h-5" /> New Invoice
-           </Link>
+        <div className="flex flex-col sm:flex-row gap-3">
+           <select 
+              value={globalTimeFilter} 
+              onChange={(e) => setGlobalTimeFilter(e.target.value)}
+              className="bg-white border border-slate-200 text-slate-700 font-medium px-4 py-2.5 rounded-lg shadow-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm cursor-pointer"
+           >
+              <option value="lifetime">Lifetime</option>
+              <option value="this_year">This Year</option>
+              <option value="this_quarter">This Quarter</option>
+              <option value="this_month">This Month</option>
+           </select>
         </div>
       </div>
 
@@ -249,7 +239,7 @@ const Dashboard = () => {
                  <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider">Net Profit</h3>
               </div>
               <p className="text-2xl font-black text-blue-700 mt-2 truncate">{formatCurrency(stats.netProfit)}</p>
-              <div className="mt-1 text-[10px] text-blue-500 font-bold">Bottom Line</div>
+              <div className="mt-1 text-[10px] text-blue-500 font-bold">Rev - (Exp + Purchases)</div>
             </div>
 
             {/* 4. Pending Amount */}
@@ -272,25 +262,45 @@ const Dashboard = () => {
               <div className="mt-1 text-[10px] text-violet-600 font-bold">Lifetime billed</div>
             </div>
 
-            {/* 6. Success Rate */}
+            {/* 6. Received Amount */}
             <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group">
               <div className="flex items-center gap-3 mb-2">
-                 <div className="p-2 bg-purple-100 rounded-lg text-purple-600"><Plus className="w-4 h-4" /></div>
-                 <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider">Success</h3>
+                 <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600"><CheckCircle className="w-4 h-4" /></div>
+                 <h3 className="text-slate-500 text-xs font-bold uppercase tracking-wider">Received</h3>
               </div>
-              <p className="text-xl font-extrabold text-slate-800 mt-2">
-                 {stats.totalInvoices > 0 ? Math.round((stats.paidInvoices / stats.totalInvoices) * 100) : 0}%
+              <p className="text-xl font-extrabold text-slate-800 mt-2 truncate">
+                 {formatCurrency(stats.totalRevenue - stats.totalPendingAmount)}
               </p>
-              <div className="mt-1 text-[10px] text-purple-600 font-bold">Invoices paid</div>
+              <div className="mt-1 text-[10px] text-indigo-600 font-bold">Payment collected</div>
             </div>
 
           </div>
 
+          {/* QUICK ACTIONS ROW */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <button onClick={() => setShowExpenseModal(true)} className="bg-white hover:bg-rose-50 border border-slate-100 hover:border-rose-100 p-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 group">
+              <div className="p-2 bg-rose-100 text-rose-600 rounded-lg group-hover:scale-110 transition-transform"><Receipt className="w-5 h-5" /></div>
+              <span className="font-bold text-slate-700">Add Expense</span>
+            </button>
+            <Link to="/invoices/create" className="bg-white hover:bg-blue-50 border border-slate-100 hover:border-blue-100 p-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 group">
+              <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:scale-110 transition-transform"><FileText className="w-5 h-5" /></div>
+              <span className="font-bold text-slate-700">New Invoice</span>
+            </Link>
+            <Link to="/quotations/create" className="bg-white hover:bg-amber-50 border border-slate-100 hover:border-amber-100 p-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 group">
+              <div className="p-2 bg-amber-100 text-amber-600 rounded-lg group-hover:scale-110 transition-transform"><FileText className="w-5 h-5" /></div>
+              <span className="font-bold text-slate-700">New Quotation</span>
+            </Link>
+            <Link to="/clients" className="bg-white hover:bg-emerald-50 border border-slate-100 hover:border-emerald-100 p-4 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 group">
+              <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg group-hover:scale-110 transition-transform"><Users className="w-5 h-5" /></div>
+              <span className="font-bold text-slate-700">Add Client</span>
+            </Link>
+          </div>
+
           {/* --- MAIN CONTENT GRID --- */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            {/* LEFT: REVENUE CHART */}
-            <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            {/* FULL WIDTH REVENUE CHART AT TOP OF GRID */}
+            <div className="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
               <div className="flex justify-between items-center mb-6">
                  <h3 className="text-lg font-bold text-slate-800">Revenue Overview</h3>
                  <select value={chartView} onChange={(e) => setChartView(e.target.value)} className="text-xs border rounded px-2 py-1 bg-slate-50 outline-none font-medium text-slate-600">
@@ -299,7 +309,7 @@ const Dashboard = () => {
                  </select>
               </div>
               
-              <div className="h-64 w-full">
+              <div className="h-52 w-full">
                  <ResponsiveContainer width="100%" height="100%">
                      <BarChart data={chartView === 'monthly' ? chartDataMonthly : chartDataYearly} margin={{ top: 10, right: 10, left: 10, bottom: 5}}>
                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -328,14 +338,16 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* RIGHT: RECENT INVOICES LIST */}
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            {/* BOTTOM 3 COLUMNS */}
+
+            {/* 1. RECENT INVOICES */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
                <div className="flex justify-between items-center mb-4">
                  <h3 className="text-lg font-bold text-slate-800">Recent Invoices</h3>
                  <Link to="/invoices" className="text-xs text-blue-600 font-bold hover:underline">View All</Link>
                </div>
 
-               <div className="space-y-4">
+               <div className="space-y-4 flex-1">
                   {recentInvoices.length === 0 ? (
                      <p className="text-sm text-slate-400 italic">No invoices created yet.</p>
                   ) : (
@@ -346,13 +358,20 @@ const Dashboard = () => {
                                  <FileText className="w-4 h-4" />
                               </div>
                               <div>
-                                 <p className="text-sm font-bold text-slate-800">{inv.client?.name}</p>
+                                 <div className="flex items-center gap-2 mb-0.5">
+                                    <p className="text-sm font-bold text-slate-800 truncate w-24 sm:w-32">{inv.client?.name}</p>
+                                    {inv.createdBy && (
+                                       <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-slate-200">
+                                          {inv.createdBy.name.split(' ')[0]}
+                                       </span>
+                                    )}
+                                 </div>
                                  <p className="text-xs text-slate-500">#{inv.invoiceNumber}</p>
                               </div>
                            </div>
                            <div className="text-right">
                               <p className="text-sm font-bold text-slate-800">{formatCurrency(inv.totalAmount)}</p>
-                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold inline-block mt-0.5 ${
                                  inv.status === 'Paid' ? 'bg-emerald-100 text-emerald-700' : 
                                  inv.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'
                               }`}>
@@ -363,90 +382,206 @@ const Dashboard = () => {
                      ))
                   )}
                </div>
+            </div>
 
-               {/* QUICK COLLECT PAYMENT WIDGET */}
-               <div className="mt-6 pt-6 border-t border-slate-100">
-                  <h4 className="flex items-center gap-2 text-sm font-bold text-slate-800 mb-3">
-                     <Wallet className="w-4 h-4 text-emerald-600" /> Collect Payment
-                  </h4>
-                  <form onSubmit={handlePaymentSubmit} className="space-y-3">
-                     <select 
-                        required
-                        value={selectedClientId} 
-                        onChange={(e) => setSelectedClientId(e.target.value)}
-                        className="w-full text-sm border border-slate-200 rounded-lg p-2 bg-slate-50 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-medium text-slate-700"
-                     >
-                        <option value="">Select a Client...</option>
-                        {clients.map(c => (
-                           <option key={c._id} value={c._id}>{c.name}</option>
-                        ))}
-                     </select>
-
-                     {/* KHATABOOK LEDGER CARD */}
-                     {activeClient && (
-                         <div className="bg-slate-50/80 p-3 rounded-lg border border-slate-200 text-xs shadow-inner">
-                             <div className="flex justify-between mb-1.5 text-slate-500">
-                                <span>Total Billed:</span>
-                                <span className="font-bold text-slate-700">₹{(activeClient.totalBilled || 0).toLocaleString('en-IN')}</span>
-                             </div>
-                             <div className="flex justify-between mb-2.5 text-slate-500">
-                                <span>Total Received:</span>
-                                <span className="font-bold text-emerald-600">₹{(activeClient.totalPaid || 0).toLocaleString('en-IN')}</span>
-                             </div>
-                             <div className="flex justify-between pt-2.5 border-t border-slate-200 border-dashed">
-                                <span className="font-bold text-slate-700">Ledger Balance:</span>
-                                {activeClient.balance > 0 ? (
-                                    <span className="font-extrabold text-rose-600 text-sm">₹{activeClient.balance.toLocaleString('en-IN')} Due</span>
-                                ) : activeClient.balance < 0 ? (
-                                    <span className="font-extrabold text-blue-600 text-sm">₹{Math.abs(activeClient.balance).toLocaleString('en-IN')} Adv</span>
-                                ) : (
-                                    <span className="font-bold text-emerald-600">Settled ✓</span>
-                                )}
-                             </div>
-                         </div>
-                     )}
-
-                     <div className="flex gap-2">
-                         <div className="relative flex-1">
-                            <span className="absolute left-3 top-2 text-slate-400 font-bold">₹</span>
-                            <input 
-                               type="number" 
-                               required
-                               placeholder="0.00"
-                               value={paymentAmount}
-                               onChange={(e) => setPaymentAmount(e.target.value)}
-                               className="w-full text-sm border border-slate-200 rounded-lg py-2 pl-7 pr-3 bg-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-bold text-slate-800"
-                            />
-                         </div>
-                         <button 
-                            type="submit" 
-                            disabled={!selectedClientId || isSubmittingPayment}
-                            className={`px-4 py-2 rounded-lg text-sm font-bold text-white transition-all flex items-center justify-center min-w-[90px] ${
-                               !selectedClientId ? 'bg-slate-300 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-200'
-                            }`}
-                         >
-                            {isSubmittingPayment ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Log Pay'}
-                         </button>
-                     </div>
-                  </form>
+            {/* 2. RECENT EXPENSES */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col">
+               <div className="flex justify-between items-center mb-4">
+                 <h3 className="text-lg font-bold text-slate-800">Recent Expenses</h3>
+                 <Link to="/expenses" className="text-xs text-rose-600 font-bold hover:underline">View All</Link>
                </div>
 
-               {/* Quick Action Box */}
-               <div className="mt-6 pt-6 border-t border-slate-100">
-                  <h4 className="text-xs font-bold text-slate-400 uppercase mb-3">Quick Actions</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                     <Link to="/clients" className="flex items-center justify-center gap-2 p-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors">
-                        <Users className="w-4 h-4" /> Add Client
-                     </Link>
-                     <Link to="/invoices" className="flex items-center justify-center gap-2 p-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-colors">
-                        <ArrowRight className="w-4 h-4" /> All Invoices
-                     </Link>
-                  </div>
+               <div className="space-y-4 flex-1">
+                  {recentExpenses.length === 0 ? (
+                     <p className="text-sm text-slate-400 italic">No expenses added yet.</p>
+                  ) : (
+                     recentExpenses.map((exp) => (
+                        <div key={exp._id} className="flex justify-between items-center p-3 hover:bg-slate-50 rounded-lg transition-colors border border-transparent hover:border-slate-100">
+                           <div className="flex items-center gap-3">
+                              <div className="bg-rose-50 p-2 rounded text-rose-600">
+                                 <Receipt className="w-4 h-4" />
+                              </div>
+                              <div>
+                                 <div className="flex items-center gap-2 mb-0.5">
+                                    <p className="text-sm font-bold text-slate-800 truncate w-24 sm:w-32">{exp.category}</p>
+                                    {exp.createdBy && (
+                                       <span className="inline-flex items-center gap-1 bg-slate-100 text-slate-500 text-[9px] font-bold px-1.5 py-0.5 rounded border border-slate-200">
+                                          {exp.createdBy.name.split(' ')[0]}
+                                       </span>
+                                    )}
+                                 </div>
+                                 <p className="text-xs text-slate-500">{new Date(exp.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</p>
+                              </div>
+                           </div>
+                           <div className="text-right">
+                              <p className="text-sm font-bold text-rose-600">{formatCurrency(exp.amount)}</p>
+                           </div>
+                        </div>
+                     ))
+                  )}
                </div>
             </div>
 
+            {/* 3. QUICK COLLECT WIDGET */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+               <h3 className="flex items-center gap-2 text-lg font-bold text-slate-800 mb-4">
+                  <Wallet className="w-5 h-5 text-emerald-600" /> Collect Payment
+               </h3>
+               <form onSubmit={handlePaymentSubmit} className="space-y-4">
+                  <select 
+                     required
+                     value={selectedClientId} 
+                     onChange={(e) => setSelectedClientId(e.target.value)}
+                     className="w-full text-sm border border-slate-200 rounded-lg p-2.5 bg-slate-50 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-medium text-slate-700"
+                  >
+                     <option value="">Select a Client...</option>
+                     {clients.map(c => (
+                        <option key={c._id} value={c._id}>{c.name}</option>
+                     ))}
+                  </select>
+
+                  {/* KHATABOOK LEDGER CARD */}
+                  {activeClient && (
+                      <div className="bg-slate-50/80 p-3 rounded-lg border border-slate-200 text-xs shadow-inner">
+                          <div className="flex justify-between mb-1.5 text-slate-500">
+                             <span>Total Billed:</span>
+                             <span className="font-bold text-slate-700">₹{(activeClient.totalBilled || 0).toLocaleString('en-IN')}</span>
+                          </div>
+                          <div className="flex justify-between mb-2.5 text-slate-500">
+                             <span>Total Received:</span>
+                             <span className="font-bold text-emerald-600">₹{(activeClient.totalPaid || 0).toLocaleString('en-IN')}</span>
+                          </div>
+                          <div className="flex justify-between pt-2.5 border-t border-slate-200 border-dashed">
+                             <span className="font-bold text-slate-700">Ledger Balance:</span>
+                             {activeClient.balance > 0 ? (
+                                 <span className="font-extrabold text-rose-600 text-sm">₹{activeClient.balance.toLocaleString('en-IN')} Due</span>
+                             ) : activeClient.balance < 0 ? (
+                                 <span className="font-extrabold text-blue-600 text-sm">₹{Math.abs(activeClient.balance).toLocaleString('en-IN')} Adv</span>
+                             ) : (
+                                 <span className="font-bold text-emerald-600">Settled ✓</span>
+                             )}
+                          </div>
+                      </div>
+                  )}
+
+                  <div className="flex flex-col gap-3">
+                      <div className="relative">
+                         <span className="absolute left-3 top-2.5 text-slate-400 font-bold">₹</span>
+                         <input 
+                            type="number" 
+                            required
+                            placeholder="Amount..."
+                            value={paymentAmount}
+                            onChange={(e) => setPaymentAmount(e.target.value)}
+                            className="w-full text-sm border border-slate-200 rounded-lg py-2.5 pl-8 pr-3 bg-white outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-bold text-slate-800"
+                         />
+                      </div>
+                      <button 
+                         type="submit" 
+                         disabled={!selectedClientId || isSubmittingPayment}
+                         className={`w-full py-2.5 rounded-lg text-sm font-bold text-white transition-all flex items-center justify-center gap-2 ${
+                            !selectedClientId ? 'bg-slate-300 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-200'
+                         }`}
+                      >
+                         {isSubmittingPayment ? <Loader2 className="w-4 h-4 animate-spin" /> : <><CheckCircle className="w-4 h-4" /> Log Payment</>}
+                      </button>
+                  </div>
+               </form>
+            </div>
+
           </div>
+
         </>
+      )}
+
+      {/* QUICK ADD EXPENSE MODAL */}
+      {showExpenseModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="flex justify-between items-center p-5 border-b border-slate-100">
+                 <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                    <Receipt className="w-5 h-5 text-rose-600" /> Log Expense
+                 </h3>
+                 <button onClick={() => setShowExpenseModal(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                    <X className="w-5 h-5" />
+                 </button>
+              </div>
+              <form onSubmit={handleExpenseSubmit} className="p-5 space-y-4">
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 mb-1 block">Category</label>
+                    <div className="relative">
+                      <Tag className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                      <input 
+                        required
+                        list="dashboard-expense-categories"
+                        value={expenseForm.category}
+                        onChange={(e) => setExpenseForm({...expenseForm, category: e.target.value})}
+                        placeholder="e.g. Office Supplies" 
+                        className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm" 
+                        autoComplete="off"
+                      />
+                      <datalist id="dashboard-expense-categories">
+                         {expenseCategories.map(cat => <option key={cat} value={cat} />)}
+                      </datalist>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                     <div>
+                       <label className="text-xs font-bold text-slate-500 mb-1 block">Amount</label>
+                       <div className="relative">
+                          <span className="absolute left-3 top-2 text-slate-500 font-bold">₹</span>
+                          <input 
+                             required
+                             type="number" 
+                             step="0.01" 
+                             min="0.1"
+                             value={expenseForm.amount}
+                             onChange={(e) => setExpenseForm({...expenseForm, amount: e.target.value})}
+                             placeholder="0.00" 
+                             className="w-full pl-8 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-bold" 
+                          />
+                       </div>
+                     </div>
+                     <div>
+                       <label className="text-xs font-bold text-slate-500 mb-1 block">Date</label>
+                       <div className="relative">
+                          <Calendar className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                          <input 
+                             required
+                             type="date" 
+                             value={expenseForm.date}
+                             onChange={(e) => setExpenseForm({...expenseForm, date: e.target.value})}
+                             className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg outline-none text-sm focus:ring-2 focus:ring-blue-500" 
+                          />
+                       </div>
+                     </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-slate-500 mb-1 block">Description (Optional)</label>
+                    <div className="relative">
+                       <FileText className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
+                       <textarea 
+                          value={expenseForm.description}
+                          onChange={(e) => setExpenseForm({...expenseForm, description: e.target.value})}
+                          placeholder="Notes..." 
+                          className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg outline-none text-sm h-20 resize-none focus:ring-2 focus:ring-blue-500" 
+                       />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex gap-3">
+                     <button type="button" onClick={() => setShowExpenseModal(false)} className="flex-1 py-2.5 bg-slate-50 border border-slate-200 text-slate-600 rounded-lg font-bold hover:bg-slate-100 transition-colors">
+                        Cancel
+                     </button>
+                     <button type="submit" disabled={isSubmittingExpense} className="flex-1 py-2.5 bg-rose-600 text-white rounded-lg font-bold hover:bg-rose-700 transition-colors shadow-md shadow-rose-200 flex justify-center items-center gap-2">
+                        {isSubmittingExpense ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Expense'}
+                     </button>
+                  </div>
+              </form>
+           </div>
+        </div>
       )}
     </Layout>
   );
