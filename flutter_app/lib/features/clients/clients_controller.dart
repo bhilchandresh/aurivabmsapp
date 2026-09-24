@@ -16,6 +16,7 @@ class Client {
   final double
   balance; // positive = pending due, negative = advance jama, 0 = settled
   final DateTime? createdAt;
+  final String? addedBy;
 
   Client({
     required this.id,
@@ -28,6 +29,7 @@ class Client {
     required this.totalBilled,
     required this.balance,
     this.createdAt,
+    this.addedBy,
   });
 
   Client copyWith({
@@ -41,6 +43,7 @@ class Client {
     double? totalBilled,
     double? balance,
     DateTime? createdAt,
+    String? addedBy,
   }) {
     return Client(
       id: id ?? this.id,
@@ -53,6 +56,7 @@ class Client {
       totalBilled: totalBilled ?? this.totalBilled,
       balance: balance ?? this.balance,
       createdAt: createdAt ?? this.createdAt,
+      addedBy: addedBy ?? this.addedBy,
     );
   }
 
@@ -70,6 +74,7 @@ class Client {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
           : null,
+      addedBy: json['addedBy'],
     );
   }
 }

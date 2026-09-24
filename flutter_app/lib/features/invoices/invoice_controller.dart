@@ -24,6 +24,7 @@ class Invoice {
   final String placeOfSupply;
   final List<dynamic> items;
   final double advancePayment;
+  final String? createdBy;
 
   Invoice({
     required this.dbId,
@@ -45,6 +46,7 @@ class Invoice {
     required this.placeOfSupply,
     required this.items,
     this.advancePayment = 0.0,
+    this.createdBy = 'Admin',
   });
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
@@ -55,6 +57,15 @@ class Invoice {
     final String address = clientObj['address'] ?? '';
     final String gst = clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
     final String state = clientObj['state'] ?? '';
+    
+    String creator = 'Admin';
+    if (json['createdBy'] != null) {
+      if (json['createdBy'] is Map) {
+        creator = json['createdBy']['name'] ?? 'Admin';
+      } else if (json['createdBy'] is String) {
+        creator = json['createdBy'];
+      }
+    }
 
     return Invoice(
       dbId: json['_id'] ?? json['id'] ?? '',
@@ -76,6 +87,7 @@ class Invoice {
       placeOfSupply: json['placeOfSupply'] ?? state,
       items: json['items'] ?? [],
       advancePayment: (json['advancePayment'] ?? 0.0).toDouble(),
+      createdBy: creator,
     );
   }
 
@@ -100,6 +112,7 @@ class Invoice {
       placeOfSupply: placeOfSupply,
       items: items,
       advancePayment: advancePayment,
+      createdBy: createdBy,
     );
   }
 }
@@ -114,10 +127,30 @@ class InvoiceController extends GetxController {
     fetchInvoices();
   }
 
-  Future<void> fetchInvoices() async {
+  Future<void> fetchInvoices({
+    String? month,
+    String? status,
+    String? sortBy,
+    String? search,
+  }) async {
     try {
       isLoading.value = true;
-      final response = await ApiService.get(ApiConstants.invoices);
+      
+      List<String> queryParams = ['limit=1000'];
+      if (month != null && month != 'all') queryParams.add('month=$month');
+      if (status != null && status != 'all') queryParams.add('status=$status');
+      if (sortBy != null && sortBy.isNotEmpty) {
+        // Map frontend sort keys to backend sort keys if needed
+        String mappedSortBy = sortBy;
+        if (sortBy == 'highest') mappedSortBy = 'amount_high';
+        if (sortBy == 'lowest') mappedSortBy = 'amount_low';
+        queryParams.add('sortBy=$mappedSortBy');
+      }
+      if (search != null && search.isNotEmpty) queryParams.add('search=$search');
+      
+      String queryString = queryParams.isNotEmpty ? '?${queryParams.join('&')}' : '';
+      
+      final response = await ApiService.get('${ApiConstants.invoices}$queryString');
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {

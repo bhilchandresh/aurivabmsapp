@@ -99,7 +99,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         );
       }),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddExpenseBottomSheet(context, isDark),
+        onPressed: () => showAddExpenseBottomSheet(context, isDark),
         backgroundColor: Colors.indigo.shade500,
         foregroundColor: Colors.white,
         icon: const Icon(LucideIcons.plus, size: 18),
@@ -1349,7 +1349,10 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 
   // --- ADD EXPENSE BOTTOM SHEET ---
-  void _showAddExpenseBottomSheet(BuildContext context, bool isDark) {
+}
+
+void showAddExpenseBottomSheet(BuildContext context, bool isDark) {
+    final _controller = Get.find<ExpensesController>();
     final formKey = GlobalKey<FormState>();
     final amountCtrl = TextEditingController();
     final descCtrl = TextEditingController();
@@ -1717,4 +1720,3 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       isScrollControlled: true,
     );
   }
-}

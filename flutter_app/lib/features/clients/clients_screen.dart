@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../../core/theme/app_extensions.dart';
@@ -126,9 +127,24 @@ class _ClientsScreenState extends State<ClientsScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'clients'.tr,
-        subtitle: 'manage_customers'.tr,
         showProfile: false,
         showBadge: false,
+        actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/SVG/refresh.svg',
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: () {
+              _clientsController.fetchClients();
+            },
+          ),
+        ],
       ),
       body: Obx(() {
         final listItems = _getFilteredAndSortedClients(
@@ -136,7 +152,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
         );
 
         final isMobile = MediaQuery.of(context).size.width < 700;
-        final double headerHeight = isMobile ? 130.0 : 80.0;
         final isLoading = _clientsController.isLoading.value && listItems.isEmpty;
 
         return Skeletonizer(
@@ -153,7 +168,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 surfaceTintColor: Colors.transparent,
                 elevation: 0,
-                toolbarHeight: headerHeight,
+                toolbarHeight: 160,
                 flexibleSpace: FlexibleSpaceBar(
                   background: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -168,24 +183,43 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Register Label
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            '${'clients'.tr} (${listItems.length})',
-                            style: context.typography.categoryHeader.copyWith(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.displayLarge?.color,
+                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Client Register',
+                              style: context.typography.cardTitle.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                              ),
                             ),
-                          ),
-                          const Icon(
-                            LucideIcons.slidersHorizontal,
-                            size: 16,
-                            color: Colors.grey,
-                          ),
-                        ],
-                      ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    'Total: ${listItems.length}',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                // View toggle (static for now to match UI exactly)
+                              
+                              ],
+                            ),
+                          ],
+                        ),
+                      
                       const SizedBox(height: 12),
                       // Client Cards Grid/List
                       if (isLoading)
@@ -216,159 +250,105 @@ class _ClientsScreenState extends State<ClientsScreen> {
   }
 
   Widget _buildFilterHeader(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 700;
-//     final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final Widget searchBar = TextField(
-      onChanged: (val) {
-        setState(() {
-          _searchQuery = val;
-        });
-      },
-      style: context.typography.inputText.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color),
-      decoration: InputDecoration(
-        hintText: 'search_clients'.tr,
-        hintStyle: context.typography.searchHint.copyWith(color: Colors.grey, fontSize: 13),
-        prefixIcon: const Icon(
-          LucideIcons.search,
-          color: Colors.grey,
-          size: 18,
-        ),
-        filled: true,
-        fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-        contentPadding: const EdgeInsets.symmetric(vertical: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: context.colorScheme.primary, width: 1.5),
-        ),
-      ),
-    );
-
-    final Widget sortDropdown = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+    return Container(
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(12),
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
         ),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: _sortBy,
-          dropdownColor: Theme.of(context).cardTheme.color,
-          icon: const Icon(
-            LucideIcons.chevronDown,
-            size: 14,
-            color: Colors.grey,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.01),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-          ),
-          items: [
-            DropdownMenuItem(
-              value: 'newest',
-              child: Text(
-                'newest_first'.tr,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-              ),
-            ),
-            DropdownMenuItem(
-              value: 'oldest',
-              child: Text(
-                'oldest_first'.tr,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-              ),
-            ),
-            DropdownMenuItem(
-              value: 'alpha_asc',
-              child: Text(
-                'a_z_name'.tr,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-              ),
-            ),
-            DropdownMenuItem(
-              value: 'dues_high',
-              child: Text(
-                'highest_dues'.tr,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-              ),
-            ),
-          ],
-          onChanged: (val) {
-            if (val != null) {
-              setState(() {
-                _sortBy = val;
-              });
-            }
-          },
-        ),
+        ],
       ),
-    );
-
-    final Widget addButton = ElevatedButton.icon(
-      onPressed: _showAddClientDialog,
-      icon: const Icon(LucideIcons.plus, size: 16),
-      label: Text(
-        'add_client'.tr,
-        style: context.typography.buttonText.copyWith(fontWeight: FontWeight.bold),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: context.colorScheme.primary,
-        foregroundColor: Colors.white,
-        elevation: 1,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
-
-    if (isMobile) {
-      return Column(
+      child: Column(
         children: [
-          searchBar,
-          const SizedBox(height: 10),
           Row(
             children: [
-              Expanded(child: sortDropdown),
-              const SizedBox(width: 10),
-              addButton,
+              Expanded(
+                child: TextField(
+                  onChanged: (val) {
+                    setState(() {
+                      _searchQuery = val;
+                    });
+                  },
+                  style: context.typography.inputText.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color),
+                  decoration: InputDecoration(
+                    hintText: 'search_clients'.tr,
+                    hintStyle: context.typography.searchHint.copyWith(fontSize: 13),
+                    prefixIcon: UnconstrainedBox(
+                      child: SvgPicture.asset(
+                        'assets/SVG/search.svg',
+                        width: 18,
+                        height: 18,
+                        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: context.colorScheme.outline.withValues(alpha: 0.5),
+                        width: 1.5,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: CustomSortDropdown(
+                  selectedValue: _sortBy,
+                  onChanged: (val) {
+                    setState(() {
+                      _sortBy = val;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _showAddClientDialog,
+                  icon: const Icon(LucideIcons.plus, size: 16, color: Colors.white),
+                  label: Text(
+                    'add_client'.tr,
+                    style: context.typography.buttonText.copyWith(color: Colors.white, fontSize: 13),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade600,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
-      );
-    } else {
-      return Row(
-        children: [
-          Expanded(child: searchBar),
-          const SizedBox(width: 12),
-          sortDropdown,
-          const SizedBox(width: 12),
-          addButton,
-        ],
-      );
-    }
+      ),
+    );
   }
 
   Widget _buildEmptyState() {
@@ -421,8 +401,8 @@ class _ClientsScreenState extends State<ClientsScreen> {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: crossAxisCount,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
           childAspectRatio: computedAspectRatio,
         ),
         itemCount: clientsList.length,
@@ -450,19 +430,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
   Widget _buildClientCard(Client client, int index) {
     final isHovered = _hoveredIndex == index;
     final balance = client.balance;
-    final isAdvance = balance < 0;
-    final isClear = balance == 0;
-    final hasGstin = client.gstin.trim().isNotEmpty;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final cardBgColor = Theme.of(context).cardTheme.color;
+    final cardBgColor = Theme.of(context).cardTheme.color ?? Colors.white;
     final cardBorderColor = isHovered
         ? AppColors.primary.withValues(alpha: 0.5)
-        : Theme.of(context).colorScheme.outline;
+        : Theme.of(context).colorScheme.outline.withValues(alpha: 0.1);
     final cardTextColor = Theme.of(context).textTheme.displayLarge?.color;
-    final secondaryTextColor = Theme.of(context).textTheme.bodyMedium?.color;
-    final panelBgColor = Theme.of(context).colorScheme.surfaceContainerHighest;
-    final panelBorderColor = Theme.of(context).colorScheme.outline;
+    final secondaryTextColor = Colors.grey.shade600;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hoveredIndex = index),
@@ -471,19 +446,20 @@ class _ClientsScreenState extends State<ClientsScreen> {
         onTap: () {
           Get.to(() => ClientDetailsScreen(clientId: client.id));
         },
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(14.0),
           decoration: BoxDecoration(
             color: cardBgColor,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: cardBorderColor, width: 1),
             boxShadow: [
               BoxShadow(
                 color: isHovered
                     ? AppColors.primary.withValues(alpha: 0.08)
-                    : Colors.black.withValues(alpha: 0.01),
-                blurRadius: isHovered ? 12 : 6,
+                    : Colors.black.withValues(alpha: 0.02),
+                blurRadius: isHovered ? 12 : 8,
                 offset: const Offset(0, 4),
               ),
             ],
@@ -491,262 +467,239 @@ class _ClientsScreenState extends State<ClientsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 44,
-                          width: 44,
-                          decoration: BoxDecoration(
-                            color: context.colorScheme.primary.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Center(
-                            child: Text(
-                              client.name.trim().isNotEmpty
-                                  ? client.name.trim()[0].toUpperCase()
-                                  : 'C',
-                              style: context.typography.clientName.copyWith(
-                                color: context.colorScheme.primary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                              ),
+              // Top Section (Row: Avatar/Badge + Info)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left side (Avatar and Badge)
+                  Column(
+                    children: [
+                      Container(
+                        height: 48,
+                        width: 48,
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withValues(alpha: 0.08),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Text(
+                            client.name.trim().isNotEmpty
+                                ? client.name.trim()[0].toUpperCase()
+                                : 'C',
+                            style: const TextStyle(
+                              color: Colors.blue,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _capitalizeName(client.name),
+                      ),
+                      const SizedBox(height: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset('assets/SVG/setting.svg', height: 8, width: 8, colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn)),
+                            const SizedBox(width: 4),
+                            Text(
+                              'By: ${client.addedBy?.isNotEmpty == true ? client.addedBy : 'System'}',
+                              style: TextStyle(
+                                fontSize: 8,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 14),
+                  // Right side (Details)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Name
+                        Text(
+                          _capitalizeName(client.name),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: cardTextColor,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        // Email
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: SvgPicture.asset('assets/SVG/mail.svg', height: 10, width: 10, colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn)),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                client.email.isNotEmpty ? client.email : 'no_email_added'.tr,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: context.typography.clientName.copyWith(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
-                                  color: cardTextColor,
-                                  letterSpacing: -0.5,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: secondaryTextColor,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              if (hasGstin) ...[
-                                const SizedBox(height: 4),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 6,
-                                    vertical: 2,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        // Phone
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: SvgPicture.asset('assets/SVG/phone.svg', height: 10, width: 10, colorFilter: const ColorFilter.mode(Colors.green, BlendMode.srcIn)),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                client.phone.isNotEmpty ? client.phone : 'no_phone_added'.tr,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: secondaryTextColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              // Bottom Section (Financials)
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    // Total Billed
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: SvgPicture.asset('assets/SVG/invoice.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.green, BlendMode.srcIn)),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Total Billed',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey.shade600,
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: isDark
-                                        ? Colors.purple.shade900.withValues(alpha: 0.15,
-                                          )
-                                        : Colors.purple.shade50,
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(
-                                      color: isDark
-                                          ? Colors.purple.shade900.withValues(alpha: 0.3,
-                                            )
-                                          : Colors.purple.shade100,
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'gst_reg'.tr.toUpperCase(),
-                                    style: context.typography.invoiceStatus.copyWith(
-                                      color: isDark
-                                          ? Colors.purple.shade300
-                                          : Colors.purple.shade700,
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 0.5,
-                                    ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  formatCurrency.format(client.totalBilled),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                    color: cardTextColor,
                                   ),
                                 ),
                               ],
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Icon(
-                          LucideIcons.mail,
-                          size: 12,
-                          color: secondaryTextColor,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            client.email.isNotEmpty
-                                ? client.email
-                                : 'no_email_added'.tr,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.typography.cardSubtitle.copyWith(
-                              fontSize: 12,
-                              color: secondaryTextColor,
-                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(
-                          LucideIcons.phone,
-                          size: 12,
-                          color: secondaryTextColor,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            client.phone.isNotEmpty
-                                ? client.phone
-                                : 'no_phone_added'.tr,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: context.typography.cardSubtitle.copyWith(
-                              fontSize: 12,
-                              color: secondaryTextColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Financial Quick View Panel
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  color: panelBgColor,
-                  border: Border(
-                    top: BorderSide(color: panelBorderColor),
-                    bottom: BorderSide(color: panelBorderColor),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'total_billed'.tr.toUpperCase(),
-                          style: context.typography.cardSubtitle.copyWith(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.grey,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          formatCurrency.format(client.totalBilled),
-                          style: context.typography.invoiceAmount.copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                            color: cardTextColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          isAdvance
-                              ? 'advance_jama'.tr.toUpperCase()
-                              : isClear
-                              ? 'status'.tr.toUpperCase()
-                              : 'balance_due'.tr,
-                          style: context.typography.cardSubtitle.copyWith(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.grey,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        if (isClear)
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                LucideIcons.checkCircle,
-                                size: 12,
-                                color: isDark
-                                    ? Colors.green.shade400
-                                    : AppColors.success,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'settled'.tr,
-                                style: context.typography.invoiceStatus.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
-                                  color: isDark
-                                      ? Colors.green.shade400
-                                      : AppColors.success,
-                                ),
-                              ),
-                            ],
-                          )
-                        else
-                          Text(
-                            formatCurrency.format(balance.abs()),
-                            style: context.typography.invoiceAmount.copyWith(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 13,
-                              color: isAdvance
-                                  ? (isDark
-                                        ? Colors.blue.shade400
-                                        : Colors.blue)
-                                  : (isDark
-                                        ? Colors.red.shade400
-                                        : AppColors.error),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // View Ledger Link
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'view_customer_ledger'.tr,
-                      style: context.typography.buttonText.copyWith(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w900,
-                        color: context.colorScheme.primary,
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    Icon(
-                      LucideIcons.arrowRight,
-                      size: 14,
-                      color: context.colorScheme.primary,
+                    Container(
+                      height: 28,
+                      width: 1,
+                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                    ),
+                    // Pending Due
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: balance > 0 
+                                  ? Colors.red.withValues(alpha: 0.1)
+                                  : (balance < 0 ? Colors.blue.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1)),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: balance > 0 
+                                ? SvgPicture.asset('assets/SVG/time.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn))
+                                : (balance < 0 
+                                    ? SvgPicture.asset('assets/SVG/invoice.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn))
+                                    : SvgPicture.asset('assets/SVG/accepted.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.green, BlendMode.srcIn))),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  balance > 0 
+                                      ? 'Pending Due'
+                                      : (balance < 0 ? 'Advance' : 'Status'),
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey.shade600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  balance == 0 ? 'Settled' : formatCurrency.format(balance.abs()),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w900,
+                                    color: balance > 0 
+                                        ? Colors.red 
+                                        : (balance < 0 ? Colors.blue : Colors.green),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -961,6 +914,268 @@ class _ClientsScreenState extends State<ClientsScreen> {
           },
         );
       },
+    );
+  }
+}
+
+class DropdownArrowPainter extends CustomPainter {
+  final Color color;
+  DropdownArrowPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    final path = Path()
+      ..moveTo(0, size.height)
+      ..lineTo(size.width / 2, 0)
+      ..lineTo(size.width, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class CustomSortDropdown extends StatefulWidget {
+  final String selectedValue;
+  final ValueChanged<String> onChanged;
+
+  const CustomSortDropdown({
+    super.key,
+    required this.selectedValue,
+    required this.onChanged,
+  });
+
+  @override
+  State<CustomSortDropdown> createState() => _CustomSortDropdownState();
+}
+
+class _CustomSortDropdownState extends State<CustomSortDropdown> {
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+  bool _isOpen = false;
+
+  void _toggleDropdown() {
+    if (_isOpen) {
+      _closeDropdown();
+    } else {
+      _openDropdown();
+    }
+  }
+
+  void _closeDropdown() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    setState(() => _isOpen = false);
+  }
+
+  void _openDropdown() {
+    final renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _closeDropdown,
+              behavior: HitTestBehavior.opaque,
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+          CompositedTransformFollower(
+            link: _layerLink,
+            showWhenUnlinked: false,
+            offset: Offset(0, size.height + 8),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: size.width + 120, // wider than button
+                child: Material(
+                  color: Colors.transparent,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutBack,
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: 0.9 + (0.1 * value),
+                        alignment: Alignment.topLeft,
+                        child: Opacity(
+                          opacity: value.clamp(0.0, 1.0),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 32),
+                          child: CustomPaint(
+                            size: const Size(14, 7),
+                            painter: DropdownArrowPainter(color: Theme.of(context).cardTheme.color ?? Colors.white),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardTheme.color ?? Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _buildDropdownItem('newest', 'newest_first'.tr, LucideIcons.arrowDownUp, Colors.blue),
+                              _buildDropdownItem('oldest', 'oldest_first'.tr, LucideIcons.arrowDownUp, Colors.grey),
+                              _buildDropdownItem('alpha_asc', 'a_z_name'.tr, LucideIcons.arrowDownAZ, Colors.purple),
+                              _buildDropdownItem('dues_high', 'highest_dues'.tr, LucideIcons.database, Colors.teal, hasWarning: true),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    Overlay.of(context).insert(_overlayEntry!);
+    setState(() => _isOpen = true);
+  }
+
+  Widget _buildDropdownItem(String value, String label, IconData iconData, MaterialColor iconColor, {bool hasWarning = false}) {
+    final isSelected = widget.selectedValue == value;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return InkWell(
+      onTap: () {
+        widget.onChanged(value);
+        _closeDropdown();
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? (isDark ? Colors.blue.withValues(alpha: 0.1) : Colors.blue.shade50.withValues(alpha: 0.5)) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.blue.withValues(alpha: 0.1) : iconColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(iconData, size: 16, color: isSelected ? Colors.blue : iconColor),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Row(
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                      fontSize: 14,
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
+                    ),
+                  ),
+                  if (hasWarning) ...[
+                    const SizedBox(width: 6),
+                    const Icon(LucideIcons.alertTriangle, size: 14, color: Colors.grey),
+                  ],
+                ],
+              ),
+            ),
+            if (isSelected)
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blue,
+                ),
+                padding: const EdgeInsets.all(2),
+                child: const Icon(LucideIcons.check, size: 12, color: Colors.white),
+              )
+            else
+              const Icon(LucideIcons.circle, size: 20, color: Colors.black12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String label = '';
+    switch(widget.selectedValue) {
+      case 'newest': label = 'Newest'; break;
+      case 'oldest': label = 'Old'; break;
+      case 'alpha_asc': label = 'A-Z'; break;
+      case 'dues_high': label = 'Dues'; break;
+    }
+
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: InkWell(
+        onTap: _toggleDropdown,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(LucideIcons.arrowDownUp, size: 16, color: Colors.grey),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                _isOpen ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                size: 16,
+                color: Colors.grey,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

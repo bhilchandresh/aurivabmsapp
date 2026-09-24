@@ -5,6 +5,9 @@ import '../../core/constants/api_constants.dart';
 
 class DashboardController extends GetxController {
   final isLoading = true.obs;
+  
+  // Visibility State
+  final isAmountsVisible = true.obs;
 
   // Stats
   final totalRevenue = 0.0.obs;
@@ -50,8 +53,27 @@ class DashboardController extends GetxController {
         paidInvoices.value = stats['paidInvoices'] ?? 0;
         pendingCount.value = stats['pendingCount'] ?? 0;
 
-        recentInvoices.assignAll(List<Map<String, dynamic>>.from(data['recentInvoices'] ?? []));
-        recentExpenses.assignAll(List<Map<String, dynamic>>.from(data['recentExpenses'] ?? []));
+        final invoicesList = List<Map<String, dynamic>>.from(data['recentInvoices'] ?? []);
+        invoicesList.sort((a, b) {
+          final dateA = a['createdAt']?.toString() ?? a['date']?.toString() ?? '';
+          final dateB = b['createdAt']?.toString() ?? b['date']?.toString() ?? '';
+          int comp = dateB.compareTo(dateA);
+          if (comp == 0) {
+            final invA = a['invoiceNumber']?.toString() ?? '';
+            final invB = b['invoiceNumber']?.toString() ?? '';
+            return invB.compareTo(invA);
+          }
+          return comp;
+        });
+        recentInvoices.assignAll(invoicesList);
+        
+        final expensesList = List<Map<String, dynamic>>.from(data['recentExpenses'] ?? []);
+        expensesList.sort((a, b) {
+          final dateA = a['createdAt']?.toString() ?? a['date']?.toString() ?? '';
+          final dateB = b['createdAt']?.toString() ?? b['date']?.toString() ?? '';
+          return dateB.compareTo(dateA); // Sort descending by date
+        });
+        recentExpenses.assignAll(expensesList);
         
         chartDataMonthly.assignAll(List<Map<String, dynamic>>.from(data['chartDataMonthly'] ?? []));
         chartDataYearly.assignAll(List<Map<String, dynamic>>.from(data['chartDataYearly'] ?? []));

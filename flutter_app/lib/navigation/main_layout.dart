@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../core/constants/app_colors.dart';
 import '../core/theme/app_extensions.dart';
 import '../core/utils/responsive_layout.dart';
@@ -130,6 +131,7 @@ class MainLayout extends StatelessWidget {
     );
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Main content
@@ -141,73 +143,35 @@ class MainLayout extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              child: SafeArea(
+              child: MediaQuery(
+                data: MediaQuery.of(context).removeViewInsets(removeBottom: true),
+                child: SafeArea(
                 child: Container(
                   height: barHeight,
-                  margin: EdgeInsets.zero,
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: const Color(0xFF1E293B), // slate-800
+                    borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.06),
-                        blurRadius: 20,
-                        offset: const Offset(0, -4),
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
                       ),
                     ],
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildBottomNavItem(context, 0, LucideIcons.layoutGrid, 'Dashboard', controller, barHeight),
-                      _buildBottomNavItem(context, 1, LucideIcons.fileText, 'Invoice', controller, barHeight),
-                      // Space for FAB
-                      const SizedBox(width: 76),
-                      _buildBottomNavItem(context, 2, LucideIcons.file, 'Quote', controller, barHeight),
-                      _buildBottomNavItem(context, 4, LucideIcons.user, 'Profile', controller, barHeight),
+                      _buildBottomNavItem(context, 0, 'assets/SVG/home.svg', 'Home', controller, barHeight),
+                      _buildBottomNavItem(context, 1, 'assets/SVG/invoice.svg', 'Invoices', controller, barHeight),
+                      _buildBottomNavItem(context, 2, 'assets/SVG/qoutation.svg', 'Quotes', controller, barHeight),
+                      _buildBottomNavItem(context, 3, 'assets/SVG/client01.svg', 'Clients', controller, barHeight),
+                      _buildBottomNavItem(context, 4, 'assets/SVG/profile.svg', 'Profile', controller, barHeight),
                     ],
                   ),
-                ),
-              ),
-            ),
-          
-          // Center Expandable FAB overlay
-          if (!isProfileTab)
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              top: 0,
-              child: SafeArea(
-                child: AurivaExpandableFab(
-                  distance: 130.0,
-                  actions: [
-                    AurivaFabAction(
-                      icon: LucideIcons.filePlus,
-                      label: 'New Invoice',
-                      onPressed: () => Get.to(() => const CreateInvoiceScreen()),
-                    ),
-                    AurivaFabAction(
-                      icon: LucideIcons.tag,
-                      label: 'New Quote',
-                      onPressed: () => Get.to(() => const CreateQuotationScreen()),
-                    ),
-                    AurivaFabAction(
-                      icon: LucideIcons.users,
-                      label: 'Client',
-                      onPressed: () => Get.to(() => const ClientsScreen()),
-                    ),
-                    AurivaFabAction(
-                      icon: LucideIcons.wallet,
-                      label: 'Expenses',
-                      onPressed: () => Get.toNamed(AppRoutes.expenses),
-                    ),
-                    AurivaFabAction(
-                      icon: LucideIcons.package,
-                      label: 'Inventory',
-                      onPressed: () => Get.toNamed(AppRoutes.inventory),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
@@ -262,62 +226,59 @@ class MainLayout extends StatelessWidget {
   Widget _buildBottomNavItem(
     BuildContext context,
     int index,
-    IconData icon,
+    String svgPath,
     String label,
     MainLayoutController controller,
     double barHeight,
   ) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => controller.changeIndex(index),
-        behavior: HitTestBehavior.opaque,
-        child: Obx(() {
-          final isSelected = controller.currentIndex.value == index;
-          // Keep icon and font sizes proportional but clean
-          final iconSize = (barHeight * 0.32).clamp(18.0, 22.0);
-          final fontSize = (barHeight * 0.16).clamp(10.0, 12.0);
+    return GestureDetector(
+      onTap: () => controller.changeIndex(index),
+      behavior: HitTestBehavior.opaque,
+      child: Obx(() {
+        final isSelected = controller.currentIndex.value == index;
+        final iconSize = (barHeight * 0.32).clamp(18.0, 22.0);
+        final fontSize = (barHeight * 0.20).clamp(12.0, 14.0);
 
-          return Container(
-            alignment: Alignment.center,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 280),
-              curve: Curves.easeInOutCubic,
-              width: isSelected ? 76 : 60, // Fixed width that gives breathing room to the text
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6), // Generous padding so it doesn't look glued
-              decoration: BoxDecoration(
-                color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12) : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeInOutCubic,
+          padding: EdgeInsets.symmetric(
+            horizontal: isSelected ? 16.0 : 8.0,
+            vertical: 8.0,
+          ),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(0xFF334155) // slate-700
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                svgPath,
+                colorFilter: ColorFilter.mode(
+                  isSelected ? Colors.white : const Color(0xFF94A3B8), // slate-400
+                  BlendMode.srcIn,
+                ),
+                width: iconSize,
+                height: iconSize,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedScale(
-                    scale: isSelected ? 1.05 : 1.0,
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeOut,
-                    child: Icon(
-                      icon,
-                      color: isSelected ? Theme.of(context).colorScheme.primary : const Color(0xFF64748B),
-                      size: iconSize,
-                    ),
+              if (isSelected) ...[
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: context.typography.navigationLabel.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: fontSize,
                   ),
-                  const SizedBox(height: 2),
-                  AnimatedDefaultTextStyle(
-                    duration: const Duration(milliseconds: 280),
-                    style: context.typography.navigationLabel.copyWith(
-                      color: isSelected ? Theme.of(context).colorScheme.primary : const Color(0xFF64748B),
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      fontSize: fontSize,
-                    ),
-                    child: Text(label, maxLines: 1, overflow: TextOverflow.visible),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ),
+                ),
+              ],
+            ],
+          ),
+        );
+      }),
     );
   }
 

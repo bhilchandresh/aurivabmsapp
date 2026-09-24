@@ -9,6 +9,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../../shared/widgets/app_input_field.dart';
+import '../../core/theme/app_extensions.dart';
 import 'expenses_controller.dart';
 import 'widgets/expense_list_item.dart';
 
@@ -77,327 +78,435 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
         showBadge: false,
         showBackButton: true,
       ),
-      body: Obx(() {
-        final showSkeleton =
-            _controller.isLoading.value && _controller.expenses.isEmpty;
-        return Skeletonizer(
-          enabled: showSkeleton,
-          child: RefreshIndicator(
-            onRefresh: () => _controller.fetchExpenses(),
-            color: AppColors.primary,
-            child: SingleChildScrollView(
+      body: RefreshIndicator(
+        onRefresh: () => _controller.fetchExpenses(),
+        color: AppColors.primary,
+        child: Obx(() {
+          final isLoading = _controller.isLoading.value;
+          final isFirstLoad = _controller.expenses.isEmpty;
+          final showSkeleton = isLoading && isFirstLoad;
+          
+          final listItems = showSkeleton
+              ? List.generate(
+                  5,
+                  (index) => Expense(
+                    id: 'loading_$index',
+                    category: 'Loading',
+                    amount: 500.0,
+                    description: 'Loading description...',
+                    date: '2026-06-10',
+                  ),
+                )
+              : _controller.processedExpenses;
+              
+          final visibleList = listItems.take(_displayLimit.value).toList();
+
+          return Skeletonizer(
+            enabled: showSkeleton,
+            child: CustomScrollView(
               controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics(),
               ),
-              padding: const EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-                top: 16.0,
-                bottom: 80.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Spending analysis chart removed
+              slivers: [
+                SliverAppBar(
+                  floating: true,
+                  snap: true,
+                  automaticallyImplyLeading: false,
+                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  toolbarHeight: 225,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Action Buttons
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: _exportCSV,
+                                  icon: const Icon(LucideIcons.download, size: 16),
+                                  label: Text('export_to_excel'.tr),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.success,
+                                    foregroundColor: Colors.white,
+                                    elevation: 1,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _showAddExpenseBottomSheet(context, isDark),
+                                  icon: const Icon(LucideIcons.plus, size: 16),
+                                  label: Text('add_expense'.tr),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    elevation: 1,
+                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
 
-                  // Filter bar & export button
-                  _buildFiltersAndActionsRow(context, isDark),
-                  const SizedBox(height: 16),
-
-                  // Expense log list
-                  _buildExpensesList(context, isDark),
-                ],
-              ),
-            ),
-          ),
-        );
-      }),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddExpenseBottomSheet(context, isDark),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        icon: const Icon(LucideIcons.plus, size: 18),
-        label: Text(
-          'add_expense'.tr,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // --- spending chart ---
-  // --- FILTERS & EXPORT ---
-  Widget _buildFiltersAndActionsRow(BuildContext context, bool isDark) {
-    final List<String> defaultCategories = [
-      'Maintenance',
-      'Fuel',
-      'Salary',
-      'Equipment',
-      'Insurance',
-      'Travel',
-      'Office',
-      'Utilities',
-      'Marketing',
-      'Other'
-    ];
-    final Set<String> existingCategories = _controller.expenses.map((e) {
-      final cat = e.category.trim();
-      return cat.isEmpty ? 'Other' : '${cat[0].toUpperCase()}${cat.substring(1)}';
-    }).toSet();
-    final List<String> allCategories = ['All Categories', ...{...defaultCategories, ...existingCategories}.toList()..sort()];
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
-        ),
-      ),
-      child: Column(
-        children: [
-          // Search Field
-          Container(
-            height: 40,
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardTheme.color,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            child: TextField(
-              onChanged: (val) => _controller.searchQuery.value = val,
-              style: TextStyle(
-                fontSize: 13,
-                color: Theme.of(context).textTheme.displayLarge?.color,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Search expenses...',
-                hintStyle: TextStyle(
-                  fontSize: 13,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-                prefixIcon: Icon(
-                  LucideIcons.search,
-                  size: 16,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-                prefixIconConstraints: const BoxConstraints(
-                  minWidth: 36,
-                  minHeight: 36,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-                isDense: true,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Row 1: Month and Category
-          Row(
-            children: [
-              // Period selector
-              Expanded(
-                child: InkWell(
-                  onTap: () => _showMonthPicker(context, isDark),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Container(
-                    height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).cardTheme.color,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.outline,
+                          // Search and Filter Panel
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardTheme.color,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Theme.of(context).colorScheme.outline),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.01),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        onChanged: (val) {
+                                          _controller.searchQuery.value = val;
+                                        },
+                                        decoration: InputDecoration(
+                                          hintText: 'Search expenses...',
+                                          hintStyle: context.typography.searchHint.copyWith(
+                                            color: Colors.grey,
+                                            fontSize: 13,
+                                          ),
+                                          prefixIcon: const Icon(
+                                            LucideIcons.search,
+                                            color: Colors.grey,
+                                            size: 18,
+                                          ),
+                                          filled: true,
+                                          fillColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                                          contentPadding: const EdgeInsets.symmetric(vertical: 10),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8),
+                                            borderSide: BorderSide(
+                                              color: AppColors.primary.withValues(alpha: 0.5),
+                                              width: 1.5,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    InkWell(
+                                      onTap: () {
+                                        // TODO: Show advanced filters
+                                      },
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: const Icon(
+                                          LucideIcons.slidersHorizontal,
+                                          size: 18,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            const Icon(LucideIcons.layoutGrid, size: 14, color: Colors.grey),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Obx(
+                                                () => DropdownButtonHideUnderline(
+                                                  child: DropdownButton<String>(
+                                                    isExpanded: true,
+                                                    isDense: true,
+                                                    value: _controller.filterCategory.value.isEmpty ? 'All' : _controller.filterCategory.value,
+                                                    icon: const Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey),
+                                                    style: context.typography.inputText.copyWith(
+                                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                                      fontSize: 13,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                    items: [
+                                                      const DropdownMenuItem(value: 'All', child: Text('All')),
+                                                      // Mock categories for UI matching
+                                                      const DropdownMenuItem(value: 'Software', child: Text('Software')),
+                                                      const DropdownMenuItem(value: 'Office', child: Text('Office')),
+                                                      const DropdownMenuItem(value: 'Travel', child: Text('Travel')),
+                                                    ],
+                                                    onChanged: (val) {
+                                                      if (val != null) {
+                                                        _controller.filterCategory.value = val == 'All' ? '' : val;
+                                                      }
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: InkWell(
+                                        onTap: () => _showMonthPicker(context, isDark),
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              const Icon(LucideIcons.calendar, size: 14, color: Colors.grey),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Obx(() {
+                                                  final val = _controller.filterMonth.value;
+                                                  final text = val.isEmpty ? 'All Months' : (
+                                                    (DateTime.tryParse('$val-01') != null) 
+                                                      ? DateFormat('MMM yyyy').format(DateTime.parse('$val-01')) 
+                                                      : val
+                                                  );
+                                                  return Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Text(
+                                                          text,
+                                                          style: context.typography.inputText.copyWith(
+                                                            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                                            fontSize: 13,
+                                                            fontWeight: FontWeight.w600,
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      const Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey),
+                                                    ],
+                                                  );
+                                                }),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(LucideIcons.calendar, size: 14, color: Colors.indigo),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Obx(() {
-                            final val = _controller.filterMonth.value;
-                            if (val.isEmpty) {
-                              return Text('All Time', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.displayLarge?.color));
-                            }
-                            try {
-                              final parsed = DateTime.parse('$val-01');
-                              return Text(DateFormat('MMM yyyy').format(parsed), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.displayLarge?.color));
-                            } catch (_) {
-                              return Text(val, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Theme.of(context).textTheme.displayLarge?.color));
-                            }
-                          }),
+                        // Header
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Expense Register', // Matching Invoice Register naming
+                              style: context.typography.cardTitle.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6), // slightly less rounded to match image
+                                  ),
+                                  child: Text(
+                                    'Total: ${listItems.length}',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                // View toggle (static for now to match UI exactly)
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).cardTheme.color,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: Theme.of(context).colorScheme.outline,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primary.withValues(alpha: 0.8),
+                                          borderRadius: BorderRadius.circular(7),
+                                        ),
+                                        child: const Icon(LucideIcons.list, size: 14, color: Colors.white),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.transparent,
+                                        ),
+                                        child: const Icon(LucideIcons.layoutGrid, size: 14, color: Colors.grey),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                        const Icon(LucideIcons.chevronDown, size: 14, color: Colors.indigo),
+                        const SizedBox(height: 12),
+
+                        if (listItems.isEmpty)
+                          Container(
+                            height: 200,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardTheme.color,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Theme.of(context).colorScheme.outline),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  LucideIcons.fileSearch,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'no_expense_logs'.tr,
+                                  style: context.typography.emptyStateDescription.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                       ],
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              // Category selector
-              Expanded(
-                child: Container(
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardTheme.color,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                  child: Obx(
-                    () => DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _controller.filterCategory.value.isEmpty ? 'All Categories' : _controller.filterCategory.value,
-                        isExpanded: true,
-                        icon: const Icon(LucideIcons.chevronDown, size: 14, color: Colors.indigo),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).textTheme.displayLarge?.color,
-                        ),
-                        dropdownColor: Theme.of(context).cardTheme.color,
-                        items: allCategories.map((String cat) {
-                          return DropdownMenuItem(
-                            value: cat,
-                            child: Text(cat, maxLines: 1, overflow: TextOverflow.ellipsis),
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          if (val != null) {
-                            if (val == 'All Categories') {
-                              _controller.filterCategory.value = '';
-                            } else {
-                              _controller.filterCategory.value = val;
-                            }
+                if (visibleList.isNotEmpty)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          if (index == visibleList.length) {
+                            return _isLoadingMore.value 
+                                ? const Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 16),
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox.shrink();
                           }
+                          
+                          final expense = visibleList[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Dismissible(
+                              key: Key(expense.id),
+                              direction: DismissDirection.endToStart,
+                              confirmDismiss: (direction) async {
+                                return await _confirmDelete(context, isDark, expense);
+                              },
+                              background: Container(
+                                alignment: Alignment.centerRight,
+                                padding: const EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade600,
+                                  borderRadius: BorderRadius.circular(16), // Match list item border radius
+                                ),
+                                child: const Icon(LucideIcons.trash2, color: Colors.white),
+                              ),
+                              child: ExpenseListItem(
+                                expense: expense,
+                                isDark: isDark,
+                                onTap: () => _showExpenseDetailsBottomSheet(context, isDark, expense),
+                                onDelete: () => _confirmDelete(context, isDark, expense),
+                                currencyFormat: formatCurrency,
+                              ),
+                            ),
+                          );
                         },
+                        childCount: visibleList.length + (_isLoadingMore.value ? 1 : 0),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Row 2: Sort, Export, Reset
-          Row(
-            children: [
-              // Sort selector
-              Expanded(
-                child: Container(
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardTheme.color,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                  child: Obx(
-                    () => DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _controller.sortBy.value,
-                        isExpanded: true,
-                        icon: const Icon(LucideIcons.chevronDown, size: 14, color: Colors.indigo),
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).textTheme.displayLarge?.color,
-                        ),
-                        dropdownColor: Theme.of(context).cardTheme.color,
-                        items: const [
-                          DropdownMenuItem(value: 'date-desc', child: Text('Newest First')),
-                          DropdownMenuItem(value: 'date-asc', child: Text('Oldest First')),
-                          DropdownMenuItem(value: 'amount-desc', child: Text('High Amount')),
-                          DropdownMenuItem(value: 'amount-asc', child: Text('Low Amount')),
-                        ],
-                        onChanged: (val) {
-                          if (val != null) _controller.sortBy.value = val;
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              // Export Button
-              InkWell(
-                onTap: _exportCSV,
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  height: 40,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade600,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.green.withValues(alpha: 0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(LucideIcons.download, size: 16, color: Colors.white),
-                      SizedBox(width: 6),
-                      Text(
-                        'Export',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Reset Button
-              InkWell(
-                onTap: () {
-                  _controller.filterMonth.value = '';
-                  _controller.filterCategory.value = '';
-                  _controller.sortBy.value = 'date-desc';
-                },
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardTheme.color,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
-                  ),
-                  child: Icon(
-                    LucideIcons.refreshCcw,
-                    size: 16,
-                    color: Theme.of(context).textTheme.displayLarge?.color,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          );
+        }),
       ),
     );
   }
@@ -551,115 +660,7 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
   }
 
   // --- EXPENSE LIST BUILDER ---
-  Widget _buildExpensesList(BuildContext context, bool isDark) {
-    final showSkeleton =
-        _controller.isLoading.value && _controller.expenses.isEmpty;
-    final list = showSkeleton
-        ? List.generate(
-            5,
-            (index) => Expense(
-              id: 'loading_$index',
-              category: 'Loading',
-              amount: 500.0,
-              description: 'Loading description...',
-              date: '2026-06-10',
-            ),
-          )
-        : _controller.processedExpenses;
 
-    if (list.isEmpty) {
-      return Container(
-        height: 180,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardTheme.color,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                LucideIcons.wallet,
-                size: 28,
-                color: isDark ? const Color(0xFF475569) : Colors.grey.shade400,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'no_expense_logs'.tr,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-                color: Theme.of(context).textTheme.bodyMedium?.color,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Use pagination limit
-    final visibleList = list.take(_displayLimit.value).toList();
-
-    return Column(
-      children: [
-        ListView.separated(
-          shrinkWrap: true,
-          padding: EdgeInsets.zero,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: visibleList.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 8),
-          itemBuilder: (context, index) {
-            final expense = visibleList[index];
-
-            return Dismissible(
-              key: Key(expense.id),
-              direction: DismissDirection.endToStart,
-              confirmDismiss: (direction) async {
-                return await _confirmDelete(context, isDark, expense);
-              },
-              background: Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 20),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade600,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(LucideIcons.trash2, color: Colors.white),
-              ),
-              child: ExpenseListItem(
-                expense: expense,
-                isDark: isDark,
-                onTap: () => _showExpenseDetailsBottomSheet(context, isDark, expense),
-                onDelete: () => _confirmDelete(context, isDark, expense),
-                currencyFormat: formatCurrency,
-              ),
-            );
-          },
-        ),
-        if (_isLoadingMore.value) ...[
-          const SizedBox(height: 16),
-          const Center(
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ],
-    );
-  }
 
   // --- DELETE CONFIRMATION DIALOG ---
   Future<bool> _confirmDelete(

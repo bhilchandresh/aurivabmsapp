@@ -9,6 +9,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:get/get.dart';
+import 'create_invoice_controller.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import '../../core/constants/app_colors.dart';
@@ -40,15 +41,11 @@ class _ItemControllers {
   }
 }
 
-class CreateInvoiceScreen extends StatefulWidget {
+class CreateInvoiceScreen extends StatelessWidget {
   final Map<String, dynamic>? invoiceToEdit;
   const CreateInvoiceScreen({super.key, this.invoiceToEdit});
 
-  @override
-  State<CreateInvoiceScreen> createState() => _CreateInvoiceScreenState();
-}
 
-class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   final ClientsController _clientsController =
       Get.isRegistered<ClientsController>()
       ? Get.find<ClientsController>()
@@ -60,31 +57,31 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       : Get.put(InventoryController());
 
   String? _selectedClientId;
-  List<Client> _filteredClients = [];
-  bool _showSuggestions = false;
+  List<Client> controller.filteredClients = [];
+  bool controller.showSuggestions.value = false;
 
-  bool _gstEnabled = false;
-  String _taxType = 'exclusive';
+  bool controller.gstEnabled.value = false;
+  String controller.taxType.value = 'exclusive';
 
   // State controllers
-  final _clientSearchController = TextEditingController();
-  final _clientNameController = TextEditingController();
-  final _clientEmailController = TextEditingController();
-  final _clientAddressController = TextEditingController();
-  final _clientPhoneController = TextEditingController();
-  final _clientGstController = TextEditingController();
-  final _invoiceNumberController = TextEditingController();
-  final _invoiceDateController = TextEditingController();
-  final _dueDateController = TextEditingController();
-  final _placeOfSupplyController = TextEditingController();
-  final _discountPercentageController = TextEditingController(text: '0');
-  final _advancePaidController = TextEditingController(text: '0');
-  final _termsController = TextEditingController(
+  final controller.clientSearchController = TextEditingController();
+  final controller.clientNameController = TextEditingController();
+  final controller.clientEmailController = TextEditingController();
+  final controller.clientAddressController = TextEditingController();
+  final controller.clientPhoneController = TextEditingController();
+  final controller.clientGstController = TextEditingController();
+  final controller.invoiceNumberController = TextEditingController();
+  final controller.invoiceDateController = TextEditingController();
+  final controller.dueDateController = TextEditingController();
+  final controller.placeOfSupplyController = TextEditingController();
+  final controller.discountPercentageController = TextEditingController(text: '0');
+  final controller.advancePaidController = TextEditingController(text: '0');
+  final controller.termsController = TextEditingController(
     text:
         '1. Goods once sold will not be taken back.\n2. Interest @18% pa will be charged if payment is not made within the due date.',
   );
-  String _selectedClientState = '';
-  double _balanceDue = 0.0;
+  String controller.selectedClientState.value = '';
+  double controller.balanceDue.value = 0.0;
 
   final Map<String, dynamic> _mockTenant = {
     'name': 'Auriva Business Solutions Pvt. Ltd.',
@@ -102,7 +99,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
     'ifscCode': 'HDFC0000123',
   };
 
-  final List<_ItemControllers> _itemsControllers = [];
+  final List<_ItemControllers> controller.itemsControllers = [];
 
   final formatCurrency = NumberFormat.currency(
     locale: 'en_IN',
@@ -111,73 +108,41 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   );
 
   // Calculated totals
-  double _subtotal = 0.0;
-  double _discountAmount = 0.0;
-  double _taxAmount = 0.0;
-  double _total = 0.0;
+  double controller.subtotal.value = 0.0;
+  double controller.discountAmount.value = 0.0;
+  double controller.taxAmount.value = 0.0;
+  double controller.total.value = 0.0;
 
-  void _onFieldChanged() {
-    _calculateTotals();
-  }
-
-  String sanitizeStateName(String name) {
-    if (name.contains(' (')) {
-      return name.split(' (')[0].trim();
-    }
-    return name.trim();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedClientState = 'select_state'.tr;
-    _inventoryController.fetchItems();
-    _clientNameController.addListener(_onFieldChanged);
-    _clientSearchController.addListener(_onClientSearchChanged);
-    _invoiceNumberController.addListener(_onFieldChanged);
-    _discountPercentageController.addListener(_calculateTotals);
-    _advancePaidController.addListener(_calculateTotals);
-
-    if (widget.invoiceToEdit != null) {
-      final inv = widget.invoiceToEdit!;
-      _invoiceNumberController.text = inv['invoiceNumber'] ?? '';
-
-      if (inv['date'] != null && inv['date'].toString().isNotEmpty) {
-        try {
-          _invoiceDateController.text = inv['date'].toString().split('T')[0];
-        } catch (_) {
-          _invoiceDateController.text = inv['date'].toString();
-        }
-      } else {
-        _invoiceDateController.text = DateFormat(
+   else {
+        controller.invoiceDateController.text = DateFormat(
           'yyyy-MM-dd',
         ).format(DateTime.now());
       }
 
       if (inv['dueDate'] != null && inv['dueDate'].toString().isNotEmpty) {
         try {
-          _dueDateController.text = inv['dueDate'].toString().split('T')[0];
+          controller.dueDateController.text = inv['dueDate'].toString().split('T')[0];
         } catch (_) {
-          _dueDateController.text = inv['dueDate'].toString();
+          controller.dueDateController.text = inv['dueDate'].toString();
         }
       } else {
-        _dueDateController.text = DateFormat(
+        controller.dueDateController.text = DateFormat(
           'yyyy-MM-dd',
         ).format(DateTime.now().add(const Duration(days: 15)));
       }
 
       final clientObj = inv['client'] ?? {};
-      _clientNameController.text = clientObj['name'] ?? '';
-      _clientEmailController.text = clientObj['email'] ?? '';
-      _clientAddressController.text = clientObj['address'] ?? '';
-      _clientPhoneController.text = clientObj['phone'] ?? '';
-      _clientGstController.text =
+      controller.clientNameController.text = clientObj['name'] ?? '';
+      controller.clientEmailController.text = clientObj['email'] ?? '';
+      controller.clientAddressController.text = clientObj['address'] ?? '';
+      controller.clientPhoneController.text = clientObj['phone'] ?? '';
+      controller.clientGstController.text =
           clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
-      _selectedClientState = sanitizeStateName(
+      controller.selectedClientState.value = sanitizeStateName(
         clientObj['state'] ?? 'select_state'.tr,
       );
-      if (!indianStates.contains(_selectedClientState)) {
-        _selectedClientState = 'select_state'.tr;
+      if (!indianStates.contains(controller.selectedClientState.value)) {
+        controller.selectedClientState.value = 'select_state'.tr;
       }
       String pos = sanitizeStateName(
         inv['placeOfSupply'] ?? clientObj['state'] ?? 'Maharashtra',
@@ -185,16 +150,16 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       if (pos == 'select_state'.tr || !indianStates.contains(pos)) {
         pos = 'Maharashtra';
       }
-      _placeOfSupplyController.text = pos;
+      controller.placeOfSupplyController.text = pos;
       _selectedClientId =
           clientObj['clientId'] ?? clientObj['_id'] ?? clientObj['id'];
 
-      _gstEnabled = inv['gstEnabled'] ?? false;
-      _taxType = inv['taxType'] ?? 'exclusive';
-      _discountPercentageController.text = (inv['discountPercentage'] ?? 0)
+      controller.gstEnabled.value = inv['gstEnabled'] ?? false;
+      controller.taxType.value = inv['taxType'] ?? 'exclusive';
+      controller.discountPercentageController.text = (inv['discountPercentage'] ?? 0)
           .toString();
-      _advancePaidController.text = (inv['advancePayment'] ?? 0.0).toString();
-      _termsController.text =
+      controller.advancePaidController.text = (inv['advancePayment'] ?? 0.0).toString();
+      controller.termsController.text =
           inv['terms'] ??
           '1. Goods once sold will not be taken back.\n2. Interest @18% pa will be charged if payment is not made within the due date.';
 
@@ -212,125 +177,40 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         controller.rateController.addListener(_onFieldChanged);
         controller.qtyController.addListener(_onFieldChanged);
         controller.gstController.addListener(_onFieldChanged);
-        _itemsControllers.add(controller);
+        controller.itemsControllers.add(controller);
       }
-      if (_itemsControllers.isEmpty) {
-        _itemsControllers.add(_ItemControllers());
-        _itemsControllers[0].nameController.addListener(_onFieldChanged);
-        _itemsControllers[0].rateController.addListener(_onFieldChanged);
-        _itemsControllers[0].qtyController.addListener(_onFieldChanged);
-        _itemsControllers[0].gstController.addListener(_onFieldChanged);
+      if (controller.itemsControllers.isEmpty) {
+        controller.itemsControllers.add(_ItemControllers());
+        controller.itemsControllers[0].nameController.addListener(_onFieldChanged);
+        controller.itemsControllers[0].rateController.addListener(_onFieldChanged);
+        controller.itemsControllers[0].qtyController.addListener(_onFieldChanged);
+        controller.itemsControllers[0].gstController.addListener(_onFieldChanged);
       }
     } else {
-      _invoiceNumberController.text = 'Auto-Generated';
-      _invoiceDateController.text = DateFormat(
+      controller.invoiceNumberController.text = 'Auto-Generated';
+      controller.invoiceDateController.text = DateFormat(
         'yyyy-MM-dd',
       ).format(DateTime.now());
-      _dueDateController.text = DateFormat(
+      controller.dueDateController.text = DateFormat(
         'yyyy-MM-dd',
       ).format(DateTime.now().add(const Duration(days: 15)));
-      _placeOfSupplyController.text = 'Maharashtra';
+      controller.placeOfSupplyController.text = 'Maharashtra';
 
-      _itemsControllers.add(_ItemControllers());
-      _itemsControllers[0].nameController.addListener(_onFieldChanged);
-      _itemsControllers[0].rateController.addListener(_onFieldChanged);
-      _itemsControllers[0].qtyController.addListener(_onFieldChanged);
-      _itemsControllers[0].gstController.addListener(_onFieldChanged);
+      controller.itemsControllers.add(_ItemControllers());
+      controller.itemsControllers[0].nameController.addListener(_onFieldChanged);
+      controller.itemsControllers[0].rateController.addListener(_onFieldChanged);
+      controller.itemsControllers[0].qtyController.addListener(_onFieldChanged);
+      controller.itemsControllers[0].gstController.addListener(_onFieldChanged);
     }
 
     _calculateTotals();
   }
 
-  void _onClientSearchChanged() {
-    final query = _clientSearchController.text.trim().toLowerCase();
-    if (query.isNotEmpty) {
-      final matches = _clientsController.clients
-          .where((c) => c.name.toLowerCase().contains(query))
-          .toList();
-      setState(() {
-        _filteredClients = matches;
-        _showSuggestions = matches.isNotEmpty;
-      });
-    } else {
-      setState(() {
-        _filteredClients = [];
-        _showSuggestions = false;
-      });
-    }
-  }
+  
 
-  @override
-  void dispose() {
-    _clientNameController.removeListener(_onFieldChanged);
-    _clientSearchController.removeListener(_onClientSearchChanged);
-    _invoiceNumberController.removeListener(_onFieldChanged);
-    _discountPercentageController.removeListener(_calculateTotals);
-    _advancePaidController.removeListener(_calculateTotals);
-    _clientSearchController.dispose();
-    _clientNameController.dispose();
-    _clientEmailController.dispose();
-    _clientAddressController.dispose();
-    _clientPhoneController.dispose();
-    _clientGstController.dispose();
-    _invoiceNumberController.dispose();
-    _invoiceDateController.dispose();
-    _dueDateController.dispose();
-    _placeOfSupplyController.dispose();
-    _discountPercentageController.dispose();
-    _advancePaidController.dispose();
-    _termsController.dispose();
-    for (var controller in _itemsControllers) {
-      controller.dispose();
-    }
-    super.dispose();
-  }
+  
 
-  void _calculateTotals() {
-    double tempSubtotal = 0.0;
-    double tempTaxAmount = 0.0;
-
-    final double discountPct =
-        double.tryParse(_discountPercentageController.text) ?? 0.0;
-
-    for (var item in _itemsControllers) {
-      final double qty = double.tryParse(item.qtyController.text) ?? 0.0;
-      final double rate = double.tryParse(item.rateController.text) ?? 0.0;
-      final double itemSubtotal = qty * rate;
-      tempSubtotal += itemSubtotal;
-
-      if (_gstEnabled) {
-        final double gstRate = double.tryParse(item.gstController.text) ?? 0.0;
-        final double itemDiscount = itemSubtotal * (discountPct / 100);
-        final double itemTaxable = itemSubtotal - itemDiscount;
-
-        double itemTax = 0.0;
-        if (_taxType == 'exclusive') {
-          itemTax = itemTaxable * (gstRate / 100);
-        } else {
-          // Inclusive
-          final double basePrice = itemTaxable / (1 + (gstRate / 100));
-          itemTax = itemTaxable - basePrice;
-        }
-        tempTaxAmount += itemTax;
-      }
-    }
-
-    _subtotal = tempSubtotal;
-    _discountAmount = _subtotal * (discountPct / 100);
-    _taxAmount = tempTaxAmount;
-
-    if (_taxType == 'exclusive') {
-      _total = (_subtotal - _discountAmount) + _taxAmount;
-    } else {
-      _total = _subtotal - _discountAmount;
-    }
-
-    final double advancePaid =
-        double.tryParse(_advancePaidController.text) ?? 0.0;
-    _balanceDue = _total - advancePaid;
-
-    setState(() {});
-  }
+  
 
   Future<void> _selectDate(
     BuildContext context,
@@ -357,14 +237,12 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       },
     );
     if (picked != null) {
-      setState(() {
-        controller.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
+      // setState handled by GetX
     }
   }
 
   Future<void> _exportPdfWithScreenshot(bool isPrint) async {
-    if (_placeOfSupplyController.text.trim().isEmpty || _placeOfSupplyController.text.trim() == 'select_state'.tr || _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+    if (controller.placeOfSupplyController.text.trim().isEmpty || controller.placeOfSupplyController.text.trim() == 'select_state'.tr || controller.placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
       Fluttertoast.showToast(
         msg: 'Please select Place of Supply',
         backgroundColor: AppColors.error,
@@ -373,7 +251,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       return;
     }
 
-    if (_clientNameController.text.trim().isEmpty) {
+    if (controller.clientNameController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_client'.tr,
         backgroundColor: AppColors.error,
@@ -382,7 +260,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       return;
     }
 
-    if (_invoiceNumberController.text.trim().isEmpty) {
+    if (controller.invoiceNumberController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_invoice_no'.tr,
         backgroundColor: AppColors.error,
@@ -391,8 +269,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       return;
     }
 
-    for (int i = 0; i < _itemsControllers.length; i++) {
-      if (_itemsControllers[i].nameController.text.trim().isEmpty) {
+    for (int i = 0; i < controller.itemsControllers.length; i++) {
+      if (controller.itemsControllers[i].nameController.text.trim().isEmpty) {
         Fluttertoast.showToast(
           msg: '${'error_req_item_name'.tr} #${i + 1}',
           backgroundColor: AppColors.error,
@@ -417,7 +295,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
       // Compile items
       final List<Map<String, dynamic>> itemsList = [];
-      for (var item in _itemsControllers) {
+      for (var item in controller.itemsControllers) {
         final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
         final double rate = double.tryParse(item.rateController.text) ?? 0.0;
         final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
@@ -431,22 +309,22 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       }
 
       final invoiceData = {
-        'id': _invoiceNumberController.text.trim(),
-        'clientName': _clientNameController.text.trim(),
-        'email': _clientEmailController.text.trim(),
-        'address': _clientAddressController.text.trim(),
-        'clientGst': _clientGstController.text.trim(),
-        'date': _invoiceDateController.text.trim(),
-        'dueDate': _dueDateController.text.trim(),
-        'placeOfSupply': _placeOfSupplyController.text.trim(),
+        'id': controller.invoiceNumberController.text.trim(),
+        'clientName': controller.clientNameController.text.trim(),
+        'email': controller.clientEmailController.text.trim(),
+        'address': controller.clientAddressController.text.trim(),
+        'clientGst': controller.clientGstController.text.trim(),
+        'date': controller.invoiceDateController.text.trim(),
+        'dueDate': controller.dueDateController.text.trim(),
+        'placeOfSupply': controller.placeOfSupplyController.text.trim(),
         'items': itemsList,
-        'discount': double.tryParse(_discountPercentageController.text) ?? 0.0,
-        'subtotal': _subtotal,
-        'discountAmount': _discountAmount,
-        'taxAmount': _taxAmount,
-        'total': _total,
-        'gstEnabled': _gstEnabled,
-        'taxType': _taxType,
+        'discount': double.tryParse(controller.discountPercentageController.text) ?? 0.0,
+        'subtotal': controller.subtotal.value,
+        'discountAmount': controller.discountAmount.value,
+        'taxAmount': controller.taxAmount.value,
+        'total': controller.total.value,
+        'gstEnabled': controller.gstEnabled.value,
+        'taxType': controller.taxType.value,
       };
 
       // Usable height parameters for clean mathematical pagination (A4 standard: 794 x 1123 @96 DPI)
@@ -1552,7 +1430,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   }
 
   void _saveAndShowBill() async {
-    if (_placeOfSupplyController.text.trim().isEmpty || _placeOfSupplyController.text.trim() == 'select_state'.tr || _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+    if (controller.placeOfSupplyController.text.trim().isEmpty || controller.placeOfSupplyController.text.trim() == 'select_state'.tr || controller.placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
       Fluttertoast.showToast(
         msg: 'Please select Place of Supply',
         backgroundColor: AppColors.error,
@@ -1561,7 +1439,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       return;
     }
 
-    if (_clientNameController.text.trim().isEmpty) {
+    if (controller.clientNameController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_client'.tr,
         backgroundColor: AppColors.error,
@@ -1570,7 +1448,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       return;
     }
 
-    if (_invoiceNumberController.text.trim().isEmpty) {
+    if (controller.invoiceNumberController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_invoice_no'.tr,
         backgroundColor: AppColors.error,
@@ -1579,8 +1457,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       return;
     }
 
-    for (int i = 0; i < _itemsControllers.length; i++) {
-      if (_itemsControllers[i].nameController.text.trim().isEmpty) {
+    for (int i = 0; i < controller.itemsControllers.length; i++) {
+      if (controller.itemsControllers[i].nameController.text.trim().isEmpty) {
         Fluttertoast.showToast(
           msg: '${'error_req_item_name'.tr} #${i + 1}',
           backgroundColor: AppColors.error,
@@ -1594,14 +1472,14 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AppLoader(
-        message: widget.invoiceToEdit != null
+        message: invoiceToEdit != null
             ? 'Updating Invoice...'
             : 'Creating Invoice...',
       ),
     );
 
     final List<Map<String, dynamic>> itemsList = [];
-    for (var item in _itemsControllers) {
+    for (var item in controller.itemsControllers) {
       final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
       final double rate = double.tryParse(item.rateController.text) ?? 0.0;
       final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
@@ -1610,44 +1488,44 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
         'additionalDetails': item.descriptionController.text.trim(),
         'quantity': qty.toInt(),
         'rate': rate,
-        'gstRate': _gstEnabled ? gstRate : 0.0,
-        'hsnCode': _gstEnabled ? item.hsnController.text.trim() : '',
+        'gstRate': controller.gstEnabled.value ? gstRate : 0.0,
+        'hsnCode': controller.gstEnabled.value ? item.hsnController.text.trim() : '',
       });
     }
 
     final Map<String, dynamic> clientData = {
-      'name': _clientNameController.text.trim(),
-      'email': _clientEmailController.text.trim(),
-      'address': _clientAddressController.text.trim(),
-      'phone': _clientPhoneController.text.trim(),
-      'gstin': _clientGstController.text.trim(),
-      'state': _selectedClientState == 'select_state'.tr
+      'name': controller.clientNameController.text.trim(),
+      'email': controller.clientEmailController.text.trim(),
+      'address': controller.clientAddressController.text.trim(),
+      'phone': controller.clientPhoneController.text.trim(),
+      'gstin': controller.clientGstController.text.trim(),
+      'state': controller.selectedClientState.value == 'select_state'.tr
           ? ''
-          : _selectedClientState,
+          : controller.selectedClientState.value,
     };
     if (_selectedClientId != null) {
       clientData['clientId'] = _selectedClientId;
     }
 
     final payload = {
-      'invoiceNumber': _invoiceNumberController.text.trim(),
-      'date': _invoiceDateController.text.trim(),
-      'dueDate': _dueDateController.text.trim(),
+      'invoiceNumber': controller.invoiceNumberController.text.trim(),
+      'date': controller.invoiceDateController.text.trim(),
+      'dueDate': controller.dueDateController.text.trim(),
       'client': clientData,
       'items': itemsList,
-      'gstEnabled': _gstEnabled,
-      'taxType': _taxType,
+      'gstEnabled': controller.gstEnabled.value,
+      'taxType': controller.taxType.value,
       'discountPercentage':
-          double.tryParse(_discountPercentageController.text) ?? 0.0,
-      'advancePayment': double.tryParse(_advancePaidController.text) ?? 0.0,
-      'placeOfSupply': _placeOfSupplyController.text.trim(),
-      'terms': _termsController.text.trim(),
+          double.tryParse(controller.discountPercentageController.text) ?? 0.0,
+      'advancePayment': double.tryParse(controller.advancePaidController.text) ?? 0.0,
+      'placeOfSupply': controller.placeOfSupplyController.text.trim(),
+      'terms': controller.termsController.text.trim(),
       'notes': 'Thank you for your business!',
     };
 
     try {
-      final isEdit = widget.invoiceToEdit != null;
-      final editId = widget.invoiceToEdit?['_id']?.toString() ?? '';
+      final isEdit = invoiceToEdit != null;
+      final editId = invoiceToEdit?['_id']?.toString() ?? '';
 
       final http.Response response;
       if (isEdit) {
@@ -1761,19 +1639,19 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
   double get _formCompleteness {
     double score = 0.0;
-    if (_clientNameController.text.trim().isNotEmpty) score += 0.25;
-    if (_invoiceNumberController.text.trim().isNotEmpty) score += 0.25;
+    if (controller.clientNameController.text.trim().isNotEmpty) score += 0.25;
+    if (controller.invoiceNumberController.text.trim().isNotEmpty) score += 0.25;
 
     final bool hasValidItem =
-        _itemsControllers.isNotEmpty &&
-        _itemsControllers.any(
+        controller.itemsControllers.isNotEmpty &&
+        controller.itemsControllers.any(
           (item) =>
               item.nameController.text.trim().isNotEmpty &&
               (double.tryParse(item.rateController.text) ?? 0) > 0,
         );
     if (hasValidItem) score += 0.25;
 
-    if (_total > 0) score += 0.25;
+    if (controller.total.value > 0) score += 0.25;
     return score;
   }
 
@@ -1874,6 +1752,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(CreateInvoiceController());
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -2038,8 +1918,8 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             label: 'search_existing_client'.tr,
             hint: 'type_to_search_clients'.tr,
             icon: LucideIcons.search,
-            controller: _clientSearchController,
-            suffixIcon: _clientSearchController.text.isNotEmpty
+            controller: controller.clientSearchController,
+            suffixIcon: controller.clientSearchController.text.isNotEmpty
                 ? IconButton(
                     icon: const Icon(
                       LucideIcons.x,
@@ -2047,13 +1927,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       color: Colors.grey,
                     ),
                     onPressed: () {
-                      _clientSearchController.clear();
+                      controller.clientSearchController.clear();
                       FocusScope.of(context).unfocus();
                     },
                   )
                 : null,
           ),
-          if (_showSuggestions && _filteredClients.isNotEmpty) ...[
+          if (controller.showSuggestions.value && controller.filteredClients.isNotEmpty) ...[
             const SizedBox(height: 6),
             Container(
               constraints: const BoxConstraints(maxHeight: 180),
@@ -2074,13 +1954,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               child: ListView.separated(
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
-                itemCount: _filteredClients.length,
+                itemCount: controller.filteredClients.length,
                 separatorBuilder: (context, index) => Divider(
                   height: 1,
                   color: Theme.of(context).colorScheme.outline,
                 ),
                 itemBuilder: (context, index) {
-                  final client = _filteredClients[index];
+                  final client = controller.filteredClients[index];
                   return ListTile(
                     dense: true,
                     title: Text(
@@ -2108,21 +1988,21 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     ),
                     onTap: () {
                       setState(() {
-                        _clientSearchController.clear();
-                        _clientNameController.text = client.name;
-                        _clientEmailController.text = client.email;
-                        _clientAddressController.text = client.address;
-                        _clientPhoneController.text = client.phone;
-                        _clientGstController.text = client.gstin;
-                        _selectedClientState = client.state.isNotEmpty
+                        controller.clientSearchController.clear();
+                        controller.clientNameController.text = client.name;
+                        controller.clientEmailController.text = client.email;
+                        controller.clientAddressController.text = client.address;
+                        controller.clientPhoneController.text = client.phone;
+                        controller.clientGstController.text = client.gstin;
+                        controller.selectedClientState.value = client.state.isNotEmpty
                             ? sanitizeStateName(client.state)
                             : 'select_state'.tr;
-                        if (!indianStates.contains(_selectedClientState)) {
-                          _selectedClientState = 'select_state'.tr;
+                        if (!indianStates.contains(controller.selectedClientState.value)) {
+                          controller.selectedClientState.value = 'select_state'.tr;
                         }
-                        _placeOfSupplyController.text = _selectedClientState;
+                        controller.placeOfSupplyController.text = controller.selectedClientState.value;
                         _selectedClientId = client.id;
-                        _showSuggestions = false;
+                        controller.showSuggestions.value = false;
                       });
                       _calculateTotals();
                       FocusScope.of(context).unfocus();
@@ -2139,7 +2019,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 child: _buildTextField(
                   label: 'client_name_star'.tr,
                   hint: 'eg_name'.tr,
-                  controller: _clientNameController,
+                  controller: controller.clientNameController,
                 ),
               ),
               const SizedBox(width: 12),
@@ -2147,7 +2027,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 child: _buildTextField(
                   label: 'email'.tr,
                   hint: 'eg_email'.tr,
-                  controller: _clientEmailController,
+                  controller: controller.clientEmailController,
                 ),
               ),
             ],
@@ -2157,13 +2037,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             label: 'address'.tr,
             hint: 'eg_address'.tr,
             maxLines: 2,
-            controller: _clientAddressController,
+            controller: controller.clientAddressController,
           ),
           const SizedBox(height: 12),
           _buildTextField(
             label: 'details'.tr,
             hint: 'eg_phone'.tr,
-            controller: _clientPhoneController,
+            controller: controller.clientPhoneController,
           ),
           const SizedBox(height: 12),
           Row(
@@ -2173,7 +2053,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 child: _buildTextField(
                   label: 'gstin'.tr,
                   hint: 'gstin'.tr,
-                  controller: _clientGstController,
+                  controller: controller.clientGstController,
                 ),
               ),
               const SizedBox(width: 12),
@@ -2181,13 +2061,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 flex: 2,
                 child: _buildDropdownField(
                   label: 'state'.tr,
-                  value: _selectedClientState,
+                  value: controller.selectedClientState.value,
                   items: indianStates,
                   onChanged: (val) {
-                    setState(() {
-                      _selectedClientState = val ?? 'select_state'.tr;
-                      _placeOfSupplyController.text = _selectedClientState;
-                    });
+                    // setState handled by GetX
                   },
                 ),
               ),
@@ -2213,9 +2090,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   label: 'invoice_date_star'.tr,
                   hint: 'date_format'.tr,
                   icon: LucideIcons.calendar,
-                  controller: _invoiceDateController,
+                  controller: controller.invoiceDateController,
                   readOnly: true,
-                  onTap: () => _selectDate(context, _invoiceDateController),
+                  onTap: () => _selectDate(context, controller.invoiceDateController),
                 ),
               ),
               const SizedBox(width: 12),
@@ -2224,9 +2101,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   label: 'due_date_star'.tr,
                   hint: 'date_format'.tr,
                   icon: LucideIcons.calendar,
-                  controller: _dueDateController,
+                  controller: controller.dueDateController,
                   readOnly: true,
-                  onTap: () => _selectDate(context, _dueDateController),
+                  onTap: () => _selectDate(context, controller.dueDateController),
                 ),
               ),
             ],
@@ -2238,15 +2115,13 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 child: _buildDropdownField(
                   label: 'place_of_supply_star'.tr,
                   value:
-                      _placeOfSupplyController.text.isEmpty ||
-                          !indianStates.contains(_placeOfSupplyController.text)
+                      controller.placeOfSupplyController.text.isEmpty ||
+                          !indianStates.contains(controller.placeOfSupplyController.text)
                       ? 'select_state'.tr
-                      : _placeOfSupplyController.text,
+                      : controller.placeOfSupplyController.text,
                   items: indianStates,
                   onChanged: (val) {
-                    setState(() {
-                      _placeOfSupplyController.text = val ?? 'select_state'.tr;
-                    });
+                    // setState handled by GetX
                     _calculateTotals();
                   },
                 ),
@@ -2293,7 +2168,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     Transform.scale(
                       scale: 0.85,
                       child: Switch(
-                        value: _gstEnabled,
+                        value: controller.gstEnabled.value,
                         activeThumbColor: Colors.white,
                         activeTrackColor: AppColors.primary,
                         inactiveThumbColor: Colors.white,
@@ -2304,34 +2179,32 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                           Colors.transparent,
                         ),
                         onChanged: (val) {
-                          setState(() {
-                            _gstEnabled = val;
-                          });
+                          // setState handled by GetX
                           _calculateTotals();
                         },
                       ),
                     ),
                   ],
                 ),
-                if (_gstEnabled) ...[
+                if (controller.gstEnabled.value) ...[
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() => _taxType = 'exclusive');
+                            setState(() => controller.taxType.value = 'exclusive');
                             _calculateTotals();
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              color: _taxType == 'exclusive'
+                              color: controller.taxType.value == 'exclusive'
                                   ? AppColors.primary
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: _taxType == 'exclusive'
+                                color: controller.taxType.value == 'exclusive'
                                     ? AppColors.primary
                                     : Colors.grey.shade200,
                               ),
@@ -2342,7 +2215,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               style: context.typography.buttonText.copyWith(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: _taxType == 'exclusive'
+                                color: controller.taxType.value == 'exclusive'
                                     ? Colors.white
                                     : Colors.grey,
                               ),
@@ -2354,18 +2227,18 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() => _taxType = 'inclusive');
+                            setState(() => controller.taxType.value = 'inclusive');
                             _calculateTotals();
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              color: _taxType == 'inclusive'
+                              color: controller.taxType.value == 'inclusive'
                                   ? AppColors.primary
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: _taxType == 'inclusive'
+                                color: controller.taxType.value == 'inclusive'
                                     ? AppColors.primary
                                     : Colors.grey.shade200,
                               ),
@@ -2376,7 +2249,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                               style: context.typography.buttonText.copyWith(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: _taxType == 'inclusive'
+                                color: controller.taxType.value == 'inclusive'
                                     ? Colors.white
                                     : Colors.grey,
                               ),
@@ -2401,7 +2274,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
       icon: LucideIcons.listOrdered,
       iconColor: Colors.teal,
       trailing: Text(
-        '${_itemsControllers.length} Items Added',
+        '${controller.itemsControllers.length} Items Added',
         style: context.typography.cardDescription.copyWith(
           fontSize: 11,
           color: Colors.grey,
@@ -2415,10 +2288,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             padding: EdgeInsets.zero,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: _itemsControllers.length,
+            itemCount: controller.itemsControllers.length,
             separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              final item = _itemsControllers[index];
+              final item = controller.itemsControllers[index];
               return AnimatedItemCard(
                 key: ValueKey(item),
                 child: Column(
@@ -2462,7 +2335,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         ),
                       ],
                     ),
-                    if (_gstEnabled) ...[
+                    if (controller.gstEnabled.value) ...[
                       const SizedBox(height: 12),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -2557,9 +2430,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                       ],
                                       onChanged: (val) {
                                         if (val != null) {
-                                          setState(() {
-                                            item.gstController.text = val;
-                                          });
+                                          // setState handled by GetX
                                           _calculateTotals();
                                         }
                                       },
@@ -2618,7 +2489,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                                           18;
                                       final double amt = q * r;
                                       double taxAmt = 0.0;
-                                      if (_taxType == 'exclusive') {
+                                      if (controller.taxType.value == 'exclusive') {
                                         taxAmt = amt * (g / 100);
                                       } else {
                                         taxAmt = amt - (amt / (1 + (g / 100)));
@@ -2647,7 +2518,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        if (_gstEnabled) ...[
+                        if (controller.gstEnabled.value) ...[
                           Expanded(
                             flex: 1,
                             child: _buildTextField(
@@ -2728,14 +2599,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
             children: [
               TextButton.icon(
                 onPressed: () {
-                  setState(() {
-                    final newControllers = _ItemControllers();
-                    newControllers.nameController.addListener(_onFieldChanged);
-                    newControllers.rateController.addListener(_onFieldChanged);
-                    newControllers.qtyController.addListener(_onFieldChanged);
-                    newControllers.gstController.addListener(_onFieldChanged);
-                    _itemsControllers.add(newControllers);
-                  });
+                  // setState handled by GetX
                   _calculateTotals();
                 },
                 label: Text(
@@ -2753,13 +2617,10 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                   ),
                 ),
               ),
-              if (_itemsControllers.isNotEmpty)
+              if (controller.itemsControllers.isNotEmpty)
                 TextButton.icon(
                   onPressed: () {
-                    setState(() {
-                      final removed = _itemsControllers.removeLast();
-                      removed.dispose();
-                    });
+                    // setState handled by GetX
                     _calculateTotals();
                   },
                   icon: const Icon(
@@ -2812,7 +2673,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
           ),
           const SizedBox(height: 6),
           TextField(
-            controller: _termsController,
+            controller: controller.termsController,
             maxLines: 4,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 12,
@@ -2901,7 +2762,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               if (selection.description.isNotEmpty) {
                 item.descriptionController.text = selection.description;
               }
-              if (_gstEnabled && selection.sku.isNotEmpty) {
+              if (controller.gstEnabled.value && selection.sku.isNotEmpty) {
                 item.hsnController.text = selection.sku;
               }
             });
@@ -3069,7 +2930,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   }
 
   Widget _buildSummarySection() {
-    final String place = _placeOfSupplyController.text.trim().toLowerCase();
+    final String place = controller.placeOfSupplyController.text.trim().toLowerCase();
     final bool isOutstate =
         place.isNotEmpty &&
         !place.contains("maharashtra") &&
@@ -3094,7 +2955,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ),
               ),
               Text(
-                formatCurrency.format(_subtotal),
+                formatCurrency.format(controller.subtotal.value),
                 style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -3125,7 +2986,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     width: 50,
                     height: 26,
                     child: TextField(
-                      controller: _discountPercentageController,
+                      controller: controller.discountPercentageController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       style: context.typography.inputText.copyWith(
@@ -3133,25 +2994,25 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                       onTap: () {
-                        if (_discountPercentageController.text == '0') {
-                          _discountPercentageController.clear();
+                        if (controller.discountPercentageController.text == '0') {
+                          controller.discountPercentageController.clear();
                         }
                       },
                       onChanged: (value) {
                         if (value.isEmpty) {
-                          _discountPercentageController.text = '0';
-                          _discountPercentageController.selection =
+                          controller.discountPercentageController.text = '0';
+                          controller.discountPercentageController.selection =
                               TextSelection.fromPosition(
                                 const TextPosition(offset: 1),
                               );
                         } else if (value.startsWith('0') && value.length > 1) {
-                          _discountPercentageController.text = value.substring(
+                          controller.discountPercentageController.text = value.substring(
                             1,
                           );
-                          _discountPercentageController
+                          controller.discountPercentageController
                               .selection = TextSelection.fromPosition(
                             TextPosition(
-                              offset: _discountPercentageController.text.length,
+                              offset: controller.discountPercentageController.text.length,
                             ),
                           );
                         }
@@ -3182,7 +3043,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ],
               ),
               Text(
-                '- ${formatCurrency.format(_discountAmount)}',
+                '- ${formatCurrency.format(controller.discountAmount.value)}',
                 style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -3222,9 +3083,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
               Text(
                 formatCurrency.format(
-                  (_taxType == 'inclusive' && _gstEnabled)
-                      ? (_subtotal - _discountAmount - _taxAmount)
-                      : (_subtotal - _discountAmount),
+                  (controller.taxType.value == 'inclusive' && controller.gstEnabled.value)
+                      ? (controller.subtotal.value - controller.discountAmount.value - controller.taxAmount.value)
+                      : (controller.subtotal.value - controller.discountAmount.value),
                 ),
                 style: context.typography.tableCell.copyWith(
                   fontSize: 12,
@@ -3236,7 +3097,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               ),
             ],
           ),
-          if (_gstEnabled && _taxAmount > 0) ...[
+          if (controller.gstEnabled.value && controller.taxAmount.value > 0) ...[
             const SizedBox(height: 16),
             if (isOutstate)
               Row(
@@ -3252,7 +3113,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     ),
                   ),
                   Text(
-                    formatCurrency.format(_taxAmount),
+                    formatCurrency.format(controller.taxAmount.value),
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -3277,7 +3138,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     ),
                   ),
                   Text(
-                    formatCurrency.format(_taxAmount / 2),
+                    formatCurrency.format(controller.taxAmount.value / 2),
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -3302,7 +3163,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     ),
                   ),
                   Text(
-                    formatCurrency.format(_taxAmount / 2),
+                    formatCurrency.format(controller.taxAmount.value / 2),
                     style: context.typography.tableCell.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -3335,7 +3196,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                     width: 60,
                     height: 26,
                     child: TextField(
-                      controller: _advancePaidController,
+                      controller: controller.advancePaidController,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
                       style: context.typography.inputText.copyWith(
@@ -3343,23 +3204,23 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                       onTap: () {
-                        if (_advancePaidController.text == '0') {
-                          _advancePaidController.clear();
+                        if (controller.advancePaidController.text == '0') {
+                          controller.advancePaidController.clear();
                         }
                       },
                       onChanged: (value) {
                         if (value.isEmpty) {
-                          _advancePaidController.text = '0';
-                          _advancePaidController.selection =
+                          controller.advancePaidController.text = '0';
+                          controller.advancePaidController.selection =
                               TextSelection.fromPosition(
                                 const TextPosition(offset: 1),
                               );
                         } else if (value.startsWith('0') && value.length > 1) {
-                          _advancePaidController.text = value.substring(1);
-                          _advancePaidController.selection =
+                          controller.advancePaidController.text = value.substring(1);
+                          controller.advancePaidController.selection =
                               TextSelection.fromPosition(
                                 TextPosition(
-                                  offset: _advancePaidController.text.length,
+                                  offset: controller.advancePaidController.text.length,
                                 ),
                               );
                         }
@@ -3390,7 +3251,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ],
               ),
               Text(
-                '- ${formatCurrency.format(double.tryParse(_advancePaidController.text) ?? 0.0)}',
+                '- ${formatCurrency.format(double.tryParse(controller.advancePaidController.text) ?? 0.0)}',
                 style: context.typography.tableCell.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -3435,7 +3296,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                       ),
                     ),
                     Text(
-                      formatCurrency.format(_balanceDue).replaceAll('₹', ''),
+                      formatCurrency.format(controller.balanceDue.value).replaceAll('₹', ''),
                       style: context.typography.invoiceAmount.copyWith(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -3448,7 +3309,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${'total_amount'.tr}: ${formatCurrency.format(_total)}',
+                  '${'total_amount'.tr}: ${formatCurrency.format(controller.total.value)}',
                   style: context.typography.cardDescription.copyWith(
                     fontSize: 11,
                     color: Colors.grey,
@@ -3764,14 +3625,12 @@ class _ScaleOnPressState extends State<ScaleOnPress>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(CreateInvoiceController());
+
     return GestureDetector(
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) => _controller.reverse(),
@@ -3811,14 +3670,12 @@ class _AnimatedItemCardState extends State<AnimatedItemCard>
     _controller.forward();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(CreateInvoiceController());
+
     return SizeTransition(
       sizeFactor: _sizeAnimation,
       child: FadeTransition(opacity: _fadeAnimation, child: widget.child),
@@ -3864,14 +3721,12 @@ class _FadeInUpState extends State<FadeInUp>
     });
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(CreateInvoiceController());
+
     return SlideTransition(
       position: _slideAnimation,
       child: FadeTransition(opacity: _fadeAnimation, child: widget.child),

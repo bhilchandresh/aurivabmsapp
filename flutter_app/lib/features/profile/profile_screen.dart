@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -344,7 +345,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 99, // Unique index for your info
                               title: 'your_information'.tr,
                               subtitle: 'your_info_sub'.tr,
-                              icon: LucideIcons.user,
+                              iconAsset: 'assets/SVG/profile.svg',
                               iconColor: Colors.blue.shade600,
                               iconBg: Colors.blue.shade50,
                               onTap: () =>
@@ -356,7 +357,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 0,
                               title: 'inventory'.tr,
                               subtitle: 'inventory_sub'.tr,
-                              icon: LucideIcons.package,
+                              iconAsset: 'assets/SVG/inventory.svg',
                               iconColor: Colors.blue.shade600,
                               iconBg: Colors.blue.shade50,
                               onTap: () =>
@@ -368,7 +369,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 1,
                               title: 'suppliers'.tr,
                               subtitle: 'suppliers_sub'.tr,
-                              icon: LucideIcons.truck,
+                              iconAsset: 'assets/SVG/supplier.svg',
                               iconColor: Colors.orange.shade600,
                               iconBg: Colors.orange.shade50,
                               onTap: () =>
@@ -380,7 +381,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 2,
                               title: 'expenses'.tr,
                               subtitle: 'expenses_sub'.tr,
-                              icon: LucideIcons.wallet,
+                              iconAsset: 'assets/SVG/expance.svg',
                               iconColor: Colors.green.shade600,
                               iconBg: Colors.green.shade50,
                               onTap: () => Get.to(() => const ExpensesScreen()),
@@ -391,7 +392,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 5, // Unique index
                               title: 'import_data'.tr,
                               subtitle: 'import_data_sub'.tr,
-                              icon: LucideIcons.database,
+                              iconAsset: 'assets/SVG/import.svg',
                               iconColor: Colors.teal.shade600,
                               iconBg: Colors.teal.shade50,
                               onTap: () => Get.to(() => const ImportDataScreen()),
@@ -402,7 +403,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 10,
                               title: 'notifications'.tr,
                               subtitle: 'notifications_sub'.tr,
-                              icon: LucideIcons.bell,
+                              iconAsset: 'assets/SVG/notification.svg',
                               iconColor: Colors.red.shade500,
                               iconBg: Colors.red.shade50,
                               onTap: () =>
@@ -414,7 +415,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 6,
                               title: 'language'.tr,
                               subtitle: 'change_language_sub'.tr,
-                              icon: LucideIcons.languages,
+                              iconAsset: 'assets/SVG/language.svg',
                               iconColor: Colors.indigo.shade600,
                               iconBg: Colors.indigo.shade50,
                               onTap: () => Get.toNamed('/language'),
@@ -427,7 +428,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 index: 7,
                                 title: isDark ? 'light_mode'.tr : 'dark_mode'.tr,
                                 subtitle: 'toggle_theme'.tr,
-                                icon: isDark ? LucideIcons.sun : LucideIcons.moon,
+                                iconAsset: isDark ? 'assets/SVG/light.svg' : 'assets/SVG/dark.svg',
                                 iconColor: isDark ? Colors.amber.shade600 : Colors.blueGrey.shade600,
                                 iconBg: isDark ? Colors.amber.shade50 : Colors.blueGrey.shade50,
                                 onTap: () {
@@ -477,7 +478,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 20,
                               title: 'contact_us'.tr,
                               subtitle: 'contact_us_sub'.tr,
-                              icon: LucideIcons.mail,
+                              iconAsset: 'assets/SVG/mail.svg',
                               iconColor: Colors.blue.shade600,
                               iconBg: Colors.blue.shade50,
                               onTap: () => Get.to(() => const ContactScreen()),
@@ -488,7 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 21,
                               title: 'privacy_policy'.tr,
                               subtitle: 'privacy_policy_sub'.tr,
-                              icon: LucideIcons.shield,
+                              iconAsset: 'assets/SVG/privacy.svg',
                               iconColor: Colors.green.shade600,
                               iconBg: Colors.green.shade50,
                               onTap: () => Get.to(() => InfoScreen(
@@ -505,7 +506,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               index: 22,
                               title: 'terms_conditions'.tr,
                               subtitle: 'terms_conditions_sub'.tr,
-                              icon: LucideIcons.fileText,
+                              iconAsset: 'assets/SVG/tearmandcondition.svg',
                               iconColor: Colors.blue.shade600,
                               iconBg: Colors.blue.shade50,
                               onTap: () => Get.to(() => InfoScreen(
@@ -559,7 +560,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 index: 3,
                                 title: 'team_access'.tr,
                                 subtitle: 'team_access_sub'.tr,
-                                icon: LucideIcons.shieldCheck,
+                                iconAsset: 'assets/SVG/teamandaccess.svg',
                                 iconColor: Colors.purple.shade600,
                                 iconBg: Colors.purple.shade50,
                                 onTap: () => Get.to(() => const TeamScreen()),
@@ -570,7 +571,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 index: 4,
                                 title: 'settings'.tr,
                                 subtitle: 'settings_sub'.tr,
-                                icon: LucideIcons.settings,
+                                iconAsset: 'assets/SVG/setting-2.svg',
                                 iconColor: Colors.blueGrey.shade600,
                                 iconBg: Colors.blueGrey.shade50,
                                 onTap: () => Get.to(() => const SettingsScreen()),
@@ -652,7 +653,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
 //   Widget _buildProfileItem({
-//     required IconData icon,
+//     required String iconAsset,
 //     required String title,
 //     required String value,
 //     required bool showBorder,
@@ -709,7 +710,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required int index,
     required String title,
     required String subtitle,
-    required IconData icon,
+    required String iconAsset,
     required Color iconColor,
     required Color iconBg,
     required VoidCallback onTap,
@@ -743,10 +744,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: isHovered ? AppColors.primary.withValues(alpha: 0.15) : iconBg,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(
-                icon,
-                color: isHovered ? AppColors.primary : iconColor,
-                size: 20,
+              child: SvgPicture.asset(
+                iconAsset,
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(
+                  isHovered ? AppColors.primary : iconColor,
+                  BlendMode.srcIn,
+                ),
               ),
             ),
             const SizedBox(width: 16),

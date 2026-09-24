@@ -4,6 +4,8 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
+import 'package:flutter_svg/flutter_svg.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../../shared/widgets/app_input_field.dart';
@@ -36,6 +38,22 @@ class _InventoryScreenState extends State<InventoryScreen> {
         showProfile: false,
         showBadge: false,
         showBackButton: true,
+        actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/SVG/moreappbar.svg',
+              width: 25,
+              height: 25,
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: () {
+              // Action for more options
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

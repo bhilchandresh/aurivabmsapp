@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:get/get.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/theme/app_extensions.dart';
 import '../../features/auth/auth_controller.dart';
 import '../../features/notifications/notification_controller.dart';
@@ -19,6 +20,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final bool? showBackButton;
   final VoidCallback? onBack;
   final bool showBorder;
+  final List<Widget>? actions;
 
   const AppTopBar({
     super.key,
@@ -31,6 +33,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     this.showBackButton,
     this.onBack,
     this.showBorder = true,
+    this.actions,
   });
 
   @override
@@ -62,7 +65,15 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                 // Dynamic Leading Icon based on pop state & showMenu override
                 if (shouldShowBack) ...[
                   IconButton(
-                    icon: Icon(LucideIcons.arrowLeft, color: titleColor),
+                    icon: SvgPicture.asset(
+                      'assets/SVG/backarrow.svg',
+                      width: 28,
+                      height: 28,
+                      colorFilter: ColorFilter.mode(
+                        titleColor ?? Colors.black,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                     onPressed: onBack ?? () => Get.back(),
                   ),
                   const SizedBox(width: 4),
@@ -101,30 +112,6 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                             color: subtitleColor,
                           ),
                         )
-                      else if (subtitle == null)
-                        Row(
-                          children: [
-                            Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                color:
-                                    context.colorSchemeExtension.statusSuccess,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              'SYSTEM LIVE',
-                              style: context.typography.topBarSubtitle.copyWith(
-                                color: subtitleColor,
-                                fontSize: 8,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ],
-                        ),
                     ],
                   ),
                 ),
@@ -186,7 +173,12 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                   Stack(
                     children: [
                       IconButton(
-                        icon: Icon(CupertinoIcons.bell, color: titleColor),
+                        icon: SvgPicture.asset(
+                          'assets/SVG/bell.svg',
+                          height: 24,
+                          width: 24,
+                          colorFilter: ColorFilter.mode(titleColor ?? Colors.black, BlendMode.srcIn),
+                        ),
                         onPressed: () {
                           Get.to(() => const NotificationScreen());
                         },
@@ -220,6 +212,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   const SizedBox(width: 8),
                 ],
+
+                if (actions != null) ...actions!,
 
                 // Profile Avatar (Only shown if showProfile is true)
                 if (showProfile) ...[

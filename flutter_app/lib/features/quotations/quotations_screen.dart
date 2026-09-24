@@ -4,6 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/api_constants.dart';
 import '../../shared/widgets/app_top_bar.dart';
@@ -174,37 +175,160 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
   void _confirmDeleteQuotation(Quotation qt) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('delete_quotation'.tr),
-        content: Text(
-          'Are you sure you want to delete quotation ${qt.id} for ${qt.clientName}?',
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: Theme.of(context).cardColor,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Icon
+                  Container(
+                    width: 52,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset('assets/SVG/delete.svg', colorFilter: ColorFilter.mode(Colors.red.shade400, BlendMode.srcIn), width: 22, height: 22),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Title
+                  Text(
+                    'Delete Quotation',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Theme.of(context).textTheme.displayLarge?.color,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  // Description
+                  Text(
+                    'Are you sure you want to delete\nquotation ${qt.id} for ${qt.clientName}?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Info Container
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: SvgPicture.asset('assets/SVG/invoice.svg', colorFilter: ColorFilter.mode(Colors.indigo.shade400, BlendMode.srcIn), width: 14, height: 14),
+                            ),
+                            const SizedBox(width: 10),
+                            Text('Quotation No.', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                            const Spacer(),
+                            Text(qt.id, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Theme.of(context).textTheme.displayLarge?.color)),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: Colors.indigo.withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: SvgPicture.asset('assets/SVG/userround.svg', colorFilter: ColorFilter.mode(Colors.indigo.shade400, BlendMode.srcIn), width: 14, height: 14),
+                            ),
+                            const SizedBox(width: 10),
+                            Text('Client', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                            const Spacer(),
+                            Text(qt.clientName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Theme.of(context).textTheme.displayLarge?.color)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            side: BorderSide(color: Colors.grey.shade300),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            final success = await _clientsController.deleteQuotation(qt.dbId);
+                            if (success) {
+                              Fluttertoast.showToast(msg: "Quotation deleted successfully!", backgroundColor: AppColors.success, textColor: Colors.white);
+                            } else {
+                              Fluttertoast.showToast(msg: "Failed to delete quotation.", backgroundColor: AppColors.error, textColor: Colors.white);
+                            }
+                          },
+                          icon: SvgPicture.asset('assets/SVG/delete.svg', colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn), width: 14, height: 14),
+                          label: const Text('Delete', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red.shade400,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // Close Button
+            Positioned(
+              right: 12,
+              top: 12,
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(LucideIcons.x, size: 16, color: Colors.grey.shade600),
+                ),
+              ),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('cancel'.tr),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final success = await _clientsController.deleteQuotation(qt.dbId);
-              if (success) {
-                Fluttertoast.showToast(
-                  msg: "Quotation deleted successfully!",
-                  backgroundColor: AppColors.success,
-                  textColor: Colors.white,
-                );
-              } else {
-                Fluttertoast.showToast(
-                  msg: "Failed to delete quotation.",
-                  backgroundColor: AppColors.error,
-                  textColor: Colors.white,
-                );
-              }
-            },
-            child: Text('delete'.tr, style: context.typography.buttonText),
-          ),
-        ],
       ),
     );
   }
@@ -292,9 +416,25 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'quotations'.tr,
-        subtitle: 'estimates_proposals'.tr,
         showProfile: false,
         showBadge: false,
+        actions: [
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/SVG/refresh.svg',
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+                BlendMode.srcIn,
+              ),
+            ),
+            onPressed: () {
+              _clientsController.fetchClients();
+              _clientsController.fetchQuotations();
+            },
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -403,10 +543,11 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          const Icon(
-                                            LucideIcons.plus,
-                                            size: 16,
-                                            color: Colors.white,
+                                          SvgPicture.asset(
+                                            'assets/SVG/plus.svg',
+                                            width: 16,
+                                            height: 16,
+                                            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                                           ),
                                           const SizedBox(width: 8),
                                           Text(
@@ -457,10 +598,13 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                         hintText: 'search_quotations'.tr,
                                         hintStyle:
                                             context.typography.searchHint,
-                                        prefixIcon: const Icon(
-                                          LucideIcons.search,
-                                          color: Colors.grey,
-                                          size: 18,
+                                        prefixIcon: UnconstrainedBox(
+                                          child: SvgPicture.asset(
+                                            'assets/SVG/search.svg',
+                                            width: 18,
+                                            height: 18,
+                                            colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                          ),
                                         ),
                                         filled: true,
                                         fillColor: Theme.of(context)
@@ -496,64 +640,17 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 12),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .scaffoldBackgroundColor
-                                            .withValues(alpha: 0.95),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton<String>(
-                                          isExpanded: true,
-                                          value: _selectedStatus,
-                                          icon: const Icon(
-                                            LucideIcons.chevronDown,
-                                            size: 14,
-                                            color: Colors.grey,
-                                          ),
-                                          style: context.typography.inputText
-                                              .copyWith(
-                                                color:
-                                                    (Theme.of(context)
-                                                        .textTheme
-                                                        .displayLarge
-                                                        ?.color ??
-                                                    Colors.black),
-                                              ),
-                                          items: [
-                                            DropdownMenuItem(
-                                              value: 'all',
-                                              child: Text('all'.tr),
-                                            ),
-                                            DropdownMenuItem(
-                                              value: 'Accepted',
-                                              child: Text('accepted'.tr),
-                                            ),
-                                            DropdownMenuItem(
-                                              value: 'Pending',
-                                              child: Text('pending'.tr),
-                                            ),
-                                            DropdownMenuItem(
-                                              value: 'Rejected',
-                                              child: Text('rejected'.tr),
-                                            ),
-                                          ],
-                                          onChanged: (val) {
-                                            if (val != null) {
-                                              setState(() {
-                                                _selectedStatus = val;
-                                              });
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    ),
+                                  CustomStatusDropdown(
+                                    selectedValue: _selectedStatus,
+                                    allCount: _quotations.length,
+                                    acceptedCount: _quotations.where((q) => q.status == 'Accepted').length,
+                                    pendingCount: _quotations.where((q) => q.status == 'Pending').length,
+                                    rejectedCount: _quotations.where((q) => q.status == 'Rejected').length,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        _selectedStatus = val;
+                                      });
+                                    },
                                   ),
                                 ],
                               ),
@@ -576,14 +673,28 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Estimates & Quotes',
-                                style: context.typography.categoryHeader,
+                               Text(
+                              'Quotation Register',
+                              style: context.typography.cardTitle.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                               ),
-                              const Icon(
-                                LucideIcons.slidersHorizontal,
-                                size: 16,
-                                color: Colors.grey,
+                            ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'Total: ${listItems.length}',
+                                  style: const TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -727,650 +838,185 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
                                         color: isHovered
-                                            ? AppColors.primary.withValues(
-                                                alpha: 0.5,
-                                              )
-                                            : Theme.of(context)
-                                                  .colorScheme
-                                                  .outline
-                                                  .withValues(alpha: 0.3),
+                                            ? AppColors.primary.withValues(alpha: 0.5)
+                                            : Theme.of(context).colorScheme.outline,
                                         width: 1,
                                       ),
                                       boxShadow: [
                                         BoxShadow(
                                           color: isHovered
-                                              ? AppColors.primary.withValues(
-                                                  alpha: 0.04,
-                                                )
-                                              : Colors.black.withValues(
-                                                  alpha: 0.01,
-                                                ),
+                                              ? AppColors.primary.withValues(alpha: 0.04)
+                                              : Colors.black.withValues(alpha: 0.01),
                                           blurRadius: isHovered ? 12 : 6,
                                           offset: const Offset(0, 4),
                                         ),
                                       ],
                                     ),
-                                    child: Row(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(10),
-                                          decoration: BoxDecoration(
-                                            color: statusColor.withValues(
-                                              alpha: 0.08,
+                                        Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Column(
+                                              children: [
+                                                Container(
+                                                  height: 40,
+                                                  width: 40,
+                                                  decoration: BoxDecoration(
+                                                    color: statusColor.withValues(alpha: 0.08),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                  ),
+                                                  child: Center(
+                                                    child: SvgPicture.asset(
+                                                      qt.status == 'Accepted'
+                                                          ? 'assets/SVG/accepted.svg'
+                                                          : (qt.status == 'Pending'
+                                                                ? 'assets/SVG/pending.svg'
+                                                                : 'assets/SVG/regected.svg'),
+                                                      width: 18,
+                                                      height: 18,
+                                                      colorFilter: ColorFilter.mode(statusColor, BlendMode.srcIn),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            borderRadius: BorderRadius.circular(
-                                              12,
-                                            ),
-                                          ),
-                                          child: Icon(
-                                            qt.status == 'Accepted'
-                                                ? LucideIcons.check
-                                                : (qt.status == 'Pending'
-                                                      ? LucideIcons.clock
-                                                      : LucideIcons.xCircle),
-                                            size: 18,
-                                            color: statusColor,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 14),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                            const SizedBox(width: 14),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Expanded(
-                                                    child: Row(
-                                                      children: [
-                                                        Flexible(
-                                                          child: Text(
-                                                            qt.id,
-                                                            style: context
-                                                                .typography
-                                                                .invoiceNumber
-                                                                .copyWith(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 13,
-                                                                  color: context
-                                                                      .colorScheme
-                                                                      .primary,
-                                                                ),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 8,
-                                                        ),
-                                                        PopupMenuButton<String>(
-                                                          padding:
-                                                              EdgeInsets.zero,
-                                                          onSelected:
-                                                              (newStatus) {
-                                                                _changeStatus(
-                                                                  qt,
-                                                                  newStatus,
-                                                                );
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Expanded(
+                                                        child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Text(
+                                                              qt.id,
+                                                              style: context.typography.invoiceNumber.copyWith(
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: 13,
+                                                                color: AppColors.primary,
+                                                              ),
+                                                              maxLines: 1,
+                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
+                                                            const SizedBox(width: 8),
+                                                            PopupMenuButton<String>(
+                                                              padding: EdgeInsets.zero,
+                                                              onSelected: (newStatus) {
+                                                                _changeStatus(qt, newStatus);
                                                               },
-                                                          itemBuilder: (context) => [
-                                                            PopupMenuItem(
-                                                              value: 'Accepted',
-                                                              child: Row(
-                                                                children: [
-                                                                  const Icon(
-                                                                    LucideIcons
-                                                                        .checkCircle,
-                                                                    size: 16,
-                                                                    color: AppColors
-                                                                        .success,
+                                                              itemBuilder: (context) => [
+                                                                PopupMenuItem(
+                                                                  value: 'Accepted',
+                                                                  child: Row(
+                                                                    children: [
+                                                                      SvgPicture.asset('assets/SVG/accepted.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(AppColors.success, BlendMode.srcIn)),
+                                                                      const SizedBox(width: 8),
+                                                                      Text('accepted'.tr),
+                                                                    ],
                                                                   ),
-                                                                  const SizedBox(
-                                                                    width: 8,
+                                                                ),
+                                                                PopupMenuItem(
+                                                                  value: 'Pending',
+                                                                  child: Row(
+                                                                    children: [
+                                                                      SvgPicture.asset('assets/SVG/pending.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(AppColors.warning, BlendMode.srcIn)),
+                                                                      const SizedBox(width: 8),
+                                                                      Text('pending'.tr),
+                                                                    ],
                                                                   ),
-                                                                  Text(
-                                                                    'accepted'
-                                                                        .tr,
+                                                                ),
+                                                                PopupMenuItem(
+                                                                  value: 'Rejected',
+                                                                  child: Row(
+                                                                    children: [
+                                                                      SvgPicture.asset('assets/SVG/regected.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(AppColors.error, BlendMode.srcIn)),
+                                                                      const SizedBox(width: 8),
+                                                                      Text('rejected'.tr),
+                                                                    ],
                                                                   ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            PopupMenuItem(
-                                                              value: 'Pending',
-                                                              child: Row(
-                                                                children: [
-                                                                  const Icon(
-                                                                    LucideIcons
-                                                                        .clock,
-                                                                    size: 16,
-                                                                    color: AppColors
-                                                                        .warning,
+                                                                ),
+                                                              ],
+                                                              child: Container(
+                                                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                                decoration: BoxDecoration(
+                                                                  color: statusColor.withValues(alpha: 0.08),
+                                                                  borderRadius: BorderRadius.circular(6),
+                                                                  border: Border.all(
+                                                                    color: statusColor.withValues(alpha: 0.15),
+                                                                    width: 1,
                                                                   ),
-                                                                  const SizedBox(
-                                                                    width: 8,
-                                                                  ),
-                                                                  Text(
-                                                                    'pending'
-                                                                        .tr,
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                            ),
-                                                            PopupMenuItem(
-                                                              value: 'Rejected',
-                                                              child: Row(
-                                                                children: [
-                                                                  const Icon(
-                                                                    LucideIcons
-                                                                        .xCircle,
-                                                                    size: 16,
-                                                                    color: AppColors
-                                                                        .error,
-                                                                  ),
-                                                                  const SizedBox(
-                                                                    width: 8,
-                                                                  ),
-                                                                  Text(
-                                                                    'rejected'
-                                                                        .tr,
-                                                                  ),
-                                                                ],
+                                                                ),
+                                                                child: Row(
+                                                                  mainAxisSize: MainAxisSize.min,
+                                                                  children: [
+                                                                     const SizedBox(width: 3),
+                                                                    Text(
+                                                                      qt.status.toUpperCase(),
+                                                                      style: context.typography.invoiceStatus.copyWith(
+                                                                        fontSize: 7,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        color: statusColor,
+                                                                        letterSpacing: 0.5,
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(width: 3),
+                                                                    Icon(LucideIcons.chevronDown, size: 8, color: statusColor),
+                                                                  ],
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
-                                                          child: Container(
-                                                            padding:
-                                                                const EdgeInsets.symmetric(
-                                                                  horizontal: 8,
-                                                                  vertical: 3,
-                                                                ),
-                                                            decoration: BoxDecoration(
-                                                              color: statusColor
-                                                                  .withValues(
-                                                                    alpha: 0.08,
-                                                                  ),
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                    20,
-                                                                  ),
-                                                              border: Border.all(
-                                                                color: statusColor
-                                                                    .withValues(
-                                                                      alpha:
-                                                                          0.15,
-                                                                    ),
-                                                                width: 1,
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              mainAxisSize:
-                                                                  MainAxisSize
-                                                                      .min,
-                                                              children: [
-                                                                Text(
-                                                                  qt.status
-                                                                      .toUpperCase(),
-                                                                  style: context
-                                                                      .typography
-                                                                      .invoiceStatus
-                                                                      .copyWith(
-                                                                        fontSize:
-                                                                            8,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        color:
-                                                                            statusColor,
-                                                                      ),
-                                                                ),
-                                                                const SizedBox(
-                                                                  width: 3,
-                                                                ),
-                                                                Icon(
-                                                                  LucideIcons
-                                                                      .chevronDown,
-                                                                  size: 10,
-                                                                  color:
-                                                                      statusColor,
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                          right: 6,
-                                                          left: 4,
-                                                        ),
-                                                    child: Text(
-                                                      formatCurrency.format(
-                                                        qt.amount,
                                                       ),
-                                                      style: context
-                                                          .typography
-                                                          .invoiceAmount
-                                                          .copyWith(
-                                                            fontWeight:
-                                                                FontWeight.w900,
-                                                            fontSize: 15,
-                                                            color:
-                                                                (Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .textTheme
-                                                                    .displayLarge
-                                                                    ?.color ??
-                                                                Colors.black),
-                                                            letterSpacing: -0.5,
-                                                          ),
-                                                    ),
+                                                      const SizedBox(width: 8),
+                                                      Text(
+                                                        formatCurrency.format(qt.amount),
+                                                        style: context.typography.invoiceAmount.copyWith(
+                                                          fontWeight: FontWeight.w900,
+                                                          fontSize: 15,
+                                                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                                          letterSpacing: -0.5,
+                                                        ),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 6),
-                                              Text(
-                                                qt.clientName,
-                                                style: context
-                                                    .typography
-                                                    .clientName
-                                                    .copyWith(
-                                                      color:
-                                                          (Theme.of(context)
-                                                              .textTheme
-                                                              .displayLarge
-                                                              ?.color ??
-                                                          Colors.black),
-                                                    ),
-                                              ),
-                                              const SizedBox(height: 6),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Expanded(
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: [
-                                                        Icon(
-                                                          LucideIcons.calendar,
-                                                          size: 13,
-                                                          color: Colors
-                                                              .grey
-                                                              .shade400,
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 6,
-                                                        ),
-                                                        Flexible(
-                                                          child: Text(
-                                                            formattedDate,
-                                                            style: context
-                                                                .typography
-                                                                .cardSubtitle
-                                                                .copyWith(
-                                                                  color: Colors
-                                                                      .grey
-                                                                      .shade500,
-                                                                ),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                                  const SizedBox(height: 2),
                                                   Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                     children: [
-                                                      Tooltip(
-                                                        message: 'Copy Link',
-                                                        child: InkWell(
-                                                          onTap: () =>
-                                                              _sharePublicLink(
-                                                                qt,
-                                                              ),
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                6,
-                                                              ),
-                                                          hoverColor: AppColors
-                                                              .primary
-                                                              .withValues(
-                                                                alpha: 0.08,
-                                                              ),
-                                                          child: const Padding(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                  4.0,
-                                                                ),
-                                                            child: Icon(
-                                                              LucideIcons
-                                                                  .share2,
-                                                              size: 16,
-                                                              color: AppColors
-                                                                  .textSecondary,
-                                                            ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          qt.clientName.isNotEmpty ? '${qt.clientName[0].toUpperCase()}${qt.clientName.substring(1)}' : qt.clientName,
+                                                          style: TextStyle(
+                                                            fontWeight: FontWeight.w600,
+                                                            fontSize: 13,
+                                                            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                                                           ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow.ellipsis,
                                                         ),
                                                       ),
-                                                      const SizedBox(width: 2),
-                                                      Tooltip(
-                                                        message: 'View Details',
-                                                        child: InkWell(
-                                                          onTap: () {
-                                                            Navigator.push(
-                                                              context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) => QuotationDetailsScreen(
-                                                                  quotationId:
-                                                                      qt.id,
-                                                                  dbId: qt.dbId,
-                                                                  clientName: qt
-                                                                      .clientName,
-                                                                  amount:
-                                                                      qt.amount,
-                                                                  date: qt.date,
-                                                                  status:
-                                                                      qt.status,
-                                                                  items:
-                                                                      List<
-                                                                        Map<
-                                                                          String,
-                                                                          dynamic
-                                                                        >
-                                                                      >.from(
-                                                                        qt.items.map(
-                                                                          (x) =>
-                                                                              Map<
-                                                                                String,
-                                                                                dynamic
-                                                                              >.from(
-                                                                                x,
-                                                                              ),
-                                                                        ),
-                                                                      ),
-                                                                  placeOfSupply:
-                                                                      qt.placeOfSupply,
-                                                                  discountPercentage:
-                                                                      qt.discountPercentage,
-                                                                  gstEnabled: qt
-                                                                      .gstEnabled,
-                                                                  taxType: qt
-                                                                      .taxType,
-                                                                  clientEmail: qt
-                                                                      .clientEmail,
-                                                                  clientPhone: qt
-                                                                      .clientPhone,
-                                                                  clientAddress:
-                                                                      qt.clientAddress,
-                                                                  advancePayment:
-                                                                      qt.advancePayment,
-                                                                  validUntil: qt
-                                                                      .validUntil,
-                                                                  templateId: qt
-                                                                      .templateId,
-                                                                ),
-                                                              ),
-                                                            );
-                                                          },
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                6,
-                                                              ),
-                                                          hoverColor: AppColors
-                                                              .primary
-                                                              .withValues(
-                                                                alpha: 0.08,
-                                                              ),
-                                                          child: const Padding(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                  4.0,
-                                                                ),
-                                                            child: Icon(
-                                                              LucideIcons.eye,
-                                                              size: 16,
-                                                              color: AppColors
-                                                                  .textSecondary,
-                                                            ),
-                                                          ),
+                                                      Container(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                                        decoration: BoxDecoration(
+                                                          color: AppColors.primary.withValues(alpha: 0.1),
+                                                          borderRadius: BorderRadius.circular(4),
                                                         ),
-                                                      ),
-                                                      const SizedBox(width: 2),
-                                                      if (qt.convertedInvoiceId !=
-                                                              null &&
-                                                          qt
-                                                              .convertedInvoiceId!
-                                                              .isNotEmpty)
-                                                        Container(
-                                                          padding:
-                                                              const EdgeInsets.symmetric(
-                                                                horizontal: 8,
-                                                                vertical: 4,
-                                                              ),
-                                                          decoration: BoxDecoration(
-                                                            color:
-                                                                Theme.of(
-                                                                      context,
-                                                                    )
-                                                                    .colorScheme
-                                                                    .outline
-                                                                    .withValues(
-                                                                      alpha:
-                                                                          0.1,
-                                                                    ),
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  6,
-                                                                ),
-                                                            border: Border.all(
-                                                              color:
-                                                                  Theme.of(
-                                                                        context,
-                                                                      )
-                                                                      .colorScheme
-                                                                      .outline
-                                                                      .withValues(
-                                                                        alpha:
-                                                                            0.3,
-                                                                      ),
-                                                            ),
-                                                          ),
-                                                          child: Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              Icon(
-                                                                LucideIcons
-                                                                    .checkCircle,
-                                                                size: 12,
-                                                                color:
-                                                                    (Theme.of(
-                                                                          context,
-                                                                        )
-                                                                        .textTheme
-                                                                        .bodyMedium
-                                                                        ?.color
-                                                                        ?.withValues(
-                                                                          alpha:
-                                                                              0.7,
-                                                                        ) ??
-                                                                    Colors
-                                                                        .grey),
-                                                              ),
-                                                              const SizedBox(
-                                                                width: 4,
-                                                              ),
-                                                              Text(
-                                                                'Converted',
-                                                                style: context
-                                                                    .typography
-                                                                    .liveIndicator
-                                                                    .copyWith(
-                                                                      color:
-                                                                          (Theme.of(
-                                                                            context,
-                                                                          ).textTheme.bodyMedium?.color?.withValues(
-                                                                            alpha:
-                                                                                0.7,
-                                                                          ) ??
-                                                                          Colors
-                                                                              .grey),
-                                                                    ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        )
-                                                      else
-                                                        Tooltip(
-                                                          message:
-                                                              'Convert to Invoice',
-                                                          child: InkWell(
-                                                            onTap: () =>
-                                                                _convertToInvoice(
-                                                                  qt,
-                                                                ),
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  6,
-                                                                ),
-                                                            hoverColor: Colors
-                                                                .purple
-                                                                .withValues(
-                                                                  alpha: 0.08,
-                                                                ),
-                                                            child: const Padding(
-                                                              padding:
-                                                                  EdgeInsets.all(
-                                                                    4.0,
-                                                                  ),
-                                                              child: Icon(
-                                                                LucideIcons
-                                                                    .arrowRightCircle,
-                                                                size: 16,
-                                                                color: Colors
-                                                                    .purple,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      const SizedBox(width: 2),
-                                                      if (qt.convertedInvoiceId ==
-                                                              null ||
-                                                          qt
-                                                              .convertedInvoiceId!
-                                                              .isEmpty) ...[
-                                                        Tooltip(
-                                                          message:
-                                                              'edit_quotation'
-                                                                  .tr,
-                                                          child: InkWell(
-                                                            onTap: () {
-                                                              final rawQuotation = _clientsController
-                                                                  .allQuotations
-                                                                  .firstWhere(
-                                                                    (json) =>
-                                                                        (json['_id'] ??
-                                                                            json['id']) ==
-                                                                        qt.dbId,
-                                                                    orElse: () =>
-                                                                        null,
-                                                                  );
-                                                              if (rawQuotation !=
-                                                                  null) {
-                                                                Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                    builder:
-                                                                        (
-                                                                          context,
-                                                                        ) => CreateQuotationScreen(
-                                                                          quotationToEdit:
-                                                                              rawQuotation,
-                                                                        ),
-                                                                  ),
-                                                                ).then(
-                                                                  (
-                                                                    _,
-                                                                  ) => _clientsController
-                                                                      .fetchClients(),
-                                                                );
-                                                              }
-                                                            },
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  6,
-                                                                ),
-                                                            hoverColor:
-                                                                AppColors
-                                                                    .primary
-                                                                    .withValues(
-                                                                      alpha:
-                                                                          0.08,
-                                                                    ),
-                                                            child: const Padding(
-                                                              padding:
-                                                                  EdgeInsets.all(
-                                                                    4.0,
-                                                                  ),
-                                                              child: Icon(
-                                                                LucideIcons
-                                                                    .edit,
-                                                                size: 16,
-                                                                color: AppColors
-                                                                    .textSecondary,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 2,
-                                                        ),
-                                                      ],
-                                                      Tooltip(
-                                                        message: 'Delete',
-                                                        child: InkWell(
-                                                          onTap: () =>
-                                                              _confirmDeleteQuotation(
-                                                                qt,
-                                                              ),
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                6,
-                                                              ),
-                                                          hoverColor: AppColors
-                                                              .error
-                                                              .withValues(
-                                                                alpha: 0.08,
-                                                              ),
-                                                          child: const Padding(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                  6.0,
-                                                                ),
-                                                            child: Icon(
-                                                              LucideIcons
-                                                                  .trash2,
-                                                              size: 16,
-                                                              color: AppColors
-                                                                  .textSecondary,
-                                                            ),
+                                                        child: const Text(
+                                                          'Admin',
+                                                          style: TextStyle(
+                                                            fontSize: 8,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: AppColors.primary,
                                                           ),
                                                         ),
                                                       ),
@@ -1378,12 +1024,195 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                   ),
                                                 ],
                                               ),
-                                            ],
-                                          ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  SvgPicture.asset('assets/SVG/calendernormal.svg', width: 12, height: 12, colorFilter: ColorFilter.mode(Colors.grey.shade400, BlendMode.srcIn)),
+                                                  const SizedBox(width: 6),
+                                                  Expanded(
+                                                    child: Text(
+                                                      formattedDate,
+                                                      style: context.typography.dueDate.copyWith(
+                                                        fontSize: 11,
+                                                        color: Colors.grey.shade500,
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Tooltip(
+                                                  message: 'Share',
+                                                  child: InkWell(
+                                                    onTap: () => _sharePublicLink(qt),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    child: Container(
+                                                      padding: const EdgeInsets.all(6),
+                                                      decoration: BoxDecoration(
+                                                        color: Theme.of(context).scaffoldBackgroundColor,
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                                                      ),
+                                                      child: SvgPicture.asset('assets/SVG/share.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade700, BlendMode.srcIn)),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                Tooltip(
+                                                  message: 'View Details',
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) => QuotationDetailsScreen(
+                                                            quotationId: qt.id,
+                                                            dbId: qt.dbId,
+                                                            clientName: qt.clientName,
+                                                            amount: qt.amount,
+                                                            date: qt.date,
+                                                            status: qt.status,
+                                                            items: List<Map<String, dynamic>>.from(qt.items.map((x) => Map<String, dynamic>.from(x))),
+                                                            placeOfSupply: qt.placeOfSupply,
+                                                            discountPercentage: qt.discountPercentage,
+                                                            gstEnabled: qt.gstEnabled,
+                                                            taxType: qt.taxType,
+                                                            clientEmail: qt.clientEmail,
+                                                            clientPhone: qt.clientPhone,
+                                                            clientAddress: qt.clientAddress,
+                                                            advancePayment: qt.advancePayment,
+                                                            validUntil: qt.validUntil,
+                                                            templateId: qt.templateId,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    child: Container(
+                                                      padding: const EdgeInsets.all(6),
+                                                      decoration: BoxDecoration(
+                                                        color: Theme.of(context).scaffoldBackgroundColor,
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                                                      ),
+                                                      child: SvgPicture.asset('assets/SVG/eyeview.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade700, BlendMode.srcIn)),
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 6),
+                                                if (qt.convertedInvoiceId != null && qt.convertedInvoiceId!.isNotEmpty)
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                                                    decoration: BoxDecoration(
+                                                      color: Theme.of(context).scaffoldBackgroundColor,
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: [
+                                                        SvgPicture.asset('assets/SVG/checkmark.svg', width: 14, height: 14, colorFilter: ColorFilter.mode((Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Colors.grey), BlendMode.srcIn)),
+                                                        const SizedBox(width: 4),
+                                                        Text(
+                                                          'Converted',
+                                                          style: context.typography.liveIndicator.copyWith(
+                                                            color: (Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7) ?? Colors.grey),
+                                                            fontSize: 10,
+                                                            fontWeight: FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  )
+                                                else ...[
+                                                  Tooltip(
+                                                    message: 'Convert to Invoice',
+                                                    child: InkWell(
+                                                      onTap: () => _convertToInvoice(qt),
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      child: Container(
+                                                        padding: const EdgeInsets.all(6),
+                                                        decoration: BoxDecoration(
+                                                          color: Theme.of(context).scaffoldBackgroundColor,
+                                                          borderRadius: BorderRadius.circular(8),
+                                                          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                                                        ),
+                                                        child: SvgPicture.asset('assets/SVG/convert.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.purple.shade600, BlendMode.srcIn)),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 6),
+                                                  Tooltip(
+                                                    message: 'edit_quotation'.tr,
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        final rawQuotation = _clientsController.allQuotations.firstWhere(
+                                                          (json) => (json['_id'] ?? json['id']) == qt.dbId,
+                                                          orElse: () => null,
+                                                        );
+                                                        if (rawQuotation != null) {
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => CreateQuotationScreen(
+                                                                quotationToEdit: rawQuotation,
+                                                              ),
+                                                            ),
+                                                          ).then((_) => _clientsController.fetchClients());
+                                                        }
+                                                      },
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      child: Container(
+                                                        padding: const EdgeInsets.all(6),
+                                                        decoration: BoxDecoration(
+                                                          color: Theme.of(context).scaffoldBackgroundColor,
+                                                          borderRadius: BorderRadius.circular(8),
+                                                          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                                                        ),
+                                                        child: SvgPicture.asset('assets/SVG/edit.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.blue.shade600, BlendMode.srcIn)),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                                const SizedBox(width: 6),
+                                                Tooltip(
+                                                  message: 'delete'.tr,
+                                                  child: InkWell(
+                                                    onTap: () => _confirmDeleteQuotation(qt),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    child: Container(
+                                                      padding: const EdgeInsets.all(6),
+                                                      decoration: BoxDecoration(
+                                                        color: Theme.of(context).scaffoldBackgroundColor,
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+                                                      ),
+                                                      child: SvgPicture.asset('assets/SVG/delete.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.red.shade600, BlendMode.srcIn)),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ],
-                                    ),
-                                  ),
+                                    ),                                  ),
                                 ),
                               ),
                             ),
@@ -1497,6 +1326,285 @@ class _FadeInUpState extends State<FadeInUp>
     return SlideTransition(
       position: _slideAnimation,
       child: FadeTransition(opacity: _fadeAnimation, child: widget.child),
+    );
+  }
+}
+
+class DropdownArrowPainter extends CustomPainter {
+  final Color color;
+  DropdownArrowPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+    final path = Path()
+      ..moveTo(0, size.height)
+      ..lineTo(size.width / 2, 0)
+      ..lineTo(size.width, size.height)
+      ..close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class CustomStatusDropdown extends StatefulWidget {
+  final String selectedValue;
+  final int allCount;
+  final int acceptedCount;
+  final int pendingCount;
+  final int rejectedCount;
+  final ValueChanged<String> onChanged;
+
+  const CustomStatusDropdown({
+    super.key,
+    required this.selectedValue,
+    required this.allCount,
+    required this.acceptedCount,
+    required this.pendingCount,
+    required this.rejectedCount,
+    required this.onChanged,
+  });
+
+  @override
+  State<CustomStatusDropdown> createState() => _CustomStatusDropdownState();
+}
+
+class _CustomStatusDropdownState extends State<CustomStatusDropdown> {
+  final LayerLink _layerLink = LayerLink();
+  OverlayEntry? _overlayEntry;
+  bool _isOpen = false;
+
+  void _toggleDropdown() {
+    if (_isOpen) {
+      _closeDropdown();
+    } else {
+      _openDropdown();
+    }
+  }
+
+  void _openDropdown() {
+    final renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _closeDropdown,
+              behavior: HitTestBehavior.opaque,
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+          CompositedTransformFollower(
+            link: _layerLink,
+            showWhenUnlinked: false,
+            offset: Offset(size.width - 250, size.height + 4),
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 250,
+                child: Material(
+                  color: Colors.transparent,
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOutBack,
+                    builder: (context, value, child) {
+                      return Transform.scale(
+                        scale: 0.9 + (0.1 * value),
+                        alignment: Alignment.topRight,
+                        child: Opacity(
+                          opacity: value.clamp(0.0, 1.0),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 24),
+                          child: CustomPaint(
+                            size: const Size(14, 7),
+                            painter: DropdownArrowPainter(color: Theme.of(context).cardColor),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 24,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(height: 8),
+                              _buildOption('all', 'All', widget.allCount, 'assets/SVG/allcube.svg', Colors.blue),
+                              _buildOption('Accepted', 'Accepted', widget.acceptedCount, 'assets/SVG/accepted.svg', AppColors.success),
+                              _buildOption('Pending', 'Pending', widget.pendingCount, 'assets/SVG/pending.svg', AppColors.warning),
+                              _buildOption('Rejected', 'Rejected', widget.rejectedCount, 'assets/SVG/regected.svg', AppColors.error),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    Overlay.of(context).insert(_overlayEntry!);
+    setState(() => _isOpen = true);
+  }
+
+  void _closeDropdown() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+    if (mounted) setState(() => _isOpen = false);
+  }
+
+  Widget _buildOption(String value, String title, int count, String svgPath, Color color) {
+    final isSelected = widget.selectedValue == value;
+    return InkWell(
+      onTap: () {
+        widget.onChanged(value);
+        _closeDropdown();
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue.withValues(alpha: 0.05) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SvgPicture.asset(svgPath, width: 20, height: 20, colorFilter: ColorFilter.mode(color, BlendMode.srcIn)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                      color: Theme.of(context).textTheme.displayLarge?.color,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    '$count Quotations',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Container(
+                width: 24,
+                height: 24,
+                decoration: const BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: Icon(Icons.check, size: 16, color: Colors.white),
+                ),
+              )
+            else
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.grey.shade300, width: 2),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String currentTitle = 'All';
+    String currentSvg = 'assets/SVG/allcube.svg';
+    Color currentColor = Colors.blue;
+
+    if (widget.selectedValue == 'Accepted') {
+      currentTitle = 'Accepted';
+      currentSvg = 'assets/SVG/accepted.svg';
+      currentColor = AppColors.success;
+    } else if (widget.selectedValue == 'Pending') {
+      currentTitle = 'Pending';
+      currentSvg = 'assets/SVG/pending.svg';
+      currentColor = AppColors.warning;
+    } else if (widget.selectedValue == 'Rejected') {
+      currentTitle = 'Rejected';
+      currentSvg = 'assets/SVG/regected.svg';
+      currentColor = AppColors.error;
+    }
+
+    return CompositedTransformTarget(
+      link: _layerLink,
+      child: GestureDetector(
+        onTap: _toggleDropdown,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: _isOpen ? Colors.blue : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(currentSvg, width: 18, height: 18, colorFilter: ColorFilter.mode(currentColor, BlendMode.srcIn)),
+              const SizedBox(width: 6),
+              Icon(
+                _isOpen ? LucideIcons.chevronUp : LucideIcons.chevronDown,
+                size: 16,
+                color: Colors.grey.shade700,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
