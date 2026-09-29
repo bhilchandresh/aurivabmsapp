@@ -172,7 +172,7 @@ class _RecordPaymentBottomSheetState extends State<RecordPaymentBottomSheet> {
                             label: 'REFERENCE / UTR NO.',
                             hint: 'e.g. 329184721',
                             controller: referenceController,
-                            svgIcon: 'assets/SVG/code.svg',
+                            svgIcon: 'assets/SVG/invoice.svg',
                             borderColor: borderColor,
                           ),
                         ),
@@ -387,18 +387,16 @@ class _RecordPaymentBottomSheetState extends State<RecordPaymentBottomSheet> {
 
   Widget _buildModeChips(Color borderColor, Color primaryColor) {
     final modes = [
-      {'name': 'Bank', 'svg': 'assets/SVG/bank.svg'},
-      {'name': 'Cash', 'svg': 'assets/SVG/cash.svg'},
-      {'name': 'UPI', 'svg': 'assets/SVG/upi.svg'},
-      {'name': 'Cheque', 'svg': 'assets/SVG/cheque.svg'},
+      {'name': 'Bank', 'icon': LucideIcons.landmark},
+      {'name': 'Cash', 'icon': LucideIcons.wallet},
+      {'name': 'UPI', 'icon': LucideIcons.smartphone},
+      {'name': 'Cheque', 'icon': LucideIcons.penTool},
     ];
     
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
     return Row(
-      children: modes.asMap().entries.map((entry) {
-        final i = entry.key;
-        final mode = entry.value;
+      children: modes.map((mode) {
         final isSelected = paymentMode == mode['name'];
         final color = isSelected ? primaryColor : Colors.grey.shade400;
         final bgColor = isSelected 
@@ -408,12 +406,12 @@ class _RecordPaymentBottomSheetState extends State<RecordPaymentBottomSheet> {
         
         return Expanded(
           child: Padding(
-            padding: EdgeInsets.only(right: i < modes.length - 1 ? 8 : 0),
+            padding: EdgeInsets.only(right: mode == modes.last ? 0 : 8),
             child: InkWell(
               onTap: () => setState(() => paymentMode = mode['name'] as String),
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                height: 60,
+                height: 52,
                 decoration: BoxDecoration(
                   color: bgColor,
                   borderRadius: BorderRadius.circular(8),
@@ -425,12 +423,7 @@ class _RecordPaymentBottomSheetState extends State<RecordPaymentBottomSheet> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SvgPicture.asset(
-                            mode['svg'] as String,
-                            width: 20,
-                            height: 20,
-                            colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-                          ),
+                          Icon(mode['icon'] as IconData, size: 16, color: color),
                           const SizedBox(height: 4),
                           Text(
                             mode['name'] as String,
@@ -447,7 +440,7 @@ class _RecordPaymentBottomSheetState extends State<RecordPaymentBottomSheet> {
                       Positioned(
                         top: 4,
                         right: 4,
-                        child: Icon(Icons.check_circle, size: 12, color: primaryColor),
+                        child: Icon(Icons.check_circle, size: 10, color: primaryColor),
                       ),
                   ],
                 ),
