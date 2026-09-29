@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/constants/app_colors.dart';
@@ -47,9 +49,9 @@ class _ImportDataScreenState extends State<ImportDataScreen>
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'import_legacy_data'.tr,
-        subtitle: 'migrate_data_desc'.tr,
         showProfile: false,
         showBadge: false,
+        showBackButton: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -57,9 +59,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+            border: Border.all(color: Theme.of(context).colorScheme.outline),
           ),
           child: Column(
             children: [
@@ -93,60 +93,220 @@ class _ImportDataScreenState extends State<ImportDataScreen>
 
   Widget _buildTabBar(bool isDark) {
     return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         border: Border(
-          bottom: BorderSide(
-            color: Theme.of(context).colorScheme.outline,
+          bottom: BorderSide(color: Theme.of(context).colorScheme.outline),
+        ),
+      ),
+      child: AnimatedBuilder(
+        animation: _tabController.animation!,
+        builder: (context, child) {
+          final animationValue = _tabController.animation!.value;
+          return Row(
+            children: [
+              _buildCustomTab(
+                'clients'.tr,
+                'assets/SVG/client01.svg',
+                0,
+                animationValue,
+              ),
+              _buildCustomTab(
+                'inventory'.tr,
+                'assets/SVG/inventory.svg',
+                1,
+                animationValue,
+              ),
+              _buildCustomTab(
+                'invoices'.tr,
+                'assets/SVG/invoice.svg',
+                2,
+                animationValue,
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildCustomTab(
+    String label,
+    String svgPath,
+    int index,
+    double animationValue,
+  ) {
+    // Calculate how 'selected' this tab is (from 0.0 to 1.0) based on the swipe position
+    final double selection = (1.0 - (animationValue - index).abs()).clamp(
+      0.0,
+      1.0,
+    );
+
+    // Smoothly calculate flex from 15 to 70 based on selection
+    final double flexValue = 15.0 + (55.0 * selection);
+
+    final bool isSelected = selection > 0.5;
+
+    return Expanded(
+      flex: flexValue.toInt(),
+      child: GestureDetector(
+        onTap: () {
+          _tabController.animateTo(index);
+        },
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          decoration: BoxDecoration(
+            color: Color.lerp(
+              Colors.transparent,
+              context.colorScheme.primary,
+              selection,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          alignment: Alignment.center,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SvgPicture.asset(
+                  svgPath,
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(
+                    Color.lerp(
+                      Theme.of(context).textTheme.bodyMedium?.color ??
+                          Colors.grey,
+                      Colors.white,
+                      selection,
+                    )!,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                if (selection > 0.3) ...[
+                  SizedBox(width: 8 * ((selection - 0.3) / 0.7)),
+                  Opacity(
+                    opacity: ((selection - 0.3) / 0.7).clamp(0.0, 1.0),
+                    child: Text(
+                      label,
+                      style: context.typography.inputText.copyWith(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.clip,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),
-      child: TabBar(
-        controller: _tabController,
-        indicatorColor: context.colorScheme.primary,
-        indicatorWeight: 3,
-        labelColor: AppColors.primary,
-        unselectedLabelColor: Theme.of(context).textTheme.bodyMedium?.color,
-        labelStyle: context.typography.inputText.copyWith(fontWeight: FontWeight.w900, fontSize: 14),
-        unselectedLabelStyle: context.typography.inputText.copyWith(
-          fontWeight: FontWeight.w600,
-          fontSize: 14,
-        ),
-        dividerColor: Colors
-            .transparent, // Disable native divider as we have container border
-        tabs: [
-          Tab(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(LucideIcons.users, size: 18),
-                const SizedBox(width: 4),
-                Flexible(child: Text('clients'.tr, overflow: TextOverflow.ellipsis)),
-              ],
+    );
+  }
+
+  Widget _buildActionCards(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildDownloadCard(isDark),
+          const SizedBox(height: 24),
+          _buildUploadCard(isDark),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDownloadCard(bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF1F6FF),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFD4E3FF)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: SvgPicture.asset(
+              'assets/SVG/donwload.svg',
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF3B7BF6),
+                BlendMode.srcIn,
+              ),
+              width: 18,
+              height: 18,
             ),
           ),
-          Tab(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(LucideIcons.package, size: 18),
-                const SizedBox(width: 4),
-                Flexible(child: Text('inventory'.tr, overflow: TextOverflow.ellipsis)),
-              ],
+          const SizedBox(height: 16),
+          Text(
+            'Download Template',
+            style: context.typography.cardTitle.copyWith(
+              fontWeight: FontWeight.w900,
+              fontSize: 13,
+              color: Colors.black,
             ),
+            textAlign: TextAlign.center,
           ),
-          Tab(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(LucideIcons.fileText, size: 18),
-                const SizedBox(width: 4),
-                Flexible(child: Text('invoices'.tr, overflow: TextOverflow.ellipsis)),
-              ],
+          const SizedBox(height: 8),
+          Text(
+            'Download the required Excel format\nwith the correct columns and sample data.',
+            style: context.typography.cardSubtitle.copyWith(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF64748B),
+              height: 1.5,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: _controller.downloadTemplate,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF3B7BF6),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+              icon: SvgPicture.asset(
+                'assets/SVG/downloac.svg',
+                width: 16,
+                height: 16,
+                colorFilter: const ColorFilter.mode(
+                  Colors.white,
+                  BlendMode.srcIn,
+                ),
+              ),
+              label: Text(
+                'Download Excel Template',
+                style: context.typography.buttonText.copyWith(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],
@@ -154,183 +314,164 @@ class _ImportDataScreenState extends State<ImportDataScreen>
     );
   }
 
-  Widget _buildActionCards(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isMobile = constraints.maxWidth < 600;
-          final widgets = [
-            _buildActionCard(
-              title: 'download_template'.tr,
-              subtitle: 'download_excel_desc'.tr,
-              icon: LucideIcons.download,
-              iconColor: Colors.blue,
-              bgColor: isDark
-                  ? Colors.blue.shade900.withValues(alpha: 0.2)
-                  : Colors.blue.shade50,
-              borderColor: isDark
-                  ? Colors.blue.shade900.withValues(alpha: 0.5)
-                  : Colors.blue.shade100,
-              buttonText: 'download_excel_btn'.tr,
-              onTap: _controller.downloadTemplate,
-              isDark: isDark,
-            ),
-            if (!isMobile)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Icon(
-                  LucideIcons.chevronRight,
-                  size: 32,
-                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-                ),
-              ),
-            if (isMobile) const SizedBox(height: 16),
-            _buildActionCard(
-              title: 'upload_filled_excel'.tr,
-              subtitle: 'upload_excel_desc'.tr,
-              icon: LucideIcons.upload,
-              iconColor: Colors.purple,
-              bgColor: isDark
-                  ? Colors.purple.shade900.withValues(alpha: 0.2)
-                  : Colors.purple.shade50,
-              borderColor: isDark
-                  ? Colors.purple.shade900.withValues(alpha: 0.5)
-                  : Colors.purple.shade100,
-              buttonText: 'upload_excel_btn'.tr,
-              onTap: _controller.pickFile,
-              isDark: isDark,
-              isUpload: true,
-            ),
-          ];
-
-          return isMobile
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: widgets,
-                )
-              : Row(
-                  children: widgets
-                      .map(
-                        (w) => w is Expanded
-                            ? w
-                            : (w is Padding ? w : Expanded(child: w)),
-                      )
-                      .toList(),
-                );
-        },
-      ),
-    );
-  }
-
-  Widget _buildActionCard({
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required Color iconColor,
-    required Color bgColor,
-    required Color borderColor,
-    required String buttonText,
-    required VoidCallback onTap,
-    required bool isDark,
-    bool isUpload = false,
-  }) {
+  Widget _buildUploadCard(bool isDark) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: const Color(0xFFF9F5FF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
+        border: Border.all(color: const Color(0xFFE9D7FF)),
       ),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Theme.of(context).cardTheme.color,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: iconColor),
+            child: SvgPicture.asset(
+              'assets/SVG/upload.svg',
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF7C3AED),
+                BlendMode.srcIn,
+              ),
+              width: 18,
+              height: 18,
+            ),
           ),
           const SizedBox(height: 16),
           Text(
-            title,
+            'Upload Filled Excel',
             style: context.typography.cardTitle.copyWith(
               fontWeight: FontWeight.w900,
-              fontSize: 16,
-              color: Theme.of(context).textTheme.bodyLarge?.color,
+              fontSize: 13,
+              color: Colors.black,
             ),
+            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
-            subtitle,
+            'Upload the Excel file with your client data.',
             style: context.typography.cardSubtitle.copyWith(
-              fontSize: 12,
+              fontSize: 10,
               fontWeight: FontWeight.w500,
-              color: Theme.of(context).textTheme.bodyMedium?.color,
+              color: const Color(0xFF64748B),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+
+          // Drag and drop area
+          GestureDetector(
+            onTap: _controller.pickFile,
+            child: CustomPaint(
+              painter: _DashedBorderPainter(
+                color: const Color(0xFFC7B1EF),
+                radius: 12,
+                strokeWidth: 1.5,
+              ),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 16,
+                ),
+                child: Column(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/SVG/doc.svg',
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF7C3AED),
+                        BlendMode.srcIn,
+                      ),
+                      width: 24,
+                      height: 24,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Drag & drop your Excel file here',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'or tap to select a file',
+                      style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Supported format: .xlsx, .xls (Max 10MB)',
+                      style: TextStyle(
+                        fontSize: 8,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 24),
-          Builder(
-            builder: (context) {
-              Widget buildButton(String label, bool isBusy) {
-                return SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: isBusy ? null : onTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.surface,
-                      foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
-                      elevation: 0,
-                      side: BorderSide(
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
-                    ),
-                    child: isBusy
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(
-                            label,
-                            style: context.typography.buttonText.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              color: Theme.of(context).textTheme.bodyLarge?.color,
-                            ),
-                          ),
-                  ),
-                );
-              }
 
-              if (isUpload) {
-                return Obx(() {
-                  final btnLabel = _controller.selectedFileName.isNotEmpty
-                      ? _controller.selectedFileName.value
-                      : buttonText;
-                  final isBusy = _controller.isParsing.value;
-                  return buildButton(btnLabel, isBusy);
-                });
-              } else {
-                return buildButton(buttonText, false);
-              }
-            },
-          ),
+          Obx(() {
+            final btnLabel = _controller.selectedFileName.isNotEmpty
+                ? _controller.selectedFileName.value
+                : 'Upload Excel File';
+            final isBusy = _controller.isParsing.value;
+            return SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: isBusy ? null : _controller.pickFile,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF7C3AED),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                ),
+                icon: isBusy
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : SvgPicture.asset(
+                        'assets/SVG/file.svg',
+                        colorFilter: const ColorFilter.mode(
+                          Colors.white,
+                          BlendMode.srcIn,
+                        ),
+                        width: 16,
+                        height: 16,
+                      ),
+                label: Text(
+                  btnLabel,
+                  style: context.typography.buttonText.copyWith(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -346,9 +487,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
       return Container(
         decoration: BoxDecoration(
           border: Border(
-            top: BorderSide(
-              color: Theme.of(context).colorScheme.outline,
-            ),
+            top: BorderSide(color: Theme.of(context).colorScheme.outline),
           ),
         ),
         child: Column(
@@ -374,7 +513,9 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                             '${_controller.parsedData.length} ${'parsed_rows_ready'.tr}',
                             style: context.typography.inputText.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: Theme.of(context).textTheme.bodyLarge?.color,
+                              color: Theme.of(
+                                context,
+                              ).textTheme.bodyLarge?.color,
                             ),
                           ),
                         ),
@@ -437,7 +578,9 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                                 style: context.typography.tableHeader.copyWith(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w900,
-                                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.color,
                                   letterSpacing: 1,
                                 ),
                               ),
@@ -454,7 +597,9 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                                 style: context.typography.tableCell.copyWith(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
-                                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.color,
                                 ),
                               ),
                             );
@@ -482,4 +627,54 @@ class _ImportDataScreenState extends State<ImportDataScreen>
       );
     });
   }
+}
+
+class _DashedBorderPainter extends CustomPainter {
+  final Color color;
+  final double strokeWidth;
+  final double dashWidth;
+  final double dashSpace;
+  final double radius;
+
+  _DashedBorderPainter({
+    required this.color,
+    this.strokeWidth = 1,
+    this.dashWidth = 6,
+    this.dashSpace = 4,
+    this.radius = 12,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = strokeWidth
+      ..style = PaintingStyle.stroke;
+
+    final path = Path()
+      ..addRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTWH(0, 0, size.width, size.height),
+          Radius.circular(radius),
+        ),
+      );
+
+    final dashPath = Path();
+    var distance = 0.0;
+    for (PathMetric pathMetric in path.computeMetrics()) {
+      while (distance < pathMetric.length) {
+        dashPath.addPath(
+          pathMetric.extractPath(distance, distance + dashWidth),
+          Offset.zero,
+        );
+        distance += dashWidth;
+        distance += dashSpace;
+      }
+      distance = 0.0;
+    }
+    canvas.drawPath(dashPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

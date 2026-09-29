@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import '../../core/services/permission_manager.dart';
 
@@ -156,7 +157,6 @@ class _TeamScreenState extends State<TeamScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'team_access'.tr,
-        subtitle: 'manage_roles'.tr,
         showProfile: false,
         showBadge: false,
         showBackButton: true,
@@ -450,10 +450,14 @@ class _TeamScreenState extends State<TeamScreen> {
                           color: Colors.grey,
                           fontSize: 12,
                         ),
-                        prefixIcon: const Icon(
-                          LucideIcons.search,
-                          color: Colors.grey,
-                          size: 16,
+                        prefixIcon: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: SvgPicture.asset(
+                            'assets/SVG/search.svg',
+                            height: 16,
+                            width: 16,
+                            colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                          ),
                         ),
                         filled: true,
                         fillColor: Theme.of(context).cardTheme.color,
@@ -485,7 +489,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       onPressed: atLimit
                           ? null
                           : () => _showAddMemberBottomSheet(context),
-                      icon: const Icon(LucideIcons.plus, size: 14),
+                      icon: SvgPicture.asset('assets/SVG/plus.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
                       label: Text(
                         'add_staff'.tr,
                         style: const TextStyle(
@@ -525,7 +529,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                     ),
                   ),
-                  const Icon(LucideIcons.users, size: 16, color: Colors.grey),
+                  SvgPicture.asset('assets/SVG/client01.svg', height: 16, width: 16, colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn)),
                 ],
               ),
               const SizedBox(height: 12),
@@ -567,7 +571,7 @@ class _TeamScreenState extends State<TeamScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(LucideIcons.users, size: 36, color: Colors.grey.shade300),
+            SvgPicture.asset('assets/SVG/client01.svg', height: 36, width: 36, colorFilter: ColorFilter.mode(Colors.grey.shade300, BlendMode.srcIn)),
             const SizedBox(height: 12),
             Text(
               'no_staff_found'.tr,
@@ -711,13 +715,14 @@ class _TeamScreenState extends State<TeamScreen> {
                                       : Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(
-                                              member.signatureImage != null
-                                                  ? LucideIcons.refreshCw
-                                                  : LucideIcons.upload,
-                                              size: 10,
-                                              color: Theme.of(context).textTheme.bodyMedium?.color,
-                                            ),
+                                            member.signatureImage != null
+                                                ? Icon(LucideIcons.refreshCw, size: 10, color: Theme.of(context).textTheme.bodyMedium?.color)
+                                                : SvgPicture.asset(
+                                                    'assets/SVG/upload.svg',
+                                                    height: 10,
+                                                    width: 10,
+                                                    colorFilter: ColorFilter.mode(Theme.of(context).textTheme.bodyMedium?.color ?? Colors.black, BlendMode.srcIn),
+                                                  ),
                                             const SizedBox(width: 4),
                                             Text(
                                               member.signatureImage != null
@@ -779,10 +784,11 @@ class _TeamScreenState extends State<TeamScreen> {
                         IconButton(
                           onPressed: () =>
                               _confirmDeleteMember(context, member),
-                          icon: const Icon(
-                            LucideIcons.trash2,
-                            size: 15,
-                            color: Colors.red,
+                          icon: SvgPicture.asset(
+                            'assets/SVG/delete.svg',
+                            height: 16,
+                            width: 16,
+                            colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
                           ),
                           style: IconButton.styleFrom(
                             backgroundColor: Colors.red.withValues(alpha: 0.06),
@@ -805,65 +811,134 @@ class _TeamScreenState extends State<TeamScreen> {
 
   // --- DELETE CONFIRMATION DIALOG ---
   void _confirmDeleteMember(BuildContext context, TeamMember member) {
-    Get.dialog(
-      AlertDialog(
-        title: Text('remove_member'.tr),
-        content: Text('remove_member_confirm'.tr),
-        actions: [
-          Obx(() {
-            final isSaving = _controller.isLoading.value;
-            return TextButton(
-              onPressed: isSaving ? null : () => Get.back(),
-              child: Text(
-                'cancel'.tr,
-                style: const TextStyle(color: Colors.grey),
-              ),
-            );
-          }),
-          Obx(() {
-            final isSaving = _controller.isLoading.value;
-            return ElevatedButton(
-              onPressed: isSaving
-                  ? null
-                  : () async {
-                      final success = await _controller.deleteMember(member.id);
-                      Get.back();
-                      if (success) {
-                        Get.snackbar(
-                          'Removed',
-                          'member_removed'.tr,
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.error,
-                          colorText: Colors.white,
-                        );
-                      } else {
-                        Get.snackbar(
-                          'Error',
-                          'member_remove_error'.tr,
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                        );
-                      }
-                    },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: isSaving
-                  ? const SizedBox(
-                      height: 16,
-                      width: 16,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Theme.of(context).cardColor,
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: SvgPicture.asset(
+                    'assets/SVG/delete.svg',
+                    height: 28,
+                    width: 28,
+                    colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Remove Member',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Are you sure you want to remove ${member.name}? This action cannot be undone.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Get.back(),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(color: Colors.grey.shade300),
+                          ),
+                        ),
+                        child: Text(
+                          'cancel'.tr,
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                    )
-                  : Text(
-                      'remove'.tr,
-                      style: const TextStyle(color: Colors.white),
                     ),
-            );
-          }),
-        ],
-      ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Obx(() {
+                        final isSaving = _controller.isLoading.value;
+                        return ElevatedButton(
+                          onPressed: isSaving
+                              ? null
+                              : () async {
+                                  final success = await _controller.deleteMember(member.id);
+                                  Get.back();
+                                  if (success) {
+                                    Get.snackbar(
+                                      'Removed',
+                                      'member_removed'.tr,
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: AppColors.error,
+                                      colorText: Colors.white,
+                                    );
+                                  } else {
+                                    Get.snackbar(
+                                      'Error',
+                                      'member_remove_error'.tr,
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: Colors.red,
+                                      colorText: Colors.white,
+                                    );
+                                  }
+                                },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: isSaving
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : const Text(
+                                  'Remove Member',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1016,13 +1091,9 @@ class _TeamScreenState extends State<TeamScreen> {
                       Get.back();
                       _pickSignature(member.id);
                     },
-                    icon: Icon(
-                      member.signatureImage != null
-                          ? LucideIcons.refreshCw
-                          : LucideIcons.upload,
-                      size: 14,
-                      color: Colors.white,
-                    ),
+                    icon: member.signatureImage != null
+                        ? const Icon(LucideIcons.refreshCw, size: 14, color: Colors.white)
+                        : SvgPicture.asset('assets/SVG/upload.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
                     label: Text(
                       member.signatureImage != null
                           ? 'change'.tr
@@ -1056,14 +1127,15 @@ class _TeamScreenState extends State<TeamScreen> {
                         Get.back();
                         _confirmDeleteMember(context, member);
                       },
-                      icon: const Icon(
-                        LucideIcons.trash2,
-                        size: 14,
-                        color: Colors.red,
+                      icon: SvgPicture.asset(
+                        'assets/SVG/delete.svg',
+                        height: 14,
+                        width: 14,
+                        colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
                       ),
-                      label: Text(
-                        'remove_member'.tr,
-                        style: const TextStyle(
+                      label: const Text(
+                        'Remove Member',
+                        style: TextStyle(
                           color: Colors.red,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -1090,16 +1162,24 @@ class _TeamScreenState extends State<TeamScreen> {
   // --- ADD MEMBER FORM BOTTOM SHEET ---
   void _showAddMemberBottomSheet(BuildContext context) {
     final formKey = GlobalKey<FormState>();
+    bool obscurePassword = true;
 
     Get.bottomSheet(
       StatefulBuilder(
         builder: (context, setSheetState) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+          final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+          final subtitleColor = isDark ? Colors.grey.shade400 : Colors.grey.shade500;
+          final fillColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+          final borderColor = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
+
           return Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardTheme.color,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              color: cardColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Form(
@@ -1108,127 +1188,179 @@ class _TeamScreenState extends State<TeamScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Drag Handle
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Header
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'add_staff'.tr,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Add Staff',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: textColor,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Create a new team member account',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: subtitleColor,
+                              ),
+                            ),
+                          ],
                         ),
-                        IconButton(
-                          icon: const Icon(LucideIcons.x, size: 18),
-                          onPressed: () => Get.back(),
+                        InkWell(
+                          onTap: () => Get.back(),
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(LucideIcons.x, size: 16, color: textColor),
+                          ),
                         ),
                       ],
                     ),
-                    const Divider(),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 24),
 
                     // Name
                     AppInputField(
-                      label: 'full_name_star'.tr,
-                      hintText: 'eg_name'.tr,
+                      label: 'Full Name *',
+                      labelFontSize: 11,
+                      hintText: 'e.g. John Doe',
                       controller: _nameCtrl,
+                      filled: true,
+                      fillColor: fillColor,
+                      contentPaddingVertical: 12,
+                      fontSize: 13,
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset('assets/SVG/profile.svg', colorFilter: ColorFilter.mode(subtitleColor, BlendMode.srcIn)),
+                      ),
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty) {
-                          return 'Please enter name';
-                        }
+                        if (val == null || val.trim().isEmpty) return 'Please enter name';
                         return null;
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
 
                     // Email
                     AppInputField(
-                      label: 'email'.tr,
-                      hintText: 'eg_email'.tr,
+                      label: 'Email Address *',
+                      labelFontSize: 11,
+                      hintText: 'e.g. sales@apextech.com',
                       keyboardType: TextInputType.emailAddress,
                       controller: _emailCtrl,
+                      filled: true,
+                      fillColor: fillColor,
+                      contentPaddingVertical: 12,
+                      fontSize: 13,
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset('assets/SVG/mail.svg', colorFilter: ColorFilter.mode(subtitleColor, BlendMode.srcIn)),
+                      ),
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty) {
-                          return 'Please enter email';
-                        }
-                        if (!GetUtils.isEmail(val.trim())) {
-                          return 'Invalid email address';
-                        }
+                        if (val == null || val.trim().isEmpty) return 'Please enter email';
+                        if (!GetUtils.isEmail(val.trim())) return 'Invalid email address';
                         return null;
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
 
                     // Password
                     AppInputField(
-                      label: 'password_star'.tr,
-                      hintText: '••••••••',
-                      obscureText: true,
+                      label: 'Password *',
+                      labelFontSize: 11,
+                      hintText: 'Create a password',
+                      obscureText: obscurePassword,
                       controller: _passwordCtrl,
+                      filled: true,
+                      fillColor: fillColor,
+                      contentPaddingVertical: 12,
+                      fontSize: 13,
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset('assets/SVG/lock.svg', colorFilter: ColorFilter.mode(subtitleColor, BlendMode.srcIn)),
+                      ),
+                      suffixIcon: GestureDetector(
+                        onTap: () => setSheetState(() => obscurePassword = !obscurePassword),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: SvgPicture.asset(
+                            obscurePassword ? 'assets/SVG/eyehide.svg' : 'assets/SVG/eyeview.svg', 
+                            colorFilter: ColorFilter.mode(subtitleColor, BlendMode.srcIn),
+                          ),
+                        ),
+                      ),
                       validator: (val) {
-                        if (val == null || val.trim().isEmpty) {
-                          return 'Please enter password';
-                        }
-                        if (val.trim().length < 6) {
-                          return 'Password must be at least 6 chars';
-                        }
+                        if (val == null || val.trim().isEmpty) return 'Please enter password';
+                        if (val.trim().length < 6) return 'Password must be at least 6 chars';
                         return null;
                       },
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Use at least 8 characters with letters, numbers and a symbol.',
+                      style: TextStyle(fontSize: 10, color: subtitleColor),
+                    ),
+                    const SizedBox(height: 16),
 
                     // Role Select
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4, bottom: 4),
-                          child: Text(
-                            'role'.tr.toUpperCase(),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                              color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
-                              letterSpacing: 0.5,
-                            ),
+                        Text(
+                          'Role *',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11,
+                            color: textColor,
                           ),
                         ),
+                        const SizedBox(height: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
+                            color: fillColor,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
-                            ),
+                            border: Border.all(color: borderColor),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButtonFormField<String>(
-                              initialValue: _selectedRole,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                              items: [
-                                DropdownMenuItem(
-                                  value: 'sales',
-                                  child: Text('sales_staff'.tr),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'admin',
-                                  child: Text('administrator'.tr),
-                                ),
+                              value: _selectedRole,
+                              icon: Icon(LucideIcons.chevronDown, size: 14, color: subtitleColor),
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              items: const [
+                                DropdownMenuItem(value: 'sales', child: Text('Sales Staff')),
+                                DropdownMenuItem(value: 'admin', child: Text('Administrator')),
                               ],
                               onChanged: (val) {
                                 if (val != null) {
-                                  setSheetState(() {
-                                    _selectedRole = val;
-                                  });
+                                  setSheetState(() => _selectedRole = val);
                                 }
                               },
                               decoration: const InputDecoration(
@@ -1240,84 +1372,92 @@ class _TeamScreenState extends State<TeamScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 32),
 
-                    // Submit Button
-                    Obx(() {
-                      final isSaving = _controller.isLoading.value;
-                      return SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton.icon(
-                          onPressed: isSaving
-                              ? null
-                              : () async {
-                                  if (formKey.currentState!.validate()) {
-                                    final success = await _controller.addMember(
-                                      _nameCtrl.text.trim(),
-                                      _emailCtrl.text.trim(),
-                                      _passwordCtrl.text.trim(),
-                                      _selectedRole,
-                                    );
-
-                                    if (success) {
-                                      // Clean controllers
-                                      _nameCtrl.clear();
-                                      _emailCtrl.clear();
-                                      _passwordCtrl.clear();
-                                      _selectedRole = 'sales';
-
-                                      Get.back();
-                                      Get.snackbar(
-                                        'Success',
-                                        'Sales staff added successfully!',
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        backgroundColor: AppColors.success,
-                                        colorText: Colors.white,
-                                      );
-                                    } else {
-                                      Get.snackbar(
-                                        'Error',
-                                        'Failed to add staff member. Email might already be taken or limit reached.',
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        backgroundColor: Colors.red,
-                                        colorText: Colors.white,
-                                      );
-                                    }
-                                  }
-                                },
-                          icon: isSaving
-                              ? const SizedBox.shrink()
-                              : const Icon(
-                                  LucideIcons.plus,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                          label: isSaving
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  'add_staff'.tr,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
+                    // Submit Buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Get.back(),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              side: BorderSide(color: borderColor),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                      );
-                    }),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Obx(() {
+                            final isSaving = _controller.isLoading.value;
+                            return ElevatedButton.icon(
+                              onPressed: isSaving
+                                  ? null
+                                  : () async {
+                                      if (formKey.currentState!.validate()) {
+                                        final success = await _controller.addMember(
+                                          _nameCtrl.text.trim(),
+                                          _emailCtrl.text.trim(),
+                                          _passwordCtrl.text.trim(),
+                                          _selectedRole,
+                                        );
+
+                                        if (success) {
+                                          _nameCtrl.clear();
+                                          _emailCtrl.clear();
+                                          _passwordCtrl.clear();
+                                          _selectedRole = 'sales';
+
+                                          Get.back();
+                                          Get.snackbar(
+                                            'Success',
+                                            'Staff added successfully!',
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            backgroundColor: AppColors.success,
+                                            colorText: Colors.white,
+                                          );
+                                        } else {
+                                          Get.snackbar(
+                                            'Error',
+                                            'Failed to add staff member.',
+                                            snackPosition: SnackPosition.BOTTOM,
+                                            backgroundColor: Colors.red,
+                                            colorText: Colors.white,
+                                          );
+                                        }
+                                      }
+                                    },
+                              icon: isSaving ? const SizedBox.shrink() : SvgPicture.asset('assets/SVG/plus.svg', height: 16, width: 16, colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+                              label: isSaving
+                                  ? const SizedBox(
+                                      height: 20, width: 20,
+                                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                    )
+                                  : const Text(
+                                      'Add Staff',
+                                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                                    ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -1326,6 +1466,7 @@ class _TeamScreenState extends State<TeamScreen> {
         },
       ),
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
     );
   }
 }

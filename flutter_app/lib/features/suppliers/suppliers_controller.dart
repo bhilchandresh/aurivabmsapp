@@ -14,6 +14,7 @@ class Supplier {
   final String address;
   final double totalPurchased;
   final double totalPaid;
+  final String createdBy;
 
   Supplier({
     required this.id,
@@ -24,6 +25,7 @@ class Supplier {
     required this.address,
     required this.totalPurchased,
     required this.totalPaid,
+    required this.createdBy,
   });
 
   double get pendingBalance => totalPurchased - totalPaid;
@@ -37,6 +39,7 @@ class Supplier {
     String? address,
     double? totalPurchased,
     double? totalPaid,
+    String? createdBy,
   }) {
     return Supplier(
       id: id ?? this.id,
@@ -47,6 +50,7 @@ class Supplier {
       address: address ?? this.address,
       totalPurchased: totalPurchased ?? this.totalPurchased,
       totalPaid: totalPaid ?? this.totalPaid,
+      createdBy: createdBy ?? this.createdBy,
     );
   }
 
@@ -60,7 +64,42 @@ class Supplier {
       address: json['address'] ?? '',
       totalPurchased: (json['totalPurchased'] ?? 0.0).toDouble(),
       totalPaid: (json['totalPaid'] ?? 0.0).toDouble(),
+      createdBy: _parseCreatedBy(json),
     );
+  }
+
+  static String _parseCreatedBy(Map<String, dynamic> json) {
+    try {
+      if (json['user'] != null && json['user'] is Map) {
+        final name = json['user']['name'];
+        if (name != null) return name.toString();
+      }
+      if (json['createdBy'] != null && json['createdBy'] is Map) {
+        final name = json['createdBy']['name'];
+        if (name != null) return name.toString();
+      }
+      if (json['createdBy'] != null && json['createdBy'] is String) {
+        return json['createdBy'].toString();
+      }
+      return 'Admin';
+    } catch (e) {
+      return 'Admin';
+    }
+  }
+  static double _parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value) ?? 0.0;
+    return 0.0;
+  }
+
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is double) return value.toInt();
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
   }
 }
 
@@ -82,9 +121,9 @@ class PurchaseBillItem {
   factory PurchaseBillItem.fromJson(Map<String, dynamic> json) {
     return PurchaseBillItem(
       description: json['description'] ?? '',
-      quantity: (json['quantity'] ?? 0).toInt(),
-      rate: (json['rate'] ?? 0.0).toDouble(),
-      amount: (json['amount'] ?? 0.0).toDouble(),
+      quantity: Supplier._parseInt(json['quantity']),
+      rate: Supplier._parseDouble(json['rate']),
+      amount: Supplier._parseDouble(json['amount']),
       inventoryId: json['inventoryId'] is Map
           ? json['inventoryId']['_id']
           : json['inventoryId'],
@@ -112,6 +151,7 @@ class SupplierPurchaseBill {
   final String status; // 'Paid', 'Partial', 'Unpaid'
   final String notes;
   final List<PurchaseBillItem> items;
+  final String createdBy;
 
   SupplierPurchaseBill({
     required this.id,
@@ -123,6 +163,7 @@ class SupplierPurchaseBill {
     required this.status,
     required this.notes,
     required this.items,
+    required this.createdBy,
   });
 
   factory SupplierPurchaseBill.fromJson(Map<String, dynamic> json) {
@@ -136,11 +177,12 @@ class SupplierPurchaseBill {
       billNumber: json['billNumber'] ?? '',
       date: json['date'] != null ? json['date'].toString() : '',
       dueDate: json['dueDate'] != null ? json['dueDate'].toString() : '',
-      totalAmount: (json['totalAmount'] ?? 0.0).toDouble(),
-      amountPaid: (json['amountPaid'] ?? 0.0).toDouble(),
+      totalAmount: Supplier._parseDouble(json['totalAmount']),
+      amountPaid: Supplier._parseDouble(json['amountPaid']),
       status: json['status'] ?? 'Unpaid',
       notes: json['notes'] ?? '',
       items: itemsList,
+      createdBy: Supplier._parseCreatedBy(json),
     );
   }
 }
@@ -165,7 +207,7 @@ class SupplierPayment {
   factory SupplierPayment.fromJson(Map<String, dynamic> json) {
     return SupplierPayment(
       id: json['_id'] ?? json['id'] ?? '',
-      amount: (json['amount'] ?? 0.0).toDouble(),
+      amount: Supplier._parseDouble(json['amount']),
       paymentDate: json['paymentDate'] != null
           ? json['paymentDate'].toString()
           : '',
@@ -182,6 +224,10 @@ class SuppliersController extends GetxController {
   var supplierPayments = <String, List<SupplierPayment>>{}.obs;
   var isLoading = false.obs;
 
+  // Subscription Plan simulation
+  var subscriptionPlan = 'premium'.obs;
+  var maxLimit = RxnInt();
+
   @override
   void onInit() {
     super.onInit();
@@ -192,7 +238,39 @@ class SuppliersController extends GetxController {
         : Get.put(AuthController(), permanent: true);
 
     authController.fetchTenantSettings();
+    
+    if (authController.tenantInfo.value != null) {
+      subscriptionPlan.value = authController.tenantInfo.value?['subscriptionPlan'] ?? 'premium';
+    }
+    ever(authController.tenantInfo, (tenant) {
+      if (tenant != null) {
+        subscriptionPlan.value = tenant['subscriptionPlan'] ?? 'premium';
+      }
+    });
+
     fetchSuppliers();
+  }
+
+  // Plan metrics
+  int get maxSuppliers {
+    if (maxLimit.value != null) {
+      return maxLimit.value!;
+    }
+    switch (subscriptionPlan.value) {
+      case 'basic':
+        return 0; // locked completely
+      case 'premium':
+        return 50;
+      default:
+        return 99999; // unlimited
+    }
+  }
+
+  bool get isLocked => subscriptionPlan.value == 'basic';
+
+  bool get isAtLimit {
+    if (maxSuppliers == 99999) return false;
+    return suppliers.length >= maxSuppliers;
   }
 
   Future<void> fetchSuppliers() async {
@@ -256,6 +334,12 @@ class SuppliersController extends GetxController {
 
           suppliers.assignAll(finalSuppliers);
           supplierBills.assignAll(tempBillsMap);
+          
+          if (body['maxLimit'] != null) {
+            maxLimit.value = (body['maxLimit'] as num).toInt();
+          } else {
+            maxLimit.value = null; // Unbounded or Basic
+          }
         }
       }
     } catch (e) {
@@ -314,6 +398,7 @@ class SuppliersController extends GetxController {
     String gstNumber,
     String address,
   ) async {
+    if (isAtLimit) return false;
     try {
       isLoading.value = true;
       final response = await ApiService.post(ApiConstants.suppliers, {

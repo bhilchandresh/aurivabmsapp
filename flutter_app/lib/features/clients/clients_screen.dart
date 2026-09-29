@@ -7,6 +7,7 @@ import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_input_field.dart';
+import '../../shared/widgets/state_picker_bottom_sheet.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'clients_controller.dart';
 import 'client_details_screen.dart';
@@ -168,7 +169,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 surfaceTintColor: Colors.transparent,
                 elevation: 0,
-                toolbarHeight: 160,
+                toolbarHeight: 145,
                 flexibleSpace: FlexibleSpaceBar(
                   background: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -251,7 +252,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
   Widget _buildFilterHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
@@ -290,7 +291,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       ),
                     ),
                     filled: true,
-                    fillColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                    fillColor: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5)),
                     contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -313,7 +314,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
             
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -339,7 +340,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     backgroundColor: Colors.blue.shade600,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                 ),
@@ -600,7 +601,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -720,196 +721,333 @@ class _ClientsScreenState extends State<ClientsScreen> {
     final addressController = TextEditingController();
     String selectedState = '';
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) {
-//         final isDark = Theme.of(context).brightness == Brightness.dark;
         return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+          builder: (context, setSheetState) {
+            final isDark = Theme.of(context).brightness == Brightness.dark;
+            final Color bgColor = Theme.of(context).cardTheme.color ?? Theme.of(context).scaffoldBackgroundColor;
+            return Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.9,
               ),
-              title: Text(
-                'add_client'.tr,
-                style: context.typography.invoiceTitle.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Theme.of(context).textTheme.displayLarge?.color,
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
                 ),
+                decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              content: SizedBox(
-                width: MediaQuery.of(context).size.width * 0.9 > 400
-                    ? 400
-                    : MediaQuery.of(context).size.width * 0.9,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      AppInputField(
-                        label: 'business_name_star'.tr,
-                        hintText: 'e_g_acme_corp'.tr,
-                        controller: nameController,
-                        prefixIcon: const Icon(LucideIcons.briefcase, size: 18),
+              child: SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Grabber
+                    const SizedBox(height: 12),
+                    Container(
+                      width: 48,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(2),
                       ),
-                      const SizedBox(height: 16),
-                      AppInputField(
-                        label: 'email_address'.tr,
-                        hintText: 'name_company_com'.tr,
-                        keyboardType: TextInputType.emailAddress,
-                        controller: emailController,
-                        prefixIcon: const Icon(LucideIcons.mail, size: 18),
-                      ),
-                      const SizedBox(height: 16),
-                      AppInputField(
-                        label: 'phone'.tr,
-                        hintText: '+91...',
-                        keyboardType: TextInputType.phone,
-                        controller: phoneController,
-                        prefixIcon: const Icon(LucideIcons.phone, size: 18),
-                      ),
-                      const SizedBox(height: 16),
-                      AppInputField(
-                        label: 'gstin'.tr,
-                        hintText: 'e_g_22aaaaa0000a1z5'.tr,
-                        controller: gstinController,
-                        prefixIcon: const Icon(LucideIcons.percent, size: 18),
-                      ),
-                      const SizedBox(height: 16),
-                      Column(
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Header
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 4, bottom: 4),
-                            child: Text(
-                              'state_ut'.tr.toUpperCase(),
-                              style: context.typography.cardSubtitle.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Theme.of(context).textTheme.bodyMedium?.color,
-                                letterSpacing: 0.5,
-                              ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Add Client',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w900,
+                                    color: Theme.of(context).textTheme.displayLarge?.color,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Add a new client to your business',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey.shade500,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          DropdownButtonFormField<String>(
-                            isExpanded: true,
-                            hint: Text(
-                              'select_state'.tr,
-                              style: context.typography.inputText.copyWith(
-                                color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
-                                fontSize: 13,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
+                          Container(
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                              shape: BoxShape.circle,
                             ),
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 14,
-                              ),
-                              filled: true,
-                              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.outline,
-                                ),
-                              ),
+                            child: IconButton(
+                              icon: const Icon(LucideIcons.x, size: 20),
+                              color: isDark ? Colors.white : Colors.black87,
+                              onPressed: () => Navigator.pop(context),
+                              constraints: const BoxConstraints(),
+                              padding: const EdgeInsets.all(8),
                             ),
-                            dropdownColor: Theme.of(context).cardTheme.color,
-                            style: context.typography.inputText.copyWith(
-                              color: Theme.of(context).textTheme.displayLarge?.color,
-                              fontSize: 14,
-                            ),
-                            items: _indianStates.map((state) {
-                              return DropdownMenuItem<String>(
-                                value: state,
-                                child: Text(
-                                  state,
-                                  style: context.typography.inputText.copyWith(
-                                    color: Theme.of(context).textTheme.displayLarge?.color,
-                                    fontSize: 13,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                ),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              if (val != null) {
-                                setDialogState(() {
-                                  selectedState = val;
-                                });
-                              }
-                            },
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-                      AppInputField(
-                        label: 'billing_address'.tr,
-                        hintText: 'full_billing_address'.tr,
-                        controller: addressController,
-                        prefixIcon: const Icon(LucideIcons.mapPin, size: 18),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // Form content
+                    Flexible(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppInputField(
+                              label: 'BUSINESS NAME *',
+                              hintText: 'Acme Corp',
+                              controller: nameController,
+                              prefixIcon: SvgPicture.asset(
+                                'assets/SVG/building.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                              ),
+                              fontSize: 14,
+                              filled: true,
+                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              contentPaddingVertical: 12.0,
+                            ),
+                            const SizedBox(height: 16),
+                            AppInputField(
+                              label: 'EMAIL ADDRESS',
+                              hintText: 'name@company.com',
+                              keyboardType: TextInputType.emailAddress,
+                              controller: emailController,
+                              prefixIcon: SvgPicture.asset(
+                                'assets/SVG/mail.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                              ),
+                              fontSize: 14,
+                              filled: true,
+                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              contentPaddingVertical: 12.0,
+                            ),
+                            const SizedBox(height: 16),
+                            AppInputField(
+                              label: 'PHONE',
+                              hintText: '9898989898',
+                              keyboardType: TextInputType.phone,
+                              controller: phoneController,
+                              prefixIcon: SvgPicture.asset(
+                                'assets/SVG/call.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                              ),
+                              fontSize: 14,
+                              filled: true,
+                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              contentPaddingVertical: 12.0,
+                            ),
+                            const SizedBox(height: 16),
+                            AppInputField(
+                              label: 'GSTIN',
+                              hintText: '22AAAAA0000A1Z5',
+                              controller: gstinController,
+                              prefixIcon: SvgPicture.asset(
+                                'assets/SVG/gst.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                              ),
+                              fontSize: 14,
+                              filled: true,
+                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              contentPaddingVertical: 12.0,
+                            ),
+                            const SizedBox(height: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 4, bottom: 8),
+                                  child: Text(
+                                    'STATE / UT',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    StatePickerBottomSheet.show(
+                                      context,
+                                      initialSelectedState: selectedState,
+                                      onStateSelected: (val) {
+                                        setSheetState(() {
+                                          selectedState = val;
+                                        });
+                                      },
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                          'assets/SVG/location.svg',
+                                          width: 18,
+                                          height: 18,
+                                          colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            selectedState.isEmpty ? 'Select State' : selectedState,
+                                            style: TextStyle(
+                                              color: selectedState.isEmpty ? Colors.grey.shade500 : Theme.of(context).textTheme.displayLarge?.color,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                        const Icon(LucideIcons.chevronDown, size: 18, color: Colors.grey),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            AppInputField(
+                              label: 'BILLING ADDRESS',
+                              hintText: 'Full billing address...',
+                              controller: addressController,
+                              prefixIcon: SvgPicture.asset(
+                                'assets/SVG/location.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                              ),
+                              maxLines: 3,
+                              fontSize: 14,
+                              filled: true,
+                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              contentPaddingVertical: 12.0,
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    
+                    // Footer Buttons
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        border: Border(
+                          top: BorderSide(
+                            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'cancel'.tr,
+                                style: TextStyle(
+                                  color: Theme.of(context).textTheme.displayLarge?.color,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                final name = nameController.text.trim();
+                                final email = emailController.text.trim();
+                                final phone = phoneController.text.trim();
+                                final address = addressController.text.trim();
+
+                                if (name.isEmpty || email.isEmpty || phone.isEmpty || selectedState.isEmpty || address.isEmpty) {
+                                  Get.snackbar('error'.tr, 'Please fill all fields except GSTIN', backgroundColor: Colors.red.withValues(alpha: 0.1), colorText: Colors.red);
+                                  return;
+                                }
+                                _clientsController.addClient(
+                                  name,
+                                  emailController.text.trim(),
+                                  phoneController.text.trim(),
+                                  gstinController.text.trim(),
+                                  selectedState,
+                                  addressController.text.trim(),
+                                );
+                                Navigator.pop(context);
+                                Get.snackbar(
+                                  'client_saved'.tr,
+                                  'client_added_successfully'.tr,
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  backgroundColor: AppColors.success.withValues(alpha: 0.1),
+                                  colorText: AppColors.success,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF2563EB), // Blue color from image
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'save_client'.tr,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    'cancel'.tr,
-                    style: context.typography.buttonText.copyWith(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    final name = nameController.text.trim();
-                    if (name.isEmpty) {
-                      Get.snackbar('error'.tr, 'business_name_required'.tr);
-                      return;
-                    }
-                    _clientsController.addClient(
-                      name,
-                      emailController.text.trim(),
-                      phoneController.text.trim(),
-                      gstinController.text.trim(),
-                      selectedState,
-                      addressController.text.trim(),
-                    );
-                    Navigator.pop(context);
-                    Get.snackbar(
-                      'client_saved'.tr,
-                      'client_added_successfully'.tr,
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: AppColors.success.withValues(alpha: 0.1),
-                      colorText: AppColors.success,
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    'save_client'.tr,
-                    style: context.typography.buttonText.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
             );
           },
         );
@@ -1139,7 +1277,7 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+            color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5)),
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)),
           ),

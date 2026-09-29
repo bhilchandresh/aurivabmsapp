@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/constants/app_colors.dart';
-import 'expenses_controller.dart';\nimport 'all_expenses_screen.dart';
-import '../../models/expense_model.dart'; 
+import 'expenses_controller.dart';
+import 'all_expenses_screen.dart';
+import 'widgets/expense_details_bottom_sheet.dart';
 
 final formatCurrency = NumberFormat.currency(
   locale: 'en_IN',
@@ -19,7 +21,8 @@ class ExpenseFiltersRow extends StatelessWidget {
   const ExpenseFiltersRow({super.key, required this.isDark});
 
   @override
-Widget build(BuildContext context, bool isDark) {
+  Widget build(BuildContext context) {
+    final controller = Get.find<ExpensesController>();
     final List<String> defaultCategories = [
       'Maintenance',
       'Fuel',
@@ -258,7 +261,8 @@ class ExpenseListView extends StatelessWidget {
   const ExpenseListView({super.key, required this.isDark, this.showAll = false});
 
   @override
-Widget build(BuildContext context) {\n    final controller = Get.find<ExpensesController>();
+  Widget build(BuildContext context) {
+    final controller = Get.find<ExpensesController>();
     final expenses = controller.processedExpenses;
 
     if (expenses.isEmpty) {
@@ -361,7 +365,7 @@ Widget build(BuildContext context) {\n    final controller = Get.find<ExpensesCo
                 child: Material(
                   color: Theme.of(context).cardTheme.color,
                   child: InkWell(
-                    onTap: () => showExpenseDetailsBottomSheet(context, isDark, controller, expense),
+                    onTap: () => showExpenseDetailsBottomSheet(context, isDark, expense),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Row(
@@ -636,205 +640,138 @@ void exportCSV(ExpensesController controller) {
     );
   }
 
-Future<bool> confirmDelete(
+  Future<bool> confirmDelete(
     BuildContext context,
     bool isDark,
-    ExpensesController controller,\n    Expense expense,
+    ExpensesController controller,
+    Expense expense,
   ) async {
     bool confirm = false;
     await Get.dialog(
-      AlertDialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-        content: Text('delete_expense_confirm'.tr),
-        actions: [
-          Obx(() {
-            final isSaving = controller.isLoading.value;
-            return TextButton(
-              onPressed: isSaving ? null : () => Get.back(),
-              child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
-            );
-          }),
-          Obx(() {
-            final isSaving = controller.isLoading.value;
-            return ElevatedButton(
-              onPressed: isSaving
-                  ? null
-                  : () async {
-                      final success = await controller.deleteExpense(
-                        expense.id,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: SvgPicture.asset(
+                  'assets/SVG/delete.svg',
+                  width: 32,
+                  height: 32,
+                  colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Delete Expense?',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).textTheme.displayLarge?.color,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'delete_expense_confirm'.tr,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: Obx(() {
+                      final isSaving = controller.isLoading.value;
+                      return OutlinedButton(
+                        onPressed: isSaving ? null : () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                        ),
+                        child: Text(
+                          'cancel'.tr, 
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
+                            fontWeight: FontWeight.w600,
+                          )
+                        ),
                       );
-                      if (success) {
-                        confirm = true;
-                        Get.back();
-                        Get.snackbar(
-                          'Deleted',
-                          'Expense record deleted successfully',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.error,
-                          colorText: Colors.white,
-                        );
-                      } else {
-                        Get.snackbar(
-                          'Error',
-                          'Failed to delete expense record. Please try again.',
-                          snackPosition: SnackPosition.BOTTOM,
+                    }),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Obx(() {
+                      final isSaving = controller.isLoading.value;
+                      return ElevatedButton(
+                        onPressed: isSaving
+                            ? null
+                            : () async {
+                                final success = await controller.deleteExpense(
+                                  expense.id,
+                                );
+                                if (success) {
+                                  confirm = true;
+                                  Get.back();
+                                  Get.snackbar(
+                                    'Deleted',
+                                    'Expense record deleted successfully',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: AppColors.error,
+                                    colorText: Colors.white,
+                                  );
+                                } else {
+                                  Get.snackbar(
+                                    'Error',
+                                    'Failed to delete expense record. Please try again.',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.red,
+                                    colorText: Colors.white,
+                                  );
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                        );
-                      }
-                    },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: isSaving
-                  ? const SizedBox(
-                      height: 16,
-                      width: 16,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : Text('delete'.tr, style: const TextStyle(color: Colors.white)),
-            );
-          }),
-        ],
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: isSaving
+                            ? const SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : Text(
+                                'delete'.tr, 
+                                style: const TextStyle(fontWeight: FontWeight.bold)
+                              ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
     return confirm;
   }
 
-void showExpenseDetailsBottomSheet(
-    BuildContext context,
-    bool isDark,
-    ExpensesController controller,\n    Expense expense,
-  ) {
-    Get.bottomSheet(
-      Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).dialogTheme.backgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    expense.category.toUpperCase(),
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 9,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    LucideIcons.x,
-                    size: 18,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  onPressed: () => Get.back(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              expense.description,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.displayLarge?.color,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(
-                  LucideIcons.calendar,
-                  size: 12,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  DateFormat(
-                    'dd MMMM yyyy',
-                  ).format(DateTime.parse(expense.date)),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'AMOUNT PAID',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
-                        color: Theme.of(context).textTheme.bodyMedium?.color,
-                  ),
-                ),
-                Text(
-                  formatCurrency.format(expense.amount),
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.error,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Get.back();
-                      confirmDelete(context, isDark, controller, expense);
-                    },
-                    icon: const Icon(
-                      LucideIcons.trash2,
-                      size: 16,
-                      color: Colors.red,
-                    ),
-                    label: Text(
-                      'delete_log'.tr,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.red),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }

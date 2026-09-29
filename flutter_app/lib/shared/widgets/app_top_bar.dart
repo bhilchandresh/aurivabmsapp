@@ -59,7 +59,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         child: SafeArea(
           child: SizedBox(
-            height: 60,
+            height: 56,
             child: Row(
               children: [
                 // Dynamic Leading Icon based on pop state & showMenu override
@@ -174,7 +174,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                     children: [
                       IconButton(
                         icon: SvgPicture.asset(
-                          'assets/SVG/bell.svg',
+                          'assets/SVG/notification.svg',
                           height: 24,
                           width: 24,
                           colorFilter: ColorFilter.mode(titleColor ?? Colors.black, BlendMode.srcIn),
@@ -225,8 +225,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                       }
                     },
                     child: Container(
-                      height: 40,
-                      width: 40,
+                      height: 32,
+                      width: 32,
                       margin: const EdgeInsets.only(right: 16),
                       decoration: BoxDecoration(
                       gradient: const LinearGradient(
@@ -234,7 +234,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                         begin: Alignment.topRight,
                         end: Alignment.bottomLeft,
                       ),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color:
                             Theme.of(context).cardTheme.color ?? Colors.white,
@@ -286,5 +286,5 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(60);
+  Size get preferredSize => const Size.fromHeight(56);
 }

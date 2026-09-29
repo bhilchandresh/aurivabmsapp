@@ -1,5 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +16,10 @@ import '../../shared/widgets/app_input_field.dart';
 import '../../core/theme/app_extensions.dart';
 import 'expenses_controller.dart';
 import 'widgets/expense_list_item.dart';
+import 'expenses_screen.dart'; // import to access showAddExpenseBottomSheet
+import 'widgets/category_picker_bottom_sheet.dart';
+import 'widgets/expense_details_bottom_sheet.dart';
+import 'expense_components.dart';
 
 class AllExpensesScreen extends StatefulWidget {
   const AllExpensesScreen({super.key});
@@ -73,7 +81,6 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppTopBar(
         title: 'All Expenses',
-        subtitle: 'View and filter all transactions',
         showProfile: false,
         showBadge: false,
         showBackButton: true,
@@ -129,8 +136,8 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: _exportCSV,
-                                  icon: const Icon(LucideIcons.download, size: 16),
-                                  label: Text('export_to_excel'.tr),
+                                  icon: SvgPicture.asset('assets/SVG/download.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+                                  label: const Text('Export'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.success,
                                     foregroundColor: Colors.white,
@@ -145,8 +152,8 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: ElevatedButton.icon(
-                                  onPressed: () => _showAddExpenseBottomSheet(context, isDark),
-                                  icon: const Icon(LucideIcons.plus, size: 16),
+                                  onPressed: () => showAddExpenseBottomSheet(context, isDark),
+                                  icon: SvgPicture.asset('assets/SVG/plus.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
                                   label: Text('add_expense'.tr),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
@@ -193,10 +200,14 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                                             color: Colors.grey,
                                             fontSize: 13,
                                           ),
-                                          prefixIcon: const Icon(
-                                            LucideIcons.search,
-                                            color: Colors.grey,
-                                            size: 18,
+                                          prefixIcon: Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: SvgPicture.asset(
+                                              'assets/SVG/search.svg',
+                                              width: 18,
+                                              height: 18,
+                                              colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                            ),
                                           ),
                                           filled: true,
                                           fillColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
@@ -244,46 +255,41 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            const Icon(LucideIcons.layoutGrid, size: 14, color: Colors.grey),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: Obx(
-                                                () => DropdownButtonHideUnderline(
-                                                  child: DropdownButton<String>(
-                                                    isExpanded: true,
-                                                    isDense: true,
-                                                    value: _controller.filterCategory.value.isEmpty ? 'All' : _controller.filterCategory.value,
-                                                    icon: const Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey),
+                                      child: InkWell(
+                                        onTap: () {
+                                          final existingCategories = _controller.allUniqueCategories;
+                                          final defaultCategories = ['Software', 'Office', 'Travel', 'Marketing', 'Utilities', 'Maintenance', 'Salaries'];
+                                          final allCategories = {...defaultCategories, ...existingCategories}.toList()..sort();
+                                          showCategoryPickerBottomSheet(context, isDark, allCategories);
+                                        },
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                          decoration: BoxDecoration(
+                                            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              SvgPicture.asset('assets/SVG/allcube.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn)),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: Obx(
+                                                  () => Text(
+                                                    _controller.filterCategory.value.isEmpty ? 'All Categories' : _controller.filterCategory.value,
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
                                                     style: context.typography.inputText.copyWith(
                                                       color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                                                       fontSize: 13,
                                                       fontWeight: FontWeight.w600,
                                                     ),
-                                                    items: [
-                                                      const DropdownMenuItem(value: 'All', child: Text('All')),
-                                                      // Mock categories for UI matching
-                                                      const DropdownMenuItem(value: 'Software', child: Text('Software')),
-                                                      const DropdownMenuItem(value: 'Office', child: Text('Office')),
-                                                      const DropdownMenuItem(value: 'Travel', child: Text('Travel')),
-                                                    ],
-                                                    onChanged: (val) {
-                                                      if (val != null) {
-                                                        _controller.filterCategory.value = val == 'All' ? '' : val;
-                                                      }
-                                                    },
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                              const Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -300,7 +306,7 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                                           ),
                                           child: Row(
                                             children: [
-                                              const Icon(LucideIcons.calendar, size: 14, color: Colors.grey),
+                                              SvgPicture.asset('assets/SVG/calendernormal.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn)),
                                               const SizedBox(width: 8),
                                               Expanded(
                                                 child: Obx(() {
@@ -407,7 +413,7 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                                         decoration: const BoxDecoration(
                                           color: Colors.transparent,
                                         ),
-                                        child: const Icon(LucideIcons.layoutGrid, size: 14, color: Colors.grey),
+                                        child: SvgPicture.asset('assets/SVG/allcube.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn)),
                                       ),
                                     ],
                                   ),
@@ -478,7 +484,7 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                               key: Key(expense.id),
                               direction: DismissDirection.endToStart,
                               confirmDismiss: (direction) async {
-                                return await _confirmDelete(context, isDark, expense);
+                                return await confirmDelete(context, isDark, _controller, expense);
                               },
                               background: Container(
                                 alignment: Alignment.centerRight,
@@ -492,8 +498,8 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                               child: ExpenseListItem(
                                 expense: expense,
                                 isDark: isDark,
-                                onTap: () => _showExpenseDetailsBottomSheet(context, isDark, expense),
-                                onDelete: () => _confirmDelete(context, isDark, expense),
+                                onTap: () => showExpenseDetailsBottomSheet(context, isDark, expense),
+                                onDelete: () => confirmDelete(context, isDark, _controller, expense),
                                 currencyFormat: formatCurrency,
                               ),
                             ),
@@ -624,7 +630,8 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
   }
 
   // --- CSV EXPORT METHOD ---
-  void _exportCSV() {
+  // --- CSV EXPORT METHOD ---
+  Future<void> _exportCSV() async {
     final list = _controller.processedExpenses;
     if (list.isEmpty) {
       Get.snackbar(
@@ -646,567 +653,31 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
       buffer.writeln('$formattedDate,$category,${item.amount},$description');
     }
 
-    Clipboard.setData(ClipboardData(text: buffer.toString()));
-
-    Get.snackbar(
-      'export_success'.tr,
-      'csv_copied'.tr,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-      duration: const Duration(seconds: 4),
-      icon: const Icon(LucideIcons.checkCircle, color: Colors.white),
-    );
+    try {
+      final directory = await getTemporaryDirectory();
+      final file = File('${directory.path}/expenses.csv');
+      await file.writeAsString(buffer.toString());
+      
+      await Share.shareXFiles(
+        [XFile(file.path)], 
+        text: 'Exported Expenses',
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to export file.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 
   // --- EXPENSE LIST BUILDER ---
 
 
   // --- DELETE CONFIRMATION DIALOG ---
-  Future<bool> _confirmDelete(
-    BuildContext context,
-    bool isDark,
-    Expense expense,
-  ) async {
-    bool confirm = false;
-    await Get.dialog(
-      AlertDialog(
-        backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-        content: Text('delete_expense_confirm'.tr),
-        actions: [
-          Obx(() {
-            final isSaving = _controller.isLoading.value;
-            return TextButton(
-              onPressed: isSaving ? null : () => Get.back(),
-              child: Text('cancel'.tr, style: const TextStyle(color: Colors.grey)),
-            );
-          }),
-          Obx(() {
-            final isSaving = _controller.isLoading.value;
-            return ElevatedButton(
-              onPressed: isSaving
-                  ? null
-                  : () async {
-                      final success = await _controller.deleteExpense(
-                        expense.id,
-                      );
-                      if (success) {
-                        confirm = true;
-                        Get.back();
-                        Get.snackbar(
-                          'Deleted',
-                          'Expense record deleted successfully',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: AppColors.error,
-                          colorText: Colors.white,
-                        );
-                      } else {
-                        Get.snackbar(
-                          'Error',
-                          'Failed to delete expense record. Please try again.',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                        );
-                      }
-                    },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: isSaving
-                  ? const SizedBox(
-                      height: 16,
-                      width: 16,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : Text('delete'.tr, style: const TextStyle(color: Colors.white)),
-            );
-          }),
-        ],
-      ),
-    );
-    return confirm;
-  }
 
   // --- EXPENSE DETAILS BOTTOM SHEET ---
-  void _showExpenseDetailsBottomSheet(
-    BuildContext context,
-    bool isDark,
-    Expense expense,
-  ) {
-    Get.bottomSheet(
-      Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).dialogTheme.backgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.outline,
-          ),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    expense.category.toUpperCase(),
-                    style: const TextStyle(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 9,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    LucideIcons.x,
-                    size: 18,
-                    color: Theme.of(context).iconTheme.color,
-                  ),
-                  onPressed: () => Get.back(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              expense.description.trim().isEmpty ? 'No Description' : expense.description,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).textTheme.displayLarge?.color,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(
-                  LucideIcons.calendar,
-                  size: 12,
-                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  DateFormat(
-                    'dd MMMM yyyy',
-                  ).format(DateTime.parse(expense.date)),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).textTheme.bodyMedium?.color,
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'AMOUNT PAID',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
-                        color: Theme.of(context).textTheme.bodyMedium?.color,
-                  ),
-                ),
-                Text(
-                  formatCurrency.format(expense.amount),
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.error,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      Get.back();
-                      _confirmDelete(context, isDark, expense);
-                    },
-                    icon: const Icon(
-                      LucideIcons.trash2,
-                      size: 16,
-                      color: Colors.red,
-                    ),
-                    label: Text(
-                      'delete_log'.tr,
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.red),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  // --- ADD EXPENSE BOTTOM SHEET ---
-  void _showAddExpenseBottomSheet(BuildContext context, bool isDark) {
-    final formKey = GlobalKey<FormState>();
-    final amountCtrl = TextEditingController();
-    final descCtrl = TextEditingController();
-
-    DateTime selectedDate = DateTime.now();
-    final dateCtrl = TextEditingController(
-      text: DateFormat('yyyy-MM-dd').format(selectedDate),
-    );
-
-    // Categories list
-    final List<String> categories = [
-      'Software',
-      'Office',
-      'Hosting',
-      'Rent',
-      'Marketing',
-      'Utilities',
-      'Travel',
-      'Salary',
-      'Other',
-    ];
-    String selectedCategory = categories[0];
-
-    Get.bottomSheet(
-      StatefulBuilder(
-        builder: (context, setSheetState) {
-          return Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).dialogTheme.backgroundColor,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
-              ),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-            padding: const EdgeInsets.all(20),
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'log_expense'.tr,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).textTheme.displayLarge?.color,
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            LucideIcons.x,
-                            size: 18,
-                            color: Theme.of(context).iconTheme.color,
-                          ),
-                          onPressed: () => Get.back(),
-                        ),
-                      ],
-                    ),
-                    const Divider(),
-                    const SizedBox(height: 12),
-
-                    // Category dropdown select
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4, bottom: 4),
-                          child: Text(
-                            'category_star'.tr,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                                  color: Theme.of(context).textTheme.bodyMedium?.color,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButtonFormField<String>(
-                              initialValue: selectedCategory,
-                              dropdownColor: Theme.of(context).cardTheme.color,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: Theme.of(context).textTheme.bodyLarge?.color,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                              items: categories.map((cat) {
-                                return DropdownMenuItem(
-                                  value: cat,
-                                  child: Text(cat),
-                                );
-                              }).toList(),
-                              onChanged: (val) {
-                                if (val != null) {
-                                  setSheetState(() {
-                                    selectedCategory = val;
-                                  });
-                                }
-                              },
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.zero,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Description Field
-                    AppInputField(
-                      label: 'expense_desc'.tr,
-                      hintText: 'e_g_aws_servers_office_desks'.tr,
-                      controller: descCtrl,
-                      validator: (val) {
-                        if (val == null || val.trim().isEmpty) {
-                          return 'Please enter description';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Amount & Date side by side
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AppInputField(
-                            label: 'amount_rupees'.tr,
-                            hintText: '0.00',
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            controller: amountCtrl,
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.only(top: 14.0, left: 4.0),
-                              child: Text(
-                                '₹',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
-                            validator: (val) {
-                              if (val == null || val.trim().isEmpty) {
-                                return 'Required';
-                              }
-                              if (double.tryParse(val.trim()) == null ||
-                                  double.parse(val.trim()) <= 0) {
-                                return 'Invalid';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 4,
-                                  bottom: 4,
-                                ),
-                                child: Text(
-                                  'select_date'.tr,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                    color: Theme.of(context).textTheme.bodyMedium?.color,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () async {
-                                  final picked = await showDatePicker(
-                                    context: context,
-                                    initialDate: selectedDate,
-                                    firstDate: DateTime(2000),
-                                    lastDate: DateTime(2101),
-                                  );
-                                  if (picked != null) {
-                                    setSheetState(() {
-                                      selectedDate = picked;
-                                      dateCtrl.text = DateFormat(
-                                        'yyyy-MM-dd',
-                                      ).format(picked);
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 14,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: Theme.of(context).colorScheme.outline,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        dateCtrl.text,
-                                        style: TextStyle(
-                                          color: Theme.of(context).textTheme.bodyLarge?.color,
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      Icon(
-                                        LucideIcons.calendar,
-                                        size: 16,
-                                        color: Theme.of(context).iconTheme.color,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Submit button
-                    Obx(() {
-                      final isSaving = _controller.isLoading.value;
-                      return SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton.icon(
-                          onPressed: isSaving
-                              ? null
-                              : () async {
-                                  if (formKey.currentState!.validate()) {
-                                    final amt = double.parse(
-                                      amountCtrl.text.trim(),
-                                    );
-                                    final desc = descCtrl.text.trim();
-
-                                    final success = await _controller
-                                        .addExpense(
-                                          selectedCategory,
-                                          amt,
-                                          dateCtrl.text,
-                                          desc,
-                                        );
-
-                                    if (success) {
-                                      Get.back();
-                                      Get.snackbar(
-                                        'Success',
-                                        'Expense added successfully!',
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        backgroundColor: AppColors.success,
-                                        colorText: Colors.white,
-                                      );
-                                    } else {
-                                      Get.snackbar(
-                                        'Error',
-                                        'Failed to add expense. Please try again.',
-                                        snackPosition: SnackPosition.BOTTOM,
-                                        backgroundColor: Colors.red,
-                                        colorText: Colors.white,
-                                      );
-                                    }
-                                  }
-                                },
-                          icon: isSaving
-                              ? const SizedBox.shrink()
-                              : const Icon(
-                                  LucideIcons.plus,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                          label: isSaving
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  'save_expense'.tr,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-      isScrollControlled: true,
-    );
-  }
 }

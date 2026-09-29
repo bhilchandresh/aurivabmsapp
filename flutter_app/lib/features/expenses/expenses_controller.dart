@@ -209,4 +209,16 @@ class ExpensesController extends GetxController {
     }
     return breakdown;
   }
+
+  Set<String> get allUniqueCategories {
+    final Set<String> categories = {};
+    for (var exp in expenses) {
+      final cat = exp.category.trim();
+      final capitalized = cat.isEmpty
+          ? 'Other'
+          : '${cat[0].toUpperCase()}${cat.substring(1)}';
+      categories.add(capitalized);
+    }
+    return categories;
+  }
 }

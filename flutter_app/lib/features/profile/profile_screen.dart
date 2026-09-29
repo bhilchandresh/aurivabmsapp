@@ -32,139 +32,237 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _showLogoutConfirmDialog(BuildContext context, AuthController authController) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final cardColor = Theme.of(context).cardTheme.color ?? (isDark ? Colors.grey.shade900 : Colors.white);
     final titleColor = isDark ? Colors.white : const Color(0xFF0F172A);
     final subtitleColor = isDark ? Colors.white60 : Colors.black54;
-    final dividerColor = isDark
-        ? Colors.white.withValues(alpha: 0.1)
-        : Colors.black.withValues(alpha: 0.08);
 
     Get.dialog(
       Dialog(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
         child: Container(
           decoration: BoxDecoration(
             color: cardColor,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: isDark
-                  ? Colors.red.withValues(alpha: 0.2)
-                  : Colors.red.shade100,
-              width: 1.2,
-            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.12),
+                color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.1),
                 blurRadius: 32,
                 offset: const Offset(0, 8),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(28),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          child: Stack(
             children: [
-              // Red icon badge
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: isDark ? 0.12 : 0.08),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.red.withValues(alpha: isDark ? 0.3 : 0.2),
-                    width: 1.5,
-                  ),
-                ),
-                child: Icon(
-                  Icons.logout_rounded,
-                  color: isDark ? Colors.red.shade400 : Colors.red.shade600,
-                  size: 26,
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Title
-              Text(
-                'sign_out'.tr,
-                style: context.typography.dialogTitle.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: titleColor,
-                  letterSpacing: 0.3,
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Subtitle
-              Text(
-                'sign_out_confirm'.tr,
-                textAlign: TextAlign.center,
-                style: context.typography.dialogContent.copyWith(
-                  fontSize: 13,
-                  color: subtitleColor,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Divider(color: dividerColor, height: 1),
-              const SizedBox(height: 20),
-              // Action buttons
-              Row(
-                children: [
-                  // Cancel
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Get.back(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: isDark ? Colors.white70 : Colors.black87,
-                        side: BorderSide(
-                          color: isDark
-                              ? Colors.white.withValues(alpha: 0.15)
-                              : Colors.black.withValues(alpha: 0.12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 4),
+                    // Centered Icon with subtle rings
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.red.withValues(alpha: 0.05), width: 1),
+                          ),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        Container(
+                          width: 75,
+                          height: 75,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.red.withValues(alpha: 0.1), width: 1),
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        'cancel'.tr,
-                        style: context.typography.buttonText.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
+                        Positioned(
+                          top: 10, right: 10,
+                          child: Container(width: 6, height: 6, decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.2), shape: BoxShape.circle)),
                         ),
+                        Positioned(
+                          bottom: 10, left: 10,
+                          child: Container(width: 4, height: 4, decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.3), shape: BoxShape.circle)),
+                        ),
+                        Positioned(
+                          bottom: 25, right: 5,
+                          child: Container(width: 5, height: 5, decoration: BoxDecoration(color: Colors.red.withValues(alpha: 0.2), shape: BoxShape.circle)),
+                        ),
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: Colors.red.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: SvgPicture.asset(
+                            'assets/SVG/logout.svg',
+                            colorFilter: ColorFilter.mode(Colors.red.shade500, BlendMode.srcIn),
+                            width: 28,
+                            height: 28,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    // Title
+                    Text(
+                      'Sign Out',
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        color: titleColor,
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Confirm Sign Out
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Get.back();
-                        authController.logout();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: isDark
-                            ? Colors.red.withValues(alpha: 0.85)
-                            : Colors.red.shade600,
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: Text(
-                        'sign_out'.tr,
-                        style: context.typography.buttonText.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                        ),
+                    const SizedBox(height: 6),
+                    // Subtitle
+                    Text(
+                      'Are you sure you want to sign out\nfrom your account?',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: subtitleColor,
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    
+                    // Warning Box
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.05),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.red.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: SvgPicture.asset(
+                              'assets/SVG/shield.svg',
+                              colorFilter: ColorFilter.mode(Colors.red.shade500, BlendMode.srcIn),
+                              width: 18,
+                              height: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'You will need to sign in again to access your account and data.',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: subtitleColor,
+                                fontWeight: FontWeight.w500,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    // Action buttons
+                    Row(
+                      children: [
+                        // Cancel
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Get.back(),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: isDark ? Colors.white70 : const Color(0xFF334155),
+                              side: BorderSide(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.15)
+                                    : Colors.grey.shade300,
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Cancel',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        // Confirm Sign Out
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Get.back();
+                              authController.logout();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFEF4444),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/SVG/logout.svg',
+                                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                                  width: 16,
+                                  height: 16,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Sign Out',
+                                  style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              // Close button
+              Positioned(
+                top: 16,
+                right: 16,
+                child: GestureDetector(
+                  onTap: () => Get.back(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.white.withValues(alpha: 0.1) : const Color(0xFFF1F5F9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      size: 16,
+                      color: isDark ? Colors.white70 : const Color(0xFF64748B),
+                    ),
                   ),
-                ],
+                ),
               ),
             ],
           ),
@@ -196,119 +294,182 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //         ? Get.find<NotificationController>()
 //         : Get.put(NotificationController(), permanent: true);
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Code-generated Logo Header matching Super Admin Profile
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.only(top: 16, bottom: 40),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E293B), // Dark background from screenshot
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(32),
-                  ),
-                ),
-                child: Column(
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: const Color(0xFF1E293B),
+            pinned: true,
+            expandedHeight: 260.0,
+            toolbarHeight: 64.0,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+            ),
+            leading: IconButton(
+              icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+              onPressed: () {
+                if (Get.isRegistered<MainLayoutController>()) {
+                  Get.find<MainLayoutController>().changeIndex(0);
+                } else {
+                  Get.back();
+                }
+              },
+            ),
+            flexibleSpace: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+                final top = constraints.biggest.height;
+                final statusBarHeight = MediaQuery.of(context).padding.top;
+                final minHeight = statusBarHeight + 64.0;
+                const expandedHeight = 260.0;
+
+                double t = (expandedHeight - top) / (expandedHeight - minHeight);
+                t = t.clamp(0.0, 1.0);
+
+                return Stack(
+                  fit: StackFit.expand,
                   children: [
-                    // Back Button
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: IconButton(
-                          icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
-                          onPressed: () {
-                            if (Get.isRegistered<MainLayoutController>()) {
-                              Get.find<MainLayoutController>().changeIndex(0);
-                            } else {
-                              Get.back();
-                            }
-                          },
-                        ),
+                    // Optional subtle hex pattern for background
+                    Positioned(
+                      right: -30,
+                      bottom: -20,
+                      child: Icon(
+                        LucideIcons.hexagon,
+                        size: 150,
+                        color: Colors.white.withValues(alpha: 0.03),
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    // App Icon (White square, blue hexagon)
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          LucideIcons.hexagon,
-                          color: Color(0xFF2563EB),
-                          size: 36,
-                        ),
+                    Positioned(
+                      left: -40,
+                      top: 40,
+                      child: Icon(
+                        LucideIcons.hexagon,
+                        size: 120,
+                        color: Colors.white.withValues(alpha: 0.03),
                       ),
                     ),
-                    const SizedBox(height: 24),
-                    // AurivaBMS Text — font locked to Inter so weight never
-                    // changes when the app language switches to a non-Latin locale.
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.baseline,
-                          textBaseline: TextBaseline.alphabetic,
-                          children: [
-                            Text(
-                              'Auriva',
-                              style: GoogleFonts.inter(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.white,
-                                letterSpacing: -0.5,
+                    
+                    // Expanded Content (Fades out)
+                    Opacity(
+                      opacity: (1 - t * 2).clamp(0.0, 1.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                LucideIcons.hexagon,
+                                color: Color(0xFF2563EB),
+                                size: 36,
                               ),
                             ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.baseline,
+                            textBaseline: TextBaseline.alphabetic,
+                            children: [
+                              Text(
+                                'Auriva',
+                                style: GoogleFonts.inter(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                              Text(
+                                'BMS',
+                                style: GoogleFonts.inter(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.blue.shade600,
+                                  letterSpacing: -0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'BUSINESS MANAGEMENT SYSTEM',
+                            style: context.typography.categoryHeader.copyWith(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: const Color(0xFF94A3B8),
+                              letterSpacing: 2.0,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
+
+                    // Collapsed Content (Fades in)
+                    Positioned(
+                      left: 56.0,
+                      bottom: 12.0,
+                      child: Opacity(
+                        opacity: ((t - 0.5) * 2).clamp(0.0, 1.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  'Auriva',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                                Text(
+                                  'BMS',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.blue.shade600,
+                                    letterSpacing: -0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
                             Text(
-                              'BMS',
-                              style: GoogleFonts.inter(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.blue.shade600,
-                                letterSpacing: -0.5,
+                              'Settings',
+                              style: context.typography.categoryHeader.copyWith(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF94A3B8),
                               ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          'BUSINESS MANAGEMENT SYSTEM',
-                          style: context.typography.categoryHeader.copyWith(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                            color: const Color(0xFF94A3B8),
-                            letterSpacing: 2.0,
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
-                ),
-              ),
+                );
+              },
+            ),
+          ),
 
-              // Body Content (Menu Items and Operations)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 20.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+          // Body Content (Menu Items and Operations)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                     // Section: Business Operations
                     _buildSectionHeader('business_operations'.tr),
                     const SizedBox(height: 8),
@@ -347,7 +508,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               subtitle: 'your_info_sub'.tr,
                               iconAsset: 'assets/SVG/profile.svg',
                               iconColor: Colors.blue.shade600,
-                              iconBg: Colors.blue.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.blue.withValues(alpha: 0.1) : Colors.blue.shade50,
                               onTap: () =>
                                   Get.to(() => const YourInformationScreen()),
                             ),
@@ -359,7 +520,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               subtitle: 'inventory_sub'.tr,
                               iconAsset: 'assets/SVG/inventory.svg',
                               iconColor: Colors.blue.shade600,
-                              iconBg: Colors.blue.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.blue.withValues(alpha: 0.1) : Colors.blue.shade50,
                               onTap: () =>
                                   Get.to(() => const InventoryScreen()),
                             ),
@@ -371,7 +532,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               subtitle: 'suppliers_sub'.tr,
                               iconAsset: 'assets/SVG/supplier.svg',
                               iconColor: Colors.orange.shade600,
-                              iconBg: Colors.orange.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.orange.withValues(alpha: 0.1) : Colors.orange.shade50,
                               onTap: () =>
                                   Get.to(() => const SuppliersScreen()),
                             ),
@@ -383,7 +544,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               subtitle: 'expenses_sub'.tr,
                               iconAsset: 'assets/SVG/expance.svg',
                               iconColor: Colors.green.shade600,
-                              iconBg: Colors.green.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.green.withValues(alpha: 0.1) : Colors.green.shade50,
                               onTap: () => Get.to(() => const ExpensesScreen()),
                             ),
                             _buildDivider(),
@@ -394,7 +555,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               subtitle: 'import_data_sub'.tr,
                               iconAsset: 'assets/SVG/import.svg',
                               iconColor: Colors.teal.shade600,
-                              iconBg: Colors.teal.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.teal.withValues(alpha: 0.1) : Colors.teal.shade50,
                               onTap: () => Get.to(() => const ImportDataScreen()),
                             ),
                             _buildDivider(),
@@ -405,20 +566,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               subtitle: 'notifications_sub'.tr,
                               iconAsset: 'assets/SVG/notification.svg',
                               iconColor: Colors.red.shade500,
-                              iconBg: Colors.red.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.red.withValues(alpha: 0.1) : Colors.red.shade50,
                               onTap: () =>
                                   Get.to(() => const NotificationScreen()),
-                            ),
-                            _buildDivider(),
-                            _buildMenuRow(
-                              context,
-                              index: 6,
-                              title: 'language'.tr,
-                              subtitle: 'change_language_sub'.tr,
-                              iconAsset: 'assets/SVG/language.svg',
-                              iconColor: Colors.indigo.shade600,
-                              iconBg: Colors.indigo.shade50,
-                              onTap: () => Get.toNamed('/language'),
                             ),
                             _buildDivider(),
                             Obx(() {
@@ -430,7 +580,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 subtitle: 'toggle_theme'.tr,
                                 iconAsset: isDark ? 'assets/SVG/light.svg' : 'assets/SVG/dark.svg',
                                 iconColor: isDark ? Colors.amber.shade600 : Colors.blueGrey.shade600,
-                                iconBg: isDark ? Colors.amber.shade50 : Colors.blueGrey.shade50,
+                                iconBg: isDark ? Colors.amber.withValues(alpha: 0.1) : Colors.blueGrey.shade50,
                                 onTap: () {
                                   Get.find<ThemeService>().switchTheme();
                                 },
@@ -480,7 +630,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               subtitle: 'contact_us_sub'.tr,
                               iconAsset: 'assets/SVG/mail.svg',
                               iconColor: Colors.blue.shade600,
-                              iconBg: Colors.blue.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.blue.withValues(alpha: 0.1) : Colors.blue.shade50,
                               onTap: () => Get.to(() => const ContactScreen()),
                             ),
                             _buildDivider(),
@@ -491,7 +641,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               subtitle: 'privacy_policy_sub'.tr,
                               iconAsset: 'assets/SVG/privacy.svg',
                               iconColor: Colors.green.shade600,
-                              iconBg: Colors.green.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.green.withValues(alpha: 0.1) : Colors.green.shade50,
                               onTap: () => Get.to(() => InfoScreen(
                                 title: 'privacy_policy'.tr,
                                 endpoint: '/public/legal/privacy_policy',
@@ -504,14 +654,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _buildMenuRow(
                               context,
                               index: 22,
-                              title: 'terms_conditions'.tr,
+                              title: 'terms_conditions_1'.tr,
                               subtitle: 'terms_conditions_sub'.tr,
                               iconAsset: 'assets/SVG/tearmandcondition.svg',
                               iconColor: Colors.blue.shade600,
-                              iconBg: Colors.blue.shade50,
+                              iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.blue.withValues(alpha: 0.1) : Colors.blue.shade50,
                               onTap: () => Get.to(() => InfoScreen(
-                                title: 'terms_conditions'.tr,
-                                endpoint: '/public/legal/terms_conditions',
+                                title: 'terms_conditions_1'.tr,
+                                endpoint: '/public/legal/terms_and_conditions',
                                 headerColor: const Color(0xFF2563EB),
                                 icon: LucideIcons.fileText,
                                 fallbackText: 'Welcome to Auriva BMS. By accessing or using our Business Management System, web application, and mobile application (collectively, the "Service"), you agree to be bound by these Terms and Conditions.\n\n1. General Usage\nAuriva BMS provides a software-as-a-service (SaaS) platform for invoicing, quotation management, and business tracking.\n\n2. User Responsibilities\nYou are responsible for maintaining the confidentiality of your account credentials. Any activity occurring under your account is your sole responsibility.',
@@ -562,7 +712,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 subtitle: 'team_access_sub'.tr,
                                 iconAsset: 'assets/SVG/teamandaccess.svg',
                                 iconColor: Colors.purple.shade600,
-                                iconBg: Colors.purple.shade50,
+                                iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.purple.withValues(alpha: 0.1) : Colors.purple.shade50,
                                 onTap: () => Get.to(() => const TeamScreen()),
                               ),
                               _buildDivider(),
@@ -573,7 +723,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 subtitle: 'settings_sub'.tr,
                                 iconAsset: 'assets/SVG/setting-2.svg',
                                 iconColor: Colors.blueGrey.shade600,
-                                iconBg: Colors.blueGrey.shade50,
+                                iconBg: Theme.of(context).brightness == Brightness.dark ? Colors.blueGrey.withValues(alpha: 0.1) : Colors.blueGrey.shade50,
                                 onTap: () => Get.to(() => const SettingsScreen()),
                               ),
                             ],
@@ -598,7 +748,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 54,
                         child: OutlinedButton.icon(
                           onPressed: () => _showLogoutConfirmDialog(context, authController),
-                          icon: const Icon(LucideIcons.logOut, size: 18),
+                          icon: SvgPicture.asset(
+                            'assets/SVG/logout.svg',
+                            width: 18,
+                            height: 18,
+                            colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? Colors.red.shade400 : Colors.red.shade600, BlendMode.srcIn),
+                          ),
                           label: Text(
                             'sign_out'.tr,
                             style: context.typography.buttonText.copyWith(
@@ -630,18 +785,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildSectionHeader(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
       child: Text(
-        title,
+        title.toUpperCase(),
         style: context.typography.categoryHeader.copyWith(
           fontSize: 11,
           fontWeight: FontWeight.bold,
@@ -670,7 +824,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //           Container(
 //             padding: const EdgeInsets.all(10),
 //             decoration: BoxDecoration(
-//               color: Colors.blue.shade50,
+//               color: isDark ? Colors.blue.withValues(alpha: 0.1) : Colors.blue.shade50,
 //               borderRadius: BorderRadius.circular(10),
 //             ),
 //             child: Icon(icon, color: Colors.blue.shade600, size: 20),

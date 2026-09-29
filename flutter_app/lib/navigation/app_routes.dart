@@ -8,9 +8,8 @@ import '../features/expenses/expenses_screen.dart';
 import '../features/team/team_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../features/import_data/import_data_screen.dart';
-import '../features/profile/language_screen.dart';
+
 import 'main_layout.dart';
-import 'super_admin_main_layout.dart';
 
 class AppRoutes {
   static const splash = '/splash';
@@ -23,8 +22,7 @@ class AppRoutes {
   static const team = '/team';
   static const settings = '/settings';
   static const importData = '/import_data';
-  static const language = '/language';
-  static const superAdminMain = '/super_admin_main';
+
 
   static final pages = [
     GetPage(
@@ -77,15 +75,6 @@ class AppRoutes {
       page: () => const ImportDataScreen(),
       transition: Transition.rightToLeftWithFade,
     ),
-    GetPage(
-      name: language,
-      page: () => const LanguageScreen(),
-      transition: Transition.rightToLeftWithFade,
-    ),
-    GetPage(
-      name: superAdminMain,
-      page: () => const SuperAdminMainLayout(),
-      transition: Transition.fadeIn,
-    ),
+
   ];
 }

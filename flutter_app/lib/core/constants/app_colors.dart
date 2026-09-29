@@ -16,12 +16,12 @@ class AppColors {
   static const Color lightBorder = Color(0xFFE2E8F0); // Slate 200
 
   // Dark Theme Colors
-  static const Color darkBackground = Color(0xFF0D1117); // GitHub Dark background
-  static const Color darkSurface = Color(0xFF161B22); // GitHub Dark surface
-  static const Color darkCard = Color(0xFF1E293B); // Slate 800
+  static const Color darkBackground = Color(0xFF000000); // True Black
+  static const Color darkSurface = Color(0xFF121212); // Slightly lighter than black
+  static const Color darkCard = Color(0xFF1C1C1E); // Distinct dark gray for cards
   static const Color darkTextPrimary = Color(0xFFF1F5F9); // Slate 100
   static const Color darkTextSecondary = Color(0xFF94A3B8); // Slate 400
-  static const Color darkBorder = Color(0xFF334155); // Slate 700
+  static const Color darkBorder = Color(0xFF333333); // Visible subtle border
 
   // Semantic Colors
   static const Color success = Color(0xFF10B981); // Emerald 500

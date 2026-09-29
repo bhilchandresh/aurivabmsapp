@@ -1,0 +1,294 @@
+﻿  void _showRecordPaymentDialog(BuildContext context, String supplierId) {
+    final amountController = TextEditingController();
+    final referenceController = TextEditingController();
+    final notesController = TextEditingController();
+
+    DateTime paymentDate = DateTime.now();
+    String paymentMode = 'Bank Transfer';
+
+    Get.dialog(
+      Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Theme.of(context).cardTheme.color,
+        surfaceTintColor: Colors.transparent,
+        child: SizedBox(
+          width: 500,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // HEADER
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 12,
+                      top: 16,
+                      bottom: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              LucideIcons.creditCard,
+                              color: Colors.green,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'record_payment_to_supplier'.tr,
+                              style: context.typography.invoiceTitle.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        IconButton(
+                          onPressed: () => Get.back(),
+                          icon: const Icon(
+                            LucideIcons.x,
+                            size: 20,
+                            color: Colors.grey,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          splashRadius: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(height: 1, color: Theme.of(context).colorScheme.outline),
+
+                  // CONTENT
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildCustomTextField(
+                            label: 'AMOUNT PAID *',
+                            hint: '₹ 0.00',
+                            controller: amountController,
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildCustomDateField(
+                                  label: 'PAYMENT DATE',
+                                  date: paymentDate,
+                                  onTap: () async {
+                                    final picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: paymentDate,
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2101),
+                                    );
+                                    if (picked != null) {
+                                      setState(() => paymentDate = picked);
+                                    }
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: _buildCustomDropdownField(
+                                  label: 'MODE',
+                                  value: paymentMode,
+                                  items: [
+                                    'Cash',
+                                    'Bank Transfer',
+                                    'UPI',
+                                    'Cheque',
+                                    'Other',
+                                  ],
+                                  onChanged: (val) {
+                                    if (val != null) {
+                                      setState(() => paymentMode = val);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _buildCustomTextField(
+                            label: 'REFERENCE / UTR NO.',
+                            hint: 'Optional',
+                            controller: referenceController,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'notes_1'.tr,
+                            style: context.typography.cardSubtitle.copyWith(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          TextFormField(
+                            controller: notesController,
+                            maxLines: 3,
+                            decoration: InputDecoration(
+                              hintText: 'enter_internal_notes_optional'.tr,
+                              hintStyle: context.typography.searchHint.copyWith(
+                                color: Colors.grey.shade400,
+                                fontSize: 13,
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                              fillColor: Theme.of(context).scaffoldBackgroundColor,
+                              filled: true,
+                            ),
+                            style: context.typography.inputText.copyWith(fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // FOOTER
+                  Divider(height: 1, color: Theme.of(context).colorScheme.outline),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Get.back(),
+                          child: Text(
+                            'cancel'.tr,
+                            style: context.typography.buttonText.copyWith(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Obx(() {
+                          final isSaving = _suppliersController.isLoading.value;
+                          return ElevatedButton(
+                            onPressed: isSaving
+                                ? null
+                                : () async {
+                                    final double amount =
+                                        double.tryParse(
+                                          amountController.text,
+                                        ) ??
+                                        0.0;
+                                    if (amount <= 0) {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Please enter a valid amount',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                      return;
+                                    }
+
+                                    final success = await _suppliersController
+                                        .recordPayment(
+                                          supplierId,
+                                          amount,
+                                          DateFormat(
+                                            'yyyy-MM-dd',
+                                          ).format(paymentDate),
+                                          paymentMode,
+                                          referenceController.text.trim(),
+                                          notesController.text.trim(),
+                                        );
+
+                                    if (success) {
+                                      Get.back();
+                                      Get.snackbar(
+                                        'Success',
+                                        'Payment recorded successfully',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.green,
+                                        colorText: Colors.white,
+                                      );
+                                    } else {
+                                      Get.snackbar(
+                                        'Error',
+                                        'Failed to record payment. Please try again.',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.red,
+                                        colorText: Colors.white,
+                                      );
+                                    }
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: isSaving
+                                ? const SizedBox(
+                                    height: 16,
+                                    width: 16,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    'record_payment'.tr,
+                                    style: context.typography.buttonText.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field, unused_element, deprecated_member_use
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
@@ -760,62 +761,84 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
-        border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.outline)),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
+      padding: const EdgeInsets.all(12),
+      child: Column(
         children: [
-          Expanded(
-            child: DynamicActionButton(
-              onTap: () => _triggerAction('WhatsApp'),
-              icon: LucideIcons.messageCircle,
-              label: 'WhatsApp',
-              iconColor: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
-              textColor: isDark ? const Color(0xFF34D399) : const Color(0xFF059669),
-              backgroundColor: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
-              borderColor: isDark ? const Color(0xFF065F46) : const Color(0xFFD1FAE5),
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: DynamicActionButton(
+                  onTap: () => _triggerAction('WhatsApp'),
+                  svgAsset: 'assets/SVG/whatsapp.svg',
+                  label: 'WhatsApp',
+                  iconColor: isDark ? const Color(0xFF34D399) : const Color(0xFF10B981),
+                  textColor: isDark ? const Color(0xFF34D399) : const Color(0xFF10B981),
+                  backgroundColor: isDark ? const Color(0xFF064E3B) : const Color(0xFFECFDF5),
+                  borderColor: isDark ? const Color(0xFF065F46) : const Color(0xFFD1FAE5),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: DynamicActionButton(
+                  onTap: () => _triggerAction('Email'),
+                  svgAsset: 'assets/SVG/mail.svg',
+                  label: 'Email',
+                  iconColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                  textColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+                  backgroundColor: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
+                  borderColor: isDark ? const Color(0xFF1E40AF) : const Color(0xFFDBEAFE),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: DynamicActionButton(
-              onTap: () => _triggerAction('Email'),
-              icon: LucideIcons.mail,
-              label: 'Email',
-              iconColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-              textColor: isDark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-              backgroundColor: isDark ? const Color(0xFF1E3A8A) : const Color(0xFFEFF6FF),
-              borderColor: isDark ? const Color(0xFF1E40AF) : const Color(0xFFDBEAFE),
-            ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: DynamicActionButton(
+                  onTap: () => _triggerAction('Share'),
+                  svgAsset: 'assets/SVG/share.svg',
+                  label: 'Share',
+                  iconColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+                  textColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+                  backgroundColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                  borderColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: DynamicActionButton(
+                  onTap: () => _triggerAction('Print Quotation'),
+                  svgAsset: 'assets/SVG/printer.svg',
+                  label: 'Print',
+                  iconColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+                  textColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+                  backgroundColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                  borderColor: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Container(
-            width: 1,
-            height: 24,
-            color: Theme.of(context).colorScheme.outline,
-          ), // Divider
-          const SizedBox(width: 8),
-          Expanded(
-            child: DynamicActionButton(
-              onTap: () => _triggerAction('Share'),
-              icon: LucideIcons.share2,
-              label: 'Share',
-              iconColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
-              textColor: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
-              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-              borderColor: Theme.of(context).colorScheme.outline,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Expanded(
-            flex: 1,
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
             child: DynamicActionButton(
               onTap: () => _triggerAction('Download PDF'),
-              icon: LucideIcons.download,
+              svgAsset: 'assets/SVG/downloac.svg',
               label: 'Download',
               iconColor: Colors.white,
               textColor: Colors.white,
-              backgroundColor: const Color(0xFF0F172A),
+              backgroundColor: AppColors.primary,
+              borderColor: AppColors.primary,
             ),
           ),
         ],
@@ -1021,10 +1044,10 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        leadingWidth: 48,
-        titleSpacing: 4,
+        scrolledUnderElevation: 0,
+        leadingWidth: 56,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: Center(
@@ -1037,93 +1060,86 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).cardTheme.color,
                   shape: BoxShape.circle,
+                  border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.02),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: Icon(
-                  LucideIcons.arrowLeft,
-                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                  size: 18,
+                child: Center(
+                  child: SvgPicture.asset(
+                    'assets/SVG/backarrow.svg',
+                    width: 18,
+                    height: 18,
+                    colorFilter: ColorFilter.mode(
+                      Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.quotationId,
-              style: TextStyle(
-                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                fontWeight: FontWeight.w900,
-                fontSize: 18,
-              ),
+        title: Text(
+          widget.quotationId,
+          style: TextStyle(
+            color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+            fontWeight: FontWeight.w800,
+            fontSize: 16,
+          ),
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.amber.withValues(alpha: 0.15) : const Color(0xFFFFFBEB),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.amber.withValues(alpha: 0.3) : const Color(0xFFFDE68A)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.02),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            const Row(
-              mainAxisSize: MainAxisSize.min,
+            child: Row(
               children: [
-                Icon(LucideIcons.hexagon, size: 10, color: Color(0xFF6366F1)),
-                SizedBox(width: 4),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFF59E0B),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
                 Text(
-                  'AURIVA PROPOSAL',
-                  style: TextStyle(
-                    color: Color(0xFF64748B),
-                    fontWeight: FontWeight.w700,
-                    fontSize: 10,
-                    letterSpacing: 1.2,
+                  _currentStatus.toUpperCase(),
+                  style: const TextStyle(
+                    color: Color(0xFFF59E0B),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
-        actions: [
-          Center(child: PulsingStatusBadge(status: _currentStatus)),
-          const SizedBox(width: 12),
-          Center(
-            child: InkWell(
-              onTap: () => _triggerAction('Print Quotation'),
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardTheme.color,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      LucideIcons.printer,
-                      size: 14,
-                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Print',
-                      style: TextStyle(
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
-          const SizedBox(width: 16),
         ],
       ),
-      body: Column(
-        children: [
-          _buildActionBar(),
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+          child: Column(
+            children: [
+              _buildActionBar(),
+              const SizedBox(height: 16),
+              Center(
                 child: Column(
                   children: [
                     Container(
@@ -1142,10 +1158,11 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(
-                            LucideIcons.monitor,
-                            size: 14,
-                            color: AppColors.primary,
+                          SvgPicture.asset(
+                            'assets/SVG/tv.svg',
+                            width: 14,
+                            height: 14,
+                            colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn),
                           ),
                           const SizedBox(width: 8),
                           const Text(
@@ -1157,31 +1174,13 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                               letterSpacing: 1.0,
                             ),
                           ),
-                          const Spacer(),
-                          Container(
-                            width: 6,
-                            height: 6,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.green,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Text(
-                            'Interactive Scaling',
-                            style: TextStyle(
-                              fontSize: 10,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                         ],
                       ),
                     ),
                     Container(
                       constraints: const BoxConstraints(maxWidth: 800),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardTheme.color,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(color: Theme.of(context).colorScheme.outline),
                         boxShadow: [
@@ -1203,9 +1202,9 @@ class _QuotationDetailsScreenState extends State<QuotationDetailsScreen> {
                   ],
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -1406,7 +1405,8 @@ class _PulsingStatusBadgeState extends State<PulsingStatusBadge>
 }
 
 class DynamicActionButton extends StatefulWidget {
-  final IconData icon;
+  final IconData? icon;
+  final String? svgAsset;
   final String label;
   final Color iconColor;
   final Color? backgroundColor;
@@ -1417,7 +1417,8 @@ class DynamicActionButton extends StatefulWidget {
 
   const DynamicActionButton({
     super.key,
-    required this.icon,
+    this.icon,
+    this.svgAsset,
     required this.label,
     required this.iconColor,
     this.backgroundColor,
@@ -1473,7 +1474,7 @@ class _DynamicActionButtonState extends State<DynamicActionButton>
             gradient: widget.gradientColors != null
                 ? LinearGradient(colors: widget.gradientColors!)
                 : null,
-            borderRadius: BorderRadius.circular(10),
+            borderRadius: BorderRadius.circular(8),
             border: widget.borderColor != null
                 ? Border.all(color: widget.borderColor!)
                 : null,
@@ -1492,8 +1493,16 @@ class _DynamicActionButtonState extends State<DynamicActionButton>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(widget.icon, size: 14, color: widget.iconColor),
-              const SizedBox(width: 4),
+              if (widget.svgAsset != null)
+                SvgPicture.asset(
+                  widget.svgAsset!,
+                  width: 14,
+                  height: 14,
+                  colorFilter: ColorFilter.mode(widget.iconColor, BlendMode.srcIn),
+                )
+              else if (widget.icon != null)
+                Icon(widget.icon, size: 14, color: widget.iconColor),
+              const SizedBox(width: 6),
               Flexible(
                 child: Text(
                   widget.label,

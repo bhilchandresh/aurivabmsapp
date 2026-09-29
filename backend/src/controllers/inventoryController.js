@@ -13,7 +13,15 @@ exports.getItems = async (req, res) => {
     const items = await Inventory.find({ tenantId: req.user.tenantId })
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 });
-    res.status(200).json({ success: true, count: items.length, data: items });
+    const tenant = await Tenant.findById(req.user.tenantId);
+    const limits = getPlanLimits(tenant ? tenant.subscriptionPlan : 'basic');
+    
+    res.status(200).json({ 
+      success: true, 
+      count: items.length, 
+      maxLimit: limits.maxInventory,
+      data: items 
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

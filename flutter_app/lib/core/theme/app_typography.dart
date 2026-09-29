@@ -9,17 +9,6 @@ class AppTypography {
   // FONT FAMILY STRATEGY
   // ---------------------------------------------------------------------------
   static String? get fontFamily {
-    if (Get.locale?.languageCode == 'hi' || Get.locale?.languageCode == 'mr') {
-      return GoogleFonts.hind().fontFamily;
-    } else if (Get.locale?.languageCode == 'gu') {
-      return GoogleFonts.hindVadodara().fontFamily;
-    } else if (Get.locale?.languageCode == 'bn') {
-      return GoogleFonts.hindSiliguri().fontFamily;
-    } else if (Get.locale?.languageCode == 'te') {
-      return GoogleFonts.hindGuntur().fontFamily;
-    } else if (Get.locale?.languageCode == 'ta') {
-      return GoogleFonts.hindMadurai().fontFamily;
-    }
     return GoogleFonts.inter().fontFamily;
   }
 

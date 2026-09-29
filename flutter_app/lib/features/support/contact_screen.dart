@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:convert';
 import '../../core/utils/api_service.dart';
 import 'info_screen.dart';
+import '../../shared/widgets/app_top_bar.dart';
 
 class ContactScreen extends StatefulWidget {
   const ContactScreen({super.key});
@@ -17,9 +19,17 @@ class _ContactScreenState extends State<ContactScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
-  final _subjectCtrl = TextEditingController();
   final _messageCtrl = TextEditingController();
+  String? _selectedSubject;
   bool _isLoading = false;
+
+  final List<String> _subjects = [
+    'General Inquiry',
+    'Technical Support',
+    'Billing',
+    'Feature Request',
+    'Other'
+  ];
 
   Future<void> _sendMessage() async {
     if (!_formKey.currentState!.validate()) {
@@ -37,7 +47,7 @@ class _ContactScreenState extends State<ContactScreen> {
       final response = await ApiService.post('/public/contact', {
         'name': _nameCtrl.text,
         'email': _emailCtrl.text,
-        'subject': _subjectCtrl.text,
+        'subject': _selectedSubject ?? 'General Inquiry',
         'message': _messageCtrl.text,
       });
       
@@ -54,7 +64,6 @@ class _ContactScreenState extends State<ContactScreen> {
         colorText: Colors.white,
       );
       
-      // Delay slightly before going back so the user sees the success message
       Future.delayed(const Duration(seconds: 1), () {
         Get.back();
       });
@@ -78,23 +87,17 @@ class _ContactScreenState extends State<ContactScreen> {
 
     return Scaffold(
       backgroundColor: bgColor,
-      appBar: AppBar(
-        backgroundColor: Colors.blue.shade600,
-        elevation: 0,
-        foregroundColor: Colors.white,
-          title: Text(
-                "Contact Us",
-                style: GoogleFonts.inter(
-                 color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: 18,
-                    fontWeight : FontWeight.bold,
-                ),
-            ),       
+      appBar: const AppTopBar(
+        title: 'Contact Us',
+        showMenu: false,
+        showProfile: false,
+        showBadge: false,
+        showBackButton: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
             child: Center(
               child: Container(
                 width: double.infinity,
@@ -111,98 +114,102 @@ class _ContactScreenState extends State<ContactScreen> {
                   ],
                 ),
                 child: Padding(
-                      padding: const EdgeInsets.all(32),
-                      child: Form(
+                  padding: const EdgeInsets.all(16),
+                  child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Name and Email (Responsive Row)
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            if (constraints.maxWidth > 400) {
-                              return Row(
+                        // Get in Touch Header
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/SVG/message.svg',
+                                width: 18,
+                                height: 18,
+                                colorFilter: ColorFilter.mode(Colors.blue.shade600, BlendMode.srcIn),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(child: _buildInput('Name', 'John Doe', LucideIcons.user, _nameCtrl)),
-                                  const SizedBox(width: 16),
-                                  Expanded(child: _buildInput('Email Address', 'john@example.com', LucideIcons.mail, _emailCtrl)),
+                                  Text(
+                                    'Get in Touch',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white : Colors.black87,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Have a question, suggestion or need support? Fill out the form below and we\'ll get back to you soon.',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      color: Colors.grey.shade500,
+                                      height: 1.3,
+                                    ),
+                                  ),
                                 ],
-                              );
-                            } else {
-                              return Column(
-                                children: [
-                                  _buildInput('Name', 'John Doe', LucideIcons.user, _nameCtrl),
-                                  const SizedBox(height: 16),
-                                  _buildInput('Email Address', 'john@example.com', LucideIcons.mail, _emailCtrl),
-                                ],
-                              );
-                            }
-                          },
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
-                        _buildInput('Subject', 'How can we help?', LucideIcons.bookOpen, _subjectCtrl),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 20),
+
+                        // Form Fields
+                        _buildInput('Name', 'John Doe', 'assets/SVG/profile.svg', _nameCtrl, isDark),
+                        const SizedBox(height: 12),
                         
-                        Text(
-                          'Message',
-                          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.blueGrey.shade700),
-                        ),
-                        const SizedBox(height: 8),
-                        TextFormField(
-                          controller: _messageCtrl,
-                          maxLines: 4,
-                          decoration: InputDecoration(
-                            hintText: 'Write your message here...',
-                            hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 14),
-                            filled: true,
-                            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.blue.shade400),
-                            ),
-                          ),
-                          validator: (v) => v!.isEmpty ? 'Required' : null,
-                        ),
-                        const SizedBox(height: 24),
+                        _buildInput('Email Address', 'john@example.com', 'assets/SVG/mail.svg', _emailCtrl, isDark),
+                        const SizedBox(height: 12),
+                        
+                        _buildDropdown('Subject', 'How can we help?', 'assets/SVG/note.svg', isDark),
+                        const SizedBox(height: 12),
+                        
+                        _buildMessageInput(isDark),
+                        const SizedBox(height: 16),
 
                         // Send Button
                         SizedBox(
                           width: double.infinity,
-                          height: 50,
+                          height: 40,
                           child: ElevatedButton.icon(
                             onPressed: _isLoading ? null : _sendMessage,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.blue.shade600,
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               elevation: 0,
                             ),
-                            icon: _isLoading ? const SizedBox() : const Icon(LucideIcons.send, size: 18),
+                            icon: _isLoading ? const SizedBox() : SvgPicture.asset('assets/SVG/send.svg', width: 14, height: 14, colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
                             label: _isLoading 
-                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                                : Text('Send Message', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                                ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                                : Text('Send Message', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600)),
                           ),
                         ),
-                        const SizedBox(height: 24),
-                        const Divider(),
+                        const SizedBox(height: 16),
+                        
+                        const Divider(height: 1),
                         const SizedBox(height: 12),
+                        
+                        // Footer
                         SizedBox(
                           width: double.infinity,
-                          child: Wrap(
-                            alignment: WrapAlignment.center,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            runSpacing: 8.0,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Wrap(
-                                spacing: 12.0,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   GestureDetector(
                                     onTap: () => Get.to(() => const InfoScreen(
@@ -210,9 +217,13 @@ class _ContactScreenState extends State<ContactScreen> {
                                       endpoint: '/public/legal/terms_and_conditions',
                                       headerColor: Color(0xFF2563EB),
                                       icon: LucideIcons.fileText,
-                                      fallbackText: 'Welcome to Auriva BMS. By accessing or using our Business Management System, web application, and mobile application (collectively, the "Service"), you agree to be bound by these Terms and Conditions.\n\n1. General Usage\nAuriva BMS provides a software-as-a-service (SaaS) platform for invoicing, quotation management, and business tracking.\n\n2. User Responsibilities\nYou are responsible for maintaining the confidentiality of your account credentials. Any activity occurring under your account is your sole responsibility.',
+                                      fallbackText: 'Welcome to Auriva BMS.',
                                     )),
-                                    child: Text('Terms of Service', style: GoogleFonts.inter(fontSize: 10, color: Colors.blue.shade600, decoration: TextDecoration.underline, decorationColor: Colors.blue.shade600)),
+                                    child: Text('Terms of Service', style: GoogleFonts.inter(fontSize: 10, color: Colors.blue.shade600)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: Text('|', style: GoogleFonts.inter(fontSize: 10, color: Colors.grey.shade300)),
                                   ),
                                   GestureDetector(
                                     onTap: () => Get.to(() => const InfoScreen(
@@ -220,13 +231,14 @@ class _ContactScreenState extends State<ContactScreen> {
                                       endpoint: '/public/legal/privacy_policy',
                                       headerColor: Color(0xFF0F9D58),
                                       icon: LucideIcons.shieldCheck,
-                                      fallbackText: 'Auriva BMS ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our web application and mobile application.\n\n1. Information We Collect\nWe collect personal information that you voluntarily provide to us when you register on the Service, such as your name, email address, phone number, and company details.\n\n2. How We Use Your Information\nWe use the information we collect primarily to provide, maintain, and improve our Service.',
+                                      fallbackText: 'Auriva BMS is committed to protecting your privacy.',
                                     )),
-                                    child: Text('Privacy Policy', style: GoogleFonts.inter(fontSize: 10, color: Colors.blue.shade600, decoration: TextDecoration.underline, decorationColor: Colors.blue.shade600)),
+                                    child: Text('Privacy Policy', style: GoogleFonts.inter(fontSize: 10, color: Colors.blue.shade600)),
                                   ),
                                 ],
                               ),
-                              Text('© 2026 Auriva. All rights reserved.', style: GoogleFonts.inter(fontSize: 10, color: Colors.grey.shade500)),
+                              const SizedBox(height: 4),
+                              Text('(c) 2026 Auriva. All rights reserved.', style: GoogleFonts.inter(fontSize: 10, color: Colors.grey.shade400)),
                             ],
                           ),
                         ),
@@ -242,34 +254,158 @@ class _ContactScreenState extends State<ContactScreen> {
     );
   }
 
-  Widget _buildInput(String label, String hint, IconData icon, TextEditingController controller) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  Widget _buildLabel(String label, bool isDark) {
+    return RichText(
+      text: TextSpan(
+        text: label,
+        style: GoogleFonts.inter(
+          fontSize: 11, 
+          fontWeight: FontWeight.w600, 
+          color: isDark ? Colors.white70 : Colors.blueGrey.shade800,
+        ),
+        children: [
+          TextSpan(
+            text: ' *',
+            style: GoogleFonts.inter(
+              color: Colors.red.shade400,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInput(String label, String hint, String svgAsset, TextEditingController controller, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.blueGrey.shade700),
-        ),
-        const SizedBox(height: 8),
+        _buildLabel(label, isDark),
+        const SizedBox(height: 4),
         TextFormField(
           controller: controller,
+          style: GoogleFonts.inter(fontSize: 12),
           decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            isDense: true,
             hintText: hint,
-            hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 14),
-            prefixIcon: Icon(icon, size: 18, color: Colors.grey.shade400),
+            hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 12),
+            prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 0),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 8),
+              child: SvgPicture.asset(svgAsset, width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade400, BlendMode.srcIn)),
+            ),
             filled: true,
             fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.blue.shade400),
+            ),
+          ),
+          validator: (v) => v!.isEmpty ? 'Required' : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown(String label, String hint, String svgAsset, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel(label, isDark),
+        const SizedBox(height: 4),
+        DropdownButtonFormField<String>(
+          value: _selectedSubject,
+          icon: Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey.shade400),
+          style: GoogleFonts.inter(fontSize: 12, color: isDark ? Colors.white : Colors.black87),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            isDense: true,
+            hintText: hint,
+            hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 12),
+            prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 0),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 8),
+              child: SvgPicture.asset(svgAsset, width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade400, BlendMode.srcIn)),
+            ),
+            filled: true,
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: Colors.blue.shade400),
+            ),
+          ),
+          items: _subjects.map((String subject) {
+            return DropdownMenuItem<String>(
+              value: subject,
+              child: Text(
+                subject,
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedSubject = newValue;
+            });
+          },
+          validator: (v) => v == null ? 'Required' : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMessageInput(bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildLabel('Message', isDark),
+        const SizedBox(height: 4),
+        TextFormField(
+          controller: _messageCtrl,
+          maxLines: 4,
+          maxLength: 500,
+          style: GoogleFonts.inter(fontSize: 12),
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            isDense: true,
+            hintText: 'Write your message here...',
+            hintStyle: GoogleFonts.inter(color: Colors.grey.shade400, fontSize: 12),
+            prefixIconConstraints: const BoxConstraints(minWidth: 32, minHeight: 0),
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 10, right: 8, bottom: 60), 
+              child: SvgPicture.asset('assets/SVG/message.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade400, BlendMode.srcIn)),
+            ),
+            filled: true,
+            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: Colors.blue.shade400),
             ),
           ),

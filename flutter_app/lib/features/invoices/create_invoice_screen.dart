@@ -2,6 +2,7 @@
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:screenshot/screenshot.dart';
@@ -9,7 +10,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:get/get.dart';
-import 'create_invoice_controller.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import '../../core/constants/app_colors.dart';
@@ -22,6 +22,7 @@ import '../../shared/widgets/app_loader.dart';
 import '../../core/constants/app_typography.dart';
 import '../../shared/widgets/custom_notification_overlay.dart';
 import '../../core/theme/app_extensions.dart';
+import '../../shared/widgets/state_picker_bottom_sheet.dart';
 
 class _ItemControllers {
   final nameController = TextEditingController();
@@ -41,11 +42,15 @@ class _ItemControllers {
   }
 }
 
-class CreateInvoiceScreen extends StatelessWidget {
+class CreateInvoiceScreen extends StatefulWidget {
   final Map<String, dynamic>? invoiceToEdit;
   const CreateInvoiceScreen({super.key, this.invoiceToEdit});
 
+  @override
+  State<CreateInvoiceScreen> createState() => _CreateInvoiceScreenState();
+}
 
+class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
   final ClientsController _clientsController =
       Get.isRegistered<ClientsController>()
       ? Get.find<ClientsController>()
@@ -57,31 +62,31 @@ class CreateInvoiceScreen extends StatelessWidget {
       : Get.put(InventoryController());
 
   String? _selectedClientId;
-  List<Client> controller.filteredClients = [];
-  bool controller.showSuggestions.value = false;
+  List<Client> _filteredClients = [];
+  bool _showSuggestions = false;
 
-  bool controller.gstEnabled.value = false;
-  String controller.taxType.value = 'exclusive';
+  bool _gstEnabled = false;
+  String _taxType = 'exclusive';
 
   // State controllers
-  final controller.clientSearchController = TextEditingController();
-  final controller.clientNameController = TextEditingController();
-  final controller.clientEmailController = TextEditingController();
-  final controller.clientAddressController = TextEditingController();
-  final controller.clientPhoneController = TextEditingController();
-  final controller.clientGstController = TextEditingController();
-  final controller.invoiceNumberController = TextEditingController();
-  final controller.invoiceDateController = TextEditingController();
-  final controller.dueDateController = TextEditingController();
-  final controller.placeOfSupplyController = TextEditingController();
-  final controller.discountPercentageController = TextEditingController(text: '0');
-  final controller.advancePaidController = TextEditingController(text: '0');
-  final controller.termsController = TextEditingController(
+  final _clientSearchController = TextEditingController();
+  final _clientNameController = TextEditingController();
+  final _clientEmailController = TextEditingController();
+  final _clientAddressController = TextEditingController();
+  final _clientPhoneController = TextEditingController();
+  final _clientGstController = TextEditingController();
+  final _invoiceNumberController = TextEditingController();
+  final _invoiceDateController = TextEditingController();
+  final _dueDateController = TextEditingController();
+  final _placeOfSupplyController = TextEditingController();
+  final _discountPercentageController = TextEditingController(text: '0');
+  final _advancePaidController = TextEditingController(text: '0');
+  final _termsController = TextEditingController(
     text:
         '1. Goods once sold will not be taken back.\n2. Interest @18% pa will be charged if payment is not made within the due date.',
   );
-  String controller.selectedClientState.value = '';
-  double controller.balanceDue.value = 0.0;
+  String _selectedClientState = '';
+  double _balanceDue = 0.0;
 
   final Map<String, dynamic> _mockTenant = {
     'name': 'Auriva Business Solutions Pvt. Ltd.',
@@ -99,7 +104,7 @@ class CreateInvoiceScreen extends StatelessWidget {
     'ifscCode': 'HDFC0000123',
   };
 
-  final List<_ItemControllers> controller.itemsControllers = [];
+  final List<_ItemControllers> _itemsControllers = [];
 
   final formatCurrency = NumberFormat.currency(
     locale: 'en_IN',
@@ -108,41 +113,73 @@ class CreateInvoiceScreen extends StatelessWidget {
   );
 
   // Calculated totals
-  double controller.subtotal.value = 0.0;
-  double controller.discountAmount.value = 0.0;
-  double controller.taxAmount.value = 0.0;
-  double controller.total.value = 0.0;
+  double _subtotal = 0.0;
+  double _discountAmount = 0.0;
+  double _taxAmount = 0.0;
+  double _total = 0.0;
 
-   else {
-        controller.invoiceDateController.text = DateFormat(
+  void _onFieldChanged() {
+    _calculateTotals();
+  }
+
+  String sanitizeStateName(String name) {
+    if (name.contains(' (')) {
+      return name.split(' (')[0].trim();
+    }
+    return name.trim();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedClientState = 'select_state'.tr;
+    _inventoryController.fetchItems();
+    _clientNameController.addListener(_onFieldChanged);
+    _clientSearchController.addListener(_onClientSearchChanged);
+    _invoiceNumberController.addListener(_onFieldChanged);
+    _discountPercentageController.addListener(_calculateTotals);
+    _advancePaidController.addListener(_calculateTotals);
+
+    if (widget.invoiceToEdit != null) {
+      final inv = widget.invoiceToEdit!;
+      _invoiceNumberController.text = inv['invoiceNumber'] ?? '';
+
+      if (inv['date'] != null && inv['date'].toString().isNotEmpty) {
+        try {
+          _invoiceDateController.text = inv['date'].toString().split('T')[0];
+        } catch (_) {
+          _invoiceDateController.text = inv['date'].toString();
+        }
+      } else {
+        _invoiceDateController.text = DateFormat(
           'yyyy-MM-dd',
         ).format(DateTime.now());
       }
 
       if (inv['dueDate'] != null && inv['dueDate'].toString().isNotEmpty) {
         try {
-          controller.dueDateController.text = inv['dueDate'].toString().split('T')[0];
+          _dueDateController.text = inv['dueDate'].toString().split('T')[0];
         } catch (_) {
-          controller.dueDateController.text = inv['dueDate'].toString();
+          _dueDateController.text = inv['dueDate'].toString();
         }
       } else {
-        controller.dueDateController.text = DateFormat(
+        _dueDateController.text = DateFormat(
           'yyyy-MM-dd',
         ).format(DateTime.now().add(const Duration(days: 15)));
       }
 
       final clientObj = inv['client'] ?? {};
-      controller.clientNameController.text = clientObj['name'] ?? '';
-      controller.clientEmailController.text = clientObj['email'] ?? '';
-      controller.clientAddressController.text = clientObj['address'] ?? '';
-      controller.clientPhoneController.text = clientObj['phone'] ?? '';
-      controller.clientGstController.text =
+      _clientNameController.text = clientObj['name'] ?? '';
+      _clientEmailController.text = clientObj['email'] ?? '';
+      _clientAddressController.text = clientObj['address'] ?? '';
+      _clientPhoneController.text = clientObj['phone'] ?? '';
+      _clientGstController.text =
           clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
-      controller.selectedClientState.value = sanitizeStateName(
+      _selectedClientState = sanitizeStateName(
         clientObj['state'] ?? 'select_state'.tr,
       );
-      if (!indianStates.contains(controller.selectedClientState.value)) {
-        controller.selectedClientState.value = 'select_state'.tr;
+      if (!indianStates.contains(_selectedClientState)) {
+        _selectedClientState = 'select_state'.tr;
       }
       String pos = sanitizeStateName(
         inv['placeOfSupply'] ?? clientObj['state'] ?? 'Maharashtra',
@@ -150,16 +187,16 @@ class CreateInvoiceScreen extends StatelessWidget {
       if (pos == 'select_state'.tr || !indianStates.contains(pos)) {
         pos = 'Maharashtra';
       }
-      controller.placeOfSupplyController.text = pos;
+      _placeOfSupplyController.text = pos;
       _selectedClientId =
           clientObj['clientId'] ?? clientObj['_id'] ?? clientObj['id'];
 
-      controller.gstEnabled.value = inv['gstEnabled'] ?? false;
-      controller.taxType.value = inv['taxType'] ?? 'exclusive';
-      controller.discountPercentageController.text = (inv['discountPercentage'] ?? 0)
+      _gstEnabled = inv['gstEnabled'] ?? false;
+      _taxType = inv['taxType'] ?? 'exclusive';
+      _discountPercentageController.text = (inv['discountPercentage'] ?? 0)
           .toString();
-      controller.advancePaidController.text = (inv['advancePayment'] ?? 0.0).toString();
-      controller.termsController.text =
+      _advancePaidController.text = (inv['advancePayment'] ?? 0.0).toString();
+      _termsController.text =
           inv['terms'] ??
           '1. Goods once sold will not be taken back.\n2. Interest @18% pa will be charged if payment is not made within the due date.';
 
@@ -177,40 +214,125 @@ class CreateInvoiceScreen extends StatelessWidget {
         controller.rateController.addListener(_onFieldChanged);
         controller.qtyController.addListener(_onFieldChanged);
         controller.gstController.addListener(_onFieldChanged);
-        controller.itemsControllers.add(controller);
+        _itemsControllers.add(controller);
       }
-      if (controller.itemsControllers.isEmpty) {
-        controller.itemsControllers.add(_ItemControllers());
-        controller.itemsControllers[0].nameController.addListener(_onFieldChanged);
-        controller.itemsControllers[0].rateController.addListener(_onFieldChanged);
-        controller.itemsControllers[0].qtyController.addListener(_onFieldChanged);
-        controller.itemsControllers[0].gstController.addListener(_onFieldChanged);
+      if (_itemsControllers.isEmpty) {
+        _itemsControllers.add(_ItemControllers());
+        _itemsControllers[0].nameController.addListener(_onFieldChanged);
+        _itemsControllers[0].rateController.addListener(_onFieldChanged);
+        _itemsControllers[0].qtyController.addListener(_onFieldChanged);
+        _itemsControllers[0].gstController.addListener(_onFieldChanged);
       }
     } else {
-      controller.invoiceNumberController.text = 'Auto-Generated';
-      controller.invoiceDateController.text = DateFormat(
+      _invoiceNumberController.text = 'Auto-Generated';
+      _invoiceDateController.text = DateFormat(
         'yyyy-MM-dd',
       ).format(DateTime.now());
-      controller.dueDateController.text = DateFormat(
+      _dueDateController.text = DateFormat(
         'yyyy-MM-dd',
       ).format(DateTime.now().add(const Duration(days: 15)));
-      controller.placeOfSupplyController.text = 'Maharashtra';
+      _placeOfSupplyController.text = 'Maharashtra';
 
-      controller.itemsControllers.add(_ItemControllers());
-      controller.itemsControllers[0].nameController.addListener(_onFieldChanged);
-      controller.itemsControllers[0].rateController.addListener(_onFieldChanged);
-      controller.itemsControllers[0].qtyController.addListener(_onFieldChanged);
-      controller.itemsControllers[0].gstController.addListener(_onFieldChanged);
+      _itemsControllers.add(_ItemControllers());
+      _itemsControllers[0].nameController.addListener(_onFieldChanged);
+      _itemsControllers[0].rateController.addListener(_onFieldChanged);
+      _itemsControllers[0].qtyController.addListener(_onFieldChanged);
+      _itemsControllers[0].gstController.addListener(_onFieldChanged);
     }
 
     _calculateTotals();
   }
 
-  
+  void _onClientSearchChanged() {
+    final query = _clientSearchController.text.trim().toLowerCase();
+    if (query.isNotEmpty) {
+      final matches = _clientsController.clients
+          .where((c) => c.name.toLowerCase().contains(query))
+          .toList();
+      setState(() {
+        _filteredClients = matches;
+        _showSuggestions = matches.isNotEmpty;
+      });
+    } else {
+      setState(() {
+        _filteredClients = [];
+        _showSuggestions = false;
+      });
+    }
+  }
 
-  
+  @override
+  void dispose() {
+    _clientNameController.removeListener(_onFieldChanged);
+    _clientSearchController.removeListener(_onClientSearchChanged);
+    _invoiceNumberController.removeListener(_onFieldChanged);
+    _discountPercentageController.removeListener(_calculateTotals);
+    _advancePaidController.removeListener(_calculateTotals);
+    _clientSearchController.dispose();
+    _clientNameController.dispose();
+    _clientEmailController.dispose();
+    _clientAddressController.dispose();
+    _clientPhoneController.dispose();
+    _clientGstController.dispose();
+    _invoiceNumberController.dispose();
+    _invoiceDateController.dispose();
+    _dueDateController.dispose();
+    _placeOfSupplyController.dispose();
+    _discountPercentageController.dispose();
+    _advancePaidController.dispose();
+    _termsController.dispose();
+    for (var controller in _itemsControllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
-  
+  void _calculateTotals() {
+    double tempSubtotal = 0.0;
+    double tempTaxAmount = 0.0;
+
+    final double discountPct =
+        double.tryParse(_discountPercentageController.text) ?? 0.0;
+
+    for (var item in _itemsControllers) {
+      final double qty = double.tryParse(item.qtyController.text) ?? 0.0;
+      final double rate = double.tryParse(item.rateController.text) ?? 0.0;
+      final double itemSubtotal = qty * rate;
+      tempSubtotal += itemSubtotal;
+
+      if (_gstEnabled) {
+        final double gstRate = double.tryParse(item.gstController.text) ?? 0.0;
+        final double itemDiscount = itemSubtotal * (discountPct / 100);
+        final double itemTaxable = itemSubtotal - itemDiscount;
+
+        double itemTax = 0.0;
+        if (_taxType == 'exclusive') {
+          itemTax = itemTaxable * (gstRate / 100);
+        } else {
+          // Inclusive
+          final double basePrice = itemTaxable / (1 + (gstRate / 100));
+          itemTax = itemTaxable - basePrice;
+        }
+        tempTaxAmount += itemTax;
+      }
+    }
+
+    _subtotal = tempSubtotal;
+    _discountAmount = _subtotal * (discountPct / 100);
+    _taxAmount = tempTaxAmount;
+
+    if (_taxType == 'exclusive') {
+      _total = (_subtotal - _discountAmount) + _taxAmount;
+    } else {
+      _total = _subtotal - _discountAmount;
+    }
+
+    final double advancePaid =
+        double.tryParse(_advancePaidController.text) ?? 0.0;
+    _balanceDue = _total - advancePaid;
+
+    setState(() {});
+  }
 
   Future<void> _selectDate(
     BuildContext context,
@@ -222,27 +344,25 @@ class CreateInvoiceScreen extends StatelessWidget {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
       builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              onSurface:
-                  (Theme.of(context).textTheme.displayLarge?.color ??
-                  Colors.black),
-            ),
-          ),
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: const TextScaler.linear(1.0)),
           child: child!,
         );
       },
     );
     if (picked != null) {
-      // setState handled by GetX
+      setState(() {
+        controller.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
     }
   }
 
   Future<void> _exportPdfWithScreenshot(bool isPrint) async {
-    if (controller.placeOfSupplyController.text.trim().isEmpty || controller.placeOfSupplyController.text.trim() == 'select_state'.tr || controller.placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+    if (_placeOfSupplyController.text.trim().isEmpty ||
+        _placeOfSupplyController.text.trim() == 'select_state'.tr ||
+        _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
       Fluttertoast.showToast(
         msg: 'Please select Place of Supply',
         backgroundColor: AppColors.error,
@@ -251,7 +371,7 @@ class CreateInvoiceScreen extends StatelessWidget {
       return;
     }
 
-    if (controller.clientNameController.text.trim().isEmpty) {
+    if (_clientNameController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_client'.tr,
         backgroundColor: AppColors.error,
@@ -260,7 +380,7 @@ class CreateInvoiceScreen extends StatelessWidget {
       return;
     }
 
-    if (controller.invoiceNumberController.text.trim().isEmpty) {
+    if (_invoiceNumberController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_invoice_no'.tr,
         backgroundColor: AppColors.error,
@@ -269,8 +389,8 @@ class CreateInvoiceScreen extends StatelessWidget {
       return;
     }
 
-    for (int i = 0; i < controller.itemsControllers.length; i++) {
-      if (controller.itemsControllers[i].nameController.text.trim().isEmpty) {
+    for (int i = 0; i < _itemsControllers.length; i++) {
+      if (_itemsControllers[i].nameController.text.trim().isEmpty) {
         Fluttertoast.showToast(
           msg: '${'error_req_item_name'.tr} #${i + 1}',
           backgroundColor: AppColors.error,
@@ -295,7 +415,7 @@ class CreateInvoiceScreen extends StatelessWidget {
 
       // Compile items
       final List<Map<String, dynamic>> itemsList = [];
-      for (var item in controller.itemsControllers) {
+      for (var item in _itemsControllers) {
         final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
         final double rate = double.tryParse(item.rateController.text) ?? 0.0;
         final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
@@ -309,22 +429,22 @@ class CreateInvoiceScreen extends StatelessWidget {
       }
 
       final invoiceData = {
-        'id': controller.invoiceNumberController.text.trim(),
-        'clientName': controller.clientNameController.text.trim(),
-        'email': controller.clientEmailController.text.trim(),
-        'address': controller.clientAddressController.text.trim(),
-        'clientGst': controller.clientGstController.text.trim(),
-        'date': controller.invoiceDateController.text.trim(),
-        'dueDate': controller.dueDateController.text.trim(),
-        'placeOfSupply': controller.placeOfSupplyController.text.trim(),
+        'id': _invoiceNumberController.text.trim(),
+        'clientName': _clientNameController.text.trim(),
+        'email': _clientEmailController.text.trim(),
+        'address': _clientAddressController.text.trim(),
+        'clientGst': _clientGstController.text.trim(),
+        'date': _invoiceDateController.text.trim(),
+        'dueDate': _dueDateController.text.trim(),
+        'placeOfSupply': _placeOfSupplyController.text.trim(),
         'items': itemsList,
-        'discount': double.tryParse(controller.discountPercentageController.text) ?? 0.0,
-        'subtotal': controller.subtotal.value,
-        'discountAmount': controller.discountAmount.value,
-        'taxAmount': controller.taxAmount.value,
-        'total': controller.total.value,
-        'gstEnabled': controller.gstEnabled.value,
-        'taxType': controller.taxType.value,
+        'discount': double.tryParse(_discountPercentageController.text) ?? 0.0,
+        'subtotal': _subtotal,
+        'discountAmount': _discountAmount,
+        'taxAmount': _taxAmount,
+        'total': _total,
+        'gstEnabled': _gstEnabled,
+        'taxType': _taxType,
       };
 
       // Usable height parameters for clean mathematical pagination (A4 standard: 794 x 1123 @96 DPI)
@@ -1362,22 +1482,18 @@ class CreateInvoiceScreen extends StatelessWidget {
             children: [
               Text(
                 'Thank you for your business!',
-                style: TextStyle(
+                style: context.typography.inputText.copyWith(
                   fontSize: 9,
                   fontStyle: FontStyle.italic,
-                  color:
-                      (Theme.of(context).textTheme.bodyMedium?.color ??
-                      Colors.grey),
+                  color: (context.typography.inputText.color ?? Colors.grey),
                 ),
               ),
               Text(
                 'Page ${pageIndex + 1} of $totalPages',
-                style: TextStyle(
+                style: context.typography.inputText.copyWith(
                   fontSize: 9,
                   fontWeight: FontWeight.bold,
-                  color:
-                      (Theme.of(context).textTheme.bodyMedium?.color ??
-                      Colors.grey),
+                  color: (context.typography.inputText.color ?? Colors.grey),
                 ),
               ),
             ],
@@ -1401,19 +1517,18 @@ class CreateInvoiceScreen extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: context.typography.inputText.copyWith(
               fontSize: isGrandTotal ? 12 : 11,
               fontWeight: isGrandTotal ? FontWeight.bold : FontWeight.normal,
               color: isInclusiveGst || isDiscount
-                  ? (Theme.of(context).textTheme.bodyMedium?.color ??
-                        Colors.grey)
+                  ? (context.typography.inputText.color ?? Colors.grey)
                   : (Theme.of(context).textTheme.displayLarge?.color ??
                         Colors.black),
             ),
           ),
           Text(
             value,
-            style: TextStyle(
+            style: context.typography.inputText.copyWith(
               fontSize: isGrandTotal ? 14 : 11,
               fontWeight: FontWeight.bold,
               color: isDiscount
@@ -1430,7 +1545,9 @@ class CreateInvoiceScreen extends StatelessWidget {
   }
 
   void _saveAndShowBill() async {
-    if (controller.placeOfSupplyController.text.trim().isEmpty || controller.placeOfSupplyController.text.trim() == 'select_state'.tr || controller.placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+    if (_placeOfSupplyController.text.trim().isEmpty ||
+        _placeOfSupplyController.text.trim() == 'select_state'.tr ||
+        _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
       Fluttertoast.showToast(
         msg: 'Please select Place of Supply',
         backgroundColor: AppColors.error,
@@ -1439,7 +1556,7 @@ class CreateInvoiceScreen extends StatelessWidget {
       return;
     }
 
-    if (controller.clientNameController.text.trim().isEmpty) {
+    if (_clientNameController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_client'.tr,
         backgroundColor: AppColors.error,
@@ -1448,7 +1565,7 @@ class CreateInvoiceScreen extends StatelessWidget {
       return;
     }
 
-    if (controller.invoiceNumberController.text.trim().isEmpty) {
+    if (_invoiceNumberController.text.trim().isEmpty) {
       Fluttertoast.showToast(
         msg: 'error_req_invoice_no'.tr,
         backgroundColor: AppColors.error,
@@ -1457,8 +1574,8 @@ class CreateInvoiceScreen extends StatelessWidget {
       return;
     }
 
-    for (int i = 0; i < controller.itemsControllers.length; i++) {
-      if (controller.itemsControllers[i].nameController.text.trim().isEmpty) {
+    for (int i = 0; i < _itemsControllers.length; i++) {
+      if (_itemsControllers[i].nameController.text.trim().isEmpty) {
         Fluttertoast.showToast(
           msg: '${'error_req_item_name'.tr} #${i + 1}',
           backgroundColor: AppColors.error,
@@ -1472,14 +1589,14 @@ class CreateInvoiceScreen extends StatelessWidget {
       context: context,
       barrierDismissible: false,
       builder: (context) => AppLoader(
-        message: invoiceToEdit != null
+        message: widget.invoiceToEdit != null
             ? 'Updating Invoice...'
             : 'Creating Invoice...',
       ),
     );
 
     final List<Map<String, dynamic>> itemsList = [];
-    for (var item in controller.itemsControllers) {
+    for (var item in _itemsControllers) {
       final double qty = double.tryParse(item.qtyController.text) ?? 1.0;
       final double rate = double.tryParse(item.rateController.text) ?? 0.0;
       final double gstRate = double.tryParse(item.gstController.text) ?? 18.0;
@@ -1488,44 +1605,44 @@ class CreateInvoiceScreen extends StatelessWidget {
         'additionalDetails': item.descriptionController.text.trim(),
         'quantity': qty.toInt(),
         'rate': rate,
-        'gstRate': controller.gstEnabled.value ? gstRate : 0.0,
-        'hsnCode': controller.gstEnabled.value ? item.hsnController.text.trim() : '',
+        'gstRate': _gstEnabled ? gstRate : 0.0,
+        'hsnCode': _gstEnabled ? item.hsnController.text.trim() : '',
       });
     }
 
     final Map<String, dynamic> clientData = {
-      'name': controller.clientNameController.text.trim(),
-      'email': controller.clientEmailController.text.trim(),
-      'address': controller.clientAddressController.text.trim(),
-      'phone': controller.clientPhoneController.text.trim(),
-      'gstin': controller.clientGstController.text.trim(),
-      'state': controller.selectedClientState.value == 'select_state'.tr
+      'name': _clientNameController.text.trim(),
+      'email': _clientEmailController.text.trim(),
+      'address': _clientAddressController.text.trim(),
+      'phone': _clientPhoneController.text.trim(),
+      'gstin': _clientGstController.text.trim(),
+      'state': _selectedClientState == 'select_state'.tr
           ? ''
-          : controller.selectedClientState.value,
+          : _selectedClientState,
     };
     if (_selectedClientId != null) {
       clientData['clientId'] = _selectedClientId;
     }
 
     final payload = {
-      'invoiceNumber': controller.invoiceNumberController.text.trim(),
-      'date': controller.invoiceDateController.text.trim(),
-      'dueDate': controller.dueDateController.text.trim(),
+      'invoiceNumber': _invoiceNumberController.text.trim(),
+      'date': _invoiceDateController.text.trim(),
+      'dueDate': _dueDateController.text.trim(),
       'client': clientData,
       'items': itemsList,
-      'gstEnabled': controller.gstEnabled.value,
-      'taxType': controller.taxType.value,
+      'gstEnabled': _gstEnabled,
+      'taxType': _taxType,
       'discountPercentage':
-          double.tryParse(controller.discountPercentageController.text) ?? 0.0,
-      'advancePayment': double.tryParse(controller.advancePaidController.text) ?? 0.0,
-      'placeOfSupply': controller.placeOfSupplyController.text.trim(),
-      'terms': controller.termsController.text.trim(),
+          double.tryParse(_discountPercentageController.text) ?? 0.0,
+      'advancePayment': double.tryParse(_advancePaidController.text) ?? 0.0,
+      'placeOfSupply': _placeOfSupplyController.text.trim(),
+      'terms': _termsController.text.trim(),
       'notes': 'Thank you for your business!',
     };
 
     try {
-      final isEdit = invoiceToEdit != null;
-      final editId = invoiceToEdit?['_id']?.toString() ?? '';
+      final isEdit = widget.invoiceToEdit != null;
+      final editId = widget.invoiceToEdit?['_id']?.toString() ?? '';
 
       final http.Response response;
       if (isEdit) {
@@ -1639,19 +1756,19 @@ class CreateInvoiceScreen extends StatelessWidget {
 
   double get _formCompleteness {
     double score = 0.0;
-    if (controller.clientNameController.text.trim().isNotEmpty) score += 0.25;
-    if (controller.invoiceNumberController.text.trim().isNotEmpty) score += 0.25;
+    if (_clientNameController.text.trim().isNotEmpty) score += 0.25;
+    if (_invoiceNumberController.text.trim().isNotEmpty) score += 0.25;
 
     final bool hasValidItem =
-        controller.itemsControllers.isNotEmpty &&
-        controller.itemsControllers.any(
+        _itemsControllers.isNotEmpty &&
+        _itemsControllers.any(
           (item) =>
               item.nameController.text.trim().isNotEmpty &&
               (double.tryParse(item.rateController.text) ?? 0) > 0,
         );
     if (hasValidItem) score += 0.25;
 
-    if (controller.total.value > 0) score += 0.25;
+    if (_total > 0) score += 0.25;
     return score;
   }
 
@@ -1684,13 +1801,20 @@ class CreateInvoiceScreen extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
-                    percentage == 100
-                        ? LucideIcons.sparkles
-                        : LucideIcons.fileEdit,
-                    size: 16,
-                    color: percentage == 100 ? Colors.amber : AppColors.primary,
-                  ),
+                  percentage == 100
+                      ? Icon(
+                          LucideIcons.sparkles,
+                          size: 16,
+                          color: Colors.amber,
+                        )
+                      : SvgPicture.asset(
+                          'assets/SVG/editfile.svg',
+                          width: 16,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.primary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                   const SizedBox(width: 8),
                   Text(
                     'invoice_completeness'.tr,
@@ -1752,8 +1876,6 @@ class CreateInvoiceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CreateInvoiceController());
-
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
@@ -1770,11 +1892,14 @@ class CreateInvoiceScreen extends StatelessWidget {
           ),
         ),
         leading: IconButton(
-          icon: Icon(
-            LucideIcons.arrowLeft,
-            color:
-                (Theme.of(context).textTheme.displayLarge?.color ??
-                Colors.black),
+          icon: SvgPicture.asset(
+            'assets/SVG/backarrow.svg',
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(
+              Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+              BlendMode.srcIn,
+            ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -1800,7 +1925,14 @@ class CreateInvoiceScreen extends StatelessWidget {
               alignment: Alignment.center,
               child: Row(
                 children: [
-                  const Icon(LucideIcons.save, size: 14, color: Colors.white),
+                  SvgPicture.asset(
+                    'assets/SVG/save.svg',
+                    width: 14,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Save',
@@ -1897,8 +2029,7 @@ class CreateInvoiceScreen extends StatelessWidget {
           style: context.typography.categoryHeader.copyWith(
             fontSize: 13,
             fontWeight: FontWeight.bold,
-            color:
-                (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            color: (context.typography.inputText.color ?? Colors.grey),
             letterSpacing: 1.2,
           ),
         ),
@@ -1909,7 +2040,7 @@ class CreateInvoiceScreen extends StatelessWidget {
   Widget _buildClientSection() {
     return _buildCard(
       title: 'bill_to'.tr,
-      icon: LucideIcons.user,
+      svgIcon: 'assets/SVG/profile.svg',
       iconColor: Colors.blue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1917,9 +2048,9 @@ class CreateInvoiceScreen extends StatelessWidget {
           _buildTextField(
             label: 'search_existing_client'.tr,
             hint: 'type_to_search_clients'.tr,
-            icon: LucideIcons.search,
-            controller: controller.clientSearchController,
-            suffixIcon: controller.clientSearchController.text.isNotEmpty
+            svgIcon: 'assets/SVG/search.svg',
+            controller: _clientSearchController,
+            suffixIcon: _clientSearchController.text.isNotEmpty
                 ? IconButton(
                     icon: const Icon(
                       LucideIcons.x,
@@ -1927,13 +2058,13 @@ class CreateInvoiceScreen extends StatelessWidget {
                       color: Colors.grey,
                     ),
                     onPressed: () {
-                      controller.clientSearchController.clear();
+                      _clientSearchController.clear();
                       FocusScope.of(context).unfocus();
                     },
                   )
                 : null,
           ),
-          if (controller.showSuggestions.value && controller.filteredClients.isNotEmpty) ...[
+          if (_showSuggestions && _filteredClients.isNotEmpty) ...[
             const SizedBox(height: 6),
             Container(
               constraints: const BoxConstraints(maxHeight: 180),
@@ -1954,13 +2085,13 @@ class CreateInvoiceScreen extends StatelessWidget {
               child: ListView.separated(
                 shrinkWrap: true,
                 padding: EdgeInsets.zero,
-                itemCount: controller.filteredClients.length,
+                itemCount: _filteredClients.length,
                 separatorBuilder: (context, index) => Divider(
                   height: 1,
                   color: Theme.of(context).colorScheme.outline,
                 ),
                 itemBuilder: (context, index) {
-                  final client = controller.filteredClients[index];
+                  final client = _filteredClients[index];
                   return ListTile(
                     dense: true,
                     title: Text(
@@ -1988,21 +2119,21 @@ class CreateInvoiceScreen extends StatelessWidget {
                     ),
                     onTap: () {
                       setState(() {
-                        controller.clientSearchController.clear();
-                        controller.clientNameController.text = client.name;
-                        controller.clientEmailController.text = client.email;
-                        controller.clientAddressController.text = client.address;
-                        controller.clientPhoneController.text = client.phone;
-                        controller.clientGstController.text = client.gstin;
-                        controller.selectedClientState.value = client.state.isNotEmpty
+                        _clientSearchController.clear();
+                        _clientNameController.text = client.name;
+                        _clientEmailController.text = client.email;
+                        _clientAddressController.text = client.address;
+                        _clientPhoneController.text = client.phone;
+                        _clientGstController.text = client.gstin;
+                        _selectedClientState = client.state.isNotEmpty
                             ? sanitizeStateName(client.state)
                             : 'select_state'.tr;
-                        if (!indianStates.contains(controller.selectedClientState.value)) {
-                          controller.selectedClientState.value = 'select_state'.tr;
+                        if (!indianStates.contains(_selectedClientState)) {
+                          _selectedClientState = 'select_state'.tr;
                         }
-                        controller.placeOfSupplyController.text = controller.selectedClientState.value;
+                        _placeOfSupplyController.text = _selectedClientState;
                         _selectedClientId = client.id;
-                        controller.showSuggestions.value = false;
+                        _showSuggestions = false;
                       });
                       _calculateTotals();
                       FocusScope.of(context).unfocus();
@@ -2018,16 +2149,16 @@ class CreateInvoiceScreen extends StatelessWidget {
               Expanded(
                 child: _buildTextField(
                   label: 'client_name_star'.tr,
-                  hint: 'eg_name'.tr,
-                  controller: controller.clientNameController,
+                  hint: 'John Doe',
+                  controller: _clientNameController,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _buildTextField(
                   label: 'email'.tr,
-                  hint: 'eg_email'.tr,
-                  controller: controller.clientEmailController,
+                  hint: 'example@email.com',
+                  controller: _clientEmailController,
                 ),
               ),
             ],
@@ -2035,15 +2166,15 @@ class CreateInvoiceScreen extends StatelessWidget {
           const SizedBox(height: 12),
           _buildTextField(
             label: 'address'.tr,
-            hint: 'eg_address'.tr,
+            hint: 'Corporate Hub, Sector V',
             maxLines: 2,
-            controller: controller.clientAddressController,
+            controller: _clientAddressController,
           ),
           const SizedBox(height: 12),
           _buildTextField(
             label: 'details'.tr,
-            hint: 'eg_phone'.tr,
-            controller: controller.clientPhoneController,
+            hint: '9898989898',
+            controller: _clientPhoneController,
           ),
           const SizedBox(height: 12),
           Row(
@@ -2053,18 +2184,20 @@ class CreateInvoiceScreen extends StatelessWidget {
                 child: _buildTextField(
                   label: 'gstin'.tr,
                   hint: 'gstin'.tr,
-                  controller: controller.clientGstController,
+                  controller: _clientGstController,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 flex: 2,
-                child: _buildDropdownField(
+                child: _buildStatePickerField(
                   label: 'state'.tr,
-                  value: controller.selectedClientState.value,
-                  items: indianStates,
+                  value: _selectedClientState,
                   onChanged: (val) {
-                    // setState handled by GetX
+                    setState(() {
+                      _selectedClientState = val;
+                      _placeOfSupplyController.text = _selectedClientState;
+                    });
                   },
                 ),
               ),
@@ -2078,7 +2211,7 @@ class CreateInvoiceScreen extends StatelessWidget {
   Widget _buildInvoiceMetaSection() {
     return _buildCard(
       title: 'invoice_details'.tr,
-      icon: LucideIcons.fileText,
+      svgIcon: 'assets/SVG/invoice.svg',
       iconColor: Colors.purple,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2089,10 +2222,10 @@ class CreateInvoiceScreen extends StatelessWidget {
                 child: _buildTextField(
                   label: 'invoice_date_star'.tr,
                   hint: 'date_format'.tr,
-                  icon: LucideIcons.calendar,
-                  controller: controller.invoiceDateController,
+                  svgIcon: 'assets/SVG/calendernormal.svg',
+                  controller: _invoiceDateController,
                   readOnly: true,
-                  onTap: () => _selectDate(context, controller.invoiceDateController),
+                  onTap: () => _selectDate(context, _invoiceDateController),
                 ),
               ),
               const SizedBox(width: 12),
@@ -2100,10 +2233,10 @@ class CreateInvoiceScreen extends StatelessWidget {
                 child: _buildTextField(
                   label: 'due_date_star'.tr,
                   hint: 'date_format'.tr,
-                  icon: LucideIcons.calendar,
-                  controller: controller.dueDateController,
+                  svgIcon: 'assets/SVG/calendernormal.svg',
+                  controller: _dueDateController,
                   readOnly: true,
-                  onTap: () => _selectDate(context, controller.dueDateController),
+                  onTap: () => _selectDate(context, _dueDateController),
                 ),
               ),
             ],
@@ -2112,16 +2245,17 @@ class CreateInvoiceScreen extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _buildDropdownField(
+                child: _buildStatePickerField(
                   label: 'place_of_supply_star'.tr,
                   value:
-                      controller.placeOfSupplyController.text.isEmpty ||
-                          !indianStates.contains(controller.placeOfSupplyController.text)
+                      _placeOfSupplyController.text.isEmpty ||
+                          !indianStates.contains(_placeOfSupplyController.text)
                       ? 'select_state'.tr
-                      : controller.placeOfSupplyController.text,
-                  items: indianStates,
+                      : _placeOfSupplyController.text,
                   onChanged: (val) {
-                    // setState handled by GetX
+                    setState(() {
+                      _placeOfSupplyController.text = val;
+                    });
                     _calculateTotals();
                   },
                 ),
@@ -2149,10 +2283,13 @@ class CreateInvoiceScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          LucideIcons.creditCard,
-                          size: 18,
-                          color: AppColors.primary,
+                        SvgPicture.asset(
+                          'assets/SVG/card.svg',
+                          width: 18,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.primary,
+                            BlendMode.srcIn,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Text(
@@ -2168,7 +2305,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                     Transform.scale(
                       scale: 0.85,
                       child: Switch(
-                        value: controller.gstEnabled.value,
+                        value: _gstEnabled,
                         activeThumbColor: Colors.white,
                         activeTrackColor: AppColors.primary,
                         inactiveThumbColor: Colors.white,
@@ -2179,34 +2316,36 @@ class CreateInvoiceScreen extends StatelessWidget {
                           Colors.transparent,
                         ),
                         onChanged: (val) {
-                          // setState handled by GetX
+                          setState(() {
+                            _gstEnabled = val;
+                          });
                           _calculateTotals();
                         },
                       ),
                     ),
                   ],
                 ),
-                if (controller.gstEnabled.value) ...[
+                if (_gstEnabled) ...[
                   const SizedBox(height: 8),
                   Row(
                     children: [
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() => controller.taxType.value = 'exclusive');
+                            setState(() => _taxType = 'exclusive');
                             _calculateTotals();
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              color: controller.taxType.value == 'exclusive'
+                              color: _taxType == 'exclusive'
                                   ? AppColors.primary
-                                  : Colors.white,
+                                  : Theme.of(context).cardTheme.color,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: controller.taxType.value == 'exclusive'
+                                color: _taxType == 'exclusive'
                                     ? AppColors.primary
-                                    : Colors.grey.shade200,
+                                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                               ),
                             ),
                             alignment: Alignment.center,
@@ -2215,9 +2354,9 @@ class CreateInvoiceScreen extends StatelessWidget {
                               style: context.typography.buttonText.copyWith(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: controller.taxType.value == 'exclusive'
+                                color: _taxType == 'exclusive'
                                     ? Colors.white
-                                    : Colors.grey,
+                                    : Theme.of(context).textTheme.bodyMedium?.color,
                               ),
                             ),
                           ),
@@ -2227,20 +2366,20 @@ class CreateInvoiceScreen extends StatelessWidget {
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
-                            setState(() => controller.taxType.value = 'inclusive');
+                            setState(() => _taxType = 'inclusive');
                             _calculateTotals();
                           },
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              color: controller.taxType.value == 'inclusive'
+                              color: _taxType == 'inclusive'
                                   ? AppColors.primary
-                                  : Colors.white,
+                                  : Theme.of(context).cardTheme.color,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: controller.taxType.value == 'inclusive'
+                                color: _taxType == 'inclusive'
                                     ? AppColors.primary
-                                    : Colors.grey.shade200,
+                                    : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
                               ),
                             ),
                             alignment: Alignment.center,
@@ -2249,9 +2388,9 @@ class CreateInvoiceScreen extends StatelessWidget {
                               style: context.typography.buttonText.copyWith(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: controller.taxType.value == 'inclusive'
+                                color: _taxType == 'inclusive'
                                     ? Colors.white
-                                    : Colors.grey,
+                                    : Theme.of(context).textTheme.bodyMedium?.color,
                               ),
                             ),
                           ),
@@ -2274,7 +2413,7 @@ class CreateInvoiceScreen extends StatelessWidget {
       icon: LucideIcons.listOrdered,
       iconColor: Colors.teal,
       trailing: Text(
-        '${controller.itemsControllers.length} Items Added',
+        '${_itemsControllers.length} Items Added',
         style: context.typography.cardDescription.copyWith(
           fontSize: 11,
           color: Colors.grey,
@@ -2288,10 +2427,10 @@ class CreateInvoiceScreen extends StatelessWidget {
             padding: EdgeInsets.zero,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: controller.itemsControllers.length,
+            itemCount: _itemsControllers.length,
             separatorBuilder: (context, index) => const SizedBox(height: 16),
             itemBuilder: (context, index) {
-              final item = controller.itemsControllers[index];
+              final item = _itemsControllers[index];
               return AnimatedItemCard(
                 key: ValueKey(item),
                 child: Column(
@@ -2335,7 +2474,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    if (controller.gstEnabled.value) ...[
+                    if (_gstEnabled) ...[
                       const SizedBox(height: 12),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -2362,9 +2501,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                                     horizontal: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(
-                                      context,
-                                    ).scaffoldBackgroundColor,
+                                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(
                                       color: Theme.of(context)
@@ -2430,7 +2567,9 @@ class CreateInvoiceScreen extends StatelessWidget {
                                       ],
                                       onChanged: (val) {
                                         if (val != null) {
-                                          // setState handled by GetX
+                                          setState(() {
+                                            item.gstController.text = val;
+                                          });
                                           _calculateTotals();
                                         }
                                       },
@@ -2489,7 +2628,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                                           18;
                                       final double amt = q * r;
                                       double taxAmt = 0.0;
-                                      if (controller.taxType.value == 'exclusive') {
+                                      if (_taxType == 'exclusive') {
                                         taxAmt = amt * (g / 100);
                                       } else {
                                         taxAmt = amt - (amt / (1 + (g / 100)));
@@ -2518,7 +2657,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        if (controller.gstEnabled.value) ...[
+                        if (_gstEnabled) ...[
                           Expanded(
                             flex: 1,
                             child: _buildTextField(
@@ -2570,7 +2709,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                                             ) ??
                                             0.0),
                                   ),
-                                  style: TextStyle(
+                                  style: context.typography.inputText.copyWith(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
                                     color:
@@ -2595,49 +2734,42 @@ class CreateInvoiceScreen extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton.icon(
-                onPressed: () {
-                  // setState handled by GetX
-                  _calculateTotals();
-                },
-                label: Text(
-                  'add_new_item_line'.tr,
-                  style: context.typography.buttonText.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                    fontSize: 13,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                ),
-              ),
-              if (controller.itemsControllers.isNotEmpty)
-                TextButton.icon(
+              Expanded(
+                child: TextButton.icon(
                   onPressed: () {
-                    // setState handled by GetX
+                    setState(() {
+                      final newControllers = _ItemControllers();
+                      newControllers.nameController.addListener(
+                        _onFieldChanged,
+                      );
+                      newControllers.rateController.addListener(
+                        _onFieldChanged,
+                      );
+                      newControllers.qtyController.addListener(_onFieldChanged);
+                      newControllers.gstController.addListener(_onFieldChanged);
+                      _itemsControllers.add(newControllers);
+                    });
                     _calculateTotals();
                   },
-                  icon: const Icon(
-                    LucideIcons.trash2,
-                    size: 16,
-                    color: AppColors.error,
+                  icon: SvgPicture.asset(
+                    'assets/SVG/plus.svg',
+                    width: 16,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.blue,
+                      BlendMode.srcIn,
+                    ),
                   ),
                   label: Text(
-                    'remove_item'.tr,
+                    'Add New Item',
                     style: context.typography.buttonText.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.error,
+                      color: Colors.blue,
                       fontSize: 13,
                     ),
                   ),
                   style: TextButton.styleFrom(
-                    backgroundColor: AppColors.error.withValues(alpha: 0.1),
+                    backgroundColor: Colors.blue.withValues(alpha: 0.1),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
@@ -2647,6 +2779,47 @@ class CreateInvoiceScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+              ),
+              if (_itemsControllers.isNotEmpty) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        final removed = _itemsControllers.removeLast();
+                        removed.dispose();
+                      });
+                      _calculateTotals();
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/SVG/delete.svg',
+                      width: 16,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.error,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    label: Text(
+                      'Remove',
+                      style: context.typography.buttonText.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppColors.error.withValues(alpha: 0.1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ],
@@ -2657,7 +2830,7 @@ class CreateInvoiceScreen extends StatelessWidget {
   Widget _buildTermsSection() {
     return _buildCard(
       title: 'terms_notes'.tr,
-      icon: LucideIcons.fileSignature,
+      svgIcon: 'assets/SVG/editnote.svg',
       iconColor: Colors.orange,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2673,9 +2846,9 @@ class CreateInvoiceScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           TextField(
-            controller: controller.termsController,
+            controller: _termsController,
             maxLines: 4,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: context.typography.inputText.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.normal,
               color:
@@ -2684,13 +2857,13 @@ class CreateInvoiceScreen extends StatelessWidget {
             ),
             decoration: InputDecoration(
               hintText: 'add_terms_and_conditions'.tr,
-              hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              hintStyle: context.typography.inputText.copyWith(
                 color: Colors.grey,
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
               filled: true,
-              fillColor: Theme.of(context).scaffoldBackgroundColor,
+              fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 12,
@@ -2734,8 +2907,7 @@ class CreateInvoiceScreen extends StatelessWidget {
           style: context.typography.categoryHeader.copyWith(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color:
-                (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            color: (context.typography.inputText.color ?? Colors.grey),
           ),
         ),
         const SizedBox(height: 6),
@@ -2762,7 +2934,7 @@ class CreateInvoiceScreen extends StatelessWidget {
               if (selection.description.isNotEmpty) {
                 item.descriptionController.text = selection.description;
               }
-              if (controller.gstEnabled.value && selection.sku.isNotEmpty) {
+              if (_gstEnabled && selection.sku.isNotEmpty) {
                 item.hsnController.text = selection.sku;
               }
             });
@@ -2783,7 +2955,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                       width: 320,
                       constraints: const BoxConstraints(maxHeight: 200),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardTheme.color ?? Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: Theme.of(
@@ -2882,7 +3054,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                   controller: fieldTextEditingController,
                   focusNode: fieldFocusNode,
                   onSubmitted: (val) => onFieldSubmitted(),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: context.typography.inputText.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color:
@@ -2890,24 +3062,17 @@ class CreateInvoiceScreen extends StatelessWidget {
                         Colors.black),
                   ),
                   decoration: InputDecoration(
-                    hintText: 'e_g_website_design'.tr,
-                    hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    hintText: 'Website Design',
+                    hintStyle: context.typography.inputText.copyWith(
                       fontSize: 12,
                       color: Colors.grey,
-                    ),
-                    prefixIcon: const Icon(
-                      LucideIcons.tag,
-                      color: Colors.grey,
-                      size: 16,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 10,
                       horizontal: 12,
                     ),
                     filled: true,
-                    fillColor: Theme.of(
-                      context,
-                    ).scaffoldBackgroundColor.withValues(alpha: 0.3),
+                    fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
@@ -2930,390 +3095,210 @@ class CreateInvoiceScreen extends StatelessWidget {
   }
 
   Widget _buildSummarySection() {
-    final String place = controller.placeOfSupplyController.text.trim().toLowerCase();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final String place = _placeOfSupplyController.text.trim().toLowerCase();
     final bool isOutstate =
         place.isNotEmpty &&
         !place.contains("maharashtra") &&
         place != 'select state';
 
-    return _buildCard(
-      title: 'financial_summary'.tr,
-      icon: LucideIcons.calculator,
-      iconColor: Colors.deepPurple,
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'subtotal'.tr,
-                style: context.typography.tableCell.copyWith(
-                  fontSize: 12,
-                  color:
-                      (Theme.of(context).textTheme.bodyMedium?.color ??
-                      Colors.grey),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF6B4EFF).withValues(alpha: 0.15) : const Color(0xFFF3E8FF), // Light purple background
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SvgPicture.asset(
+                  'assets/SVG/calculator.svg',
+                  width: 20,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF6B4EFF),
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
+              const SizedBox(width: 12),
               Text(
-                formatCurrency.format(controller.subtotal.value),
-                style: context.typography.tableCell.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color:
-                      (Theme.of(context).textTheme.displayLarge?.color ??
-                      Colors.black),
+                'financial_summary'.tr,
+                style: context.typography.cardTitle.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : const Color(0xFF0F172A),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'discount'.tr,
-                    style: context.typography.tableCell.copyWith(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 50,
-                    height: 26,
-                    child: TextField(
-                      controller: controller.discountPercentageController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      style: context.typography.inputText.copyWith(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      onTap: () {
-                        if (controller.discountPercentageController.text == '0') {
-                          controller.discountPercentageController.clear();
-                        }
-                      },
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          controller.discountPercentageController.text = '0';
-                          controller.discountPercentageController.selection =
-                              TextSelection.fromPosition(
-                                const TextPosition(offset: 1),
-                              );
-                        } else if (value.startsWith('0') && value.length > 1) {
-                          controller.discountPercentageController.text = value.substring(
-                            1,
-                          );
-                          controller.discountPercentageController
-                              .selection = TextSelection.fromPosition(
-                            TextPosition(
-                              offset: controller.discountPercentageController.text.length,
-                            ),
-                          );
-                        }
-                      },
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        filled: true,
-                        fillColor: Theme.of(context).scaffoldBackgroundColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+
+          // Subtotal
+          _buildSummaryRow(
+            label: 'subtotal'.tr,
+            value: formatCurrency.format(_subtotal),
+            valueColor: isDark ? Colors.white : const Color(0xFF0F172A),
+          ),
+          const SizedBox(height: 16),
+
+          // Discount
+          _buildSummaryInputRow(
+            label: 'discount'.tr,
+            controller: _discountPercentageController,
+            amount: '- ${formatCurrency.format(_discountAmount)}',
+            amountColor: const Color(0xFFEF4444), // Red
+          ),
+          const SizedBox(height: 16),
+
+          // Taxable Amount
+          _buildSummaryRow(
+            label: 'taxable_amount'.tr,
+            value: formatCurrency.format(
+              (_taxType == 'inclusive' && _gstEnabled)
+                  ? (_subtotal - _discountAmount - _taxAmount)
+                  : (_subtotal - _discountAmount),
+            ),
+            valueColor: isDark ? Colors.white : const Color(0xFF0F172A),
+          ),
+
+          // CGST/SGST or IGST
+          if (_gstEnabled && _taxAmount > 0) ...[
+            const SizedBox(height: 16),
+            if (isOutstate)
+              _buildSummaryRow(
+                label: 'igst'.tr,
+                value: formatCurrency.format(_taxAmount),
+                valueColor: isDark ? Colors.white : const Color(0xFF0F172A),
+              )
+            else ...[
+              _buildSummaryRow(
+                label: 'cgst'.tr,
+                value: formatCurrency.format(_taxAmount / 2),
+                valueColor: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
-              Text(
-                '- ${formatCurrency.format(controller.discountAmount.value)}',
-                style: context.typography.tableCell.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.error,
-                ),
+              const SizedBox(height: 16),
+              _buildSummaryRow(
+                label: 'sgst'.tr,
+                value: formatCurrency.format(_taxAmount / 2),
+                valueColor: isDark ? Colors.white : const Color(0xFF0F172A),
               ),
             ],
+          ],
+
+          const SizedBox(height: 16),
+
+          // Advance Paid
+          _buildSummaryInputRow(
+            label: 'advance_paid'.tr,
+            controller: _advancePaidController,
+            amount:
+                '- ${formatCurrency.format(double.tryParse(_advancePaidController.text) ?? 0.0)}',
+            amountColor: const Color(0xFF10B981), // Green
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+
+          // Dashed Divider
           Row(
             children: List.generate(
-              80,
+              60,
               (index) => Expanded(
                 child: Container(
                   color: index % 2 == 0
                       ? Theme.of(
                           context,
-                        ).colorScheme.outline.withValues(alpha: 0.5)
+                        ).colorScheme.outline.withValues(alpha: 0.3)
                       : Colors.transparent,
                   height: 1,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'taxable_amount'.tr,
-                style: context.typography.tableCell.copyWith(
-                  fontSize: 12,
-                  color:
-                      (Theme.of(context).textTheme.bodyMedium?.color ??
-                      Colors.grey),
-                ),
-              ),
-              Text(
-                formatCurrency.format(
-                  (controller.taxType.value == 'inclusive' && controller.gstEnabled.value)
-                      ? (controller.subtotal.value - controller.discountAmount.value - controller.taxAmount.value)
-                      : (controller.subtotal.value - controller.discountAmount.value),
-                ),
-                style: context.typography.tableCell.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color:
-                      (Theme.of(context).textTheme.displayLarge?.color ??
-                      Colors.black),
-                ),
-              ),
-            ],
-          ),
-          if (controller.gstEnabled.value && controller.taxAmount.value > 0) ...[
-            const SizedBox(height: 16),
-            if (isOutstate)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'igst'.tr,
-                    style: context.typography.tableCell.copyWith(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  Text(
-                    formatCurrency.format(controller.taxAmount.value),
-                    style: context.typography.tableCell.copyWith(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          (Theme.of(context).textTheme.displayLarge?.color ??
-                          Colors.black),
-                    ),
-                  ),
-                ],
-              )
-            else ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'cgst'.tr,
-                    style: context.typography.tableCell.copyWith(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  Text(
-                    formatCurrency.format(controller.taxAmount.value / 2),
-                    style: context.typography.tableCell.copyWith(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          (Theme.of(context).textTheme.displayLarge?.color ??
-                          Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'sgst'.tr,
-                    style: context.typography.tableCell.copyWith(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  Text(
-                    formatCurrency.format(controller.taxAmount.value / 2),
-                    style: context.typography.tableCell.copyWith(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          (Theme.of(context).textTheme.displayLarge?.color ??
-                          Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ],
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'advance_paid'.tr,
-                    style: context.typography.tableCell.copyWith(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 60,
-                    height: 26,
-                    child: TextField(
-                      controller: controller.advancePaidController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      style: context.typography.inputText.copyWith(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      onTap: () {
-                        if (controller.advancePaidController.text == '0') {
-                          controller.advancePaidController.clear();
-                        }
-                      },
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          controller.advancePaidController.text = '0';
-                          controller.advancePaidController.selection =
-                              TextSelection.fromPosition(
-                                const TextPosition(offset: 1),
-                              );
-                        } else if (value.startsWith('0') && value.length > 1) {
-                          controller.advancePaidController.text = value.substring(1);
-                          controller.advancePaidController.selection =
-                              TextSelection.fromPosition(
-                                TextPosition(
-                                  offset: controller.advancePaidController.text.length,
-                                ),
-                              );
-                        }
-                      },
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        filled: true,
-                        fillColor: Theme.of(context).scaffoldBackgroundColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                '- ${formatCurrency.format(double.tryParse(controller.advancePaidController.text) ?? 0.0)}',
-                style: context.typography.tableCell.copyWith(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.success,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Divider(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-            height: 1,
-            thickness: 1,
-          ),
-          const SizedBox(height: 20),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+
+          // Balance Due Box
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF6B4EFF).withValues(alpha: 0.1) : const Color(0xFFEEF0FF), // Light purple/blue background
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
               children: [
-                Text(
-                  'balance_due'.tr,
-                  style: context.typography.categoryHeader.copyWith(
-                    fontSize: 10,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+                // Coins Icon
+                SvgPicture.asset(
+                  'assets/SVG/moneytotal.svg',
+                  width: 28,
+                  colorFilter: const ColorFilter.mode(
+                    Color(0xFF6B4EFF),
+                    BlendMode.srcIn,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+                const SizedBox(width: 12),
+                // Text Column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'balance_due'.tr,
+                        style: context.typography.cardTitle.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'total_amount'.tr,
+                        style: context.typography.cardDescription.copyWith(
+                          fontSize: 11,
+                          color: isDark ? Colors.grey.shade400 : const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Amounts Column
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '₹',
-                      style: context.typography.currencyText.copyWith(
-                        fontSize: 18,
+                      formatCurrency.format(_balanceDue),
+                      style: context.typography.invoiceAmount.copyWith(
+                        fontSize: 19,
                         fontWeight: FontWeight.w900,
-                        color:
-                            (Theme.of(context).textTheme.displayLarge?.color ??
-                            Colors.black87),
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        height: 1.2,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      formatCurrency.format(controller.balanceDue.value).replaceAll('₹', ''),
-                      style: context.typography.invoiceAmount.copyWith(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color:
-                            (Theme.of(context).textTheme.displayLarge?.color ??
-                            Colors.black87),
+                      '${formatCurrency.format(_total)} (Total)',
+                      style: context.typography.cardDescription.copyWith(
+                        fontSize: 11,
+                        color: const Color(0xFF6B4EFF),
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${'total_amount'.tr}: ${formatCurrency.format(controller.total.value)}',
-                  style: context.typography.cardDescription.copyWith(
-                    fontSize: 11,
-                    color: Colors.grey,
-                  ),
                 ),
               ],
             ),
@@ -3323,9 +3308,121 @@ class CreateInvoiceScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSummaryRow({
+    required String label,
+    required String value,
+    required Color valueColor,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: context.typography.tableCell.copyWith(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade400 : const Color(0xFF64748B),
+          ),
+        ),
+        Text(
+          value,
+          style: context.typography.tableCell.copyWith(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: valueColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryInputRow({
+    required String label,
+    required TextEditingController controller,
+    required String amount,
+    required Color amountColor,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: context.typography.tableCell.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade400 : const Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 50,
+              height: 28,
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.2),
+                ),
+              ),
+              child: TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: context.typography.inputText.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+                onTap: () {
+                  if (controller.text == '0') {
+                    controller.clear();
+                  }
+                },
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    controller.text = '0';
+                    controller.selection = TextSelection.fromPosition(
+                      const TextPosition(offset: 1),
+                    );
+                  } else if (value.startsWith('0') && value.length > 1) {
+                    controller.text = value.substring(1);
+                    controller.selection = TextSelection.fromPosition(
+                      TextPosition(offset: controller.text.length),
+                    );
+                  }
+                },
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.zero,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  isDense: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Text(
+          amount,
+          textAlign: TextAlign.right,
+          style: context.typography.tableCell.copyWith(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: amountColor,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCard({
     required String title,
     IconData? icon,
+    String? svgIcon,
     Color? iconColor,
     Widget? trailing,
     required Widget child,
@@ -3352,7 +3449,18 @@ class CreateInvoiceScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             child: Row(
               children: [
-                if (icon != null) ...[
+                if (svgIcon != null) ...[
+                  SvgPicture.asset(
+                    svgIcon,
+                    width: 18,
+                    height: 18,
+                    colorFilter: ColorFilter.mode(
+                      iconColor ?? AppColors.primary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                ] else if (icon != null) ...[
                   Icon(icon, size: 18, color: iconColor ?? AppColors.primary),
                   const SizedBox(width: 8),
                 ],
@@ -3363,8 +3471,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color:
                         iconColor ??
-                        (Theme.of(context).textTheme.bodyMedium?.color ??
-                            Colors.grey),
+                        (context.typography.inputText.color ?? Colors.grey),
                   ),
                 ),
                 if (trailing != null) ...[const Spacer(), trailing],
@@ -3381,20 +3488,18 @@ class CreateInvoiceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdownField({
+  Widget _buildStatePickerField({
     required String label,
     required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
+    required ValueChanged<String> onChanged,
   }) {
-    final selectedValue = items.contains(value) ? value : items.first;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         RichText(
           text: TextSpan(
             text: label.replaceAll('*', '').trim(),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: context.typography.inputText.copyWith(
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
@@ -3404,7 +3509,7 @@ class CreateInvoiceScreen extends StatelessWidget {
               if (label.contains('*'))
                 TextSpan(
                   text: ' *',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: context.typography.inputText.copyWith(
                     color: Colors.red,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -3414,81 +3519,51 @@ class CreateInvoiceScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        Container(
-          height: 42,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(
-              color: Theme.of(
-                context,
-              ).colorScheme.outline.withValues(alpha: 0.3),
+        GestureDetector(
+          onTap: () {
+            StatePickerBottomSheet.show(
+              context,
+              initialSelectedState: value == 'select_state'.tr ? null : value,
+              onStateSelected: onChanged,
+            );
+          },
+          child: Container(
+            height: 42,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: Theme.of(
+                  context,
+                ).colorScheme.outline.withValues(alpha: 0.3),
+              ),
             ),
-          ),
-          alignment: Alignment.center,
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<String>(
-              isExpanded: true,
-              value: selectedValue,
-              icon: Icon(
-                LucideIcons.chevronDown,
-                size: 16,
-                color:
-                    (Theme.of(context).textTheme.displayLarge?.color ??
-                    Colors.black87),
-              ),
-              style: context.typography.inputText.copyWith(
-                color:
-                    (Theme.of(context).textTheme.displayLarge?.color ??
-                    Colors.black),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-              items: items.map((String val) {
-                return DropdownMenuItem<String>(
-                  value: val,
+            alignment: Alignment.center,
+            child: Row(
+              children: [
+                Expanded(
                   child: Text(
-                    val,
+                    value,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyMedium?.copyWith(fontSize: 14),
+                    style: context.typography.inputText.copyWith(
+                      color:
+                          (Theme.of(context).textTheme.displayLarge?.color ??
+                          Colors.black),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                );
-              }).toList(),
-              onChanged: onChanged,
+                ),
+                Icon(
+                  LucideIcons.chevronDown,
+                  size: 16,
+                  color:
+                      (Theme.of(context).textTheme.displayLarge?.color ??
+                      Colors.black87),
+                ),
+              ],
             ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummaryRow(
-    String label,
-    String amount, {
-    bool isDiscount = false,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: context.typography.tableCell.copyWith(
-            fontSize: 13,
-            color:
-                (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
-          ),
-        ),
-        Text(
-          amount,
-          style: context.typography.tableCell.copyWith(
-            fontWeight: FontWeight.bold,
-            color: isDiscount
-                ? AppColors.error
-                : (Theme.of(context).textTheme.displayLarge?.color ??
-                      Colors.black),
           ),
         ),
       ],
@@ -3500,6 +3575,7 @@ class CreateInvoiceScreen extends StatelessWidget {
     required String hint,
     required TextEditingController controller,
     IconData? icon,
+    String? svgIcon,
     Widget? suffixIcon,
     int maxLines = 1,
     TextInputType? keyboardType,
@@ -3513,7 +3589,7 @@ class CreateInvoiceScreen extends StatelessWidget {
         RichText(
           text: TextSpan(
             text: label.replaceAll('*', '').trim(),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: context.typography.inputText.copyWith(
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
@@ -3523,7 +3599,7 @@ class CreateInvoiceScreen extends StatelessWidget {
               if (label.contains('*'))
                 TextSpan(
                   text: ' *',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: context.typography.inputText.copyWith(
                     color: Colors.red,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -3551,17 +3627,36 @@ class CreateInvoiceScreen extends StatelessWidget {
           },
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            hintStyle: context.typography.inputText.copyWith(
               color: Colors.grey,
               fontSize: 14,
               fontWeight: FontWeight.normal,
             ),
-            prefixIcon: icon != null
-                ? Icon(icon, size: 18, color: Colors.blue)
-                : null,
+            prefixIconConstraints: const BoxConstraints(minWidth: 40, maxHeight: 40),
+            prefixIcon: svgIcon != null
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 8),
+                    child: UnconstrainedBox(
+                      child: SvgPicture.asset(
+                        svgIcon,
+                        width: 15,
+                        height: 15,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.blue,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                  )
+                : (icon != null
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 12, right: 8),
+                          child: Icon(icon, size: 14, color: Colors.blue),
+                        )
+                      : null),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: Theme.of(context).scaffoldBackgroundColor,
+            fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 12,
@@ -3625,12 +3720,14 @@ class _ScaleOnPressState extends State<ScaleOnPress>
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOut));
   }
 
-  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CreateInvoiceController());
-
     return GestureDetector(
       onTapDown: (_) => _controller.forward(),
       onTapUp: (_) => _controller.reverse(),
@@ -3670,12 +3767,14 @@ class _AnimatedItemCardState extends State<AnimatedItemCard>
     _controller.forward();
   }
 
-  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CreateInvoiceController());
-
     return SizeTransition(
       sizeFactor: _sizeAnimation,
       child: FadeTransition(opacity: _fadeAnimation, child: widget.child),
@@ -3721,12 +3820,14 @@ class _FadeInUpState extends State<FadeInUp>
     });
   }
 
-  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(CreateInvoiceController());
-
     return SlideTransition(
       position: _slideAnimation,
       child: FadeTransition(opacity: _fadeAnimation, child: widget.child),

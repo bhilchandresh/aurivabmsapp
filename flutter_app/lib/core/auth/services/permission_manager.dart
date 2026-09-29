@@ -8,13 +8,8 @@ class PermissionManager {
 
   // ── Role check helpers ─────────────────────────────────────────────────────
 
-  bool get isSuperAdmin {
-    final role = _sessionManager.currentUserRole.toLowerCase();
-    return role.contains('superadmin') || role.contains('super_admin');
-  }
 
   bool get isAdmin {
-    if (isSuperAdmin) return true;
     final role = _sessionManager.currentUserRole.toLowerCase();
     return role.contains('admin');
   }
@@ -28,7 +23,6 @@ class PermissionManager {
   // ── Resource permissions check ─────────────────────────────────────────────
 
   bool hasPermission(String resource, String action) {
-    if (isSuperAdmin) return true;
 
     final user = _sessionManager.currentUserModel;
     if (user == null) return false;

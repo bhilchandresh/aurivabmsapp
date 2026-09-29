@@ -20,6 +20,9 @@ import '../auth/auth_controller.dart';
 import 'quotation_details_screen.dart';
 import '../../shared/widgets/app_loader.dart';
 import '../../core/constants/app_typography.dart';
+import '../../core/theme/app_extensions.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../shared/widgets/custom_notification_overlay.dart';
 
 class _ItemControllers {
   final nameController = TextEditingController();
@@ -474,7 +477,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
 
   // The perfect, system-aligned pixel-perfect screenshot generator
   Future<void> _exportPdfWithScreenshot(bool isPrint) async {
-    if (_placeOfSupplyController.text.trim().isEmpty || _placeOfSupplyController.text.trim() == 'select_state'.tr || _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+    if (_placeOfSupplyController.text.trim().isEmpty ||
+        _placeOfSupplyController.text.trim() == 'select_state'.tr ||
+        _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select Place of Supply')),
       );
@@ -834,8 +839,8 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 const SizedBox(height: 2),
                 Center(
                   child: Text(
-                    '${_companyInfo['email']!.toUpperCase()}  •  ${_companyInfo['phone']!.toUpperCase()}'
-                    '${_companyInfo['website'] != null && _companyInfo['website']!.isNotEmpty ? '  •  ${_companyInfo['website']!.toUpperCase()}' : ''}',
+                    '${_companyInfo['email']!.toUpperCase()}  Ã¢â‚¬Â¢  ${_companyInfo['phone']!.toUpperCase()}'
+                    '${_companyInfo['website'] != null && _companyInfo['website']!.isNotEmpty ? '  Ã¢â‚¬Â¢  ${_companyInfo['website']!.toUpperCase()}' : ''}',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 10,
@@ -1593,7 +1598,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -1632,7 +1637,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
+                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -1679,18 +1684,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
-                    color:
-                        (Theme.of(context).textTheme.bodyMedium?.color ??
-                        Colors.grey),
+                    color: (context.typography.inputText.color ?? Colors.grey),
                   ),
                 ),
                 Text(
                   "${'date_colon'.tr}$quoteDate",
                   style: TextStyle(
                     fontSize: 11,
-                    color:
-                        (Theme.of(context).textTheme.bodyMedium?.color ??
-                        Colors.grey),
+                    color: (context.typography.inputText.color ?? Colors.grey),
                   ),
                 ),
               ],
@@ -1916,7 +1917,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           ] else ...[
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              color: const Color(0xFF0F172A),
+              color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -2251,9 +2252,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     fontFamily: AppTypography.serifFontFamily,
-                    color:
-                        (Theme.of(context).textTheme.bodyMedium?.color ??
-                        Colors.grey),
+                    color: (context.typography.inputText.color ?? Colors.grey),
                   ),
                 ),
                 Text(
@@ -2261,9 +2260,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   style: TextStyle(
                     fontSize: 11,
                     fontFamily: AppTypography.serifFontFamily,
-                    color:
-                        (Theme.of(context).textTheme.bodyMedium?.color ??
-                        Colors.grey),
+                    color: (context.typography.inputText.color ?? Colors.grey),
                   ),
                 ),
               ],
@@ -2930,7 +2927,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: const Color(0xFFF3E8FF),
+                              color: (Theme.of(context).brightness == Brightness.dark ? AppColors.primary.withValues(alpha: 0.1) : const Color(0xFFF3E8FF)),
                               width: 1.5,
                             ),
                           ),
@@ -3601,7 +3598,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               children: [
                 Container(
                   height: 6,
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
                 ),
                 AnimatedContainer(
                   duration: const Duration(milliseconds: 400),
@@ -3629,13 +3626,15 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   }
 
   Future<void> _saveAndShowDetails() async {
-    if (_placeOfSupplyController.text.trim().isEmpty || _placeOfSupplyController.text.trim() == 'select_state'.tr || _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
+    if (_placeOfSupplyController.text.trim().isEmpty ||
+        _placeOfSupplyController.text.trim() == 'select_state'.tr ||
+        _placeOfSupplyController.text.trim().toLowerCase() == 'select state') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select Place of Supply')),
       );
       return;
     }
-    
+
     if (_clientNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(
         context,
@@ -3680,7 +3679,8 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         'additionalDetails': item.descriptionController.text.trim(),
         'quantity': qty,
         'rate': rate,
-        'gst': gstRate,
+        'gstRate': _gstEnabled ? gstRate : 0.0,
+        'hsnCode': _gstEnabled ? item.hsnController.text.trim() : '',
       });
     }
 
@@ -3729,12 +3729,29 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       Navigator.pop(context); // Dismiss loading dialog
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Fluttertoast.showToast(
-          msg: isEdit
-              ? "Quotation updated successfully!"
-              : "Quotation created successfully!",
-          backgroundColor: AppColors.success,
-          textColor: Colors.white,
+        final responseData = jsonDecode(response.body);
+        final inv = responseData['data'] ?? {};
+        final clientObj = inv['client'] ?? {};
+
+        final double totalAmt = (inv['totalAmount'] ?? inv['grandTotal'] ?? 0.0).toDouble();
+        final String clientNameStr = clientObj['name'] ?? 'Unknown';
+        final String quotationNum = inv['quotationNumber'] ?? inv['id'] ?? 'Quotation';
+        
+        final formattedAmount = NumberFormat.currency(
+          locale: 'en_IN',
+          symbol: '₹',
+          decimalDigits: 0,
+        ).format(totalAmt);
+
+        CustomNotificationOverlay.show(
+          context: context,
+          title: isEdit ? 'Quotation Updated' : 'Quotation Created',
+          message: isEdit
+              ? '$formattedAmount updated for $clientNameStr'
+              : '$formattedAmount saved for $clientNameStr',
+          amount: formattedAmount,
+          invoiceNumber: 'Quotation $quotationNum',
+          type: 'invoice',
         );
 
         final ClientsController clientsController =
@@ -3743,9 +3760,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             : Get.put(ClientsController());
         await clientsController.fetchQuotations();
 
-        final responseData = jsonDecode(response.body);
-        final inv = responseData['data'] ?? {};
-        final clientObj = inv['client'] ?? {};
+        // Parsed above for notification
 
         final String name = clientObj['name'] ?? 'Unknown';
         final String email = clientObj['email'] ?? '';
@@ -3821,41 +3836,28 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            LucideIcons.arrowLeft,
+          icon: SvgPicture.asset(
+            'assets/SVG/backarrow.svg',
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(
+              Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
+              BlendMode.srcIn,
+            ),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          widget.quotationToEdit != null
+              ? 'edit_quotation'.tr
+              : 'new_quotation'.tr,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
             color:
                 (Theme.of(context).textTheme.displayLarge?.color ??
                 Colors.black),
           ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.quotationToEdit != null
-                  ? 'edit_quotation'.tr
-                  : 'new_quotation'.tr,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color:
-                    (Theme.of(context).textTheme.displayLarge?.color ??
-                    Colors.black),
-              ),
-            ),
-            Text(
-              widget.quotationToEdit != null
-                  ? 'edit_estimate_proposal'.tr
-                  : 'create_new_estimate_proposal'.tr,
-              style: TextStyle(
-                fontSize: 11,
-                color:
-                    (Theme.of(context).textTheme.bodyMedium?.color ??
-                    Colors.grey),
-              ),
-            ),
-          ],
         ),
         actions: [
           const SizedBox(width: 6),
@@ -3880,7 +3882,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               alignment: Alignment.center,
               child: Row(
                 children: [
-                  const Icon(LucideIcons.save, size: 14, color: Colors.white),
+                  SvgPicture.asset(
+                    'assets/SVG/save.svg',
+                    width: 14,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.white,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'save'.tr,
@@ -3955,9 +3964,122 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
     );
   }
 
+  Widget _buildSummaryRow({
+    required String label,
+    required String value,
+    required Color valueColor,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: context.typography.tableCell.copyWith(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF64748B),
+          ),
+        ),
+        Text(
+          value,
+          style: context.typography.tableCell.copyWith(
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+            color: valueColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryInputRow({
+    required String label,
+    required TextEditingController controller,
+    required String amount,
+    required Color amountColor,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              label,
+              style: context.typography.tableCell.copyWith(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF64748B),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              width: 50,
+              height: 28,
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outline.withValues(alpha: 0.2),
+                ),
+              ),
+              child: TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: context.typography.inputText.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+                onTap: () {
+                  if (controller.text == '0') {
+                    controller.clear();
+                  }
+                },
+                onChanged: (value) {
+                  if (value.isEmpty) {
+                    controller.text = '0';
+                    controller.selection = TextSelection.fromPosition(
+                      const TextPosition(offset: 1),
+                    );
+                  } else if (value.startsWith('0') && value.length > 1) {
+                    controller.text = value.substring(1);
+                    controller.selection = TextSelection.fromPosition(
+                      TextPosition(offset: controller.text.length),
+                    );
+                  }
+                  _calculateTotals();
+                },
+                decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.zero,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  isDense: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Text(
+          amount,
+          textAlign: TextAlign.right,
+          style: context.typography.tableCell.copyWith(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: amountColor,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildCard({
     required String title,
     IconData? icon,
+    String? svgIcon,
     Color? iconColor,
     Widget? headerTrailing,
     required Widget child,
@@ -3981,12 +4103,21 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             child: Row(
               children: [
-                if (icon != null) ...[
-                  Icon(icon, size: 18, color: iconColor ?? AppColors.primary),
-                  const SizedBox(width: 8),
+                if (svgIcon != null) ...[
+                  SvgPicture.asset(
+                    svgIcon,
+                    width: 14,
+                    colorFilter: iconColor != null
+                        ? ColorFilter.mode(iconColor, BlendMode.srcIn)
+                        : null,
+                  ),
+                  const SizedBox(width: 6),
+                ] else if (icon != null) ...[
+                  Icon(icon, size: 16, color: iconColor ?? AppColors.primary),
+                  const SizedBox(width: 6),
                 ],
                 Text(
                   title.toUpperCase(),
@@ -3995,8 +4126,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     fontWeight: FontWeight.bold,
                     color:
                         iconColor ??
-                        (Theme.of(context).textTheme.bodyMedium?.color ??
-                            Colors.grey),
+                        (context.typography.inputText.color ?? Colors.grey),
                     letterSpacing: 1.0,
                   ),
                 ),
@@ -4018,7 +4148,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   Widget _buildClientSection(bool isWide) {
     return _buildCard(
       title: 'quote_to'.tr,
-      icon: LucideIcons.user,
+      svgIcon: 'assets/SVG/profile.svg',
       iconColor: Colors.blue,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -4027,7 +4157,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             controller: _clientSearchController,
             label: 'search_existing_client'.tr,
             hint: 'type_to_search_clients'.tr,
-            icon: LucideIcons.search,
+            svgIcon: 'assets/SVG/search.svg',
             suffixIcon: _clientSearchController.text.isNotEmpty
                 ? IconButton(
                     icon: const Icon(
@@ -4118,7 +4248,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 child: _buildInputField(
                   controller: _clientNameController,
                   label: 'client_name_star'.tr,
-                  hint: 'eg_name'.tr,
+                  hint: 'John Doe',
                 ),
               ),
               const SizedBox(width: 12),
@@ -4126,7 +4256,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                 child: _buildInputField(
                   controller: _clientEmailController,
                   label: 'email'.tr,
-                  hint: 'eg_email'.tr,
+                  hint: 'example@email.com',
                   keyboardType: TextInputType.emailAddress,
                 ),
               ),
@@ -4136,14 +4266,14 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           _buildInputField(
             controller: _clientAddressController,
             label: 'address'.tr,
-            hint: 'eg_address'.tr,
+            hint: 'Corporate Hub, Sector V',
             maxLines: 2,
           ),
           const SizedBox(height: 12),
           _buildInputField(
             controller: _clientPhoneController,
             label: 'details'.tr,
-            hint: 'eg_phone'.tr,
+            hint: '9898989898',
           ),
           const SizedBox(height: 12),
           _buildInputField(
@@ -4159,7 +4289,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   Widget _buildQuotationMetaSection(bool isWide) {
     return _buildCard(
       title: 'quote_details'.tr,
-      icon: LucideIcons.fileText,
+      svgIcon: 'assets/SVG/invoice.svg',
       iconColor: Colors.purple,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -4171,13 +4301,21 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   controller: _quoteDateController,
                   label: 'quotation_date_star'.tr,
                   hint: 'yyyy_mm_dd'.tr,
-                  icon: LucideIcons.calendar,
+                  svgIcon: 'assets/SVG/calendernormal.svg',
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
                       initialDate: DateTime.now(),
                       firstDate: DateTime(2020),
                       lastDate: DateTime(2030),
+                      builder: (context, child) {
+                        return MediaQuery(
+                          data: MediaQuery.of(context).copyWith(
+                            textScaler: const TextScaler.linear(1.0),
+                          ),
+                          child: child!,
+                        );
+                      },
                     );
                     if (picked != null) {
                       _quoteDateController.text = DateFormat(
@@ -4193,13 +4331,21 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   controller: _validUntilController,
                   label: 'valid_until_star'.tr,
                   hint: 'yyyy_mm_dd'.tr,
-                  icon: LucideIcons.calendarClock,
+                  svgIcon: 'assets/SVG/calendernormal.svg',
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
                       initialDate: DateTime.now().add(const Duration(days: 7)),
                       firstDate: DateTime(2020),
                       lastDate: DateTime(2030),
+                      builder: (context, child) {
+                        return MediaQuery(
+                          data: MediaQuery.of(context).copyWith(
+                            textScaler: const TextScaler.linear(1.0),
+                          ),
+                          child: child!,
+                        );
+                      },
                     );
                     if (picked != null) {
                       _validUntilController.text = DateFormat(
@@ -4229,15 +4375,18 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(
-                          LucideIcons.creditCard,
-                          size: 18,
-                          color: AppColors.primary,
+                        SvgPicture.asset(
+                          'assets/SVG/card.svg',
+                          width: 18,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.primary,
+                            BlendMode.srcIn,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Text(
                           'enable_gst'.tr,
-                          style: const TextStyle(
+                          style: context.typography.categoryHeader.copyWith(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
                             color: AppColors.primary,
@@ -4283,7 +4432,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             decoration: BoxDecoration(
                               color: _taxType == 'exclusive'
                                   ? AppColors.primary
-                                  : Colors.white,
+                                  : (Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Colors.white),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: _taxType == 'exclusive'
@@ -4299,7 +4448,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                 fontWeight: FontWeight.bold,
                                 color: _taxType == 'exclusive'
                                     ? Colors.white
-                                    : Colors.grey,
+                                    : (Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.grey),
                               ),
                             ),
                           ),
@@ -4317,7 +4466,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             decoration: BoxDecoration(
                               color: _taxType == 'inclusive'
                                   ? AppColors.primary
-                                  : Colors.white,
+                                  : (Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Colors.white),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
                                 color: _taxType == 'inclusive'
@@ -4333,7 +4482,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                 fontWeight: FontWeight.bold,
                                 color: _taxType == 'inclusive'
                                     ? Colors.white
-                                    : Colors.grey,
+                                    : (Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.grey),
                               ),
                             ),
                           ),
@@ -4353,7 +4502,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
   Widget _buildItemsSection(bool isWide) {
     return _buildCard(
       title: 'line_items'.tr,
-      icon: LucideIcons.list,
+      svgIcon: 'assets/SVG/editfile.svg',
       iconColor: Colors.teal,
       headerTrailing: Text(
         '${_itemsControllers.length} Items Added',
@@ -4450,9 +4599,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                     horizontal: 8,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Theme.of(
-                                      context,
-                                    ).scaffoldBackgroundColor,
+                                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(
                                       color: Theme.of(context)
@@ -4636,9 +4783,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                                   horizontal: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).scaffoldBackgroundColor,
+                                      color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
                                   borderRadius: BorderRadius.circular(6),
                                   border: Border.all(
                                     color: Theme.of(context).colorScheme.outline
@@ -4673,49 +4818,29 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
 
           const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton.icon(
-                onPressed: _addItem,
-                label: Text(
-                  'add_new_item_line'.tr,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
-                    fontSize: 13,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                ),
-              ),
-              if (_itemsControllers.isNotEmpty)
-                TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      final removed = _itemsControllers.removeLast();
-                      removed.dispose();
-                    });
-                    _calculateTotals();
-                  },
-                  icon: const Icon(
-                    LucideIcons.trash2,
-                    size: 16,
-                    color: AppColors.error,
+              Expanded(
+                child: TextButton.icon(
+                  onPressed: _addItem,
+                  icon: SvgPicture.asset(
+                    'assets/SVG/plus.svg',
+                    width: 16,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.blue,
+                      BlendMode.srcIn,
+                    ),
                   ),
                   label: Text(
-                    'remove_item'.tr,
-                    style: const TextStyle(
+                    'Add New',
+                    overflow: TextOverflow.ellipsis,
+                    style: context.typography.buttonText.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: AppColors.error,
+                      color: Colors.blue,
                       fontSize: 13,
                     ),
                   ),
                   style: TextButton.styleFrom(
-                    backgroundColor: AppColors.error.withValues(alpha: 0.1),
+                    backgroundColor: Colors.blue.withValues(alpha: 0.1),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
@@ -4725,6 +4850,48 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                     ),
                   ),
                 ),
+              ),
+              if (_itemsControllers.isNotEmpty) ...[
+                const SizedBox(width: 12),
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        final removed = _itemsControllers.removeLast();
+                        removed.dispose();
+                      });
+                      _calculateTotals();
+                    },
+                    icon: SvgPicture.asset(
+                      'assets/SVG/delete.svg',
+                      width: 16,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.error,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    label: Text(
+                      'Remove',
+                      overflow: TextOverflow.ellipsis,
+                      style: context.typography.buttonText.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.error,
+                        fontSize: 13,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppColors.error.withValues(alpha: 0.1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ],
@@ -4741,7 +4908,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
 
     final Widget termsCard = _buildCard(
       title: 'terms_notes'.tr,
-      icon: LucideIcons.fileSignature,
+      svgIcon: 'assets/SVG/editnote.svg',
       iconColor: Colors.orange,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -4759,7 +4926,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           TextField(
             controller: _termsController,
             maxLines: 4,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: context.typography.inputText.copyWith(
               fontSize: 12,
               fontWeight: FontWeight.normal,
               color:
@@ -4768,13 +4935,13 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             ),
             decoration: InputDecoration(
               hintText: 'add_terms_cond'.tr,
-              hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              hintStyle: context.typography.inputText.copyWith(
                 color: Colors.grey,
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
               filled: true,
-              fillColor: Theme.of(context).scaffoldBackgroundColor,
+              fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
                 vertical: 12,
@@ -4808,391 +4975,207 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
       ),
     );
 
-    final Widget financialCard = _buildCard(
-      title: 'financial_summary'.tr,
-      icon: LucideIcons.calculator,
-      iconColor: Colors.deepPurple,
+    final Widget financialCard = Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardTheme.color,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'subtotal'.tr,
-                style: TextStyle(
-                  fontSize: 12,
-                  color:
-                      (Theme.of(context).textTheme.bodyMedium?.color ??
-                      Colors.grey),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: (Theme.of(context).brightness == Brightness.dark ? AppColors.primary.withValues(alpha: 0.1) : const Color(0xFFF3E8FF)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SvgPicture.asset(
+                  'assets/SVG/calculator.svg',
+                  width: 20,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.primary,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
+              const SizedBox(width: 12),
               Text(
-                formatCurrency.format(_subtotal),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color:
-                      (Theme.of(context).textTheme.displayLarge?.color ??
-                      Colors.black),
+                'financial_summary'.tr,
+                style: context.typography.cardTitle.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'discount_percent'.tr,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 50,
-                    height: 26,
-                    child: TextField(
-                      controller: _discountPercentageController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      onTap: () {
-                        if (_discountPercentageController.text == '0') {
-                          _discountPercentageController.clear();
-                        }
-                      },
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          _discountPercentageController.text = '0';
-                          _discountPercentageController.selection =
-                              TextSelection.fromPosition(
-                                const TextPosition(offset: 1),
-                              );
-                        } else if (value.startsWith('0') && value.length > 1) {
-                          _discountPercentageController.text = value.substring(
-                            1,
-                          );
-                          _discountPercentageController
-                              .selection = TextSelection.fromPosition(
-                            TextPosition(
-                              offset: _discountPercentageController.text.length,
-                            ),
-                          );
-                        }
-                        _calculateTotals();
-                      },
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        filled: true,
-                        fillColor: Theme.of(context).scaffoldBackgroundColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+
+          // Subtotal
+          _buildSummaryRow(
+            label: 'subtotal'.tr,
+            value: formatCurrency.format(_subtotal),
+            valueColor: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+          ),
+          const SizedBox(height: 16),
+
+          // Discount
+          _buildSummaryInputRow(
+            label: 'discount'.tr,
+            controller: _discountPercentageController,
+            amount: '- ${formatCurrency.format(_discountAmount)}',
+            amountColor: const Color(0xFFEF4444),
+          ),
+          const SizedBox(height: 16),
+
+          // Taxable Amount
+          _buildSummaryRow(
+            label: 'taxable_amount'.tr,
+            value: formatCurrency.format(
+              (_taxType == 'inclusive' && _gstEnabled)
+                  ? (_subtotal - _discountAmount - _taxAmount)
+                  : (_subtotal - _discountAmount),
+            ),
+            valueColor: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+          ),
+
+          // CGST/SGST or IGST
+          if (_gstEnabled && _taxAmount > 0) ...[
+            const SizedBox(height: 16),
+            if (isOutstate)
+              _buildSummaryRow(
+                label: 'igst'.tr,
+                value: formatCurrency.format(_taxAmount),
+                valueColor: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+              )
+            else ...[
+              _buildSummaryRow(
+                label: 'cgst'.tr,
+                value: formatCurrency.format(_taxAmount / 2),
+                valueColor: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
               ),
-              Text(
-                '- ${formatCurrency.format(_discountAmount)}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.error,
-                ),
+              const SizedBox(height: 16),
+              _buildSummaryRow(
+                label: 'sgst'.tr,
+                value: formatCurrency.format(_taxAmount / 2),
+                valueColor: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
               ),
             ],
+          ],
+
+          const SizedBox(height: 16),
+
+          // Advance Received
+          _buildSummaryInputRow(
+            label: 'advance_received'.tr,
+            controller: _advanceReceivedController,
+            amount:
+                '- ${formatCurrency.format(double.tryParse(_advanceReceivedController.text) ?? 0.0)}',
+            amountColor: const Color(0xFF10B981),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+
+          // Dashed Divider
           Row(
             children: List.generate(
-              80,
+              60,
               (index) => Expanded(
                 child: Container(
                   color: index % 2 == 0
                       ? Theme.of(
                           context,
-                        ).colorScheme.outline.withValues(alpha: 0.5)
+                        ).colorScheme.outline.withValues(alpha: 0.3)
                       : Colors.transparent,
                   height: 1,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'taxable_amount'.tr,
-                style: TextStyle(
-                  fontSize: 12,
-                  color:
-                      (Theme.of(context).textTheme.bodyMedium?.color ??
-                      Colors.grey),
-                ),
-              ),
-              Text(
-                formatCurrency.format(
-                  (_taxType == 'inclusive' && _gstEnabled)
-                      ? (_subtotal - _discountAmount - _taxAmount)
-                      : (_subtotal - _discountAmount),
-                ),
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color:
-                      (Theme.of(context).textTheme.displayLarge?.color ??
-                      Colors.black),
-                ),
-              ),
-            ],
-          ),
-          if (_gstEnabled && _taxAmount > 0) ...[
-            const SizedBox(height: 16),
-            if (isOutstate)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'igst'.tr,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  Text(
-                    formatCurrency.format(_taxAmount),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          (Theme.of(context).textTheme.displayLarge?.color ??
-                          Colors.black),
-                    ),
-                  ),
-                ],
-              )
-            else ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'cgst'.tr,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  Text(
-                    formatCurrency.format(_taxAmount / 2),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          (Theme.of(context).textTheme.displayLarge?.color ??
-                          Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'sgst'.tr,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  Text(
-                    formatCurrency.format(_taxAmount / 2),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color:
-                          (Theme.of(context).textTheme.displayLarge?.color ??
-                          Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ],
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    'advance_received'.tr,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:
-                          (Theme.of(context).textTheme.bodyMedium?.color ??
-                          Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  SizedBox(
-                    width: 60,
-                    height: 26,
-                    child: TextField(
-                      controller: _advanceReceivedController,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      onTap: () {
-                        if (_advanceReceivedController.text == '0') {
-                          _advanceReceivedController.clear();
-                        }
-                      },
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          _advanceReceivedController.text = '0';
-                          _advanceReceivedController.selection =
-                              TextSelection.fromPosition(
-                                const TextPosition(offset: 1),
-                              );
-                        } else if (value.startsWith('0') && value.length > 1) {
-                          _advanceReceivedController.text = value.substring(1);
-                          _advanceReceivedController
-                              .selection = TextSelection.fromPosition(
-                            TextPosition(
-                              offset: _advanceReceivedController.text.length,
-                            ),
-                          );
-                        }
-                        _calculateTotals();
-                      },
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.zero,
-                        filled: true,
-                        fillColor: Theme.of(context).scaffoldBackgroundColor,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.5),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(4),
-                          borderSide: BorderSide(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outline.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                '- ${formatCurrency.format(double.tryParse(_advanceReceivedController.text) ?? 0.0)}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.success,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Divider(
-            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-            height: 1,
-            thickness: 1,
-          ),
-          const SizedBox(height: 20),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+
+          // Balance Due Box
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: (Theme.of(context).brightness == Brightness.dark ? AppColors.primary.withValues(alpha: 0.1) : const Color(0xFFEEF0FF)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
               children: [
-                Text(
-                  'balance_due'.tr,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+                // Coins Icon
+                SvgPicture.asset(
+                  'assets/SVG/moneytotal.svg',
+                  width: 28,
+                  colorFilter: const ColorFilter.mode(
+                    AppColors.primary,
+                    BlendMode.srcIn,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+                const SizedBox(width: 12),
+                // Text Column
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'balance_due'.tr,
+                        style: context.typography.cardTitle.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'total_amount'.tr,
+                        style: context.typography.cardDescription.copyWith(
+                          fontSize: 11,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Amounts Column
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '₹',
-                      style: TextStyle(
-                        fontSize: 18,
+                      formatCurrency.format(
+                        _total -
+                            (double.tryParse(_advanceReceivedController.text) ??
+                                0.0),
+                      ),
+                      style: context.typography.invoiceAmount.copyWith(
+                        fontSize: 19,
                         fontWeight: FontWeight.w900,
-                        color:
-                            (Theme.of(context).textTheme.displayLarge?.color ??
-                            Colors.black87),
+                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        height: 1.2,
                       ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      formatCurrency
-                          .format(
-                            (_total -
-                                (double.tryParse(
-                                      _advanceReceivedController.text,
-                                    ) ??
-                                    0.0)),
-                          )
-                          .replaceAll('₹', ''),
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color:
-                            (Theme.of(context).textTheme.displayLarge?.color ??
-                            Colors.black87),
+                      '${formatCurrency.format(_total)} (Total)',
+                      style: context.typography.cardDescription.copyWith(
+                        fontSize: 11,
+                        color: AppColors.primary,
                       ),
                     ),
                   ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "${'amount'.tr}: ${formatCurrency.format(_total)}",
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
                 ),
               ],
             ),
@@ -5257,8 +5240,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            color:
-                (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+            color: (context.typography.inputText.color ?? Colors.grey),
           ),
         ),
         const SizedBox(height: 6),
@@ -5404,7 +5386,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                   controller: fieldTextEditingController,
                   focusNode: fieldFocusNode,
                   onSubmitted: (val) => onFieldSubmitted(),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: context.typography.inputText.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color:
@@ -5412,24 +5394,17 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                         Colors.black),
                   ),
                   decoration: InputDecoration(
-                    hintText: 'e_g_mobile_app_development'.tr,
-                    hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    hintText: 'Mobile App Development',
+                    hintStyle: context.typography.inputText.copyWith(
                       fontSize: 12,
                       color: Colors.grey,
-                    ),
-                    prefixIcon: const Icon(
-                      LucideIcons.tag,
-                      color: Colors.grey,
-                      size: 16,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 10,
                       horizontal: 12,
                     ),
                     filled: true,
-                    fillColor: Theme.of(
-                      context,
-                    ).scaffoldBackgroundColor.withValues(alpha: 0.3),
+                    fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
@@ -5456,6 +5431,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
     required String label,
     required String hint,
     IconData? icon,
+    String? svgIcon,
     Widget? suffixIcon,
     int maxLines = 1,
     TextInputType keyboardType = TextInputType.text,
@@ -5469,7 +5445,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
         RichText(
           text: TextSpan(
             text: label.replaceAll('*', '').trim(),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: context.typography.inputText.copyWith(
               fontSize: 11,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
@@ -5479,7 +5455,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
               if (label.contains('*'))
                 TextSpan(
                   text: ' *',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  style: context.typography.inputText.copyWith(
                     color: Colors.red,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
@@ -5496,7 +5472,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           readOnly: readOnly ?? (onTap != null),
           onTap: onTap,
           onChanged: onChanged,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          style: context.typography.inputText.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color:
@@ -5505,20 +5481,39 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
           ),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            hintStyle: context.typography.inputText.copyWith(
               color: Colors.grey,
               fontSize: 14,
               fontWeight: FontWeight.normal,
             ),
-            prefixIcon: icon != null
-                ? Icon(icon, size: 18, color: Colors.blue)
+            prefixIconConstraints: const BoxConstraints(minWidth: 40, maxHeight: 40),
+            prefixIcon: svgIcon != null
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 8),
+                    child: UnconstrainedBox(
+                      child: SvgPicture.asset(
+                        svgIcon,
+                        width: 15,
+                        height: 15,
+                        colorFilter: const ColorFilter.mode(
+                          Colors.blue,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                    ),
+                  )
+                : icon != null
+                ? Padding(
+                    padding: const EdgeInsets.only(left: 10, right: 6),
+                    child: Icon(icon, size: 14, color: Colors.blue),
+                  )
                 : null,
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: Theme.of(context).scaffoldBackgroundColor,
+            fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor,
             contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 12,
+              horizontal: 10,
+              vertical: 10,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -5563,9 +5558,7 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
             label,
             style: TextStyle(
               fontSize: 12,
-              color:
-                  (Theme.of(context).textTheme.bodyMedium?.color ??
-                  Colors.grey),
+              color: (context.typography.inputText.color ?? Colors.grey),
             ),
           ),
           Text(

@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../models/auth_user.dart';
 import '../models/auth_tokens.dart';
@@ -12,8 +12,7 @@ class SecureStorageKeys {
   static const String currentCompany = 'current_company_json';
   static const String lastLogin = 'last_login_timestamp';
   static const String offlineExpiry = 'offline_expiry_timestamp';
-  static const String language = 'app_lang_code';
-  static const String countryCode = 'app_country_code';
+
   static const String hasSeenOnboarding = 'has_seen_onboarding';
   static const String userSignature = 'user_signature';
   
@@ -138,7 +137,6 @@ class SecureStorageService {
     await _storage.delete(key: SecureStorageKeys.legacyUserEmail);
     await _storage.delete(key: SecureStorageKeys.legacyUserRole);
     await _storage.delete(key: SecureStorageKeys.legacyUserId);
-    await _storage.delete(key: SecureStorageKeys.language);
-    await _storage.delete(key: SecureStorageKeys.countryCode);
+
   }
 }

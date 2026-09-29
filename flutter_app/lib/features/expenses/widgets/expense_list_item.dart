@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../expenses_controller.dart';
 import '../../../core/constants/app_colors.dart';
@@ -110,10 +111,11 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Center(
-                child: Icon(
-                  LucideIcons.receipt,
-                  size: 18,
-                  color: categoryColor,
+                child: SvgPicture.asset(
+                  'assets/SVG/dollar.svg',
+                  width: 18,
+                  height: 18,
+                  colorFilter: ColorFilter.mode(categoryColor, BlendMode.srcIn),
                 ),
               ),
             ),
@@ -154,16 +156,20 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 11,
-                      color: Colors.grey.shade600,
+                  FractionallySizedBox(
+                    widthFactor: 0.7,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      description,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 11,
+                        color: Colors.grey.shade600,
+                        height: 1.2,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
@@ -177,10 +183,11 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            LucideIcons.calendar,
-                            size: 13,
-                            color: Colors.grey.shade400,
+                          SvgPicture.asset(
+                            'assets/SVG/calendernormal.svg',
+                            width: 13,
+                            height: 13,
+                            colorFilter: ColorFilter.mode(Colors.grey.shade400, BlendMode.srcIn),
                           ),
                           const SizedBox(width: 6),
                           Text(
@@ -195,7 +202,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _buildActionIcon(LucideIcons.trash2, 'Delete', onTap: widget.onDelete),
+                          _buildActionIcon('assets/SVG/delete.svg', 'Delete', onTap: widget.onDelete, iconColor: Colors.red),
                         ],
                       ),
                     ],
@@ -206,7 +213,7 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
     );
   }
 
-  Widget _buildActionIcon(IconData icon, String tooltip, {VoidCallback? onTap}) {
+  Widget _buildActionIcon(String iconPath, String tooltip, {VoidCallback? onTap, Color? iconColor}) {
     return Tooltip(
       message: tooltip,
       child: InkWell(
@@ -221,10 +228,11 @@ class _ExpenseListItemState extends State<ExpenseListItem> {
               color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
             ),
           ),
-          child: Icon(
-            icon,
-            size: 14,
-            color: Colors.grey.shade700,
+          child: SvgPicture.asset(
+            iconPath,
+            width: 14,
+            height: 14,
+            colorFilter: ColorFilter.mode(iconColor ?? Colors.grey.shade700, BlendMode.srcIn),
           ),
         ),
       ),

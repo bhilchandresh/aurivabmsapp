@@ -31,7 +31,7 @@ class SessionManager {
   String? _legacyUserId;
   String? _legacyToken;
   String? _legacyRefreshToken;
-  String? _legacyLanguage;
+
   String? _legacyCurrency;
   String? _legacyTimezone;
   String? _legacyUserRole;
@@ -50,7 +50,7 @@ class SessionManager {
     _legacyUserId = await _storage.read(key: 'user_id');
     _legacyCompanyId = await _storage.read(key: 'company_id') ?? 'default_company';
     _legacyRefreshToken = await _storage.read(key: 'refresh_token');
-    _legacyLanguage = await _storage.read(key: 'app_lang_code') ?? 'en';
+
     _legacyCurrency = await _storage.read(key: 'currency') ?? 'INR';
     _legacyTimezone = await _storage.read(key: 'timezone') ?? 'Asia/Kolkata';
     _legacyUserRole = await _storage.read(key: 'user_role');
@@ -73,7 +73,7 @@ class SessionManager {
   String get currentUser => _currentUser?.userId ?? _legacyUserId ?? '';
   String get currentToken => _legacyToken ?? '';
   String get refreshToken => _legacyRefreshToken ?? '';
-  String get language => _currentUser?.language ?? _legacyLanguage ?? 'en';
+
   String get currency => _currentUser?.currency ?? _legacyCurrency ?? 'INR';
   String get timezone => _currentUser?.timezone ?? _legacyTimezone ?? 'Asia/Kolkata';
   String get currentUserRole => _currentUser?.roleName ?? _legacyUserRole ?? '';
@@ -105,7 +105,7 @@ class SessionManager {
     // Update legacy variables for backward compatibility
     _legacyUserId = user.userId;
     _legacyCompanyId = company.companyId;
-    _legacyLanguage = user.language;
+
     _legacyCurrency = user.currency;
     _legacyTimezone = user.timezone;
 
@@ -138,10 +138,7 @@ class SessionManager {
     await _storage.write(key: 'refresh_token', value: refreshToken);
   }
 
-  Future<void> updateLanguage(String language) async {
-    _legacyLanguage = language;
-    await _storage.write(key: 'app_lang_code', value: language);
-  }
+
 
   Future<void> logout() async {
     await endSession();

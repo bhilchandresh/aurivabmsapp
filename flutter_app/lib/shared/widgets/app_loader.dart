@@ -10,10 +10,12 @@ class AppLoader extends StatelessWidget {
 //     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardTheme.color?.withValues(alpha: 0.9) ?? Colors.white.withValues(alpha: 0.9),
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardTheme.color?.withValues(alpha: 0.9) ?? Colors.white.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline,
@@ -50,6 +52,7 @@ class AppLoader extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

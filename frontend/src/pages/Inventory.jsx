@@ -38,6 +38,7 @@ const Inventory = () => {
             ]);
             return {
                 items: resItems.data.data,
+                maxLimit: resItems.data.maxLimit,
                 plan: resSettings.data.data.subscriptionPlan || 'basic'
             };
         },
@@ -49,7 +50,8 @@ const Inventory = () => {
             setItems(fetchedData.items);
             setPlanDetails({ 
                 plan: fetchedData.plan, 
-                usage: fetchedData.items.length 
+                usage: fetchedData.items.length,
+                maxLimit: fetchedData.maxLimit
             });
             setLoading(false);
         }
@@ -163,9 +165,10 @@ const Inventory = () => {
         );
     }
 
-    // Pro Limit Tracking Variables
-    const isPro = planDetails?.plan === 'premium';
-    const limitHit = isPro && planDetails.usage >= 100;
+    // Plan Limit Tracking Variables
+    const hasLimit = planDetails?.maxLimit !== undefined && planDetails?.maxLimit !== null && planDetails?.maxLimit > 0;
+    const limitHit = hasLimit && planDetails.usage >= planDetails.maxLimit;
+    const progressPercentage = hasLimit ? Math.min((planDetails.usage / planDetails.maxLimit) * 100, 100) : 0;
 
     const filteredItems = items.filter(i => i.itemName.toLowerCase().includes(searchTerm.toLowerCase()) || i.sku.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -186,13 +189,13 @@ const Inventory = () => {
                     </div>
                     
                     <div className="flex items-center gap-4 w-full md:w-auto">
-                        {isPro && (
+                        {hasLimit && (
                             <div className="bg-blue-50/50 border border-blue-100 px-4 py-2.5 rounded-xl flex items-center gap-4 w-full md:w-auto transition-all">
                                 <span className="text-xs font-bold text-blue-700 uppercase tracking-widest">Usage</span>
                                 <div className="flex-1 w-24 h-2 bg-blue-200/50 rounded-full overflow-hidden">
-                                    <div className={`h-full rounded-full transition-all ${limitHit ? 'bg-rose-500' : 'bg-blue-600'}`} style={{ width: `${(planDetails.usage / 100) * 100}%` }}></div>
+                                    <div className={`h-full rounded-full transition-all ${limitHit ? 'bg-rose-500' : 'bg-blue-600'}`} style={{ width: `${progressPercentage}%` }}></div>
                                 </div>
-                                <span className={`text-xs font-black ${limitHit ? 'text-rose-600' : 'text-blue-800'}`}>{planDetails.usage} / 100</span>
+                                <span className={`text-xs font-black ${limitHit ? 'text-rose-600' : 'text-blue-800'}`}>{planDetails.usage} / {planDetails.maxLimit}</span>
                             </div>
                         )}
                     </div>

@@ -194,7 +194,7 @@ class ClientsController extends GetxController {
 
   Future<void> fetchInvoices() async {
     try {
-      final response = await ApiService.get(ApiConstants.invoices);
+      final response = await ApiService.get('${ApiConstants.invoices}?limit=10000');
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
@@ -208,7 +208,7 @@ class ClientsController extends GetxController {
             final clientObj = item['client'];
             String cid = '';
             if (clientObj is Map) {
-              cid = clientObj['clientId'] ?? clientObj['id'] ?? '';
+              cid = clientObj['clientId'] ?? clientObj['_id'] ?? clientObj['id'] ?? '';
             } else if (clientObj is String) {
               cid = clientObj;
             }
@@ -305,7 +305,7 @@ class ClientsController extends GetxController {
 
   Future<void> fetchQuotations() async {
     try {
-      final response = await ApiService.get(ApiConstants.quotations);
+      final response = await ApiService.get('${ApiConstants.quotations}?limit=10000');
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
@@ -318,7 +318,7 @@ class ClientsController extends GetxController {
             final clientObj = item['client'];
             String cid = '';
             if (clientObj is Map) {
-              cid = clientObj['_id'] ?? clientObj['id'] ?? '';
+              cid = clientObj['clientId'] ?? clientObj['_id'] ?? clientObj['id'] ?? '';
             } else if (clientObj is String) {
               cid = clientObj;
             }

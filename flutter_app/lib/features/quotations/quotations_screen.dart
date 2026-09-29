@@ -38,6 +38,7 @@ class Quotation {
   final double advancePayment;
   final String? validUntil;
   final String? templateId;
+  final String? createdBy;
 
   Quotation({
     required this.dbId,
@@ -61,6 +62,7 @@ class Quotation {
     this.advancePayment = 0.0,
     this.validUntil,
     this.templateId,
+    this.createdBy,
   });
 
   factory Quotation.fromJson(Map<String, dynamic> json) {
@@ -95,6 +97,7 @@ class Quotation {
           .toDouble(),
       validUntil: json['validUntil'] ?? json['dueDate'] ?? '',
       templateId: json['templateId'] ?? json['template'],
+      createdBy: json['createdBy']?.toString(),
     );
   }
 }
@@ -224,7 +227,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
+                      color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Column(
@@ -1065,7 +1068,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                     child: Container(
                                                       padding: const EdgeInsets.all(6),
                                                       decoration: BoxDecoration(
-                                                        color: Theme.of(context).scaffoldBackgroundColor,
+                                                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                                                         borderRadius: BorderRadius.circular(8),
                                                         border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                       ),
@@ -1107,7 +1110,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                     child: Container(
                                                       padding: const EdgeInsets.all(6),
                                                       decoration: BoxDecoration(
-                                                        color: Theme.of(context).scaffoldBackgroundColor,
+                                                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                                                         borderRadius: BorderRadius.circular(8),
                                                         border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                       ),
@@ -1120,7 +1123,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                   Container(
                                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                                                     decoration: BoxDecoration(
-                                                      color: Theme.of(context).scaffoldBackgroundColor,
+                                                      color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                                                       borderRadius: BorderRadius.circular(8),
                                                       border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                     ),
@@ -1149,7 +1152,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                       child: Container(
                                                         padding: const EdgeInsets.all(6),
                                                         decoration: BoxDecoration(
-                                                          color: Theme.of(context).scaffoldBackgroundColor,
+                                                          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                                                           borderRadius: BorderRadius.circular(8),
                                                           border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                         ),
@@ -1181,7 +1184,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                       child: Container(
                                                         padding: const EdgeInsets.all(6),
                                                         decoration: BoxDecoration(
-                                                          color: Theme.of(context).scaffoldBackgroundColor,
+                                                          color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                                                           borderRadius: BorderRadius.circular(8),
                                                           border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                         ),
@@ -1199,7 +1202,7 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                     child: Container(
                                                       padding: const EdgeInsets.all(6),
                                                       decoration: BoxDecoration(
-                                                        color: Theme.of(context).scaffoldBackgroundColor,
+                                                        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
                                                         borderRadius: BorderRadius.circular(8),
                                                         border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                       ),

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import '../../core/theme/app_extensions.dart';
 
@@ -245,9 +247,28 @@ class _NotificationWidgetState extends State<_NotificationWidget>
   }
 
   Widget _buildNotificationCard() {
+    String? displayAmount = widget.amount;
+    String? displayAction = '';
+    String? displayFor = '';
+    String fallbackMessage = widget.message;
+
+    if (widget.amount != null && widget.message.startsWith(widget.amount!)) {
+      final remainder = widget.message.substring(widget.amount!.length).trim();
+      final parts = remainder.split(' for ');
+      if (parts.isNotEmpty) {
+        displayAction = parts[0].trim();
+        if (parts.length > 1 && parts[1].trim().isNotEmpty) {
+          displayFor = 'for ${parts.sublist(1).join(' for ').trim()}';
+        }
+        fallbackMessage = '';
+      }
+    }
+
+    final dateStr = DateFormat('dd MMM yyyy').format(DateTime.now());
+    
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -272,78 +293,84 @@ class _NotificationWidgetState extends State<_NotificationWidget>
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildLogo(),
+              _buildLeftIcon(),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    // Header Row
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: _primaryBlue,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'AurivaBMS',
-                          style: context.typography.clientName.copyWith(
-                            color: _textDark,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          'now',
-                          style: context.typography.notificationTime.copyWith(
-                            color: _textGrey,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    
-                    // Title Row
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            widget.title,
-                            style: context.typography.notificationTitle.copyWith(
-                              color: _textDark,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        if (widget.type == 'payment')
-                          const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 18)
-                        else
-                          const Icon(Icons.description, color: _primaryBlue, size: 18),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    
-                    // Body Text
                     Text(
-                      widget.message,
-                      style: context.typography.notificationSubtitle.copyWith(
-                        color: _textGrey,
+                      widget.title,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF111827),
+                        letterSpacing: -0.2,
                       ),
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 4),
+                    
+                    if (fallbackMessage.isEmpty) ...[
+                      Row(
+                        children: [
+                          Text(
+                            displayAmount ?? '',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: _primaryBlue,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              displayAction ?? '',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: _textGrey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      if (displayFor != null && displayFor!.isNotEmpty)
+                        Text(
+                          displayFor,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: _textGrey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ] else ...[
+                      Text(
+                        fallbackMessage,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: _textGrey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                    
+                    const SizedBox(height: 6),
                     if (widget.invoiceNumber != null && widget.invoiceNumber!.isNotEmpty)
                       Text(
-                        widget.invoiceNumber!,
-                        style: context.typography.notificationSubtitle.copyWith(
-                          color: _textGrey,
+                        '${widget.invoiceNumber} • $dateStr',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF9CA3AF),
+                          fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -351,118 +378,91 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
-              _buildRightIcon(),
+              const SizedBox(width: 24),
             ],
           ),
           
-          // Bottom Indicator Pill
+          Positioned(
+            top: -12,
+            right: -8,
+            child: GestureDetector(
+              onTap: () => dismiss(),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFF3F4F6),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close, size: 16, color: Color(0xFF4B5563)),
+              ),
+            ),
+          ),
+          
           Positioned(
             bottom: -12,
             left: 0,
             right: 0,
-            child: Center(
-              child: Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: _primaryBlue.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildDash(isActive: true),
+                const SizedBox(width: 6),
+                _buildDash(isActive: false),
+                const SizedBox(width: 6),
+                _buildDash(isActive: false),
+              ],
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildLogo() {
+  Widget _buildDash({required bool isActive}) {
     return Container(
-      width: 64,
-      height: 64,
+      width: isActive ? 16 : 12,
+      height: 3,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 15,
-            spreadRadius: 0,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Center(
-        child: SizedBox(
-          width: 36,
-          height: 36,
-          child: CustomPaint(
-            painter: HexagonPainter(
-              color: _primaryBlue,
-              strokeWidth: 3.5,
-            ),
-          ),
-        ),
+        color: isActive ? _primaryBlue : const Color(0xFFE5E7EB),
+        borderRadius: BorderRadius.circular(1.5),
       ),
     );
   }
 
-  Widget _buildRightIcon() {
-    IconData mainIcon;
-    IconData badgeIcon;
-    
-    if (widget.type == 'payment') {
-      mainIcon = Icons.account_balance_wallet_rounded;
-      badgeIcon = Icons.currency_rupee_rounded;
-    } else {
-      mainIcon = Icons.insert_drive_file_rounded;
-      badgeIcon = Icons.add_rounded;
-    }
-
+  Widget _buildLeftIcon() {
     return Container(
-      width: 64,
-      height: 64,
+      width: 40,
+      height: 40,
       decoration: BoxDecoration(
-        color: _primaryBlue.withValues(alpha: 0.04),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.5), width: 2),
+        color: _primaryBlue.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // 4 Corner Dots
-          Positioned(top: 8, left: 8, child: _buildDot()),
-          Positioned(top: 8, right: 8, child: _buildDot()),
-          Positioned(bottom: 8, left: 8, child: _buildDot()),
-          Positioned(bottom: 8, right: 8, child: _buildDot()),
-
-          // Main Icon
-          Icon(mainIcon, color: _primaryBlue, size: 28),
-
-          // Small Badge over Icon
-          Positioned(
-            right: 8,
-            bottom: 8,
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: _primaryBlue,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.5),
-              ),
-              child: Icon(badgeIcon, color: Colors.white, size: 10),
+          Positioned(top: 6, left: 6, child: _buildIconDot()),
+          Positioned(top: 6, right: 6, child: _buildIconDot()),
+          Positioned(bottom: 6, left: 6, child: _buildIconDot()),
+          Positioned(bottom: 6, right: 6, child: _buildIconDot()),
+          
+          if (widget.type == 'payment')
+            const Icon(Icons.account_balance_wallet_rounded, color: _primaryBlue, size: 20)
+          else
+            SvgPicture.asset(
+              'assets/SVG/invoice.svg',
+              width: 20,
+              height: 20,
+              colorFilter: const ColorFilter.mode(_primaryBlue, BlendMode.srcIn),
             ),
-          )
         ],
       ),
     );
   }
 
-  Widget _buildDot() {
+  Widget _buildIconDot() {
     return Container(
-      width: 3,
-      height: 3,
+      width: 4,
+      height: 4,
       decoration: BoxDecoration(
         color: _primaryBlue.withValues(alpha: 0.15),
         shape: BoxShape.circle,

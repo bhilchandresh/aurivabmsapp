@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:lottie/lottie.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_button.dart';
@@ -84,17 +86,112 @@ class _LoginScreenState extends State<LoginScreen>
     super.dispose();
   }
 
+  Widget _buildCustomTextField({
+    required String label,
+    required String hint,
+    required String iconAsset,
+    required TextEditingController controller,
+    bool isPassword = false,
+  }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? Colors.grey.shade800 : const Color(0xFFF1F5F9);
+    final iconBgColor = isDark ? const Color(0xFF334155) : const Color(0xFFF8FAFC);
+    final iconColor = isDark ? Colors.white70 : const Color(0xFF64748B);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.01),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: iconBgColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Center(
+              child: SvgPicture.asset(
+                iconAsset,
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.white54 : const Color(0xFF64748B),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                TextFormField(
+                  controller: controller,
+                  obscureText: isPassword && !_showPassword,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    letterSpacing: isPassword && !_showPassword ? 4 : 0,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle: TextStyle(
+                      color: isDark ? Colors.white38 : const Color(0xFF94A3B8),
+                      fontWeight: FontWeight.normal,
+                      letterSpacing: 0,
+                    ),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  validator: (val) => val == null || val.isEmpty ? 'Required' : null,
+                ),
+              ],
+            ),
+          ),
+          if (isPassword)
+            IconButton(
+              icon: SvgPicture.asset(
+                _showPassword ? 'assets/SVG/eyeview.svg' : 'assets/SVG/eyehide.svg',
+                width: 20,
+                height: 20,
+                colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+              ),
+              onPressed: () => setState(() => _showPassword = !_showPassword),
+            ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Dynamic theme colors
-    final baseBgColor = Theme.of(context).scaffoldBackgroundColor;
-    final cardBgColor = Theme.of(context).cardTheme.color?.withValues(alpha: 0.65) ?? Colors.white.withValues(alpha: 0.8);
-    final cardBorderColor = Theme.of(context).colorScheme.outline;
-    final textColor = Theme.of(context).textTheme.displayLarge?.color;
-    final subtextColor = Theme.of(context).textTheme.bodyMedium?.color;
-    final logoBgColor = Theme.of(context).colorScheme.surfaceContainerHighest;
+    final baseBgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtextColor = isDark ? Colors.white60 : const Color(0xFF64748B);
 
     return Scaffold(
       backgroundColor: baseBgColor,
@@ -115,11 +212,7 @@ class _LoginScreenState extends State<LoginScreen>
                       height: 350,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color:
-                            (isDark
-                                    ? const Color(0xFF1E3A8A)
-                                    : const Color(0xFFBFDBFE))
-                                .withValues(alpha: isDark ? 0.35 : 0.45),
+                        color: (isDark ? const Color(0xFF1E3A8A) : const Color(0xFFE0E7FF)).withValues(alpha: isDark ? 0.3 : 0.8),
                       ),
                     ),
                   ),
@@ -131,11 +224,7 @@ class _LoginScreenState extends State<LoginScreen>
                       height: 400,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color:
-                            (isDark
-                                    ? const Color(0xFF4C1D95)
-                                    : const Color(0xFFE9D5FF))
-                                .withValues(alpha: isDark ? 0.3 : 0.4),
+                        color: (isDark ? const Color(0xFF4C1D95) : const Color(0xFFF3E8FF)).withValues(alpha: isDark ? 0.2 : 0.8),
                       ),
                     ),
                   ),
@@ -143,267 +232,261 @@ class _LoginScreenState extends State<LoginScreen>
               );
             },
           ),
-
-          // 2. High-blur backdrop for background glow
+          // High-blur backdrop for smooth gradients
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
               child: Container(color: Colors.transparent),
             ),
           ),
-          // 4. Centered Interactive Card
-          Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: cardBgColor,
-                        borderRadius: BorderRadius.circular(24),
-                        border: Border.all(color: cardBorderColor, width: 1.5),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05,
+          
+          // Main Content
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Header Lottie & Title
+                      StaggeredFadeSlide(
+                        controller: _introController,
+                        delay: 0.0,
+                        child: Column(
+                          children: [
+                            Lottie.asset(
+                              'assets/lottie/business_analytics.json', 
+                              height: 220,
+                              width: 300,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                print('Lottie Error: $error');
+                                return Container(
+                                  height: 220,
+                                  width: 300,
+                                  color: Colors.red.withValues(alpha: 0.1),
+                                  child: Center(child: Text('Lottie Error: $error', style: const TextStyle(color: Colors.red))),
+                                );
+                              },
                             ),
-                            blurRadius: 30,
-                            offset: const Offset(0, 15),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Top accent line
-                          Container(
-                            height: 4,
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Color(0xFF3B82F6), Color(0xFF8B5CF6)],
+                            const SizedBox(height: 10),
+                            RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.w600, // Reduced Auriva weight slightly
+                                  color: textColor,
+                                  letterSpacing: -0.5,
+                                  fontFamily: 'Inter',
+                                ),
+                                children: const [
+                                  TextSpan(text: 'Auriva'),
+                                  TextSpan(
+                                    text: 'BMS',
+                                    style: TextStyle(color: Color(0xFF5B61F4), fontWeight: FontWeight.w900), // Made BMS super bold
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 28,
-                              vertical: 36,
+                            const SizedBox(height: 6),
+                            Text(
+                              'Business Management System',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: subtextColor,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Inter',
+                              ),
                             ),
-                            child: Column(
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+
+                      // Error Banner
+                      if (_errorMessage != null)
+                        StaggeredFadeSlide(
+                          controller: _introController,
+                          delay: 0.1,
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 24),
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.red.shade900.withValues(alpha: 0.3) : Colors.red.shade50,
+                              border: Border(left: BorderSide(color: Colors.red.shade500, width: 4)),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
                               children: [
-                                // Brand Header with staggered entry
-                                StaggeredFadeSlide(
-                                  controller: _introController,
-                                  delay: 0.0,
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        width: 56,
-                                        height: 56,
-                                        decoration: BoxDecoration(
-                                          color: logoBgColor,
-                                          borderRadius: BorderRadius.circular(
-                                            16,
-                                          ),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: context.colorScheme.primary
-                                                  .withValues(alpha: isDark ? 0.3 : 0.1,
-                                                  ),
-                                              blurRadius: 12,
-                                              offset: const Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Center(
-                                          child: Icon(
-                                            LucideIcons.hexagon,
-                                            color: context.colorScheme.primary,
-                                            size: 32,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      RichText(
-                                        text: TextSpan(
-                                          style: context.typography.screenTitle
-                                              .copyWith(
-                                                color: textColor,
-                                                fontWeight: FontWeight.w800,
-                                                letterSpacing: -0.5,
-                                              ),
-                                          children: [
-                                            const TextSpan(text: 'Auriva'),
-                                            TextSpan(
-                                              text: 'BMS',
-                                              style: context.typography.screenTitle.copyWith(
-                                                color: context.colorScheme.primary,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        'bms_subtitle'.tr,
-                                        style: context.typography.inputText.copyWith(
-                                          color: subtextColor,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 32),
-
-                                // Error Banner
-                                if (_errorMessage != null)
-                                  StaggeredFadeSlide(
-                                    controller: _introController,
-                                    delay: 0.1,
-                                    child: Container(
-                                      margin: const EdgeInsets.only(bottom: 24),
-                                      padding: const EdgeInsets.all(14),
-                                      decoration: BoxDecoration(
-                                        color: isDark
-                                            ? Colors.red.shade900.withValues(alpha: 0.3,
-                                              )
-                                            : Colors.red.shade50,
-                                        border: Border(
-                                          left: BorderSide(
-                                            color: Colors.red.shade500,
-                                            width: 4,
-                                          ),
-                                        ),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          Icon(
-                                            LucideIcons.alertTriangle,
-                                            color: Colors.red.shade500,
-                                            size: 20,
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Text(
-                                              _errorMessage!,
-                                              style: context.typography.errorText.copyWith(
-                                                color: isDark
-                                                    ? Colors.red.shade200
-                                                    : Colors.red.shade800,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                Icon(LucideIcons.alertTriangle, color: Colors.red.shade500, size: 20),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: TextStyle(
+                                      color: isDark ? Colors.red.shade200 : Colors.red.shade800,
+                                      fontWeight: FontWeight.w500,
                                     ),
-                                  ),
-
-                                // Login Form
-                                Form(
-                                  key: _formKey,
-                                  child: Column(
-                                    children: [
-                                      StaggeredFadeSlide(
-                                        controller: _introController,
-                                        delay: 0.15,
-                                        child: AppInputField(
-                                          label: 'work_email'.tr,
-                                          hintText: 'name_company_com'.tr,
-                                          controller: _emailController,
-                                          keyboardType:
-                                              TextInputType.emailAddress,
-                                          prefixIcon: const Icon(
-                                            LucideIcons.mail,
-                                            size: 20,
-                                          ),
-                                          validator: (val) =>
-                                              val == null || val.isEmpty
-                                              ? 'email_req'.tr
-                                              : null,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
-                                      StaggeredFadeSlide(
-                                        controller: _introController,
-                                        delay: 0.25,
-                                        child: AppInputField(
-                                          label: 'password'.tr,
-                                          hintText: '••••••••',
-                                          controller: _passwordController,
-                                          obscureText: !_showPassword,
-                                          prefixIcon: const Icon(
-                                            LucideIcons.lock,
-                                            size: 20,
-                                          ),
-                                          suffixIcon: IconButton(
-                                            icon: Icon(
-                                              _showPassword
-                                                  ? LucideIcons.eyeOff
-                                                  : LucideIcons.eye,
-                                              size: 20,
-                                            ),
-                                            onPressed: () => setState(
-                                              () => _showPassword =
-                                                  !_showPassword,
-                                            ),
-                                          ),
-                                          validator: (val) =>
-                                              val == null || val.isEmpty
-                                              ? 'password_req'.tr
-                                              : null,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 28),
-                                      StaggeredFadeSlide(
-                                        controller: _introController,
-                                        delay: 0.35,
-                                        child: Obx(
-                                          () => AppButton(
-                                            text: 'sign_in_btn'.tr,
-                                            isLoading:
-                                                _authController.isLoading.value,
-                                            onPressed: _handleLogin,
-                                            icon: const Icon(
-                                              LucideIcons.arrowRight,
-                                              size: 16,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(height: 32),
-                                StaggeredFadeSlide(
-                                  controller: _introController,
-                                  delay: 0.45,
-                                  child: Column(
-                                    children: [
-                                      Divider(color: cardBorderColor),
-                                      const SizedBox(height: 20),
-                                      Text(
-                                        'protected_by_security'.tr,
-                                        textAlign: TextAlign.center,
-                                        style: context.typography.helperText.copyWith(
-                                          color: subtextColor,
-                                          height: 1.4,
-                                        ),
-                                      ),
-                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ],
+                        ),
+
+                      // Form
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            StaggeredFadeSlide(
+                              controller: _introController,
+                              delay: 0.15,
+                              child: _buildCustomTextField(
+                                label: 'Email',
+                                hint: 'name@company.com',
+                                iconAsset: 'assets/SVG/mail.svg',
+                                controller: _emailController,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            StaggeredFadeSlide(
+                              controller: _introController,
+                              delay: 0.25,
+                              child: _buildCustomTextField(
+                                label: 'Password',
+                                hint: '••••••••',
+                                iconAsset: 'assets/SVG/lock.svg',
+                                controller: _passwordController,
+                                isPassword: true,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            StaggeredFadeSlide(
+                              controller: _introController,
+                              delay: 0.35,
+                              child: Obx(() {
+                                final isLoading = _authController.isLoading.value;
+                                return Container(
+                                  width: double.infinity,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(16),
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFF5B61F4), Color(0xFF7C5CFC)],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: const Color(0xFF5B61F4).withValues(alpha: 0.3),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: isLoading ? null : _handleLogin,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                    ),
+                                    child: isLoading
+                                        ? const SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                          )
+                                        : const Row(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                "Sign In to Dashboard",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                  fontFamily: 'Inter',
+                                                ),
+                                              ),
+                                              SizedBox(width: 12),
+                                              Icon(LucideIcons.arrowRight, color: Colors.white, size: 20),
+                                            ],
+                                          ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      
+                      // OR Divider
+                      StaggeredFadeSlide(
+                        controller: _introController,
+                        delay: 0.40,
+                        child: Row(
+                          children: [
+                            Expanded(child: Divider(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                "OR",
+                                style: TextStyle(
+                                  color: subtextColor,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider(color: isDark ? Colors.white12 : Colors.grey.shade200)),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Footer
+                      StaggeredFadeSlide(
+                        controller: _introController,
+                        delay: 0.45,
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/SVG/shield.svg',
+                                  width: 18,
+                                  height: 18,
+                                  colorFilter: const ColorFilter.mode(Color(0xFF5B61F4), BlendMode.srcIn),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  "Protected by Enterprise Security.",
+                                  style: TextStyle(
+                                    color: subtextColor,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "© 2026 Auriva Solutions. All rights reserved.",
+                              style: TextStyle(
+                                color: isDark ? Colors.white38 : Colors.grey.shade500,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

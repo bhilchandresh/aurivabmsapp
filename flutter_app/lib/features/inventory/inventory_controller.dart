@@ -90,6 +90,7 @@ class InventoryController extends GetxController {
   var items = <InventoryItem>[].obs;
   var transactions = <String, List<InventoryTransaction>?>{}.obs;
   var isLoading = false.obs;
+  var maxLimit = RxnInt();
 
   // Multiple selection state
   var selectedItems = <String>{}.obs;
@@ -166,6 +167,12 @@ class InventoryController extends GetxController {
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
           items.assignAll(data.map((c) => InventoryItem.fromJson(c)).toList());
+          
+          if (body['maxLimit'] != null) {
+            maxLimit.value = (body['maxLimit'] as num).toInt();
+          } else {
+            maxLimit.value = null; // Unbounded or Basic
+          }
         }
       }
     } catch (e) {
@@ -202,6 +209,10 @@ class InventoryController extends GetxController {
 
   // Plan metrics
   int get maxItems {
+    if (maxLimit.value != null) {
+      return maxLimit.value!;
+    }
+    // Fallback if API hasn't returned it yet
     switch (subscriptionPlan.value) {
       case 'basic':
         return 0; // locked completely

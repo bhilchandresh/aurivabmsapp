@@ -63,13 +63,7 @@ class AuthController extends GetxController {
     if (hasSeenOnboarding != 'true') {
       Get.offAllNamed(AppRoutes.onboarding);
     } else if (token.value.isNotEmpty) {
-      if (userRole.value.toLowerCase().contains('superadmin') ||
-          userRole.value.toLowerCase().contains('super_admin') ||
-          userEmail.value.toLowerCase() == 'riva@auriva.in') {
-        Get.offAllNamed(AppRoutes.superAdminMain);
-      } else {
-        Get.offAllNamed(AppRoutes.main);
-      }
+      Get.offAllNamed(AppRoutes.main);
     } else {
       Get.offAllNamed(AppRoutes.login);
     }
@@ -158,13 +152,7 @@ class AuthController extends GetxController {
           fontSize: 14.0,
         );
 
-        if (userRole.value.toLowerCase().contains('superadmin') ||
-            userRole.value.toLowerCase().contains('super_admin') ||
-            userEmail.value.toLowerCase() == 'riva@auriva.in') {
-          Get.offAllNamed(AppRoutes.superAdminMain);
-        } else {
-          Get.offAllNamed(AppRoutes.main);
-        }
+        Get.offAllNamed(AppRoutes.main);
         return true;
       } else {
         final msg = data['message'] ?? 'Invalid credentials';

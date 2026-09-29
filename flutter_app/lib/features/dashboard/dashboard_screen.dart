@@ -177,9 +177,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   String getPlanName(String? plan) {
-    if (plan == 'enterprise') return 'BUSINESS PLAN';
-    if (plan == 'premium') return 'PRO PLAN';
-    return 'STARTER PLAN';
+    if (plan == null || plan.isEmpty) return 'STARTER PLAN';
+    return plan.toUpperCase();
   }
 
   DateTime? _parseDate(String dateStr) {
@@ -277,7 +276,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0, bottom: 20.0),
           child: Obx(() {
             final isLoading = dashboardController.isLoading.value;
             final showSkeleton = isLoading;
@@ -327,7 +326,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).cardTheme.color,
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
@@ -466,10 +465,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          Icon(
-                                            LucideIcons.crown,
-                                            size: 14,
-                                            color: isWarning ? Colors.red : const Color(0xFF0284C7),
+                                          SvgPicture.asset(
+                                            'assets/SVG/plan.svg',
+                                            width: 14,
+                                            height: 14,
+                                            colorFilter: ColorFilter.mode(isWarning ? Colors.red : const Color(0xFF0284C7), BlendMode.srcIn),
                                           ),
                                           const SizedBox(width: 6),
                                           Text(
@@ -839,20 +839,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Container(
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
-            color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
+            color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isFeatured
                   ? AppColors.primary.withValues(alpha: 0.5)
-                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
               width: isFeatured ? 1.5 : 1.0,
             ),
             boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.1 : 0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
+              if (!isDark)
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
             ],
           ),
           child: Column(
@@ -872,7 +873,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Container(
                             padding: EdgeInsets.all(isSmall ? 6 : 8),
                             decoration: BoxDecoration(
-                              color: bgColor,
+                              color: isDark ? color.withValues(alpha: 0.15) : bgColor,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Transform.rotate(
@@ -1044,6 +1045,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required Color bgColor,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return ScaleOnPress(
       onTap: onTap,
       child: Container(
@@ -1056,11 +1059,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             width: 1,
           ),
           boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.02),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
+            if (!isDark)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
           ],
         ),
         child: Column(
@@ -1070,7 +1074,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: bgColor,
+                color: isDark ? color.withValues(alpha: 0.15) : bgColor,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: SvgPicture.asset(
@@ -1111,7 +1115,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
           boxShadow: [
@@ -1344,7 +1348,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: statusBgColor,
+                                  color: isDark ? statusColor.withValues(alpha: 0.15) : statusBgColor,
                                   shape: BoxShape.circle,
                                 ),
                                 child: SvgPicture.asset(
@@ -1378,7 +1382,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFEEF2FF),
+                                            color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF),
                                             borderRadius: BorderRadius.circular(4),
                                           ),
                                           child: Row(
@@ -1399,7 +1403,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: const Color(0xFFEEF2FF),
+                                              color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF),
                                               borderRadius: BorderRadius.circular(4),
                                             ),
                                             child: Row(
@@ -1466,7 +1470,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: statusBgColor,
+                                      color: isDark ? statusColor.withValues(alpha: 0.15) : statusBgColor,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Row(
@@ -1510,7 +1514,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
         decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
           boxShadow: [
@@ -1678,7 +1682,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           width: 45,
                           height: 45,
                           decoration: BoxDecoration(
-                            color: tailwindEmeraldLight,
+                            color: isDark ? tailwindEmerald.withValues(alpha: 0.15) : tailwindEmeraldLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Center(
@@ -1766,7 +1770,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFEEF2FF),
+                                  color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -1816,10 +1820,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 1.0),
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
           boxShadow: [
+            if (!isDark)
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.01),
               blurRadius: 10,
@@ -1897,8 +1902,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Container(
                       width: 32,
                       height: 32,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFEEF2FF),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF),
                         shape: BoxShape.circle,
                       ),
                       child: Center(
@@ -1961,7 +1966,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1E293B) : Colors.grey.shade50,
+                color: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -2045,7 +2050,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Container(
                 height: 52,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E293B) : Colors.grey.shade50,
+                  color: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                 ),
@@ -2094,7 +2099,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFECFDF5),
+                            color: isDark ? tailwindEmerald.withValues(alpha: 0.15) : const Color(0xFFECFDF5),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
@@ -2178,7 +2183,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   height: 44,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: _isPaymentFormValid ? tailwindEmerald : Colors.grey.shade400,
+                    color: _isPaymentFormValid ? tailwindEmerald : (isDark ? Colors.grey.shade800 : Colors.grey.shade400),
                     borderRadius: BorderRadius.circular(10),
                     boxShadow: !_isPaymentFormValid ? [] : [
                       BoxShadow(
@@ -2220,7 +2225,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFECFDF5),
+                  color: isDark ? tailwindEmerald.withValues(alpha: 0.15) : const Color(0xFFECFDF5),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: tailwindEmerald.withValues(alpha: 0.3)),
                 ),
@@ -2277,7 +2282,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFFECFDF5) : const Color(0xFFEEF2FF),
+                        color: isSelected 
+                            ? (isDark ? tailwindEmerald.withValues(alpha: 0.15) : const Color(0xFFECFDF5))
+                            : (isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF)),
                         shape: BoxShape.circle,
                       ),
                       child: SvgPicture.asset(

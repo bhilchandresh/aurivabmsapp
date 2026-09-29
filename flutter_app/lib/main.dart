@@ -53,32 +53,21 @@ void main() async {
   // Initialize OneSignal Push Notifications asynchronously to prevent black screen
   NotificationService.init();
 
-  // Load saved language
-  const storage = FlutterSecureStorage();
-  final savedLangCode = await storage.read(key: 'app_lang_code');
-  final savedCountryCode = await storage.read(key: 'app_country_code');
-
-  Locale initialLocale = Get.deviceLocale ?? const Locale('en', 'US');
-  if (savedLangCode != null && savedLangCode.isNotEmpty) {
-    initialLocale = Locale(savedLangCode, savedCountryCode ?? '');
-  }
-
   // Set current locale in AppTheme so it is available before GetMaterialApp loads
-  AppTheme.currentLocale = initialLocale;
+  AppTheme.currentLocale = const Locale('en', 'US');
 
-  runApp(AurivaApp(initialLocale: initialLocale));
+  runApp(const AurivaApp());
 }
 
 class AurivaApp extends StatelessWidget {
-  final Locale initialLocale;
-  const AurivaApp({super.key, required this.initialLocale});
+  const AurivaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Auriva-BMS',
       translations: AppTranslations(),
-      locale: initialLocale,
+      locale: const Locale('en', 'US'),
       fallbackLocale: const Locale('en', 'US'),
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
@@ -88,10 +77,8 @@ class AurivaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
         final mediaQueryData = MediaQuery.of(context);
-        final clampedTextScaler = mediaQueryData.textScaler.clamp(
-          minScaleFactor: 1.0,
-          maxScaleFactor: 1.15,
-        );
+        final double scale = mediaQueryData.textScaler.scale(1.0).clamp(1.0, 1.15);
+        final clampedTextScaler = TextScaler.linear(scale);
         return MediaQuery(
           data: mediaQueryData.copyWith(textScaler: clampedTextScaler),
           child: child!,

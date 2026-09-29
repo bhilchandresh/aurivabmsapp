@@ -248,12 +248,12 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                           onPressed: () => Navigator.pop(context),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
-                            side: BorderSide(color: Colors.grey.shade300),
+                            side: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           ),
                           child: Text(
                             'Cancel',
-                            style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold, fontSize: 13),
+                            style: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey.shade700, fontWeight: FontWeight.bold, fontSize: 13),
                           ),
                         ),
                       ),
@@ -1171,7 +1171,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                           borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: Text(
-                                          inv.createdBy ?? 'Admin',
+                                          (inv.createdBy ?? 'Admin').length > 7 ? '${(inv.createdBy ?? 'Admin').substring(0, 7)}..' : (inv.createdBy ?? 'Admin'),
                                           style: const TextStyle(
                                             fontSize: 8,
                                             fontWeight: FontWeight.bold,
@@ -1355,7 +1355,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         borderRadius: BorderRadius.circular(6),
                                                         border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                       ),
-                                                      child: SvgPicture.asset('assets/SVG/share.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade700, BlendMode.srcIn)),
+                                                      child: SvgPicture.asset('assets/SVG/share.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Theme.of(context).iconTheme.color ?? Colors.grey.shade400, BlendMode.srcIn)),
                                                     ),
                                                   ),
                                                 ),
@@ -1397,7 +1397,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         borderRadius: BorderRadius.circular(6),
                                                         border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                       ),
-                                                      child: SvgPicture.asset('assets/SVG/eyeview.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade700, BlendMode.srcIn)),
+                                                      child: SvgPicture.asset('assets/SVG/eyeview.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Theme.of(context).iconTheme.color ?? Colors.grey.shade400, BlendMode.srcIn)),
                                                     ),
                                                   ),
                                                 ),
@@ -1449,7 +1449,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         borderRadius: BorderRadius.circular(6),
                                                         border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                       ),
-                                                      child: SvgPicture.asset('assets/SVG/edit.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade700, BlendMode.srcIn)),
+                                                      child: SvgPicture.asset('assets/SVG/edit.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Theme.of(context).iconTheme.color ?? Colors.grey.shade400, BlendMode.srcIn)),
                                                     ),
                                                   ),
                                                 ),
@@ -1466,7 +1466,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                                         borderRadius: BorderRadius.circular(6),
                                                         border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
                                                       ),
-                                                      child: SvgPicture.asset('assets/SVG/delete.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.grey.shade700, BlendMode.srcIn)),
+                                                      child: SvgPicture.asset('assets/SVG/delete.svg', width: 14, height: 14, colorFilter: ColorFilter.mode(Colors.red.shade400, BlendMode.srcIn)),
                                                     ),
                                                   ),
                                                 ),
@@ -1678,7 +1678,7 @@ class _CustomStatusFilterDropdownState extends State<CustomStatusFilterDropdown>
                     margin: const EdgeInsets.only(top: 10),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardTheme.color ?? Colors.white,
+                      color: Theme.of(context).cardTheme.color ?? Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -1718,7 +1718,7 @@ class _CustomStatusFilterDropdownState extends State<CustomStatusFilterDropdown>
                     left: offset.dx - 16 + (size.width / 2) - 10,
                     child: CustomPaint(
                       size: const Size(20, 10),
-                      painter: TrianglePainter(color: Theme.of(context).cardTheme.color ?? Colors.white),
+                      painter: TrianglePainter(color: Theme.of(context).cardTheme.color ?? Theme.of(context).cardColor),
                     ),
                   ),
                 ],
@@ -1904,7 +1904,7 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).cardTheme.color ?? Colors.white,
+                  color: Theme.of(context).cardTheme.color ?? Theme.of(context).cardColor,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -2056,7 +2056,7 @@ class _CustomMonthFilterDropdownState extends State<CustomMonthFilterDropdown> {
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).cardTheme.color ?? Colors.white,
+                      color: Theme.of(context).cardTheme.color ?? Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(

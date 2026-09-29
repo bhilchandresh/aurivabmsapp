@@ -94,36 +94,48 @@ class _SelectClientScreenState extends State<SelectClientScreen> {
     }
   }
 
-  Color _getAvatarBgColor(String name) {
-    if (name.isEmpty) return Colors.blue.shade50;
-    final colors = [
-      Colors.blue.shade50,
-      Colors.green.shade50,
-      Colors.pink.shade50,
-      Colors.purple.shade50,
-      Colors.orange.shade50,
-      Colors.teal.shade50,
-      Colors.indigo.shade50,
-      Colors.cyan.shade50,
-      Colors.amber.shade50,
-    ];
+  Color _getAvatarBgColor(String name, bool isDark) {
+    if (name.isEmpty) return isDark ? Colors.blue.withValues(alpha: 0.15) : Colors.blue.shade50;
+    final colors = isDark 
+      ? [
+          Colors.blue.withValues(alpha: 0.15),
+          Colors.green.withValues(alpha: 0.15),
+          Colors.pink.withValues(alpha: 0.15),
+          Colors.purple.withValues(alpha: 0.15),
+          Colors.orange.withValues(alpha: 0.15),
+          Colors.teal.withValues(alpha: 0.15),
+        ]
+      : [
+          Colors.blue.shade50,
+          Colors.green.shade50,
+          Colors.pink.shade50,
+          Colors.purple.shade50,
+          Colors.orange.shade50,
+          Colors.teal.shade50,
+        ];
     final hash = name.codeUnits.fold(0, (a, b) => a + b);
     return colors[hash % colors.length];
   }
 
-  Color _getAvatarTextColor(String name) {
-    if (name.isEmpty) return Colors.blue.shade700;
-    final colors = [
-      Colors.blue.shade700,
-      Colors.green.shade700,
-      Colors.pink.shade700,
-      Colors.purple.shade700,
-      Colors.orange.shade700,
-      Colors.teal.shade700,
-      Colors.indigo.shade700,
-      Colors.cyan.shade700,
-      Colors.amber.shade700,
-    ];
+  Color _getAvatarTextColor(String name, bool isDark) {
+    if (name.isEmpty) return isDark ? Colors.blue.shade300 : Colors.blue.shade700;
+    final colors = isDark
+      ? [
+          Colors.blue.shade300,
+          Colors.green.shade300,
+          Colors.pink.shade300,
+          Colors.purple.shade300,
+          Colors.orange.shade300,
+          Colors.teal.shade300,
+        ]
+      : [
+          Colors.blue.shade700,
+          Colors.green.shade700,
+          Colors.pink.shade700,
+          Colors.purple.shade700,
+          Colors.orange.shade700,
+          Colors.teal.shade700,
+        ];
     final hash = name.codeUnits.fold(0, (a, b) => a + b);
     return colors[hash % colors.length];
   }
@@ -355,7 +367,7 @@ class _SelectClientScreenState extends State<SelectClientScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 1.0),
+                    color: Theme.of(context).cardTheme.color ?? Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
                       color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
@@ -372,7 +384,7 @@ class _SelectClientScreenState extends State<SelectClientScreen> {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: _getAvatarBgColor(client.name),
+                              color: _getAvatarBgColor(client.name, isDark),
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -381,7 +393,7 @@ class _SelectClientScreenState extends State<SelectClientScreen> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: _getAvatarTextColor(client.name),
+                                  color: _getAvatarTextColor(client.name, isDark),
                                 ),
                               ),
                             ),
@@ -390,13 +402,13 @@ class _SelectClientScreenState extends State<SelectClientScreen> {
                             width: 24,
                             height: 24,
                             decoration: BoxDecoration(
-                              color: Colors.grey.shade100,
+                              color: isDark ? Colors.grey.withValues(alpha: 0.15) : Colors.grey.shade100,
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               LucideIcons.chevronRight,
                               size: 14,
-                              color: Colors.grey.shade600,
+                              color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                             ),
                           ),
                         ],

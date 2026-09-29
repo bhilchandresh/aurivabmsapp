@@ -151,7 +151,7 @@ class MainLayout extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B), // slate-800
+                    color: AppColors.darkCard, // previously 0xFF1E293B
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
@@ -248,7 +248,7 @@ class MainLayout extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: isSelected
-                ? const Color(0xFF334155) // slate-700
+                ? AppColors.darkBorder // previously 0xFF334155
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(16),
           ),
