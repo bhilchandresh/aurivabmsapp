@@ -87,6 +87,8 @@ dependencies:
   rxdart: ^0.28.0
   flutter_html: ^3.0.0
   lottie: ^3.3.0
+  archive: ^3.6.1
+  xml: ^6.6.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -109,7 +111,7 @@ flutter_launcher_icons:
   ios: true
   image_path: "logo.png"
   adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: "logo_padded.png.png"
+  adaptive_icon_foreground: "logo_padded.png"
 
 flutter_native_splash:
   color: "#ffffff"
@@ -117,7 +119,7 @@ flutter_native_splash:
   android: true
   ios: true
   android_12:
-    image: "logo_padded.png.png"
+    image: "logo_padded.png"
     icon_background_color: "#ffffff"
 
 

@@ -9,7 +9,6 @@ import '../inventory/inventory_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'widgets/add_purchase_bill_bottom_sheet.dart';
 import 'widgets/record_payment_bottom_sheet.dart';
-import 'widgets/record_payment_bottom_sheet.dart';
 class SupplierDetailsScreen extends StatefulWidget {
   final String supplierId;
 
@@ -106,7 +105,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
               ),
               child: IconButton(
                 padding: EdgeInsets.zero,
@@ -210,14 +209,14 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: isDark ? Colors.blue.shade900.withValues(alpha: 0.3) : Colors.blue.shade50,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Center(
               child: Text(
                 supplier.name.substring(0, 1).toUpperCase(),
                 style: context.typography.clientName.copyWith(
-                  color: Colors.blue.shade700,
+                  color: isDark ? Colors.blue.shade300 : Colors.blue.shade700,
                   fontWeight: FontWeight.w700,
                   fontSize: 24,
                 ),
@@ -321,7 +320,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 subtitle: '${bills.length} bills',
                 icon: 'assets/SVG/invoice.svg',
                 iconBgColor: isDark ? Colors.blue.shade900 : Colors.blue.shade50,
-                iconColor: Colors.blue.shade600,
+                iconColor: isDark ? Colors.blue.shade400 : Colors.blue.shade600,
                 amountColor: Theme.of(context).textTheme.displayLarge?.color,
                 bgColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF3F5F9),
                 isDark: isDark,
@@ -335,8 +334,8 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 subtitle: '${payments.length} payments',
                 icon: 'assets/SVG/wallet.svg',
                 iconBgColor: isDark ? Colors.green.shade900 : Colors.green.shade50,
-                iconColor: Colors.green.shade600,
-                amountColor: Colors.green.shade600,
+                iconColor: isDark ? Colors.green.shade400 : Colors.green.shade600,
+                amountColor: isDark ? Colors.green.shade400 : Colors.green.shade600,
                 bgColor: isDark ? const Color(0xFF14532D).withValues(alpha: 0.2) : const Color(0xFFF0FDF4),
                 isDark: isDark,
               ),
@@ -352,8 +351,8 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             subtitle: 'Amount payable to supplier',
             icon: 'assets/SVG/dollar.svg',
             iconBgColor: isDark ? Colors.red.shade900 : Colors.red.shade50,
-            iconColor: Colors.red.shade600,
-            amountColor: Colors.red.shade600,
+            iconColor: isDark ? Colors.red.shade400 : Colors.red.shade600,
+            amountColor: isDark ? Colors.red.shade400 : Colors.red.shade600,
             bgColor: isDark ? const Color(0xFF7F1D1D).withValues(alpha: 0.2) : const Color(0xFFFEF2F2),
             isDark: isDark,
           ),
@@ -372,12 +371,20 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
     Color? amountColor,
     required Color bgColor,
     required bool isDark,
+    Color? borderColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: borderColor ??
+              (isDark
+                  ? iconColor.withValues(alpha: 0.25)
+                  : iconColor.withValues(alpha: 0.18)),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -518,11 +525,11 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isActive
-              ? Colors.indigo.shade50
+              ? (isDark ? Colors.indigo.shade900.withValues(alpha: 0.3) : Colors.indigo.shade50)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: isActive ? Colors.indigo.shade300 : Colors.transparent,
+            color: isActive ? (isDark ? Colors.indigo.shade400 : Colors.indigo.shade300) : Colors.transparent,
             width: 1,
           ),
         ),
@@ -532,7 +539,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             fontSize: 14.0,
             fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
             color: isActive
-                ? Colors.indigo.shade700
+                ? (isDark ? Colors.indigo.shade300 : Colors.indigo.shade700)
                 : (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
           ),
         ),
@@ -987,7 +994,6 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
       default:
         return Colors.grey;
     }
-  }
   }
 
   void _confirmDeleteBill(String billId, String billNo) {
@@ -2315,7 +2321,7 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 Icon(
                   LucideIcons.calendar,
                   size: 16,
-                  color: Colors.grey.shade800,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade400 : Colors.grey.shade800,
                 ),
               ],
             ),

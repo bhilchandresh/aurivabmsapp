@@ -44,172 +44,182 @@ class _RecordPaymentBottomSheetState extends State<RecordPaymentBottomSheet> {
     final subtitleColor = isDark ? Colors.grey.shade400 : Colors.grey.shade600;
     final borderColor = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: Container(
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -5),
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.85,
+      ),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Handle bar
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            height: 4,
+            width: 40,
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+              borderRadius: BorderRadius.circular(2),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              height: 4,
-              width: 40,
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 8),
-            
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(LucideIcons.creditCard, color: Colors.green, size: 24),
+          ),
+          const SizedBox(height: 8),
+          
+          // Header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Record Payment to Supplier',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: textColor,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Add payment details for this supplier',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: subtitleColor,
-                          ),
-                        ),
-                      ],
+                  child: SvgPicture.asset(
+                    'assets/SVG/wallet.svg',
+                    width: 22,
+                    height: 22,
+                    colorFilter: const ColorFilter.mode(
+                      Colors.green,
+                      BlendMode.srcIn,
                     ),
                   ),
-                  InkWell(
-                    onTap: () => Get.back(),
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.grey.shade800 : const Color(0xFFF0F4F8),
-                        shape: BoxShape.circle,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Record Payment to Supplier',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: textColor,
+                        ),
                       ),
-                      child: Icon(LucideIcons.x, size: 18, color: subtitleColor),
+                      const SizedBox(height: 2),
+                      Text(
+                        'Add payment details for this supplier',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: subtitleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                InkWell(
+                  onTap: () => Get.back(),
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey.shade800 : const Color(0xFFF0F4F8),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(LucideIcons.x, size: 18, color: subtitleColor),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          
+          // Scrollable Content
+          Flexible(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // AMOUNT PAID
+                  _buildTextField(
+                    label: 'AMOUNT PAID *',
+                    hint: '₹ 0.00',
+                    controller: amountController,
+                    svgIcon: 'assets/SVG/moneytotal.svg',
+                    borderColor: borderColor,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // PAYMENT DATE & REFERENCE
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildDateField(
+                          label: 'PAYMENT DATE *',
+                          date: paymentDate,
+                          onTap: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: paymentDate,
+                              firstDate: DateTime(2000),
+                              lastDate: DateTime(2101),
+                            );
+                            if (picked != null) {
+                              setState(() => paymentDate = picked);
+                            }
+                          },
+                          borderColor: borderColor,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildTextField(
+                          label: 'REFERENCE / UTR NO.',
+                          hint: 'e.g. 329184721',
+                          controller: referenceController,
+                          svgIcon: 'assets/SVG/invoice.svg',
+                          borderColor: borderColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // PAYMENT MODE
+                  Text(
+                    'MODE *',
+                    style: TextStyle(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade600,
                     ),
                   ),
+                  const SizedBox(height: 4),
+                  _buildModeChips(borderColor, primaryColor),
+                  const SizedBox(height: 12),
+                  
+                  // Notes
+                  _buildTextField(
+                    label: 'NOTES',
+                    hint: 'Enter internal notes (Optional)',
+                    controller: notesController,
+                    svgIcon: 'assets/SVG/note.svg',
+                    borderColor: borderColor,
+                    maxLines: 2,
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            
-            // Scrollable Content
-            Flexible(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // AMOUNT PAID
-                    _buildTextField(
-                      label: 'AMOUNT PAID *',
-                      hint: '₹ 0.00',
-                      controller: amountController,
-                      svgIcon: 'assets/SVG/moneytotal.svg',
-                      borderColor: borderColor,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    // PAYMENT DATE & REFERENCE
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildDateField(
-                            label: 'PAYMENT DATE *',
-                            date: paymentDate,
-                            onTap: () async {
-                              final picked = await showDatePicker(
-                                context: context,
-                                initialDate: paymentDate,
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime(2101),
-                              );
-                              if (picked != null) {
-                                setState(() => paymentDate = picked);
-                              }
-                            },
-                            borderColor: borderColor,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: _buildTextField(
-                            label: 'REFERENCE / UTR NO.',
-                            hint: 'e.g. 329184721',
-                            controller: referenceController,
-                            svgIcon: 'assets/SVG/invoice.svg',
-                            borderColor: borderColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    // PAYMENT MODE
-                    Text(
-                      'MODE *',
-                      style: TextStyle(
-                        fontSize: 8,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    _buildModeChips(borderColor, primaryColor),
-                    const SizedBox(height: 12),
-                    
-                    // Notes
-                    _buildTextField(
-                      label: 'NOTES',
-                      hint: 'Enter internal notes (Optional)',
-                      controller: notesController,
-                      svgIcon: 'assets/SVG/note.svg',
-                      borderColor: borderColor,
-                      maxLines: 2,
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
-              ),
-            ),
-            
-            // Bottom Actions
-            Container(
+          ),
+          
+          // Bottom Actions
+          Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: bgColor,
@@ -267,9 +277,8 @@ class _RecordPaymentBottomSheetState extends State<RecordPaymentBottomSheet> {
             ),
           ],
         ),
-      ),
-    );
-  }
+      );
+    }
 
   Widget _buildTextField({
     required String label,

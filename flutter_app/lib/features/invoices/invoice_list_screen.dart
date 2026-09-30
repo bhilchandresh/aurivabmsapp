@@ -1939,11 +1939,6 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    String currentText = 'Newest First';
-    if (widget.selectedSort == 'oldest') currentText = 'Oldest First';
-    else if (widget.selectedSort == 'highest') currentText = 'Highest Amount';
-    else if (widget.selectedSort == 'lowest') currentText = 'Lowest Amount';
-
     return GestureDetector(
       onTap: _toggleDropdown,
       child: Container(

@@ -127,14 +127,14 @@ class _ContactScreenState extends State<ContactScreen> {
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.blue.withValues(alpha: 0.1),
+                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: SvgPicture.asset(
                                 'assets/SVG/message.svg',
                                 width: 18,
                                 height: 18,
-                                colorFilter: ColorFilter.mode(Colors.blue.shade600, BlendMode.srcIn),
+                                colorFilter: ColorFilter.mode(Theme.of(context).colorScheme.primary, BlendMode.srcIn),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -155,7 +155,7 @@ class _ContactScreenState extends State<ContactScreen> {
                                     'Have a question, suggestion or need support? Fill out the form below and we\'ll get back to you soon.',
                                     style: GoogleFonts.inter(
                                       fontSize: 11,
-                                      color: Colors.grey.shade500,
+                                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade500,
                                       height: 1.3,
                                     ),
                                   ),
@@ -186,7 +186,7 @@ class _ContactScreenState extends State<ContactScreen> {
                           child: ElevatedButton.icon(
                             onPressed: _isLoading ? null : _sendMessage,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade600,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               elevation: 0,
@@ -219,11 +219,11 @@ class _ContactScreenState extends State<ContactScreen> {
                                       icon: LucideIcons.fileText,
                                       fallbackText: 'Welcome to Auriva BMS.',
                                     )),
-                                    child: Text('Terms of Service', style: GoogleFonts.inter(fontSize: 10, color: Colors.blue.shade600)),
+                                    child: Text('Terms of Service', style: GoogleFonts.inter(fontSize: 10, color: Theme.of(context).colorScheme.primary)),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text('|', style: GoogleFonts.inter(fontSize: 10, color: Colors.grey.shade300)),
+                                    child: Text('|', style: GoogleFonts.inter(fontSize: 10, color: isDark ? Colors.grey.shade700 : Colors.grey.shade300)),
                                   ),
                                   GestureDetector(
                                     onTap: () => Get.to(() => const InfoScreen(
@@ -233,12 +233,12 @@ class _ContactScreenState extends State<ContactScreen> {
                                       icon: LucideIcons.shieldCheck,
                                       fallbackText: 'Auriva BMS is committed to protecting your privacy.',
                                     )),
-                                    child: Text('Privacy Policy', style: GoogleFonts.inter(fontSize: 10, color: Colors.blue.shade600)),
+                                    child: Text('Privacy Policy', style: GoogleFonts.inter(fontSize: 10, color: Theme.of(context).colorScheme.primary)),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              Text('(c) 2026 Auriva. All rights reserved.', style: GoogleFonts.inter(fontSize: 10, color: Colors.grey.shade400)),
+                              Text('(c) 2026 Auriva. All rights reserved.', style: GoogleFonts.inter(fontSize: 10, color: isDark ? Colors.grey.shade500 : Colors.grey.shade400)),
                             ],
                           ),
                         ),
@@ -283,7 +283,7 @@ class _ContactScreenState extends State<ContactScreen> {
         const SizedBox(height: 4),
         TextFormField(
           controller: controller,
-          style: GoogleFonts.inter(fontSize: 12),
+          style: GoogleFonts.inter(fontSize: 12, color: isDark ? Colors.white : Colors.black87),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
             isDense: true,
@@ -306,7 +306,7 @@ class _ContactScreenState extends State<ContactScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.blue.shade400),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
             ),
           ),
           validator: (v) => v!.isEmpty ? 'Required' : null,
@@ -347,7 +347,7 @@ class _ContactScreenState extends State<ContactScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.blue.shade400),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
             ),
           ),
           items: _subjects.map((String subject) {
@@ -383,7 +383,7 @@ class _ContactScreenState extends State<ContactScreen> {
           controller: _messageCtrl,
           maxLines: 4,
           maxLength: 500,
-          style: GoogleFonts.inter(fontSize: 12),
+          style: GoogleFonts.inter(fontSize: 12, color: isDark ? Colors.white : Colors.black87),
           decoration: InputDecoration(
             contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             isDense: true,
@@ -406,7 +406,7 @@ class _ContactScreenState extends State<ContactScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.blue.shade400),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
             ),
           ),
           validator: (v) => v!.isEmpty ? 'Required' : null,

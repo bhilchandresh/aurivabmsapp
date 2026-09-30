@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../core/theme/app_typography.dart';
-import '../../../core/constants/app_colors.dart';
 import '../suppliers_controller.dart';
 import '../../inventory/inventory_controller.dart';
 
@@ -247,7 +245,7 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
-                              color: isDark ? Colors.grey.shade800 : Colors.white,
+                              color: isDark ? primaryColor.withValues(alpha: 0.1) : Colors.white,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
                             ),
@@ -436,12 +434,12 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
                   width: 32,
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: isDark ? Colors.red.shade900.withValues(alpha: 0.3) : Colors.red.shade50,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: SvgPicture.asset(
                     'assets/SVG/delete.svg',
-                    colorFilter: ColorFilter.mode(Colors.red.shade400, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(isDark ? Colors.red.shade300 : Colors.red.shade400, BlendMode.srcIn),
                   ),
                 ),
               ),
@@ -487,7 +485,7 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
                       style: TextStyle(
                         fontSize: 8,
                         fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade600,
+                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -528,7 +526,7 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
           style: TextStyle(
             fontSize: 8,
             fontWeight: FontWeight.bold,
-            color: Colors.grey.shade600,
+            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
           ),
         ),
         const SizedBox(height: 4),
@@ -574,7 +572,7 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.green, width: 1.5),
+                    borderSide: BorderSide(color: isDark ? Colors.green.shade400 : Colors.green, width: 1.5),
                   ),
                 ),
                 style: const TextStyle(fontSize: 11),
@@ -646,7 +644,7 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
           style: TextStyle(
             fontSize: 8,
             fontWeight: FontWeight.bold,
-            color: Colors.grey.shade600,
+            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
           ),
         ),
         const SizedBox(height: 4),
@@ -682,7 +680,7 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Colors.green, width: 1.5),
+                borderSide: BorderSide(color: isDark ? Colors.green.shade400 : Colors.green, width: 1.5),
               ),
             ),
             style: const TextStyle(fontSize: 11),
@@ -709,7 +707,7 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
           style: TextStyle(
             fontSize: 8,
             fontWeight: FontWeight.bold,
-            color: Colors.grey.shade600,
+            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
           ),
         ),
         const SizedBox(height: 4),
@@ -761,7 +759,7 @@ class _AddPurchaseBillBottomSheetState extends State<AddPurchaseBillBottomSheet>
           style: TextStyle(
             fontSize: 8,
             fontWeight: FontWeight.bold,
-            color: Colors.grey.shade600,
+            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
           ),
         ),
         const SizedBox(height: 4),

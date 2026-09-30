@@ -28,7 +28,7 @@ class _ItemControllers {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final qtyController = TextEditingController(text: '1');
-  final rateController = TextEditingController(text: '0.00');
+  final rateController = TextEditingController(text: '0');
   final hsnController = TextEditingController();
   final gstController = TextEditingController(text: '18');
 
@@ -4552,6 +4552,11 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             keyboardType: TextInputType.number,
                             controller: item.qtyController,
                             onChanged: (val) => _calculateTotals(),
+                            onTap: () {
+                              if (item.qtyController.text == '0') {
+                                item.qtyController.text = '';
+                              }
+                            },
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -4565,7 +4570,9 @@ class _CreateQuotationScreenState extends State<CreateQuotationScreen> {
                             readOnly: false,
                             onChanged: (val) => _calculateTotals(),
                             onTap: () {
-                              if (item.rateController.text == '0') {
+                              if (item.rateController.text == '0' ||
+                                  item.rateController.text == '0.00' ||
+                                  item.rateController.text == '0.0') {
                                 item.rateController.text = '';
                               }
                             },

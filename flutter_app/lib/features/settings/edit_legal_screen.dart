@@ -98,8 +98,8 @@ class _EditLegalScreenState extends State<EditLegalScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
-    final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    final cardColor = Theme.of(context).cardTheme.color ?? (isDark ? const Color(0xFF1E293B) : Colors.white);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -141,7 +141,7 @@ class _EditLegalScreenState extends State<EditLegalScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black87,
+                            color: Theme.of(context).textTheme.displayLarge?.color ?? (isDark ? Colors.white : Colors.black87),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -160,19 +160,20 @@ class _EditLegalScreenState extends State<EditLegalScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white70 : Colors.blueGrey.shade800,
+                            color: Theme.of(context).textTheme.displayLarge?.color ?? (isDark ? Colors.white70 : Colors.blueGrey.shade800),
                           ),
                         ),
                         const SizedBox(height: 8),
                         DropdownButtonFormField<String>(
                           initialValue: _selectedDoc,
                           icon: Icon(LucideIcons.chevronDown, size: 16, color: Colors.grey.shade400),
-                          style: GoogleFonts.inter(fontSize: 14, color: isDark ? Colors.white : Colors.black87),
+                          dropdownColor: cardColor,
+                          style: GoogleFonts.inter(fontSize: 14, color: Theme.of(context).textTheme.displayLarge?.color ?? (isDark ? Colors.white : Colors.black87)),
                           decoration: InputDecoration(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             isDense: true,
                             filled: true,
-                            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                            fillColor: bgColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
@@ -183,7 +184,7 @@ class _EditLegalScreenState extends State<EditLegalScreen> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: Colors.blue.shade400),
+                              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
                             ),
                           ),
                           items: _docTypes.entries.map((entry) {
@@ -209,7 +210,7 @@ class _EditLegalScreenState extends State<EditLegalScreen> {
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? Colors.white70 : Colors.blueGrey.shade800,
+                            color: Theme.of(context).textTheme.displayLarge?.color ?? (isDark ? Colors.white70 : Colors.blueGrey.shade800),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -222,7 +223,7 @@ class _EditLegalScreenState extends State<EditLegalScreen> {
                             hintText: 'Enter document content here...',
                             hintStyle: GoogleFonts.inter(color: Colors.grey.shade400),
                             filled: true,
-                            fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC),
+                            fillColor: bgColor,
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
@@ -233,7 +234,7 @@ class _EditLegalScreenState extends State<EditLegalScreen> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(color: Colors.blue.shade400),
+                              borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
                             ),
                           ),
                           validator: (v) => v!.isEmpty ? 'Content cannot be empty' : null,
@@ -247,7 +248,7 @@ class _EditLegalScreenState extends State<EditLegalScreen> {
                           child: ElevatedButton.icon(
                             onPressed: _isSaving ? null : _saveDocument,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue.shade600,
+                              backgroundColor: Theme.of(context).colorScheme.primary,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               elevation: 0,

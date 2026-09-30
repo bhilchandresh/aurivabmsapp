@@ -2466,7 +2466,9 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
                             controller: item.rateController,
                             onChanged: _calculateTotals,
                             onTap: () {
-                              if (item.rateController.text == '0') {
+                              if (item.rateController.text == '0' ||
+                                  item.rateController.text == '0.00' ||
+                                  item.rateController.text == '0.0') {
                                 item.rateController.text = '';
                               }
                             },

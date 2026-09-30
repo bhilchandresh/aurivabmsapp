@@ -147,7 +147,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                     children: [
                                       Text(
                                         'Supplier',
-                                        style: TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
+                                        style: TextStyle(fontSize: 11, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontWeight: FontWeight.w600),
                                       ),
                                       Text(
                                         max == 99999 ? '$current/∞' : '$current/$max',
@@ -351,7 +351,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                         child: Text(
                                           supplier.name.isNotEmpty ? supplier.name.substring(0, 1).toUpperCase() : 'S',
                                           style: TextStyle(
-                                            color: Color(0xFF2563EB), // blue text
+                                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), // blue text
                                             fontWeight: FontWeight.bold,
                                             fontSize: 20,
                                           ),
@@ -381,7 +381,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                             ),
                                             child: Text(
                                               supplier.createdBy,
-                                              style: TextStyle(fontSize: 9, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                              style: TextStyle(fontSize: 9, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), fontWeight: FontWeight.w500),
                                             ),
                                           ),
                                         ],
@@ -403,7 +403,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                     const SizedBox(width: 6),
                                     Text(
                                       supplier.email.isNotEmpty ? supplier.email : 'No email added',
-                                      style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                                      style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                                     ),
                                   ],
                                 ),
@@ -419,7 +419,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                     const SizedBox(width: 6),
                                     Text(
                                       supplier.phone.isNotEmpty ? supplier.phone : 'No phone added',
-                                      style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                                      style: TextStyle(fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                                     ),
                                   ],
                                 ),
@@ -437,7 +437,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                         children: [
                                           Text(
                                             'TOTAL BOUGHT',
-                                            style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 9, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFCBD5E1) : const Color(0xFF94A3B8), fontWeight: FontWeight.bold),
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
@@ -459,12 +459,12 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                         children: [
                                           Text(
                                             'PENDING DUE',
-                                            style: TextStyle(fontSize: 9, color: Color(0xFF94A3B8), fontWeight: FontWeight.bold),
+                                            style: TextStyle(fontSize: 9, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFCBD5E1) : const Color(0xFF94A3B8), fontWeight: FontWeight.bold),
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
                                             '₹${supplier.pendingBalance.toStringAsFixed(0)}',
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFEF4444)),
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF87171) : const Color(0xFFEF4444)),
                                           ),
                                         ],
                                       ),
@@ -484,7 +484,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                         },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFEFF6FF).withValues(alpha: 0.1) : Color(0xFFEFF6FF)), // Light blue
-                                          foregroundColor: const Color(0xFF2563EB), // Blue text
+                                          foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), // Blue text
                                           elevation: 0,
                                           padding: const EdgeInsets.symmetric(vertical: 10),
                                           shape: RoundedRectangleBorder(
@@ -513,12 +513,12 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                         'assets/SVG/delete.svg', 
                                         width: 13, 
                                         height: 13, 
-                                        colorFilter: ColorFilter.mode(Color(0xFFEF4444), BlendMode.srcIn)
+                                        colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF87171) : const Color(0xFFEF4444), BlendMode.srcIn)
                                       ),
-                                      label: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFFEF4444))),
+                                      label: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF87171) : const Color(0xFFEF4444))),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFFEF2F2).withValues(alpha: 0.1) : Color(0xFFFEF2F2)), // Light red
-                                        foregroundColor: const Color(0xFFEF4444),
+                                        foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF87171) : const Color(0xFFEF4444),
                                         elevation: 0,
                                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                                         shape: RoundedRectangleBorder(
@@ -601,7 +601,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                         'assets/SVG/supplier.svg',
                         width: 24,
                         height: 24,
-                        colorFilter: ColorFilter.mode(Color(0xFF2563EB), BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), BlendMode.srcIn),
                       ),
                     ),
                   ),
@@ -617,14 +617,14 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                         SizedBox(height: 4),
                         Text(
                           'Enter supplier details to add to your registry',
-                          style: TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                          style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
                     onPressed: () => Get.back(),
-                    icon: Icon(LucideIcons.x, size: 20, color: Color(0xFF64748B)),
+                    icon: Icon(LucideIcons.x, size: 20, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
                     style: IconButton.styleFrom(
                       backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.white,
                       shape: RoundedRectangleBorder(
@@ -641,7 +641,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 label: 'SUPPLIER NAME *',
                 controller: nameController,
                 hintText: 'Apex Technologies',
-                prefixIcon: SvgPicture.asset('assets/SVG/profile.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Color(0xFF64748B), BlendMode.srcIn)),
+                prefixIcon: SvgPicture.asset('assets/SVG/profile.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
                 fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
                 fontSize: 14,
@@ -652,7 +652,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 controller: emailController,
                 hintText: 'sales@apextech.com',
                 keyboardType: TextInputType.emailAddress,
-                prefixIcon: SvgPicture.asset('assets/SVG/mail.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Color(0xFF64748B), BlendMode.srcIn)),
+                prefixIcon: SvgPicture.asset('assets/SVG/mail.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
                 fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
                 fontSize: 14,
@@ -663,7 +663,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 controller: phoneController,
                 hintText: '+91 98765 43210',
                 keyboardType: TextInputType.phone,
-                prefixIcon: SvgPicture.asset('assets/SVG/mobile.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Color(0xFF64748B), BlendMode.srcIn)),
+                prefixIcon: SvgPicture.asset('assets/SVG/mobile.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
                 fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
                 fontSize: 14,
@@ -673,7 +673,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 label: 'GST NUMBER',
                 controller: gstController,
                 hintText: '29ABCDE1234F1Z1',
-                prefixIcon: SvgPicture.asset('assets/SVG/gst.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Color(0xFF64748B), BlendMode.srcIn)),
+                prefixIcon: SvgPicture.asset('assets/SVG/gst.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
                 fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
                 fontSize: 14,
@@ -683,7 +683,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 label: 'ADDRESS',
                 controller: addressController,
                 hintText: '22, Industrial Area, Ahmedabad, Gujarat',
-                prefixIcon: SvgPicture.asset('assets/SVG/location.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Color(0xFF64748B), BlendMode.srcIn)),
+                prefixIcon: SvgPicture.asset('assets/SVG/location.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
                 fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
                 fontSize: 14,
@@ -787,7 +787,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     'assets/SVG/delete.svg',
                     width: 28,
                     height: 28,
-                    colorFilter: ColorFilter.mode(Color(0xFFEF4444), BlendMode.srcIn)
+                    colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF87171) : const Color(0xFFEF4444), BlendMode.srcIn)
                   ),
                 ),
               ),
@@ -808,7 +808,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF64748B),
+                  color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                 ),
               ),
               const SizedBox(height: 24),

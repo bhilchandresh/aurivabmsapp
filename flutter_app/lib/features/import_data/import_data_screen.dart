@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../../core/theme/app_extensions.dart';
 import 'import_data_controller.dart';
@@ -27,11 +26,15 @@ class _ImportDataScreenState extends State<ImportDataScreen>
     _tabController.addListener(_handleTabSelection);
   }
 
+  int _currentIdx = 0;
+
   void _handleTabSelection() {
-    final tabs = ['clients', 'inventory', 'invoices'];
-    final selectedTab = tabs[_tabController.index];
-    if (_controller.activeTab.value != selectedTab) {
-      _controller.setActiveTab(selectedTab);
+    if (!_tabController.indexIsChanging && _tabController.index != _currentIdx) {
+      _currentIdx = _tabController.index;
+      final tabs = ['clients', 'inventory', 'invoices'];
+      if (_currentIdx >= 0 && _currentIdx < tabs.length) {
+        _controller.setActiveTab(tabs[_currentIdx]);
+      }
     }
   }
 
@@ -103,9 +106,9 @@ class _ImportDataScreenState extends State<ImportDataScreen>
         ),
       ),
       child: AnimatedBuilder(
-        animation: _tabController.animation!,
+        animation: _tabController.animation ?? _tabController,
         builder: (context, child) {
-          final animationValue = _tabController.animation!.value;
+          final animationValue = _tabController.animation?.value ?? _tabController.index.toDouble();
           return Row(
             children: [
               _buildCustomTab(
@@ -148,13 +151,16 @@ class _ImportDataScreenState extends State<ImportDataScreen>
     // Smoothly calculate flex from 15 to 70 based on selection
     final double flexValue = 15.0 + (55.0 * selection);
 
-    final bool isSelected = selection > 0.5;
-
     return Expanded(
       flex: flexValue.toInt(),
       child: GestureDetector(
         onTap: () {
           _tabController.animateTo(index);
+          final tabs = ['clients', 'inventory', 'invoices'];
+          if (index >= 0 && index < tabs.length) {
+            _currentIdx = index;
+            _controller.setActiveTab(tabs[index]);
+          }
         },
         behavior: HitTestBehavior.opaque,
         child: Container(
@@ -184,7 +190,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                           Colors.grey,
                       Colors.white,
                       selection,
-                    )!,
+                    ) ?? Colors.white,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -230,22 +236,22 @@ class _ImportDataScreenState extends State<ImportDataScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF1F6FF),
+        color: isDark ? const Color(0xFF3B7BF6).withValues(alpha: 0.1) : const Color(0xFFF1F6FF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFD4E3FF)),
+        border: Border.all(color: isDark ? const Color(0xFF3B7BF6).withValues(alpha: 0.3) : const Color(0xFFD4E3FF)),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF3B7BF6).withValues(alpha: 0.2) : Colors.white,
               borderRadius: BorderRadius.circular(8),
             ),
             child: SvgPicture.asset(
               'assets/SVG/donwload.svg',
-              colorFilter: const ColorFilter.mode(
-                Color(0xFF3B7BF6),
+              colorFilter: ColorFilter.mode(
+                isDark ? const Color(0xFF60A5FA) : const Color(0xFF3B7BF6),
                 BlendMode.srcIn,
               ),
               width: 18,
@@ -258,7 +264,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
             style: context.typography.cardTitle.copyWith(
               fontWeight: FontWeight.w900,
               fontSize: 13,
-              color: Colors.black,
+              color: isDark ? Colors.white : Colors.black,
             ),
             textAlign: TextAlign.center,
           ),
@@ -268,7 +274,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
             style: context.typography.cardSubtitle.copyWith(
               fontSize: 10,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF64748B),
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
               height: 1.5,
             ),
             textAlign: TextAlign.center,
@@ -318,22 +324,22 @@ class _ImportDataScreenState extends State<ImportDataScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFF9F5FF),
+        color: isDark ? const Color(0xFF7C3AED).withValues(alpha: 0.1) : const Color(0xFFF9F5FF),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE9D7FF)),
+        border: Border.all(color: isDark ? const Color(0xFF7C3AED).withValues(alpha: 0.3) : const Color(0xFFE9D7FF)),
       ),
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: isDark ? const Color(0xFF7C3AED).withValues(alpha: 0.2) : Colors.white,
               borderRadius: BorderRadius.circular(8),
             ),
             child: SvgPicture.asset(
               'assets/SVG/upload.svg',
-              colorFilter: const ColorFilter.mode(
-                Color(0xFF7C3AED),
+              colorFilter: ColorFilter.mode(
+                isDark ? const Color(0xFFA78BFA) : const Color(0xFF7C3AED),
                 BlendMode.srcIn,
               ),
               width: 18,
@@ -346,7 +352,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
             style: context.typography.cardTitle.copyWith(
               fontWeight: FontWeight.w900,
               fontSize: 13,
-              color: Colors.black,
+              color: isDark ? Colors.white : Colors.black,
             ),
             textAlign: TextAlign.center,
           ),
@@ -356,7 +362,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
             style: context.typography.cardSubtitle.copyWith(
               fontSize: 10,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF64748B),
+              color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
             ),
             textAlign: TextAlign.center,
           ),
@@ -367,7 +373,7 @@ class _ImportDataScreenState extends State<ImportDataScreen>
             onTap: _controller.pickFile,
             child: CustomPaint(
               painter: _DashedBorderPainter(
-                color: const Color(0xFFC7B1EF),
+                color: isDark ? const Color(0xFF7C3AED).withValues(alpha: 0.5) : const Color(0xFFC7B1EF),
                 radius: 12,
                 strokeWidth: 1.5,
               ),
@@ -381,38 +387,38 @@ class _ImportDataScreenState extends State<ImportDataScreen>
                   children: [
                     SvgPicture.asset(
                       'assets/SVG/doc.svg',
-                      colorFilter: const ColorFilter.mode(
-                        Color(0xFF7C3AED),
+                      colorFilter: ColorFilter.mode(
+                        isDark ? const Color(0xFFA78BFA) : const Color(0xFF7C3AED),
                         BlendMode.srcIn,
                       ),
                       width: 24,
                       height: 24,
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Drag & drop your Excel file here',
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
-                        color: Colors.black,
+                        color: isDark ? Colors.white : Colors.black,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'or tap to select a file',
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF64748B),
+                        color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
                       ),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'Supported format: .xlsx, .xls (Max 10MB)',
                       style: TextStyle(
                         fontSize: 8,
                         fontWeight: FontWeight.w500,
-                        color: Color(0xFF94A3B8),
+                        color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF94A3B8),
                       ),
                     ),
                   ],
@@ -632,20 +638,18 @@ class _ImportDataScreenState extends State<ImportDataScreen>
 class _DashedBorderPainter extends CustomPainter {
   final Color color;
   final double strokeWidth;
-  final double dashWidth;
-  final double dashSpace;
   final double radius;
 
   _DashedBorderPainter({
     required this.color,
     this.strokeWidth = 1,
-    this.dashWidth = 6,
-    this.dashSpace = 4,
     this.radius = 12,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    const double dashWidth = 6;
+    const double dashSpace = 4;
     final paint = Paint()
       ..color = color
       ..strokeWidth = strokeWidth

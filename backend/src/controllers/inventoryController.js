@@ -186,7 +186,7 @@ exports.bulkImportInventory = async (req, res) => {
         purchasePrice: Number(item.purchasePrice) || 0,
         unitPrice: Number(item.unitPrice) || 0,
         currentStock: Number(item.currentStock) || 0,
-        status: item.status || 'In Stock'
+        status: (item.status && (item.status.toString().toLowerCase() === 'inactive' || item.status.toString().toLowerCase() === 'out of stock' || item.status.toString() === '0')) ? 'inactive' : 'active'
       });
       importedCount++;
       currentCount++;

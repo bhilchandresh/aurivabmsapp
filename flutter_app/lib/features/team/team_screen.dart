@@ -189,7 +189,7 @@ class _TeamScreenState extends State<TeamScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.amber.shade50,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.amber.shade900.withValues(alpha: 0.3) : Colors.amber.shade50,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -398,7 +398,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           child: LinearProgressIndicator(
                             value: pct,
                             minHeight: 8,
-                            backgroundColor: Colors.grey.shade100,
+                            backgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade100,
                             valueColor: AlwaysStoppedAnimation<Color>(
                               progressColor,
                             ),
@@ -500,8 +500,8 @@ class _TeamScreenState extends State<TeamScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.grey.shade200,
-                        disabledForegroundColor: Colors.grey.shade400,
+                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade200,
+                        disabledForegroundColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade600 : Colors.grey.shade400,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 14,
                           vertical: 12,
@@ -571,7 +571,7 @@ class _TeamScreenState extends State<TeamScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset('assets/SVG/client01.svg', height: 36, width: 36, colorFilter: ColorFilter.mode(Colors.grey.shade300, BlendMode.srcIn)),
+            SvgPicture.asset('assets/SVG/client01.svg', height: 36, width: 36, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade600 : Colors.grey.shade300, BlendMode.srcIn)),
             const SizedBox(height: 12),
             Text(
               'no_staff_found'.tr,
@@ -863,13 +863,13 @@ class _TeamScreenState extends State<TeamScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
-                            side: BorderSide(color: Colors.grey.shade300),
+                            side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Colors.grey.shade300),
                           ),
                         ),
                         child: Text(
                           'cancel'.tr,
                           style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade300 : Colors.grey.shade700,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -1049,9 +1049,9 @@ class _TeamScreenState extends State<TeamScreen> {
               width: double.infinity,
               height: 120,
               decoration: BoxDecoration(
-                color: Colors.grey.shade50,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800.withValues(alpha: 0.5) : Colors.grey.shade50,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Colors.grey.shade200),
               ),
               child: member.signatureImage != null
                   ? Center(
@@ -1168,11 +1168,11 @@ class _TeamScreenState extends State<TeamScreen> {
       StatefulBuilder(
         builder: (context, setSheetState) {
           final isDark = Theme.of(context).brightness == Brightness.dark;
-          final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-          final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
-          final subtitleColor = isDark ? Colors.grey.shade400 : Colors.grey.shade500;
-          final fillColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
-          final borderColor = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
+          final cardColor = Theme.of(context).cardTheme.color ?? (isDark ? const Color(0xFF1E293B) : Colors.white);
+          final textColor = Theme.of(context).textTheme.displayLarge?.color ?? (isDark ? Colors.white : const Color(0xFF0F172A));
+          final subtitleColor = Theme.of(context).textTheme.bodyMedium?.color ?? (isDark ? Colors.grey.shade400 : Colors.grey.shade500);
+          final fillColor = Theme.of(context).scaffoldBackgroundColor;
+          final borderColor = Theme.of(context).colorScheme.outline.withValues(alpha: 0.3);
 
           return Container(
             decoration: BoxDecoration(
@@ -1348,6 +1348,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButtonFormField<String>(
                               value: _selectedRole,
+                              dropdownColor: cardColor,
                               icon: Icon(LucideIcons.chevronDown, size: 14, color: subtitleColor),
                               style: TextStyle(
                                 color: textColor,

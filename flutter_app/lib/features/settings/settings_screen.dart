@@ -221,7 +221,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
+                  border: Border(bottom: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade200)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -243,7 +243,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
                   itemCount: _indianStates.length,
-                  separatorBuilder: (context, index) => Divider(height: 1, color: Colors.grey.shade100, indent: 20, endIndent: 20),
+                  separatorBuilder: (context, index) => Divider(height: 1, color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade100, indent: 20, endIndent: 20),
                   itemBuilder: (context, index) {
                     final state = _indianStates[index];
                     final isSelected = _selectedState == state;
@@ -733,7 +733,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: _gstEnabled ? AppColors.primary.withValues(alpha: 0.1) : Colors.grey.shade100,
+                                    color: _gstEnabled ? AppColors.primary.withValues(alpha: 0.1) : (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade100),
                                     shape: BoxShape.circle,
                                   ),
                                   child: SvgPicture.asset(
@@ -1049,11 +1049,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Colors.grey.shade300),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey.shade300),
+              borderSide: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Colors.grey.shade300),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
@@ -1061,7 +1061,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide(color: Colors.grey.shade200),
+              borderSide: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.grey.shade200),
             ),
             fillColor: Theme.of(context).cardTheme.color ?? Colors.white,
             filled: true,
@@ -1150,10 +1150,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFEF2F2), // tailwind rose-50
+        color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withValues(alpha: 0.1) : const Color(0xFFFEF2F2), // tailwind rose-50
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFFFECDD3), // tailwind rose-200
+          color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withValues(alpha: 0.3) : const Color(0xFFFECDD3), // tailwind rose-200
         ),
       ),
       child: Column(
@@ -1163,8 +1163,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFEE2E2), // tailwind red-100
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withValues(alpha: 0.2) : const Color(0xFFFEE2E2), // tailwind red-100
                   shape: BoxShape.circle,
                 ),
                 child: SvgPicture.asset(
@@ -1175,23 +1175,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Danger Zone',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
-                  color: Color(0xFF991B1B), // tailwind red-800
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.red.shade400 : const Color(0xFF991B1B), // tailwind red-800
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          const Text(
+          Text(
             'Permanently deleting your account will revoke access to all your business data, invoices, and settings. This action cannot be undone.',
             style: TextStyle(
               fontSize: 12,
               height: 1.4,
-              color: Color(0xFFB91C1C), // tailwind red-700
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.red.shade300 : const Color(0xFFB91C1C), // tailwind red-700
             ),
           ),
           const SizedBox(height: 20),
@@ -1205,7 +1205,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 decoration: BoxDecoration(
                   color: Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFFCA5A5)),
+                  border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFDC2626) : const Color(0xFFFCA5A5)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -1240,7 +1240,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           builder: (context, setStateDialog) {
             return Dialog(
               insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).cardTheme.color,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(20.0),
@@ -1254,8 +1254,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFEE2E2),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withValues(alpha: 0.2) : const Color(0xFFFEE2E2),
                             shape: BoxShape.circle,
                           ),
                           child: SvgPicture.asset('assets/SVG/danger.svg', height: 24, width: 24, colorFilter: const ColorFilter.mode(Color(0xFFDC2626), BlendMode.srcIn)),
@@ -1263,20 +1263,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         InkWell(
                           onTap: () => Navigator.pop(context),
                           borderRadius: BorderRadius.circular(20),
-                          child: const Padding(
-                            padding: EdgeInsets.all(4.0),
-                            child: Icon(LucideIcons.x, size: 20, color: Colors.black87),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Icon(LucideIcons.x, size: 20, color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'Delete Account',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
-                        color: Colors.black,
+                        color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1284,7 +1284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       'Are you absolutely sure you want to delete your account? A 6-digit OTP will be sent to your email to verify your identity.',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade700,
+                        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey.shade700,
                         height: 1.4,
                       ),
                     ),
@@ -1292,13 +1292,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFEF2F2),
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withValues(alpha: 0.1) : const Color(0xFFFEF2F2),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: const Color(0xFFFECDD3)),
+                        border: Border.all(color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withValues(alpha: 0.3) : const Color(0xFFFECDD3)),
                       ),
                       child: RichText(
-                        text: const TextSpan(
-                          style: TextStyle(fontSize: 13, color: Color(0xFF4B5563), height: 1.5),
+                        text: TextSpan(
+                          style: TextStyle(fontSize: 13, color: Theme.of(context).textTheme.bodyMedium?.color ?? const Color(0xFF4B5563), height: 1.5),
                           children: [
                             TextSpan(
                               text: 'Note: ',
@@ -1309,7 +1309,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                             TextSpan(
                               text: '30 days ',
-                              style: TextStyle(fontWeight: FontWeight.w900, color: Colors.black87),
+                              style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
                             ),
                             TextSpan(
                               text: 'after deletion. If you wish to recover your account during this period, please contact the AurivaBMS team.',
@@ -1327,13 +1327,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             onPressed: isRequestingOTP ? null : () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
-                              side: BorderSide(color: Colors.grey.shade300),
+                              side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Colors.grey.shade300),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Colors.black87,
+                                color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -1402,7 +1402,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             
             return Dialog(
               insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-              backgroundColor: Colors.white,
+              backgroundColor: Theme.of(context).cardTheme.color,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               child: Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -1414,20 +1414,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(12),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFEE2E2),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).brightness == Brightness.dark ? Colors.red.withValues(alpha: 0.2) : const Color(0xFFFEE2E2),
                             shape: BoxShape.circle,
                           ),
                           child: SvgPicture.asset('assets/SVG/danger.svg', height: 24, width: 24, colorFilter: const ColorFilter.mode(Color(0xFFDC2626), BlendMode.srcIn)),
                         ),
                         const SizedBox(width: 16),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'Delete Account',
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
-                              color: Colors.black,
+                              color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
                             ),
                           ),
                         ),
@@ -1438,7 +1438,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       'Enter the 6-digit verification code sent to your email to confirm deletion.',
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey.shade600,
                         height: 1.4,
                       ),
                     ),
@@ -1457,10 +1457,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               height: 52,
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade800 : Colors.white,
                                 borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: const Color(0xFFE2E8F0),
+                                  color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : const Color(0xFFE2E8F0),
                                   width: 1,
                                 ),
                               ),
@@ -1469,7 +1469,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: char.isNotEmpty ? Colors.black87 : Colors.grey.shade400,
+                                  color: char.isNotEmpty ? (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87) : Colors.grey.shade400,
                                 ),
                               ),
                             );
@@ -1504,13 +1504,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             onPressed: isDeleting ? null : () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
-                              side: BorderSide(color: Colors.grey.shade300),
+                              side: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Colors.grey.shade300),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Cancel',
                               style: TextStyle(
-                                color: Colors.black87,
+                                color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),

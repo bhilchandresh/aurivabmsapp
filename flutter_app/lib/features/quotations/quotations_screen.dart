@@ -1562,20 +1562,16 @@ class _CustomStatusDropdownState extends State<CustomStatusDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    String currentTitle = 'All';
     String currentSvg = 'assets/SVG/allcube.svg';
     Color currentColor = Colors.blue;
 
     if (widget.selectedValue == 'Accepted') {
-      currentTitle = 'Accepted';
       currentSvg = 'assets/SVG/accepted.svg';
       currentColor = AppColors.success;
     } else if (widget.selectedValue == 'Pending') {
-      currentTitle = 'Pending';
       currentSvg = 'assets/SVG/pending.svg';
       currentColor = AppColors.warning;
     } else if (widget.selectedValue == 'Rejected') {
-      currentTitle = 'Rejected';
       currentSvg = 'assets/SVG/regected.svg';
       currentColor = AppColors.error;
     }

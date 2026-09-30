@@ -3,7 +3,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:lottie/lottie.dart';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -12,7 +11,6 @@ import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_top_bar.dart';
 import '../clients/clients_controller.dart';
 import '../expenses/expenses_controller.dart';
-import '../expenses/widgets/expense_list_item.dart';
 import '../invoices/create_invoice_screen.dart';
 import '../invoices/invoice_details_screen.dart';
 import '../invoices/invoice_list_screen.dart';
@@ -226,17 +224,342 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return null;
   }
 
-  bool _isDateInFilter(DateTime? date, String filter) {
-    if (filter == 'Lifetime' || date == null) return true;
-    final now = DateTime.now();
-    if (filter == 'This Year') {
-      return date.year == now.year;
-    } else if (filter == 'This Month') {
-      return date.year == now.year && date.month == now.month;
-    } else if (filter == 'Today') {
-      return date.year == now.year && date.month == now.month && date.day == now.day;
+  String _getTimeframeIcon(String filter) {
+    switch (filter) {
+      case 'This Year':
+        return 'assets/SVG/calendar.svg';
+      case 'This Month':
+        return 'assets/SVG/calendernormal.svg';
+      case 'Today':
+        return 'assets/SVG/time.svg';
+      case 'Lifetime':
+      default:
+        return 'assets/SVG/allcube.svg';
     }
-    return true;
+  }
+
+  Color _getTimeframeColor(String filter) {
+    switch (filter) {
+      case 'This Year':
+        return const Color(0xFF3B82F6);
+      case 'This Month':
+        return const Color(0xFF10B981);
+      case 'Today':
+        return const Color(0xFFF59E0B);
+      case 'Lifetime':
+      default:
+        return const Color(0xFF6366F1);
+    }
+  }
+
+  Future<void> _showTimeframeFilterBottomSheet(BuildContext context) async {
+    final filters = [
+      {
+        'id': 'Lifetime',
+        'title': 'Lifetime',
+        'subtitle': 'All historical sales, revenue & expenses',
+        'icon': 'assets/SVG/allcube.svg',
+        'color': const Color(0xFF6366F1),
+        'badge': 'ALL DATA',
+      },
+      {
+        'id': 'This Year',
+        'title': 'This Year',
+        'subtitle': 'Current year (${DateTime.now().year}) transactions',
+        'icon': 'assets/SVG/calendar.svg',
+        'color': const Color(0xFF3B82F6),
+        'badge': '${DateTime.now().year}',
+      },
+      {
+        'id': 'This Month',
+        'title': 'This Month',
+        'subtitle': '${DateFormat('MMMM yyyy').format(DateTime.now())} overview',
+        'icon': 'assets/SVG/calendernormal.svg',
+        'color': const Color(0xFF10B981),
+        'badge': DateFormat('MMM').format(DateTime.now()).toUpperCase(),
+      },
+      {
+        'id': 'Today',
+        'title': 'Today',
+        'subtitle': 'Real-time metrics for ${DateFormat('dd MMM').format(DateTime.now())}',
+        'icon': 'assets/SVG/time.svg',
+        'color': const Color(0xFFF59E0B),
+        'badge': 'LIVE',
+      },
+    ];
+
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        final bgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+        final borderColor = isDark
+            ? Colors.white.withValues(alpha: 0.1)
+            : Colors.black.withValues(alpha: 0.08);
+
+        return Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 42,
+                      height: 4.5,
+                      margin: const EdgeInsets.only(bottom: 18),
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.white24 : Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: SvgPicture.asset(
+                          'assets/SVG/allcube.svg',
+                          width: 17,
+                          height: 17,
+                          colorFilter: const ColorFilter.mode(
+                            AppColors.primary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Dashboard Timeframe',
+                              style: TextStyle(
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                              ),
+                            ),
+                            const SizedBox(height: 1),
+                            Text(
+                              'Select period to filter stats & analytics',
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                color: isDark ? Colors.white60 : Colors.grey.shade600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        icon: Icon(
+                          LucideIcons.x,
+                          size: 16,
+                          color: isDark ? Colors.white60 : Colors.grey.shade700,
+                        ),
+                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                        padding: EdgeInsets.zero,
+                        style: IconButton.styleFrom(
+                          backgroundColor: isDark
+                              ? Colors.white.withValues(alpha: 0.08)
+                              : Colors.grey.shade100,
+                          shape: const CircleBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  ...filters.map((opt) {
+                    final isSelected = _globalFilter == opt['id'];
+                    final color = opt['color'] as Color;
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () async {
+                            Navigator.of(ctx).pop();
+                            final selectedVal = opt['id'] as String;
+                            if (selectedVal != _globalFilter) {
+                              setState(() {
+                                _globalFilter = selectedVal;
+                                _isManualRefreshing = true;
+                              });
+                              await Future.wait([
+                                clientsController.fetchClients(),
+                                expensesController.fetchExpenses(),
+                                Future.delayed(const Duration(milliseconds: 500)),
+                              ]);
+                              if (mounted) {
+                                setState(() {
+                                  _isManualRefreshing = false;
+                                });
+                              }
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(14),
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? color.withValues(alpha: isDark ? 0.15 : 0.08)
+                                  : (isDark
+                                      ? Colors.white.withValues(alpha: 0.03)
+                                      : Colors.grey.shade50),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: isSelected
+                                    ? color.withValues(alpha: 0.8)
+                                    : borderColor,
+                                width: isSelected ? 1.2 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 36,
+                                  height: 36,
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: SvgPicture.asset(
+                                    opt['icon'] as String,
+                                    width: 17,
+                                    height: 17,
+                                    colorFilter: ColorFilter.mode(
+                                      color,
+                                      BlendMode.srcIn,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            opt['title'] as String,
+                                            style: TextStyle(
+                                              fontSize: 13.5,
+                                              fontWeight: isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.w600,
+                                              color: isDark
+                                                  ? Colors.white
+                                                  : const Color(0xFF0F172A),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 1.5,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: color.withValues(
+                                                alpha: 0.12,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+                                            child: Text(
+                                              opt['badge'] as String,
+                                              style: TextStyle(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.bold,
+                                                color: color,
+                                                letterSpacing: 0.3,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        opt['subtitle'] as String,
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: isDark
+                                              ? Colors.white60
+                                              : Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isSelected
+                                        ? color
+                                        : Colors.transparent,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? color
+                                          : (isDark
+                                              ? Colors.white30
+                                              : Colors.grey.shade400),
+                                      width: isSelected ? 0 : 1.2,
+                                    ),
+                                  ),
+                                  child: isSelected
+                                      ? const Center(
+                                          child: Icon(
+                                            Icons.check_rounded,
+                                            color: Colors.white,
+                                            size: 13,
+                                          ),
+                                        )
+                                      : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 4),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -602,53 +925,74 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         }
 
                         Widget buildFilterDropdown({bool isFullWidth = false}) {
-                          return Container(
-                            width: isFullWidth ? double.infinity : null,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
-                                width: 1,
-                              ),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _globalFilter,
-                                isDense: true,
-                                icon: const Icon(LucideIcons.chevronDown, size: 16),
-                                isExpanded: isFullWidth,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: Theme.of(context).textTheme.bodyMedium?.color,
+                          final iconPath = _getTimeframeIcon(_globalFilter);
+                          final color = _getTimeframeColor(_globalFilter);
+
+                          return Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () => _showTimeframeFilterBottomSheet(context),
+                              borderRadius: BorderRadius.circular(10),
+                              child: Container(
+                                width: isFullWidth ? double.infinity : null,
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).cardColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                    color: color.withValues(alpha: 0.25),
+                                    width: 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: color.withValues(alpha: 0.04),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                                 ),
-                                items: ['Lifetime', 'This Year', 'This Month', 'Today']
-                                    .map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) async {
-                                  if (newValue != null && newValue != _globalFilter) {
-                                    setState(() {
-                                      _globalFilter = newValue;
-                                      _isManualRefreshing = true;
-                                    });
-                                    await Future.wait([
-                                      clientsController.fetchClients(),
-                                      expensesController.fetchExpenses(),
-                                      Future.delayed(const Duration(milliseconds: 600)),
-                                    ]);
-                                    if (mounted) {
-                                      setState(() {
-                                        _isManualRefreshing = false;
-                                      });
-                                    }
-                                  }
-                                },
+                                child: Row(
+                                  mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.all(5),
+                                          decoration: BoxDecoration(
+                                            color: color.withValues(alpha: 0.12),
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: SvgPicture.asset(
+                                            iconPath,
+                                            width: 14,
+                                            height: 14,
+                                            colorFilter: ColorFilter.mode(
+                                              color,
+                                              BlendMode.srcIn,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          _globalFilter,
+                                          style: TextStyle(
+                                            fontSize: 12.5,
+                                            fontWeight: FontWeight.w600,
+                                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Icon(
+                                      LucideIcons.chevronDown,
+                                      size: 14,
+                                      color: color,
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           );

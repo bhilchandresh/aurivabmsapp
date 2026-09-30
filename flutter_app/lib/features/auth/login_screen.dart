@@ -8,6 +8,7 @@ import '../../core/theme/app_extensions.dart';
 import '../../shared/widgets/app_button.dart';
 import '../../shared/widgets/app_input_field.dart';
 import 'auth_controller.dart';
+import 'view_legal_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -482,6 +483,60 @@ class _LoginScreenState extends State<LoginScreen>
                                 color: isDark ? Colors.white38 : Colors.grey.shade500,
                                 fontSize: 12,
                               ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    Get.to(() => const ViewLegalScreen(
+                                      title: 'Privacy Policy',
+                                      documentType: 'privacy_policy',
+                                    ));
+                                  },
+                                  style: TextButton.styleFrom(
+                                    minimumSize: Size.zero,
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    "Privacy Policy",
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white70 : Colors.blueGrey.shade600,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  " • ",
+                                  style: TextStyle(color: isDark ? Colors.white38 : Colors.grey.shade500),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Get.to(() => const ViewLegalScreen(
+                                      title: 'Terms & Conditions',
+                                      documentType: 'terms_and_conditions',
+                                    ));
+                                  },
+                                  style: TextButton.styleFrom(
+                                    minimumSize: Size.zero,
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    "Terms & Conditions",
+                                    style: TextStyle(
+                                      color: isDark ? Colors.white70 : Colors.blueGrey.shade600,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

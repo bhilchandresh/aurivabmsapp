@@ -163,18 +163,18 @@ class AppColorSchemeExtension extends ThemeExtension<AppColorSchemeExtension> {
   ) {
     if (other is! AppColorSchemeExtension) return this;
     return AppColorSchemeExtension(
-      borderColor: Color.lerp(borderColor, other.borderColor, t)!,
-      dividerColor: Color.lerp(dividerColor, other.dividerColor, t)!,
-      drawerBackground: Color.lerp(drawerBackground, other.drawerBackground, t)!,
-      sidebarBackground: Color.lerp(sidebarBackground, other.sidebarBackground, t)!,
-      shimmerBase: Color.lerp(shimmerBase, other.shimmerBase, t)!,
-      shimmerHighlight: Color.lerp(shimmerHighlight, other.shimmerHighlight, t)!,
-      statusSuccess: Color.lerp(statusSuccess, other.statusSuccess, t)!,
-      statusWarning: Color.lerp(statusWarning, other.statusWarning, t)!,
-      statusError: Color.lerp(statusError, other.statusError, t)!,
-      statusInfo: Color.lerp(statusInfo, other.statusInfo, t)!,
-      cardBackground: Color.lerp(cardBackground, other.cardBackground, t)!,
-      kpiCardBackground: Color.lerp(kpiCardBackground, other.kpiCardBackground, t)!,
+      borderColor: Color.lerp(borderColor, other.borderColor, t) ?? borderColor,
+      dividerColor: Color.lerp(dividerColor, other.dividerColor, t) ?? dividerColor,
+      drawerBackground: Color.lerp(drawerBackground, other.drawerBackground, t) ?? drawerBackground,
+      sidebarBackground: Color.lerp(sidebarBackground, other.sidebarBackground, t) ?? sidebarBackground,
+      shimmerBase: Color.lerp(shimmerBase, other.shimmerBase, t) ?? shimmerBase,
+      shimmerHighlight: Color.lerp(shimmerHighlight, other.shimmerHighlight, t) ?? shimmerHighlight,
+      statusSuccess: Color.lerp(statusSuccess, other.statusSuccess, t) ?? statusSuccess,
+      statusWarning: Color.lerp(statusWarning, other.statusWarning, t) ?? statusWarning,
+      statusError: Color.lerp(statusError, other.statusError, t) ?? statusError,
+      statusInfo: Color.lerp(statusInfo, other.statusInfo, t) ?? statusInfo,
+      cardBackground: Color.lerp(cardBackground, other.cardBackground, t) ?? cardBackground,
+      kpiCardBackground: Color.lerp(kpiCardBackground, other.kpiCardBackground, t) ?? kpiCardBackground,
     );
   }
 }
