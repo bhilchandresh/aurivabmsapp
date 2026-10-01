@@ -4,9 +4,6 @@ import 'package:get/get.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:lottie/lottie.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import '../../core/theme/app_extensions.dart';
-import '../../shared/widgets/app_button.dart';
-import '../../shared/widgets/app_input_field.dart';
 import 'auth_controller.dart';
 import 'view_legal_screen.dart';
 

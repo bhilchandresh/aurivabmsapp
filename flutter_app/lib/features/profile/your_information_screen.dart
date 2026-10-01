@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../core/theme/app_extensions.dart';
 import '../auth/auth_controller.dart';
 
 class YourInformationScreen extends StatelessWidget {

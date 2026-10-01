@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
@@ -7,13 +6,11 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:io';
-import 'dart:math';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
-import '../../shared/widgets/app_input_field.dart';
 import 'expenses_controller.dart';
 import 'all_expenses_screen.dart';
 import 'widgets/expense_list_item.dart';
@@ -1261,9 +1258,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   () => const AllExpensesScreen(),
                   transition: Transition.fadeIn,
                 ),
-                child: Row(
+                child: const Row(
                   children: [
-                    const Text(
+                    Text(
                       'View All',
                       style: TextStyle(
                         color: Colors.indigo,
@@ -1271,8 +1268,8 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         fontSize: 12,
                       ),
                     ),
-                    const SizedBox(width: 4),
-                    const Icon(LucideIcons.chevronRight, size: 14, color: Colors.indigo),
+                    SizedBox(width: 4),
+                    Icon(LucideIcons.chevronRight, size: 14, color: Colors.indigo),
                   ],
                 ),
               ),
@@ -1515,7 +1512,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   }
 
   void showAddExpenseBottomSheet(BuildContext context, bool isDark) {
-    final _controller = Get.find<ExpensesController>();
+    final controller = Get.find<ExpensesController>();
     final formKey = GlobalKey<FormState>();
     final amountCtrl = TextEditingController();
     final descCtrl = TextEditingController();
@@ -1537,7 +1534,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
       'Salary',
       'Other',
     ];
-    final Set<String> existingCategories = _controller.allUniqueCategories;
+    final Set<String> existingCategories = controller.allUniqueCategories;
     final List<String> allCategories = {...defaultCategories, ...existingCategories}.toList()..sort();
     
     final categoryCtrl = TextEditingController(
@@ -1551,7 +1548,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           final inputBorderColor = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
 
           // Helper for labels
-          Widget _buildLabel(String text, {bool isRequired = false}) {
+          Widget buildLabel(String text, {bool isRequired = false}) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 6),
               child: Row(
@@ -1576,7 +1573,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           }
 
           // Helper for input decoration
-          InputDecoration _inputDeco(String hint, {Widget? prefixIcon, BoxConstraints? prefixIconConstraints, double? hintSize}) {
+          InputDecoration inputDeco(String hint, {Widget? prefixIcon, BoxConstraints? prefixIconConstraints, double? hintSize}) {
             return InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: hintSize ?? 12),
@@ -1681,7 +1678,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     const SizedBox(height: 16),
 
                     // Category Field
-                    _buildLabel('Category', isRequired: true),
+                    buildLabel('Category', isRequired: true),
                     Container(
                       decoration: BoxDecoration(
                         color: inputBgColor,
@@ -1730,12 +1727,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel('Amount (₹)', isRequired: true),
+                              buildLabel('Amount (₹)', isRequired: true),
                               TextFormField(
                                 controller: amountCtrl,
                                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                                 style: const TextStyle(fontSize: 13),
-                                decoration: _inputDeco(
+                                decoration: inputDeco(
                                   '0.00',
                                   hintSize: 15,
                                   prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
@@ -1761,7 +1758,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildLabel('Date', isRequired: true),
+                              buildLabel('Date', isRequired: true),
                               InkWell(
                                 onTap: () async {
                                   final picked = await showDatePicker(
@@ -1813,13 +1810,13 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                     const SizedBox(height: 12),
 
                     // Description Field
-                    _buildLabel('Description', isRequired: true),
+                    buildLabel('Description', isRequired: true),
                     TextFormField(
                       controller: descCtrl,
                       maxLines: 2,
                       maxLength: 200,
                       style: const TextStyle(fontSize: 13),
-                      decoration: _inputDeco(
+                      decoration: inputDeco(
                         'e.g. AWS Servers, Office desks',
                         prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
                         prefixIcon: Padding(
@@ -1861,19 +1858,19 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Obx(() {
-                            final isSaving = _controller.isLoading.value;
+                            final isSaving = controller.isLoading.value;
                             return ElevatedButton(
                               onPressed: isSaving
                                   ? null
                                   : () async {
                                       if (formKey.currentState!.validate()) {
                                         final amt = double.parse(amountCtrl.text.trim());
-                                        String finalDesc = descCtrl.text.trim();
+                                        final String finalDesc = descCtrl.text.trim();
 
                                         // We need to parse back date to yyyy-MM-dd format for the backend/controller
                                         final formattedForBackend = DateFormat('yyyy-MM-dd').format(selectedDate);
 
-                                        final success = await _controller.addExpense(
+                                        final success = await controller.addExpense(
                                           categoryCtrl.text.trim(),
                                           amt,
                                           formattedForBackend,

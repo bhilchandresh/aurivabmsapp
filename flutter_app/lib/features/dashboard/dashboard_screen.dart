@@ -64,7 +64,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   final AuthController authController = Get.isRegistered<AuthController>()
       ? Get.find<AuthController>()
       : Get.put(AuthController(), permanent: true);
-  final DashboardController dashboardController = Get.put(DashboardController());
+  final DashboardController dashboardController = Get.put(
+    DashboardController(),
+  );
 
   // Quick Payment form variables
   String? _selectedClientId;
@@ -83,7 +85,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   // Chart state
-  String _chartView = 'monthly'; // 'monthly' or 'yearly'
+  final String _chartView = 'monthly'; // 'monthly' or 'yearly'
   String _globalFilter = 'Lifetime';
   bool _isManualRefreshing = false;
 
@@ -141,7 +143,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       amount,
       today,
       _paymentMode,
-      _paymentNotesController.text.isNotEmpty ? _paymentNotesController.text : 'Dashboard Quick Collect',
+      _paymentNotesController.text.isNotEmpty
+          ? _paymentNotesController.text
+          : 'Dashboard Quick Collect',
     );
 
     // Give a brief delay for UI state to settle
@@ -273,7 +277,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       {
         'id': 'This Month',
         'title': 'This Month',
-        'subtitle': '${DateFormat('MMMM yyyy').format(DateTime.now())} overview',
+        'subtitle':
+            '${DateFormat('MMMM yyyy').format(DateTime.now())} overview',
         'icon': 'assets/SVG/calendernormal.svg',
         'color': const Color(0xFF10B981),
         'badge': DateFormat('MMM').format(DateTime.now()).toUpperCase(),
@@ -281,7 +286,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       {
         'id': 'Today',
         'title': 'Today',
-        'subtitle': 'Real-time metrics for ${DateFormat('dd MMM').format(DateTime.now())}',
+        'subtitle':
+            'Real-time metrics for ${DateFormat('dd MMM').format(DateTime.now())}',
         'icon': 'assets/SVG/time.svg',
         'color': const Color(0xFFF59E0B),
         'badge': 'LIVE',
@@ -358,7 +364,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               style: TextStyle(
                                 fontSize: 14.5,
                                 fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : const Color(0xFF0F172A),
+                                color: isDark
+                                    ? Colors.white
+                                    : const Color(0xFF0F172A),
                               ),
                             ),
                             const SizedBox(height: 1),
@@ -366,7 +374,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               'Select period to filter stats & analytics',
                               style: TextStyle(
                                 fontSize: 11.5,
-                                color: isDark ? Colors.white60 : Colors.grey.shade600,
+                                color: isDark
+                                    ? Colors.white60
+                                    : Colors.grey.shade600,
                               ),
                             ),
                           ],
@@ -379,7 +389,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           size: 16,
                           color: isDark ? Colors.white60 : Colors.grey.shade700,
                         ),
-                        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
                         padding: EdgeInsets.zero,
                         style: IconButton.styleFrom(
                           backgroundColor: isDark
@@ -411,7 +424,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               await Future.wait([
                                 clientsController.fetchClients(),
                                 expensesController.fetchExpenses(),
-                                Future.delayed(const Duration(milliseconds: 500)),
+                                Future.delayed(
+                                  const Duration(milliseconds: 500),
+                                ),
                               ]);
                               if (mounted) {
                                 setState(() {
@@ -429,10 +444,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? color.withValues(alpha: isDark ? 0.15 : 0.08)
+                                  ? color.withValues(
+                                      alpha: isDark ? 0.15 : 0.08,
+                                    )
                                   : (isDark
-                                      ? Colors.white.withValues(alpha: 0.03)
-                                      : Colors.grey.shade50),
+                                        ? Colors.white.withValues(alpha: 0.03)
+                                        : Colors.grey.shade50),
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
                                 color: isSelected
@@ -464,7 +481,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -530,8 +548,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       color: isSelected
                                           ? color
                                           : (isDark
-                                              ? Colors.white30
-                                              : Colors.grey.shade400),
+                                                ? Colors.white30
+                                                : Colors.grey.shade400),
                                       width: isSelected ? 0 : 1.2,
                                     ),
                                   ),
@@ -599,7 +617,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           physics: const AlwaysScrollableScrollPhysics(
             parent: BouncingScrollPhysics(),
           ),
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 0, bottom: 20.0),
+          padding: const EdgeInsets.only(
+            left: 16.0,
+            right: 16.0,
+            top: 0,
+            bottom: 20.0,
+          ),
           child: Obx(() {
             final isLoading = dashboardController.isLoading.value;
             final showSkeleton = isLoading;
@@ -607,17 +630,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             // --- Real-time stats from Backend API ---
             double totalRevenue = dashboardController.totalRevenue.value;
-            double totalPendingAmount = dashboardController.totalPendingAmount.value;
+            double totalPendingAmount =
+                dashboardController.totalPendingAmount.value;
             int totalInvoices = dashboardController.totalInvoices.value;
             int paidCount = dashboardController.paidInvoices.value;
             int pendingCount = dashboardController.pendingCount.value;
             double totalExpenses = dashboardController.totalExpenses.value;
             double netProfit = dashboardController.netProfit.value;
             double totalReceived = totalRevenue - totalPendingAmount;
-            int successRate = totalInvoices > 0 ? ((paidCount / totalInvoices) * 100).round() : 0;
-            
+            int successRate = totalInvoices > 0
+                ? ((paidCount / totalInvoices) * 100).round()
+                : 0;
+
             // Note: recentInvoices extraction remains similar but from dashboardController if needed. We'll leave it out for this simplified stat UI as the backend provides it natively.
-            
+
             if (useDummy) {
               totalRevenue = 250000.0;
               totalExpenses = 85000.0;
@@ -647,7 +673,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Widget buildWelcomeHeader() {
                           return Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
                             decoration: BoxDecoration(
                               color: Theme.of(context).cardTheme.color,
                               borderRadius: BorderRadius.circular(20),
@@ -666,7 +695,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   children: [
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Container(
@@ -675,10 +705,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               vertical: 4,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                                              borderRadius: BorderRadius.circular(20),
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                               border: Border.all(
-                                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                    .withValues(alpha: 0.2),
                                               ),
                                             ),
                                             child: Row(
@@ -687,22 +724,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 Icon(
                                                   LucideIcons.hexagon,
                                                   size: 12,
-                                                  color: Theme.of(context).colorScheme.primary,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
                                                 ),
                                                 const SizedBox(width: 4),
                                                 Obx(() {
-                                                  final role = authController.userRole.value.toUpperCase();
+                                                  final role = authController
+                                                      .userRole
+                                                      .value
+                                                      .toUpperCase();
                                                   String displayRole = 'USER';
                                                   if (role.isNotEmpty) {
-                                                    displayRole = role.replaceAll('_', ' ');
+                                                    displayRole = role
+                                                        .replaceAll('_', ' ');
                                                   }
                                                   return Text(
                                                     displayRole,
-                                                    style: context.typography.roleBadgeText.copyWith(
-                                                      color: context.colorScheme.primary,
-                                                      fontSize: 10,
-                                                      fontWeight: FontWeight.bold,
-                                                    ),
+                                                    style: context
+                                                        .typography
+                                                        .roleBadgeText
+                                                        .copyWith(
+                                                          color: context
+                                                              .colorScheme
+                                                              .primary,
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                   );
                                                 }),
                                               ],
@@ -711,30 +760,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           const SizedBox(height: 8),
                                           Text(
                                             'welcome_back'.tr,
-                                            style: context.typography.screenTitle.copyWith(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.normal,
-                                              color: Theme.of(context).textTheme.bodyMedium?.color,
-                                            ),
+                                            style: context
+                                                .typography
+                                                .screenTitle
+                                                .copyWith(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).textTheme.bodyMedium?.color,
+                                                ),
                                           ),
                                           const SizedBox(height: 4),
-                                          Wrap(
-                                            crossAxisAlignment: WrapCrossAlignment.center,
+                                          Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
                                             children: [
-                                              Text(
-                                                authController.userName.value.isNotEmpty
-                                                    ? authController.userName.value
-                                                    : 'Admin',
-                                                style: context.typography.screenTitle.copyWith(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: const Color(0xFF4F46E5), // Match the primary color
-                                                ),
-                                              ),
-                                              Text(
-                                                ' 👋',
-                                                style: context.typography.screenTitle.copyWith(
-                                                  fontSize: 20,
+                                              Flexible(
+                                                child: Text(
+                                                  authController
+                                                          .userName
+                                                          .value
+                                                          .isNotEmpty
+                                                      ? authController
+                                                            .userName
+                                                            .value
+                                                      : 'Admin',
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: context
+                                                      .typography
+                                                      .screenTitle
+                                                      .copyWith(
+                                                        fontSize: 20,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: const Color(
+                                                          0xFF4F46E5,
+                                                        ), // Match the primary color
+                                                      ),
                                                 ),
                                               ),
                                             ],
@@ -752,7 +816,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 const SizedBox(height: 16),
                                 // Subscription Badge
                                 Obx(() {
-                                  final tenant = authController.tenantInfo.value;
+                                  final tenant =
+                                      authController.tenantInfo.value;
                                   if (tenant == null ||
                                       tenant['subscriptionEnd'] == null) {
                                     return const SizedBox.shrink();
@@ -776,11 +841,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       decoration: BoxDecoration(
                                         color: isWarning
                                             ? Colors.red.withValues(alpha: 0.08)
-                                            : const Color(0xFFF0F9FF), // lighter blue
+                                            : const Color(
+                                                0xFFF0F9FF,
+                                              ), // lighter blue
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
                                           color: isWarning
-                                              ? Colors.red.withValues(alpha: 0.15)
+                                              ? Colors.red.withValues(
+                                                  alpha: 0.15,
+                                                )
                                               : const Color(0xFFE0F2FE),
                                           width: 1,
                                         ),
@@ -792,19 +861,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             'assets/SVG/plan.svg',
                                             width: 14,
                                             height: 14,
-                                            colorFilter: ColorFilter.mode(isWarning ? Colors.red : const Color(0xFF0284C7), BlendMode.srcIn),
+                                            colorFilter: ColorFilter.mode(
+                                              isWarning
+                                                  ? Colors.red
+                                                  : const Color(0xFF0284C7),
+                                              BlendMode.srcIn,
+                                            ),
                                           ),
                                           const SizedBox(width: 6),
                                           Text(
                                             planName.toUpperCase(),
-                                            style: context.typography.roleBadgeText.copyWith(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.bold,
-                                              color: isWarning
-                                                  ? Colors.red
-                                                  : const Color(0xFF0284C7),
-                                              letterSpacing: 0.5,
-                                            ),
+                                            style: context
+                                                .typography
+                                                .roleBadgeText
+                                                .copyWith(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isWarning
+                                                      ? Colors.red
+                                                      : const Color(0xFF0284C7),
+                                                  letterSpacing: 0.5,
+                                                ),
                                           ),
                                           const SizedBox(width: 8),
                                           Container(
@@ -822,13 +899,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                             daysLeft > 0
                                                 ? '$daysLeft ${'days_left'.tr}'
                                                 : 'expired'.tr,
-                                            style: context.typography.statusLabel.copyWith(
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w500,
-                                              color: isWarning
-                                                  ? Colors.red
-                                                  : const Color(0xFF0284C7),
-                                            ),
+                                            style: context
+                                                .typography
+                                                .statusLabel
+                                                .copyWith(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: isWarning
+                                                      ? Colors.red
+                                                      : const Color(0xFF0284C7),
+                                                ),
                                           ),
                                         ],
                                       ),
@@ -846,7 +926,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           return InkWell(
                             onTap: () {
                               setState(() {
-                                dashboardController.isAmountsVisible.value = !dashboardController.isAmountsVisible.value;
+                                dashboardController.isAmountsVisible.value =
+                                    !dashboardController.isAmountsVisible.value;
                               });
                             },
                             borderRadius: BorderRadius.circular(12),
@@ -860,12 +941,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                                  color: Theme.of(
+                                    context,
+                                  ).dividerColor.withValues(alpha: 0.1),
                                   width: 1,
                                 ),
                               ),
                               child: SvgPicture.asset(
-                                dashboardController.isAmountsVisible.value ? 'assets/SVG/eyeview.svg' : 'assets/SVG/eyehide.svg',
+                                dashboardController.isAmountsVisible.value
+                                    ? 'assets/SVG/eyeview.svg'
+                                    : 'assets/SVG/eyehide.svg',
                                 width: 20,
                                 height: 20,
                                 colorFilter: ColorFilter.mode(
@@ -877,27 +962,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           );
                         }
 
-                        Widget buildRevealStatsButton({bool isFullWidth = false}) {
+                        Widget buildRevealStatsButton({
+                          bool isFullWidth = false,
+                        }) {
                           return InkWell(
                             onTap: () {
                               setState(() {
-                                dashboardController.isAmountsVisible.value = true;
+                                dashboardController.isAmountsVisible.value =
+                                    true;
                               });
                             },
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               width: isFullWidth ? double.infinity : null,
-                              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 16,
+                              ),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
+                                  color: Theme.of(
+                                    context,
+                                  ).dividerColor.withValues(alpha: 0.1),
                                   width: 1,
                                 ),
                               ),
                               child: Row(
-                                mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+                                mainAxisSize: isFullWidth
+                                    ? MainAxisSize.max
+                                    : MainAxisSize.min,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SvgPicture.asset(
@@ -915,7 +1010,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                                      color: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.color,
                                     ),
                                   ),
                                 ],
@@ -931,11 +1028,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           return Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: () => _showTimeframeFilterBottomSheet(context),
+                              onTap: () =>
+                                  _showTimeframeFilterBottomSheet(context),
                               borderRadius: BorderRadius.circular(10),
                               child: Container(
                                 width: isFullWidth ? double.infinity : null,
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 9,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).cardColor,
                                   borderRadius: BorderRadius.circular(10),
@@ -952,8 +1053,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ],
                                 ),
                                 child: Row(
-                                  mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: isFullWidth
+                                      ? MainAxisSize.max
+                                      : MainAxisSize.min,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -961,8 +1065,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         Container(
                                           padding: const EdgeInsets.all(5),
                                           decoration: BoxDecoration(
-                                            color: color.withValues(alpha: 0.12),
-                                            borderRadius: BorderRadius.circular(6),
+                                            color: color.withValues(
+                                              alpha: 0.12,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
                                           ),
                                           child: SvgPicture.asset(
                                             iconPath,
@@ -980,7 +1088,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           style: TextStyle(
                                             fontSize: 12.5,
                                             fontWeight: FontWeight.w600,
-                                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                                            color: Theme.of(
+                                              context,
+                                            ).textTheme.bodyLarge?.color,
                                           ),
                                         ),
                                       ],
@@ -1008,7 +1118,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: buildFilterDropdown(isFullWidth: true),
+                                      child: buildFilterDropdown(
+                                        isFullWidth: true,
+                                      ),
                                     ),
                                     const SizedBox(width: 12),
                                     buildVisibilityToggleButton(),
@@ -1049,82 +1161,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: context.width < 600 ? 2 : 3,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      childAspectRatio: context.width < 600 ? 1.15 : 1.35,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: context.width < 600 ? 2 : 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: context.width < 600 ? 1.15 : 1.35,
+                      ),
+                      itemCount: 6,
+                      itemBuilder: (context, index) {
+                        String obscureValue(String val) =>
+                            dashboardController.isAmountsVisible.value
+                            ? val
+                            : '••••••';
+                        switch (index) {
+                          case 0:
+                            return _buildStatCard(
+                              title: 'revenue'.tr,
+                              value: obscureValue(
+                                formatCurrency.format(totalRevenue),
+                              ),
+                              subtitle: 'income_arrow'.tr,
+                              svgPath: 'assets/SVG/profit.svg',
+                              color: tailwindEmerald,
+                              bgColor: tailwindEmeraldLight,
+                              delay: 50,
+                            );
+                          case 1:
+                            return _buildStatCard(
+                              title: 'expenses_caps'.tr,
+                              value: obscureValue(
+                                formatCurrency.format(totalExpenses),
+                              ),
+                              subtitle: 'outflow'.tr,
+                              svgPath: 'assets/SVG/loss.svg',
+                              color: tailwindRose,
+                              bgColor: tailwindRoseLight,
+                              delay: 100,
+                            );
+                          case 2:
+                            return _buildStatCard(
+                              title: 'NET PROFIT',
+                              value: obscureValue(
+                                formatCurrency.format(netProfit),
+                              ),
+                              subtitle: 'Rev - (Exp + Purchases)',
+                              svgPath: 'assets/SVG/wallet.svg',
+                              color: context.colorScheme.primary,
+                              bgColor: AppColors.primary.withValues(alpha: 0.1),
+                              isFeatured: true,
+                              delay: 150,
+                            );
+                          case 3:
+                            return _buildStatCard(
+                              title: 'pending'.tr,
+                              value: obscureValue(
+                                formatCurrency.format(totalPendingAmount),
+                              ),
+                              subtitle: '$pendingCount ${'unpaid'.tr}',
+                              svgPath: 'assets/SVG/time.svg',
+                              color: tailwindAmber,
+                              bgColor: tailwindAmberLight,
+                              delay: 200,
+                            );
+                          case 4:
+                            return _buildStatCard(
+                              title: 'invoices'.tr,
+                              value: obscureValue('$totalInvoices'),
+                              subtitle: 'lifetime_billed'.tr,
+                              svgPath: 'assets/SVG/invoice.svg',
+                              color: tailwindViolet,
+                              bgColor: tailwindVioletLight,
+                              delay: 250,
+                            );
+                          case 5:
+                          default:
+                            return _buildStatCard(
+                              title: 'RECEIVED',
+                              value: obscureValue(
+                                formatCurrency.format(totalReceived),
+                              ),
+                              subtitle: 'Payment collected',
+                              svgPath: 'assets/SVG/checkmark.svg',
+                              color: tailwindPurple,
+                              bgColor: tailwindPurpleLight,
+                              delay: 300,
+                            );
+                        }
+                      },
                     ),
-                    itemCount: 6,
-                    itemBuilder: (context, index) {
-                      String obscureValue(String val) => dashboardController.isAmountsVisible.value ? val : '••••••';
-                      switch (index) {
-                        case 0:
-                          return _buildStatCard(
-                            title: 'revenue'.tr,
-                            value: obscureValue(formatCurrency.format(totalRevenue)),
-                            subtitle: 'income_arrow'.tr,
-                            svgPath: 'assets/SVG/profit.svg',
-                            color: tailwindEmerald,
-                            bgColor: tailwindEmeraldLight,
-                            delay: 50,
-                          );
-                        case 1:
-                          return _buildStatCard(
-                            title: 'expenses_caps'.tr,
-                            value: obscureValue(formatCurrency.format(totalExpenses)),
-                            subtitle: 'outflow'.tr,
-                            svgPath: 'assets/SVG/loss.svg',
-                            color: tailwindRose,
-                            bgColor: tailwindRoseLight,
-                            delay: 100,
-                          );
-                        case 2:
-                          return _buildStatCard(
-                            title: 'NET PROFIT',
-                            value: obscureValue(formatCurrency.format(netProfit)),
-                            subtitle: 'Rev - (Exp + Purchases)',
-                            svgPath: 'assets/SVG/wallet.svg',
-                            color: context.colorScheme.primary,
-                            bgColor: AppColors.primary.withValues(alpha: 0.1),
-                            isFeatured: true,
-                            delay: 150,
-                          );
-                        case 3:
-                          return _buildStatCard(
-                            title: 'pending'.tr,
-                            value: obscureValue(formatCurrency.format(totalPendingAmount)),
-                            subtitle: '$pendingCount ${'unpaid'.tr}',
-                            svgPath: 'assets/SVG/time.svg',
-                            color: tailwindAmber,
-                            bgColor: tailwindAmberLight,
-                            delay: 200,
-                          );
-                        case 4:
-                          return _buildStatCard(
-                            title: 'invoices'.tr,
-                            value: obscureValue('$totalInvoices'),
-                            subtitle: 'lifetime_billed'.tr,
-                            svgPath: 'assets/SVG/invoice.svg',
-                            color: tailwindViolet,
-                            bgColor: tailwindVioletLight,
-                            delay: 250,
-                          );
-                        case 5:
-                        default:
-                          return _buildStatCard(
-                            title: 'RECEIVED',
-                            value: obscureValue(formatCurrency.format(totalReceived)),
-                            subtitle: 'Payment collected',
-                            svgPath: 'assets/SVG/checkmark.svg',
-                            color: tailwindPurple,
-                            bgColor: tailwindPurpleLight,
-                            delay: 300,
-                          );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 24),
+                    const SizedBox(height: 24),
                   ],
 
                   _buildGridActionButtons(isDark),
@@ -1133,21 +1258,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   // --- MAIN LAYOUT (Recent Invoices & Quick Actions) ---
                   Column(
                     children: [
-                      _buildRecentInvoices(dashboardController.recentInvoices, isDark),
-                      const SizedBox(height: 16),
-                      _buildRecentExpenses(
-                        expensesController.expenses.take(5).map((e) => {
-                          'id': e.id,
-                          '_id': e.id,
-                          'category': e.category,
-                          'amount': e.amount,
-                          'description': e.description,
-                          'date': e.date,
-                          'createdBy': {'name': e.user},
-                        }).toList(), 
-                        isDark
-                      ),
-                      const SizedBox(height: 16),
+                      if (dashboardController.recentInvoices.isNotEmpty) ...[
+                        _buildRecentInvoices(
+                          dashboardController.recentInvoices,
+                          isDark,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                      if (expensesController.expenses.isNotEmpty) ...[
+                        _buildRecentExpenses(
+                          expensesController.expenses
+                              .take(5)
+                              .map(
+                                (e) => {
+                                  'id': e.id,
+                                  '_id': e.id,
+                                  'category': e.category,
+                                  'amount': e.amount,
+                                  'description': e.description,
+                                  'date': e.date,
+                                  'createdBy': {'name': e.user},
+                                },
+                              )
+                              .toList(),
+                          isDark,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       _buildQuickCollectPayment(isDark),
                       const SizedBox(height: 20),
                     ],
@@ -1188,7 +1325,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             border: Border.all(
               color: isFeatured
                   ? AppColors.primary.withValues(alpha: 0.5)
-                  : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                  : Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.3),
               width: isFeatured ? 1.5 : 1.0,
             ),
             boxShadow: [
@@ -1217,7 +1356,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           Container(
                             padding: EdgeInsets.all(isSmall ? 6 : 8),
                             decoration: BoxDecoration(
-                              color: isDark ? color.withValues(alpha: 0.15) : bgColor,
+                              color: isDark
+                                  ? color.withValues(alpha: 0.15)
+                                  : bgColor,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Transform.rotate(
@@ -1242,7 +1383,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               style: context.typography.statisticLabel.copyWith(
                                 fontSize: isSmall ? 9 : 10,
                                 fontWeight: FontWeight.w900,
-                                color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+                                color:
+                                    (Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium?.color ??
+                                    Colors.grey),
                                 letterSpacing: 1.0,
                               ),
                             ),
@@ -1259,7 +1404,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           fontWeight: FontWeight.w900,
                           color: isFeatured
                               ? AppColors.primary
-                              : ((Theme.of(context).textTheme.displayLarge?.color ?? Colors.black)),
+                              : ((Theme.of(
+                                      context,
+                                    ).textTheme.displayLarge?.color ??
+                                    Colors.black)),
                         ),
                       ),
                       const SizedBox(height: 2),
@@ -1277,7 +1425,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              if (isFeatured) Container(height: 4, color: context.colorScheme.primary),
+              if (isFeatured)
+                Container(height: 4, color: context.colorScheme.primary),
             ],
           ),
         ),
@@ -1322,7 +1471,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'onTap': () {
           final BuildContext context = Get.context!;
           final bool isDark = Theme.of(context).brightness == Brightness.dark;
-          
+
           Get.to(() => const ExpensesScreen());
           Future.delayed(const Duration(milliseconds: 300), () {
             showAddExpenseBottomSheet(Get.context!, isDark);
@@ -1390,7 +1539,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return ScaleOnPress(
       onTap: onTap,
       child: Container(
@@ -1425,10 +1574,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 svgPath,
                 width: 22,
                 height: 22,
-                colorFilter: ColorFilter.mode(
-                  color,
-                  BlendMode.srcIn,
-                ),
+                colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
               ),
             ),
             const SizedBox(height: 12),
@@ -1461,7 +1607,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.01),
@@ -1482,7 +1630,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     color: context.colorScheme.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: SvgPicture.asset('assets/SVG/invoice.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(context.colorScheme.primary, BlendMode.srcIn)),
+                  child: SvgPicture.asset(
+                    'assets/SVG/invoice.svg',
+                    width: 18,
+                    height: 18,
+                    colorFilter: ColorFilter.mode(
+                      context.colorScheme.primary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -1494,7 +1650,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         style: context.typography.cardTitle.copyWith(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
-                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                          color:
+                              (Theme.of(
+                                context,
+                              ).textTheme.displayLarge?.color ??
+                              Colors.black),
                         ),
                       ),
                       const SizedBox(height: 1),
@@ -1530,14 +1690,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color: context.colorScheme.primary,
                         ),
                       ),
-                      Icon(LucideIcons.chevronRight, size: 14, color: context.colorScheme.primary),
+                      Icon(
+                        LucideIcons.chevronRight,
+                        size: 14,
+                        color: context.colorScheme.primary,
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            
+
             if (recentInvoices.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -1562,14 +1726,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 itemBuilder: (context, idx) {
                   final Map<String, dynamic> inv = recentInvoices[idx];
                   final clientObj = inv['client'] ?? {};
-                  final String clientName = clientObj['name'] ?? 'Unknown Client';
+                  final String clientName =
+                      clientObj['name'] ?? 'Unknown Client';
                   final String status = inv['status'] ?? 'Pending';
                   final String statusLower = status.toLowerCase();
-                  
+
                   String svgPath = 'assets/SVG/pending.svg';
                   Color statusColor = tailwindAmber;
                   Color statusBgColor = tailwindAmberLight;
-                  
+
                   if (statusLower == 'paid') {
                     svgPath = 'assets/SVG/paid.svg';
                     statusColor = tailwindEmerald;
@@ -1583,8 +1748,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     statusColor = tailwindRose;
                     statusBgColor = tailwindRoseLight;
                   }
-                  
-                  final double totalAmount = (inv['totalAmount'] ?? 0).toDouble();
+
+                  final double totalAmount = (inv['totalAmount'] ?? 0)
+                      .toDouble();
                   final String invoiceNumber = inv['invoiceNumber'] ?? '';
                   final String rawDate = inv['date'] ?? '';
                   final String id = inv['_id'] ?? inv['id'] ?? '';
@@ -1605,18 +1771,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   return ScaleOnPress(
                     onTap: () {
-                      final rawInvoice = clientsController.allInvoices.firstWhere(
-                        (json) =>
-                            (json['invoiceNumber'] == invoiceNumber) ||
-                            (json['_id'] ?? json['id']) == id,
-                        orElse: () => {},
-                      );
+                      final rawInvoice = clientsController.allInvoices
+                          .firstWhere(
+                            (json) =>
+                                (json['invoiceNumber'] == invoiceNumber) ||
+                                (json['_id'] ?? json['id']) == id,
+                            orElse: () => {},
+                          );
                       if (rawInvoice.isNotEmpty) {
                         final rawClientObj = rawInvoice['client'] ?? {};
                         final String clientEmail = rawClientObj['email'] ?? '';
-                        final String clientAddress = rawClientObj['address'] ?? '';
+                        final String clientAddress =
+                            rawClientObj['address'] ?? '';
                         final String clientGst =
-                            rawClientObj['gstin'] ?? rawClientObj['gstNumber'] ?? '';
+                            rawClientObj['gstin'] ??
+                            rawClientObj['gstNumber'] ??
+                            '';
                         final String placeOfSupply =
                             rawInvoice['placeOfSupply'] ??
                             rawClientObj['state'] ??
@@ -1630,7 +1800,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                         Get.to(
                           () => InvoiceDetailsScreen(
-                            invoiceId: invoiceNumber.isNotEmpty ? invoiceNumber : id,
+                            invoiceId: invoiceNumber.isNotEmpty
+                                ? invoiceNumber
+                                : id,
                             dbId: id,
                             clientName: clientName,
                             amount: totalAmount,
@@ -1652,7 +1824,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       } else {
                         Get.to(
                           () => InvoiceDetailsScreen(
-                            invoiceId: invoiceNumber.isNotEmpty ? invoiceNumber : id,
+                            invoiceId: invoiceNumber.isNotEmpty
+                                ? invoiceNumber
+                                : id,
                             dbId: id,
                             clientName: clientName,
                             amount: totalAmount,
@@ -1666,7 +1840,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       decoration: BoxDecoration(
                         color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.1)),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withValues(alpha: 0.1),
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.02),
@@ -1680,19 +1858,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border(
-                              left: BorderSide(
-                                color: statusColor,
-                                width: 4,
-                              ),
+                              left: BorderSide(color: statusColor, width: 4),
                             ),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 12,
+                          ),
                           child: Row(
                             children: [
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: isDark ? statusColor.withValues(alpha: 0.15) : statusBgColor,
+                                  color: isDark
+                                      ? statusColor.withValues(alpha: 0.15)
+                                      : statusBgColor,
                                   shape: BoxShape.circle,
                                 ),
                                 child: SvgPicture.asset(
@@ -1714,20 +1894,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       clientName,
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: context.typography.clientName.copyWith(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                      ),
+                                      style: context.typography.clientName
+                                          .copyWith(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color:
+                                                (Theme.of(context)
+                                                    .textTheme
+                                                    .displayLarge
+                                                    ?.color ??
+                                                Colors.black),
+                                          ),
                                     ),
                                     const SizedBox(height: 2),
                                     Row(
                                       children: [
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 2,
+                                          ),
                                           decoration: BoxDecoration(
-                                            color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF),
-                                            borderRadius: BorderRadius.circular(4),
+                                            color: isDark
+                                                ? const Color(
+                                                    0xFF6366F1,
+                                                  ).withValues(alpha: 0.15)
+                                                : const Color(0xFFEEF2FF),
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
                                           ),
                                           child: Row(
                                             children: [
@@ -1745,24 +1940,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         if (inv['createdBy'] != null) ...[
                                           const SizedBox(width: 6),
                                           Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6,
+                                              vertical: 2,
+                                            ),
                                             decoration: BoxDecoration(
-                                              color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF),
-                                              borderRadius: BorderRadius.circular(4),
+                                              color: isDark
+                                                  ? const Color(
+                                                      0xFF6366F1,
+                                                    ).withValues(alpha: 0.15)
+                                                  : const Color(0xFFEEF2FF),
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
                                             ),
                                             child: Row(
                                               children: [
                                                 // const Icon(LucideIcons.user, size: 9, color: Color(0xFF6366F1)),
                                                 const SizedBox(width: 4),
                                                 Text(
-                                                  inv['createdBy']['name'] ?? 'User',
+                                                  inv['createdBy']['name'] ??
+                                                      'User',
                                                   style: const TextStyle(
                                                     fontSize: 9,
                                                     fontWeight: FontWeight.w700,
                                                     color: Color(0xFF6366F1),
                                                   ),
                                                 ),
-                                                 const SizedBox(width: 4),
+                                                const SizedBox(width: 4),
                                               ],
                                             ),
                                           ),
@@ -1773,23 +1977,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     Row(
                                       children: [
                                         SvgPicture.asset(
-                                        'assets/SVG/calendernormal.svg',
-                                        width: 13,
-                                        height: 13,
-                                        colorFilter: ColorFilter.mode(
-                                          Colors.grey.shade500,
-                                          BlendMode.srcIn,
+                                          'assets/SVG/calendernormal.svg',
+                                          width: 13,
+                                          height: 13,
+                                          colorFilter: ColorFilter.mode(
+                                            Colors.grey.shade500,
+                                            BlendMode.srcIn,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        displayDate,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey.shade500,
-                                          fontWeight: FontWeight.w500,
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          displayDate,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade500,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
-                                      ),
                                       ],
                                     ),
                                   ],
@@ -1801,11 +2005,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 children: [
                                   Text(
                                     formatCurrency.format(totalAmount),
-                                    style: context.typography.invoiceAmount.copyWith(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                    ),
+                                    style: context.typography.invoiceAmount
+                                        .copyWith(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color:
+                                              (Theme.of(
+                                                context,
+                                              ).textTheme.displayLarge?.color ??
+                                              Colors.black),
+                                        ),
                                   ),
                                   const SizedBox(height: 2),
                                   Container(
@@ -1814,7 +2023,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       vertical: 3,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: isDark ? statusColor.withValues(alpha: 0.15) : statusBgColor,
+                                      color: isDark
+                                          ? statusColor.withValues(alpha: 0.15)
+                                          : statusBgColor,
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Row(
@@ -1822,11 +2033,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         const SizedBox(width: 4),
                                         Text(
                                           status,
-                                          style: context.typography.invoiceStatus.copyWith(
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.w700,
-                                            color: statusColor,
-                                          ),
+                                          style: context
+                                              .typography
+                                              .invoiceStatus
+                                              .copyWith(
+                                                fontSize: 9,
+                                                fontWeight: FontWeight.w700,
+                                                color: statusColor,
+                                              ),
                                         ),
                                         const SizedBox(width: 4),
                                       ],
@@ -1842,7 +2056,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   );
                 },
               ),
-            
           ],
         ),
       ),
@@ -1860,7 +2073,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.01),
@@ -1886,7 +2101,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     'assets/SVG/expance.svg',
                     width: 18,
                     height: 18,
-                    colorFilter: const ColorFilter.mode(tailwindRose, BlendMode.srcIn),
+                    colorFilter: const ColorFilter.mode(
+                      tailwindRose,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1899,7 +2117,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         style: context.typography.cardTitle.copyWith(
                           fontSize: 14,
                           fontWeight: FontWeight.w900,
-                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                          color:
+                              (Theme.of(
+                                context,
+                              ).textTheme.displayLarge?.color ??
+                              Colors.black),
                         ),
                       ),
                       const SizedBox(height: 1),
@@ -1910,9 +2132,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color: Colors.grey.shade500,
                         ),
                       ),
-                      ],
-                    ),
+                    ],
                   ),
+                ),
                 TextButton(
                   onPressed: () {
                     final mainCtrl = Get.isRegistered<MainLayoutController>()
@@ -1935,14 +2157,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         style: context.typography.buttonText.copyWith(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                          color:
+                              (Theme.of(
+                                context,
+                              ).textTheme.displayLarge?.color ??
+                              Colors.black87),
                         ),
                       ),
                       const SizedBox(width: 2),
                       Icon(
                         LucideIcons.chevronRight,
                         size: 16,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black87),
                       ),
                     ],
                   ),
@@ -1950,7 +2178,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            
+
             if (recentExpenses.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 20),
@@ -1974,17 +2202,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 separatorBuilder: (context, idx) => const SizedBox(height: 6),
                 itemBuilder: (context, idx) {
                   final Map<String, dynamic> exp = recentExpenses[idx];
-                  
+
                   String title = exp['category']?.toString() ?? 'Expense';
                   if (title.trim().isEmpty) {
                     title = 'Expense';
                   }
                   final double amount = (exp['amount'] ?? 0).toDouble();
                   final String rawDate = exp['date'] ?? '';
-                  final String user = (exp['createdBy'] != null) ? (exp['createdBy']['name'] ?? '') : '';
+                  final String user = (exp['createdBy'] != null)
+                      ? (exp['createdBy']['name'] ?? '')
+                      : '';
 
                   final expense = Expense(
-                    id: exp['_id']?.toString() ?? exp['id']?.toString() ?? idx.toString(),
+                    id:
+                        exp['_id']?.toString() ??
+                        exp['id']?.toString() ??
+                        idx.toString(),
                     category: exp['category'] ?? '',
                     amount: amount,
                     description: exp['description'] ?? '',
@@ -2002,7 +2235,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                   final desc = (exp['description']?.toString() ?? '').trim();
                   final descText = desc.isEmpty ? 'No Description' : desc;
-                  
+
                   final itemCurrencyFormat = NumberFormat.currency(
                     locale: 'en_IN',
                     symbol: '₹',
@@ -2010,12 +2243,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   );
 
                   return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -2026,7 +2264,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           width: 45,
                           height: 45,
                           decoration: BoxDecoration(
-                            color: isDark ? tailwindEmerald.withValues(alpha: 0.15) : tailwindEmeraldLight,
+                            color: isDark
+                                ? tailwindEmerald.withValues(alpha: 0.15)
+                                : tailwindEmeraldLight,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Center(
@@ -2047,17 +2287,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                            Text(
-  // The parenthesis ensure the fallback happens BEFORE the capitalization
-  (title ?? '').toTitleCase(), 
-  style: TextStyle(
-    fontSize: 12,
-    fontWeight: FontWeight.w900,
-    color: context.colorScheme.primary,
-  ),
-  maxLines: 1,
-  overflow: TextOverflow.ellipsis,
-),
+                              Text(
+                                // The parenthesis ensure the fallback happens BEFORE the capitalization
+                                (title ?? '').toTitleCase(),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  color: context.colorScheme.primary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                               const SizedBox(height: 2),
                               Text(
                                 descText,
@@ -2106,15 +2346,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w900,
-                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                                color:
+                                    (Theme.of(
+                                      context,
+                                    ).textTheme.displayLarge?.color ??
+                                    Colors.black),
                               ),
                             ),
                             if (user.isNotEmpty) ...[
                               const SizedBox(height: 4),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF),
+                                  color: isDark
+                                      ? const Color(
+                                          0xFF6366F1,
+                                        ).withValues(alpha: 0.15)
+                                      : const Color(0xFFEEF2FF),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
@@ -2166,14 +2417,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+          ),
           boxShadow: [
             if (!isDark)
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.01),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.01),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
           ],
         ),
         child: Column(
@@ -2197,7 +2450,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: context.typography.cardTitle.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w900,
-                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                    color:
+                        (Theme.of(context).textTheme.displayLarge?.color ??
+                        Colors.black),
                   ),
                 ),
               ],
@@ -2205,399 +2460,508 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(height: 12),
 
             // Client Selection
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () async {
-                final result = await Get.to(() => const SelectClientScreen());
-                if (result != null && result is String) {
-                  if (_selectedClientId != result) {
-                    setState(() {
-                      _selectedClientId = result;
-                      _paymentAmountController.clear();
-                      _paymentNotesController.clear();
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () async {
+                  final result = await Get.to(() => const SelectClientScreen());
+                  if (result != null && result is String) {
+                    if (_selectedClientId != result) {
+                      setState(() {
+                        _selectedClientId = result;
+                        _paymentAmountController.clear();
+                        _paymentNotesController.clear();
+                      });
+                    }
+                    // Scroll to the Quick Collect section when a client is selected
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      if (_quickCollectKey.currentContext != null) {
+                        Scrollable.ensureVisible(
+                          _quickCollectKey.currentContext!,
+                          duration: const Duration(milliseconds: 400),
+                          curve: Curves.easeInOut,
+                          alignment:
+                              1.0, // align bottom of the content to bottom of screen
+                        );
+                      }
                     });
                   }
-                  // Scroll to the Quick Collect section when a client is selected
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    if (_quickCollectKey.currentContext != null) {
-                      Scrollable.ensureVisible(
-                        _quickCollectKey.currentContext!,
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                        alignment: 1.0, // align bottom of the content to bottom of screen
-                      );
-                    }
-                  });
-                }
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardTheme.color ?? Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'assets/SVG/userround.svg',
-                          width: 16,
-                          height: 16,
-                          colorFilter: const ColorFilter.mode(Color(0xFF6366F1), BlendMode.srcIn),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _selectedClientId == null || activeClient == null
-                          ? Text(
-                              'select_client'.tr,
-                              style: context.typography.searchHint.copyWith(
-                                fontSize: 13,
-                                color: Colors.grey.shade500,
-                              ),
-                            )
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  activeClient.name,
-                                  style: context.typography.inputText.copyWith(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w900,
-                                    color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                                  ),
-                                ),
-                                if (activeClient.phone.isNotEmpty) ...[
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    activeClient.phone,
-                                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      fontSize: 11,
-                                      color: Colors.grey.shade500,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                    ),
-                    Icon(
-                      LucideIcons.chevronDown,
-                      size: 16,
-                      color: Colors.grey.shade800,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          if (_selectedClientId != null && activeClient != null) ...[
-            const SizedBox(height: 12),
-
-            // Ledger Summary
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.grey.shade50,
+                },
                 borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color ?? Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.4),
+                    ),
+                  ),
+                  child: Row(
                     children: [
-                      Text(
-                        'Total Billed',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w500,
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF6366F1).withValues(alpha: 0.15)
+                              : const Color(0xFFEEF2FF),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            'assets/SVG/userround.svg',
+                            width: 16,
+                            height: 16,
+                            colorFilter: const ColorFilter.mode(
+                              Color(0xFF6366F1),
+                              BlendMode.srcIn,
+                            ),
+                          ),
                         ),
                       ),
-                      Text(
-                        formatCurrency.format(activeClient.totalBilled),
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                        ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _selectedClientId == null || activeClient == null
+                            ? Text(
+                                'select_client'.tr,
+                                style: context.typography.searchHint.copyWith(
+                                  fontSize: 13,
+                                  color: Colors.grey.shade500,
+                                ),
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    activeClient.name,
+                                    style: context.typography.inputText
+                                        .copyWith(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w900,
+                                          color:
+                                              (Theme.of(
+                                                context,
+                                              ).textTheme.displayLarge?.color ??
+                                              Colors.black),
+                                        ),
+                                  ),
+                                  if (activeClient.phone.isNotEmpty) ...[
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      activeClient.phone,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            fontSize: 11,
+                                            color: Colors.grey.shade500,
+                                          ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                      ),
+                      Icon(
+                        LucideIcons.chevronDown,
+                        size: 16,
+                        color: Colors.grey.shade800,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total Received',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        formatCurrency.format(activeClientTotalPaid),
-                        style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          color: tailwindEmerald,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Divider(height: 1, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Balance Due',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      Text(
-                        activeClient.balance > 0 
-                            ? formatCurrency.format(activeClient.balance)
-                            : 'Settled',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w900,
-                          color: activeClient.balance > 0 ? tailwindRose : tailwindEmerald,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
             ),
-            const SizedBox(height: 12),
+            if (_selectedClientId != null && activeClient != null) ...[
+              const SizedBox(height: 12),
 
-            if (activeClient.balance > 0) ...[
-              // ENTER AMOUNT
+              // Ledger Summary
               Container(
-                height: 52,
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isDark ? Theme.of(context).scaffoldBackgroundColor : Colors.grey.shade50,
+                  color: isDark
+                      ? Theme.of(context).scaffoldBackgroundColor
+                      : Colors.grey.shade50,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    const SizedBox(width: 16),
-                    Text(
-                      '₹',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Billed',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          formatCurrency.format(activeClient.totalBilled),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            color:
+                                (Theme.of(
+                                  context,
+                                ).textTheme.displayLarge?.color ??
+                                Colors.black),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: TextField(
-                        controller: _paymentAmountController,
-                        onChanged: (_) => setState(() {}),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        style: context.typography.inputText.copyWith(
-                          fontSize: 24,
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Total Received',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey.shade500,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        Text(
+                          formatCurrency.format(activeClientTotalPaid),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            color: tailwindEmerald,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Divider(
+                      height: 1,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.3),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Balance Due',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color:
+                                (Theme.of(
+                                  context,
+                                ).textTheme.displayLarge?.color ??
+                                Colors.black),
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        Text(
+                          activeClient.balance > 0
+                              ? formatCurrency.format(activeClient.balance)
+                              : 'Settled',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            color: activeClient.balance > 0
+                                ? tailwindRose
+                                : tailwindEmerald,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              if (activeClient.balance > 0) ...[
+                // ENTER AMOUNT
+                Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? Theme.of(context).scaffoldBackgroundColor
+                        : Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 16),
+                      Text(
+                        '₹',
+                        style: TextStyle(
+                          fontSize: 18,
                           fontWeight: FontWeight.w900,
-                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                        ),
-                        decoration: InputDecoration(
-                          hintText: '0',
-                          hintStyle: TextStyle(
-                            color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.only(bottom: 4),
+                          color: isDark
+                              ? Colors.grey.shade400
+                              : Colors.grey.shade700,
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ScaleOnPress(
-                        onTap: () {
-                          if (activeClient != null) {
-                            setState(() {
-                              _paymentAmountController.text = activeClient.balance > 0 ? activeClient.balance.toStringAsFixed(0) : '0';
-                            });
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: isDark ? tailwindEmerald.withValues(alpha: 0.15) : const Color(0xFFECFDF5),
-                            borderRadius: BorderRadius.circular(6),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextField(
+                          controller: _paymentAmountController,
+                          onChanged: (_) => setState(() {}),
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
                           ),
-                          child: const Text(
-                            'Max',
-                            style: TextStyle(
-                              color: tailwindEmerald,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                          style: context.typography.inputText.copyWith(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color:
+                                (Theme.of(
+                                  context,
+                                ).textTheme.displayLarge?.color ??
+                                Colors.black),
+                          ),
+                          decoration: InputDecoration(
+                            hintText: '0',
+                            hintStyle: TextStyle(
+                              color: isDark
+                                  ? Colors.grey.shade600
+                                  : Colors.grey.shade400,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.only(bottom: 4),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ScaleOnPress(
+                          onTap: () {
+                            setState(() {
+                              _paymentAmountController.text =
+                                  activeClient.balance > 0
+                                  ? activeClient.balance.toStringAsFixed(0)
+                                  : '0';
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark
+                                  ? tailwindEmerald.withValues(alpha: 0.15)
+                                  : const Color(0xFFECFDF5),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text(
+                              'Max',
+                              style: TextStyle(
+                                color: tailwindEmerald,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // PAYMENT METHOD
-              Row(
-                children: [
-                  _buildPaymentMethodCard('Bank Txn', 'assets/SVG/bank.svg', isDark),
-                  const SizedBox(width: 8),
-                  _buildPaymentMethodCard('UPI', 'assets/SVG/mobile.svg', isDark),
-                  const SizedBox(width: 8),
-                  _buildPaymentMethodCard('Cash', 'assets/SVG/cash.svg', isDark),
-                  const SizedBox(width: 8),
-                  _buildPaymentMethodCard('Cheque', 'assets/SVG/cheque.svg', isDark),
-                ],
-              ),
-              const SizedBox(height: 12),
-
-              // REMARK
-              Container(
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).cardTheme.color ?? Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    SvgPicture.asset(
-                      'assets/SVG/note.svg',
-                      width: 16,
-                      height: 16,
-                      colorFilter: ColorFilter.mode(Colors.grey.shade500, BlendMode.srcIn),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _paymentNotesController,
-                        onChanged: (_) => setState(() {}),
-                        style: context.typography.inputText.copyWith(
-                          fontSize: 12,
-                          color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Add a note...',
-                          hintStyle: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade400,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.only(bottom: 10), // Adjust vertical centering for 40 height
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Log Payment Button
-              ScaleOnPress(
-                onTap: _isLoggingPayment || !_isPaymentFormValid
-                    ? () {}
-                    : _handlePaymentSubmit,
-                child: Container(
-                  height: 44,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: _isPaymentFormValid ? tailwindEmerald : (isDark ? Colors.grey.shade800 : Colors.grey.shade400),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: !_isPaymentFormValid ? [] : [
-                      BoxShadow(
-                        color: tailwindEmerald.withValues(alpha: 0.2),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
-                  alignment: Alignment.center,
-                  child: _isLoggingPayment
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(LucideIcons.checkCircle, color: Colors.white, size: 16),
-                            const SizedBox(width: 6),
-                            const Text(
-                              'Log Payment',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                              ),
-                            ),
-                          ],
-                        ),
                 ),
-              ),
-            ] else ...[
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                decoration: BoxDecoration(
-                  color: isDark ? tailwindEmerald.withValues(alpha: 0.15) : const Color(0xFFECFDF5),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: tailwindEmerald.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                const SizedBox(height: 12),
+
+                // PAYMENT METHOD
+                Row(
                   children: [
-                    const Icon(LucideIcons.checkCircle, color: tailwindEmerald, size: 20),
+                    _buildPaymentMethodCard(
+                      'Bank Txn',
+                      'assets/SVG/bank.svg',
+                      isDark,
+                    ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Amount Settled',
-                      style: TextStyle(
-                        color: tailwindEmerald,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                    _buildPaymentMethodCard(
+                      'UPI',
+                      'assets/SVG/mobile.svg',
+                      isDark,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPaymentMethodCard(
+                      'Cash',
+                      'assets/SVG/cash.svg',
+                      isDark,
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPaymentMethodCard(
+                      'Cheque',
+                      'assets/SVG/cheque.svg',
+                      isDark,
                     ),
                   ],
                 ),
-              ),
-            ],
-          ]
-        ],
-      ),
-    ),
-  );
-}
+                const SizedBox(height: 12),
 
-  Widget _buildPaymentMethodCard(String title, String svgAssetPath, bool isDark) {
+                // REMARK
+                Container(
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).cardTheme.color ?? Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 12),
+                      SvgPicture.asset(
+                        'assets/SVG/note.svg',
+                        width: 16,
+                        height: 16,
+                        colorFilter: ColorFilter.mode(
+                          Colors.grey.shade500,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: TextField(
+                          controller: _paymentNotesController,
+                          onChanged: (_) => setState(() {}),
+                          style: context.typography.inputText.copyWith(
+                            fontSize: 12,
+                            color:
+                                (Theme.of(
+                                  context,
+                                ).textTheme.displayLarge?.color ??
+                                Colors.black),
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Add a note...',
+                            hintStyle: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade400,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.only(
+                              bottom: 10,
+                            ), // Adjust vertical centering for 40 height
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Log Payment Button
+                ScaleOnPress(
+                  onTap: _isLoggingPayment || !_isPaymentFormValid
+                      ? () {}
+                      : _handlePaymentSubmit,
+                  child: Container(
+                    height: 44,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: _isPaymentFormValid
+                          ? tailwindEmerald
+                          : (isDark
+                                ? Colors.grey.shade800
+                                : Colors.grey.shade400),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: !_isPaymentFormValid
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: tailwindEmerald.withValues(alpha: 0.2),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                    ),
+                    alignment: Alignment.center,
+                    child: _isLoggingPayment
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                LucideIcons.checkCircle,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                              SizedBox(width: 6),
+                              Text(
+                                'Log Payment',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                  ),
+                ),
+              ] else ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? tailwindEmerald.withValues(alpha: 0.15)
+                        : const Color(0xFFECFDF5),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: tailwindEmerald.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        LucideIcons.checkCircle,
+                        color: tailwindEmerald,
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Amount Settled',
+                        style: TextStyle(
+                          color: tailwindEmerald,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentMethodCard(
+    String title,
+    String svgAssetPath,
+    bool isDark,
+  ) {
     final bool isSelected = _paymentMode == title;
     return Expanded(
       child: GestureDetector(
@@ -2612,7 +2976,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             color: Theme.of(context).cardTheme.color ?? Colors.white,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: isSelected ? tailwindEmerald : Theme.of(context).colorScheme.outline.withValues(alpha: 0.3),
+              color: isSelected
+                  ? tailwindEmerald
+                  : Theme.of(
+                      context,
+                    ).colorScheme.outline.withValues(alpha: 0.3),
               width: isSelected ? 1.5 : 1,
             ),
           ),
@@ -2626,9 +2994,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: isSelected 
-                            ? (isDark ? tailwindEmerald.withValues(alpha: 0.15) : const Color(0xFFECFDF5))
-                            : (isDark ? const Color(0xFF6366F1).withValues(alpha: 0.15) : const Color(0xFFEEF2FF)),
+                        color: isSelected
+                            ? (isDark
+                                  ? tailwindEmerald.withValues(alpha: 0.15)
+                                  : const Color(0xFFECFDF5))
+                            : (isDark
+                                  ? const Color(
+                                      0xFF6366F1,
+                                    ).withValues(alpha: 0.15)
+                                  : const Color(0xFFEEF2FF)),
                         shape: BoxShape.circle,
                       ),
                       child: SvgPicture.asset(
@@ -2636,7 +3010,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         width: 14,
                         height: 14,
                         colorFilter: ColorFilter.mode(
-                          isSelected ? tailwindEmerald : const Color(0xFF6366F1),
+                          isSelected
+                              ? tailwindEmerald
+                              : const Color(0xFF6366F1),
                           BlendMode.srcIn,
                         ),
                       ),
@@ -2647,7 +3023,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       style: TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w900,
-                        color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                        color:
+                            (Theme.of(context).textTheme.displayLarge?.color ??
+                            Colors.black),
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -2665,7 +3043,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       color: tailwindEmerald,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(LucideIcons.check, size: 8, color: Colors.white),
+                    child: const Icon(
+                      LucideIcons.check,
+                      size: 8,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
             ],
@@ -2681,9 +3063,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(alpha: isDark ? 0.6 : 0.8),
+          color: (Theme.of(context).cardTheme.color ?? Colors.white).withValues(
+            alpha: isDark ? 0.6 : 0.8,
+          ),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5)),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.01),
@@ -2721,7 +3107,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: Theme.of(context).scaffoldBackgroundColor,
-                        border: Border.all(color: Theme.of(context).colorScheme.outline),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -2737,7 +3125,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             'add_client'.tr,
                             style: context.typography.buttonText.copyWith(
                               fontSize: 12,
-                              color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                              color:
+                                  (Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge?.color ??
+                                  Colors.black),
                             ),
                           ),
                         ],
@@ -2762,7 +3154,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       decoration: BoxDecoration(
                         color: Theme.of(context).scaffoldBackgroundColor,
-                        border: Border.all(color: Theme.of(context).colorScheme.outline),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -2778,7 +3172,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             'all_invoices'.tr,
                             style: context.typography.buttonText.copyWith(
                               fontSize: 12,
-                              color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
+                              color:
+                                  (Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge?.color ??
+                                  Colors.black),
                             ),
                           ),
                         ],

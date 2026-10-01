@@ -1,0 +1,164 @@
+﻿Analyzing flutter_app...                                        
+
+warning - Unused import: 'package:get/get.dart' - lib\core\theme\app_typography.dart:3:8 - unused_import
+warning - Unused import: '../../core/theme/app_extensions.dart' - lib\features\auth\login_screen.dart:7:8 - unused_import
+warning - Unused import: '../../shared/widgets/app_button.dart' - lib\features\auth\login_screen.dart:8:8 - unused_import
+warning - Unused import: '../../shared/widgets/app_input_field.dart' - lib\features\auth\login_screen.dart:9:8 - unused_import
+   info - Don't invoke 'print' in production code - lib\features\auth\login_screen.dart:266:33 - avoid_print
+warning - Unused import: 'package:get/get.dart' - lib\features\auth\view_legal_screen.dart:2:8 - unused_import
+warning - Unused import: '../../core/theme/app_text_styles.dart' - lib\features\clients\client_details_screen.dart:10:8 - unused_import
+   info - Local variables should be final - lib\features\clients\client_details_screen.dart:1327:9 - prefer_final_locals
+   info - Local variables should be final - lib\features\clients\client_details_screen.dart:1328:9 - prefer_final_locals
+   info - Use interpolation to compose strings and values - lib\features\clients\client_details_screen.dart:1836:29 - prefer_interpolation_to_compose_strings
+warning - The value of the field '_indianStates' isn't used - lib\features\clients\clients_screen.dart:36:22 - unused_field
+warning - The value of the local variable 'isMobile' isn't used - lib\features\clients\clients_screen.dart:155:15 - unused_local_variable
+   info - Use 'const' with the constructor to improve performance - lib\features\clients\clients_screen.dart:209:44 - prefer_const_constructors
+warning - The value of the local variable 'isDark' isn't used - lib\features\clients\clients_screen.dart:434:11 - unused_local_variable
+   info - Local variables should be final - lib\features\dashboard\dashboard_controller.dart:60:11 - prefer_final_locals
+   info - Don't invoke 'print' in production code - lib\features\dashboard\dashboard_controller.dart:83:7 - avoid_print
+   info - The private field _chartView could be 'final' - lib\features\dashboard\dashboard_screen.dart:86:10 - prefer_final_fields
+warning - The value of the field '_chartView' isn't used - lib\features\dashboard\dashboard_screen.dart:86:10 - unused_field
+warning - The value of the field '_isManualRefreshing' isn't used - lib\features\dashboard\dashboard_screen.dart:88:8 - unused_field
+warning - The value of the local variable 'successRate' isn't used - lib\features\dashboard\dashboard_screen.dart:617:17 - unused_local_variable
+warning - The value of the local variable 'expense' isn't used - lib\features\dashboard\dashboard_screen.dart:1986:25 - unused_local_variable
+warning - Dead code - lib\features\dashboard\dashboard_screen.dart:2052:10 - dead_code
+warning - The left operand can't be null, so the right operand is never executed - lib\features\dashboard\dashboard_screen.dart:2052:13 - dead_null_aware_expression
+warning - The operand can't be 'null', so the condition is always 'true' - lib\features\dashboard\dashboard_screen.dart:2437:44 - unnecessary_null_comparison
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\dashboard_screen.dart:2550:25 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\dashboard\dashboard_screen.dart:2552:37 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\dashboard_screen.dart:2576:24 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\dashboard\dashboard_screen.dart:2578:29 - prefer_const_literals_to_create_immutables
+warning - The declaration '_buildQuickActions' isn't referenced - lib\features\dashboard\dashboard_screen.dart:2678:10 - unused_element
+   info - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\expenses\all_expenses_screen.dart:4:8 - unnecessary_import
+warning - Unused import: 'package:fl_chart/fl_chart.dart' - lib\features\expenses\all_expenses_screen.dart:10:8 - unused_import
+warning - Unused import: '../../shared/widgets/app_input_field.dart' - lib\features\expenses\all_expenses_screen.dart:15:8 - unused_import
+   info - Use 'const' with the constructor to improve performance - lib\features\expenses\all_expenses_screen.dart:82:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\expenses\all_expenses_screen.dart:383:44 - prefer_const_constructors
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\features\expenses\all_expenses_screen.dart:661:13 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\features\expenses\all_expenses_screen.dart:661:19 - deprecated_member_use
+warning - Unused import: 'all_expenses_screen.dart' - lib\features\expenses\expense_components.dart:10:8 - unused_import
+   info - Use 'const' with the constructor to improve performance - lib\features\expenses\expense_components.dart:206:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\expenses\expense_components.dart:320:15 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\expenses\expense_components.dart:321:27 - prefer_const_literals_to_create_immutables
+   info - The import of 'package:flutter/services.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\expenses\expenses_screen.dart:2:8 - unnecessary_import
+warning - Unused import: 'dart:math' - lib\features\expenses\expenses_screen.dart:10:8 - unused_import
+warning - Unused import: '../../shared/widgets/app_input_field.dart' - lib\features\expenses\expenses_screen.dart:16:8 - unused_import
+warning - The value of the local variable 'categories' isn't used - lib\features\expenses\expenses_screen.dart:281:11 - unused_local_variable
+   info - 'swapAnimationDuration' is deprecated and shouldn't be used. Please use [duration] instead - lib\features\expenses\expenses_screen.dart:483:43 - deprecated_member_use
+   info - 'swapAnimationCurve' is deprecated and shouldn't be used. Please use [curve] instead - lib\features\expenses\expenses_screen.dart:484:43 - deprecated_member_use
+   info - 'swapAnimationDuration' is deprecated and shouldn't be used. Please use [duration] instead - lib\features\expenses\expenses_screen.dart:517:31 - deprecated_member_use
+   info - 'swapAnimationCurve' is deprecated and shouldn't be used. Please use [curve] instead - lib\features\expenses\expenses_screen.dart:518:31 - deprecated_member_use
+   info - 'Share' is deprecated and shouldn't be used. Use SharePlus instead - lib\features\expenses\expenses_screen.dart:1190:13 - deprecated_member_use
+   info - 'shareXFiles' is deprecated and shouldn't be used. Use SharePlus.instance.share() instead - lib\features\expenses\expenses_screen.dart:1190:19 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\expenses\expenses_screen.dart:1264:24 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\expenses\expenses_screen.dart:1265:29 - prefer_const_literals_to_create_immutables
+   info - The local variable '_controller' starts with an underscore - lib\features\expenses\expenses_screen.dart:1518:11 - no_leading_underscores_for_local_identifiers
+   info - The local variable '_buildLabel' starts with an underscore - lib\features\expenses\expenses_screen.dart:1554:18 - no_leading_underscores_for_local_identifiers
+   info - The local variable '_inputDeco' starts with an underscore - lib\features\expenses\expenses_screen.dart:1579:27 - no_leading_underscores_for_local_identifiers
+   info - Local variables should be final - lib\features\expenses\expenses_screen.dart:1871:41 - prefer_final_locals
+   info - The local variable '_controller' starts with an underscore - lib\features\expenses\widgets\category_picker_bottom_sheet.dart:9:11 - no_leading_underscores_for_local_identifiers
+warning - Unused import: '../../../core/constants/app_colors.dart' - lib\features\expenses\widgets\expense_details_bottom_sheet.dart:8:8 - unused_import
+warning - Unused import: 'package:lucide_icons/lucide_icons.dart' - lib\features\expenses\widgets\expense_list_item.dart:3:8 - unused_import
+   info - Use 'const' with the constructor to improve performance - lib\features\inventory\inventory_screen.dart:853:25 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\inventory\inventory_screen.dart:853:52 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\inventory\inventory_screen.dart:1097:45 - prefer_const_constructors
+warning - The value of the local variable 'isDark' isn't used - lib\features\inventory\inventory_screen.dart:1882:11 - unused_local_variable
+   info - Use 'const' with the constructor to improve performance - lib\features\invoices\create_invoice_screen.dart:1805:25 - prefer_const_constructors
+   info - Local variables should be final - lib\features\invoices\invoice_controller.dart:139:7 - prefer_final_locals
+   info - Local variables should be final - lib\features\invoices\invoice_controller.dart:151:7 - prefer_final_locals
+   info - Use 'const' with the constructor to improve performance - lib\features\invoices\invoice_list_screen.dart:996:44 - prefer_const_constructors
+   info - Local variables should be final - lib\features\invoices\invoice_list_screen.dart:1507:5 - prefer_final_locals
+   info - Local variables should be final - lib\features\invoices\invoice_list_screen.dart:1508:5 - prefer_final_locals
+   info - Local variables should be final - lib\features\invoices\invoice_list_screen.dart:2094:29 - prefer_final_locals
+   info - Local variables should be final - lib\features\invoices\invoice_list_screen.dart:2095:29 - prefer_final_locals
+   info - Local variables should be final - lib\features\invoices\invoice_list_screen.dart:2141:33 - prefer_final_locals
+   info - Local variables should be final - lib\features\invoices\invoice_list_screen.dart:2171:5 - prefer_final_locals
+warning - Unused import: '../../core/theme/app_extensions.dart' - lib\features\profile\your_information_screen.dart:6:8 - unused_import
+warning - The declaration '_buildTopIconText' isn't referenced - lib\features\profile\your_information_screen.dart:218:10 - unused_element
+warning - The value of the field '_hoveredCardIndex' isn't used - lib\features\settings\settings_screen.dart:49:8 - unused_field
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor or activeTrackColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\features\settings\settings_screen.dart:774:37 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\settings\settings_screen.dart:1215:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\settings\settings_screen.dart:1217:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\settings\settings_screen.dart:1218:32 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\settings\settings_screen.dart:1303:29 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\settings\settings_screen.dart:1305:38 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\settings\settings_screen.dart:1305:84 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\settings\settings_screen.dart:1307:29 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\settings\settings_screen.dart:1314:29 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\supplier_details_screen.dart:1036:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\supplier_details_screen.dart:1180:15 - prefer_const_constructors
+warning - The declaration '_showAddBillDialog' isn't referenced - lib\features\suppliers\supplier_details_screen.dart:1289:8 - unused_element
+warning - The declaration '_buildCustomDropdownField' isn't referenced - lib\features\suppliers\supplier_details_screen.dart:2334:10 - unused_element
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:98:42 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:163:107 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:163:150 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:178:37 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:214:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:260:25 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:347:99 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:347:142 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:379:105 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:379:148 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:401:52 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:401:69 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:417:52 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:417:69 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:453:120 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:486:111 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:486:154 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:501:60 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:501:77 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:504:45 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:504:77 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:520:109 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:520:152 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:568:25 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:569:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:570:23 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:583:100 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:595:81 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:595:125 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:597:100 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:597:143 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:617:25 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:646:79 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:646:123 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:657:79 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:657:123 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:668:79 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:668:123 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:678:79 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:678:123 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:688:79 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:688:123 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:704:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:704:52 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:745:111 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:747:35 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:747:55 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:829:30 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:829:52 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:882:50 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:885:35 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\suppliers\suppliers_screen.dart:885:57 - prefer_const_constructors
+   info - Parameter 'key' could be a super parameter - lib\features\suppliers\widgets\record_payment_bottom_sheet.dart:11:9 - use_super_parameters
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\features\support\contact_screen.dart:325:11 - deprecated_member_use
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\features\team\team_screen.dart:1350:31 - deprecated_member_use
+warning - Unused import: 'package:flutter_secure_storage/flutter_secure_storage.dart' - lib\main.dart:7:8 - unused_import
+warning - Unused import: '../features/invoices/create_invoice_screen.dart' - lib\navigation\main_layout.dart:16:8 - unused_import
+warning - Unused import: '../features/quotations/create_quotation_screen.dart' - lib\navigation\main_layout.dart:17:8 - unused_import
+warning - Unused import: 'app_routes.dart' - lib\navigation\main_layout.dart:18:8 - unused_import
+warning - Unused import: 'widgets/auriva_expandable_fab.dart' - lib\navigation\main_layout.dart:19:8 - unused_import
+   info - Local variables should be final - lib\navigation\widgets\auriva_expandable_fab.dart:306:5 - prefer_final_locals
+   info - Local variables should be final - lib\navigation\widgets\auriva_expandable_fab.dart:307:5 - prefer_final_locals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\shared\widgets\app_input_field.dart:98:83 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\shared\widgets\app_input_field.dart:102:83 - deprecated_member_use
+   info - The import of 'package:flutter/cupertino.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\shared\widgets\app_top_bar.dart:2:8 - unnecessary_import
+warning - Unused import: '../../core/theme/app_extensions.dart' - lib\shared\widgets\custom_notification_overlay.dart:7:8 - unused_import
+warning - The value of the field '_textDark' isn't used - lib\shared\widgets\custom_notification_overlay.dart:163:22 - unused_field
+   info - Local variables should be final - lib\shared\widgets\custom_notification_overlay.dart:250:5 - prefer_final_locals
+warning - Dead code - lib\shared\widgets\custom_notification_overlay.dart:330:45 - dead_code
+warning - The left operand can't be null, so the right operand is never executed - lib\shared\widgets\custom_notification_overlay.dart:330:48 - dead_null_aware_expression
+warning - The operand can't be 'null', so the condition is always 'true' - lib\shared\widgets\custom_notification_overlay.dart:342:38 - unnecessary_null_comparison
+warning - The '!' will have no effect because the receiver can't be null - lib\shared\widgets\custom_notification_overlay.dart:342:59 - unnecessary_non_null_assertion
+

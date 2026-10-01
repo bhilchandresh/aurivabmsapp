@@ -502,10 +502,13 @@ class _InventoryScreenState extends State<InventoryScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              LucideIcons.packageOpen,
-              size: 36,
-              color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+            SvgPicture.asset(
+              'assets/SVG/inventory.svg',
+              height: 48,
+              colorFilter: ColorFilter.mode(
+                isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                BlendMode.srcIn,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -850,7 +853,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         margin: EdgeInsets.only(top: context.mediaQueryPadding.top + kToolbarHeight),
         decoration: BoxDecoration(
           color: isDark ? (Theme.of(context).cardTheme.color ?? Colors.grey.shade900) : Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1094,7 +1097,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: const Color(0xFFE2E8F0)),
+                                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),

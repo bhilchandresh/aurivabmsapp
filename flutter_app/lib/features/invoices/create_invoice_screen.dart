@@ -1802,7 +1802,7 @@ class _CreateInvoiceScreenState extends State<CreateInvoiceScreen> {
               Row(
                 children: [
                   percentage == 100
-                      ? Icon(
+                      ? const Icon(
                           LucideIcons.sparkles,
                           size: 16,
                           color: Colors.amber,

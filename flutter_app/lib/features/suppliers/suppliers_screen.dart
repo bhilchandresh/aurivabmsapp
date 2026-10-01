@@ -95,7 +95,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                           padding: const EdgeInsets.all(12.0),
                           child: SvgPicture.asset(
                             'assets/SVG/search.svg',
-                            colorFilter: ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                            colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
                           ),
                         ),
                         filled: true,
@@ -160,7 +160,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                     borderRadius: BorderRadius.circular(4),
                                     child: LinearProgressIndicator(
                                       value: max == 99999 ? 0.0 : progress,
-                                      backgroundColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF1F5F9).withValues(alpha: 0.1) : Color(0xFFF1F5F9)),
+                                      backgroundColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF1F5F9).withValues(alpha: 0.1) : const Color(0xFFF1F5F9)),
                                       valueColor: AlwaysStoppedAnimation<Color>(
                                         limitHit ? Colors.red : const Color(0xFF3B82F6),
                                       ),
@@ -175,7 +175,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: limitHit ? null : () => _showAddSupplierDialog(context),
-                              icon: Icon(LucideIcons.plus, size: 16),
+                              icon: const Icon(LucideIcons.plus, size: 16),
                               label: Text('add_vendor'.tr),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Theme.of(context).colorScheme.primary,
@@ -211,7 +211,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                         color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
                       ),
                     ),
-                    Icon(
+                    const Icon(
                       LucideIcons.slidersHorizontal,
                       size: 16,
                       color: Colors.grey,
@@ -257,10 +257,10 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          LucideIcons.truck,
-                          size: 40,
-                          color: Colors.grey,
+                        SvgPicture.asset(
+                          'assets/SVG/supplier.svg',
+                          height: 48,
+                          colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -344,7 +344,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                       width: 48,
                                       height: 48,
                                       decoration: BoxDecoration(
-                                        color: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFEFF6FF).withValues(alpha: 0.1) : Color(0xFFEFF6FF)), // light blue
+                                        color: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFEFF6FF).withValues(alpha: 0.1) : const Color(0xFFEFF6FF)), // light blue
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Center(
@@ -376,7 +376,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                           Container(
                                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                             decoration: BoxDecoration(
-                                              color: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF1F5F9).withValues(alpha: 0.1) : Color(0xFFF1F5F9)),
+                                              color: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF1F5F9).withValues(alpha: 0.1) : const Color(0xFFF1F5F9)),
                                               borderRadius: BorderRadius.circular(6),
                                             ),
                                             child: Text(
@@ -398,7 +398,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                       'assets/SVG/mail.svg', 
                                       width: 13, 
                                       height: 13, 
-                                      colorFilter: ColorFilter.mode(Color(0xFF3B82F6), BlendMode.srcIn)
+                                      colorFilter: const ColorFilter.mode(Color(0xFF3B82F6), BlendMode.srcIn)
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
@@ -414,7 +414,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                       'assets/SVG/call.svg', 
                                       width: 13, 
                                       height: 13, 
-                                      colorFilter: ColorFilter.mode(Color(0xFF10B981), BlendMode.srcIn)
+                                      colorFilter: const ColorFilter.mode(Color(0xFF10B981), BlendMode.srcIn)
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
@@ -450,7 +450,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                     Container(
                                       width: 1,
                                       height: 20,
-                                      color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Color(0xFFE2E8F0)),
+                                      color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : const Color(0xFFE2E8F0)),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
@@ -483,7 +483,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                           Get.to(() => SupplierDetailsScreen(supplierId: supplier.id));
                                         },
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFEFF6FF).withValues(alpha: 0.1) : Color(0xFFEFF6FF)), // Light blue
+                                          backgroundColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFEFF6FF).withValues(alpha: 0.1) : const Color(0xFFEFF6FF)), // Light blue
                                           foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), // Blue text
                                           elevation: 0,
                                           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -498,10 +498,10 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                               'assets/SVG/supplier.svg', 
                                               width: 14, 
                                               height: 14, 
-                                              colorFilter: ColorFilter.mode(Color(0xFF2563EB), BlendMode.srcIn)
+                                              colorFilter: const ColorFilter.mode(Color(0xFF2563EB), BlendMode.srcIn)
                                             ),
                                             const SizedBox(width: 6),
-                                            Text('View Full Ledger', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                            const Text('View Full Ledger', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                           ],
                                         ),
                                       ),
@@ -517,7 +517,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                       ),
                                       label: Text('Delete', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF87171) : const Color(0xFFEF4444))),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFFEF2F2).withValues(alpha: 0.1) : Color(0xFFFEF2F2)), // Light red
+                                        backgroundColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFFEF2F2).withValues(alpha: 0.1) : const Color(0xFFFEF2F2)), // Light red
                                         foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF87171) : const Color(0xFFEF4444),
                                         elevation: 0,
                                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
@@ -565,7 +565,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
         ),
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).cardTheme.color : Colors.white,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(24),
             topRight: Radius.circular(24),
           ),
@@ -580,7 +580,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Color(0xFFE2E8F0)),
+                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : const Color(0xFFE2E8F0)),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -592,9 +592,9 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
+                      color: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF8FAFC).withValues(alpha: 0.05) : const Color(0xFFF8FAFC)),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF1F5F9).withValues(alpha: 0.1) : Color(0xFFF1F5F9))),
+                      border: Border.all(color: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF1F5F9).withValues(alpha: 0.1) : const Color(0xFFF1F5F9))),
                     ),
                     child: Center(
                       child: SvgPicture.asset(
@@ -614,7 +614,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                           'Add Supplier',
                           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF0F172A))),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           'Enter supplier details to add to your registry',
                           style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
@@ -643,7 +643,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 hintText: 'Apex Technologies',
                 prefixIcon: SvgPicture.asset('assets/SVG/profile.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
-                fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
+                fillColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF8FAFC).withValues(alpha: 0.05) : const Color(0xFFF8FAFC)),
                 fontSize: 14,
               ),
               const SizedBox(height: 12),
@@ -654,7 +654,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: SvgPicture.asset('assets/SVG/mail.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
-                fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
+                fillColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF8FAFC).withValues(alpha: 0.05) : const Color(0xFFF8FAFC)),
                 fontSize: 14,
               ),
               const SizedBox(height: 12),
@@ -665,7 +665,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 keyboardType: TextInputType.phone,
                 prefixIcon: SvgPicture.asset('assets/SVG/mobile.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
-                fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
+                fillColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF8FAFC).withValues(alpha: 0.05) : const Color(0xFFF8FAFC)),
                 fontSize: 14,
               ),
               const SizedBox(height: 12),
@@ -675,7 +675,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 hintText: '29ABCDE1234F1Z1',
                 prefixIcon: SvgPicture.asset('assets/SVG/gst.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
-                fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
+                fillColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF8FAFC).withValues(alpha: 0.05) : const Color(0xFFF8FAFC)),
                 fontSize: 14,
               ),
               const SizedBox(height: 12),
@@ -685,7 +685,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                 hintText: '22, Industrial Area, Ahmedabad, Gujarat',
                 prefixIcon: SvgPicture.asset('assets/SVG/location.svg', width: 18, height: 18, colorFilter: ColorFilter.mode(Theme.of(context).brightness == Brightness.dark ? const Color(0xFF94A3B8) : const Color(0xFF64748B), BlendMode.srcIn)),
                 filled: true,
-                fillColor: (Theme.of(context).brightness == Brightness.dark ? Color(0xFFF8FAFC).withValues(alpha: 0.05) : Color(0xFFF8FAFC)),
+                fillColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF8FAFC).withValues(alpha: 0.05) : const Color(0xFFF8FAFC)),
                 fontSize: 14,
               ),
               const SizedBox(height: 24),
@@ -701,7 +701,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                         side: BorderSide(color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : const Color(0xFFE2E8F0))),
                         foregroundColor: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF0F172A)),
                       ),
-                      child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -742,9 +742,9 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                             : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  SvgPicture.asset('assets/SVG/save.svg', width: 16, height: 16, colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+                                  SvgPicture.asset('assets/SVG/save.svg', width: 16, height: 16, colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
                                   const SizedBox(width: 8),
-                                  Text('Save', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                  const Text('Save', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                                 ],
                               ),
                       );
@@ -826,7 +826,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                         side: BorderSide(color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : const Color(0xFFE2E8F0))),
                         foregroundColor: (Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF0F172A)),
                       ),
-                      child: Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                      child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -879,10 +879,10 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                     'assets/SVG/delete.svg',
                                     width: 16,
                                     height: 16,
-                                    colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn)
+                                    colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn)
                                   ),
                                   const SizedBox(width: 8),
-                                  Text('Delete', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                  const Text('Delete', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                                 ],
                               ),
                       );

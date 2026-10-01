@@ -326,10 +326,10 @@ class _SelectClientScreenState extends State<SelectClientScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  LucideIcons.users,
-                  size: 48,
-                  color: Colors.grey.shade300,
+                SvgPicture.asset(
+                  'assets/SVG/client01.svg',
+                  height: 48,
+                  colorFilter: ColorFilter.mode(Colors.grey.shade500, BlendMode.srcIn),
                 ),
                 const SizedBox(height: 16),
                 Text(

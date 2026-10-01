@@ -1033,9 +1033,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
+              const Text(
                 'Delete Bill?',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),
@@ -1177,9 +1177,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
+              const Text(
                 'Delete Payment?',
-                style: const TextStyle(
+                style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 20,
                 ),

@@ -993,7 +993,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                   ),
                                   child: Text(
                                     'Total: ${listItems.length}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: AppColors.primary,
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,
@@ -1022,10 +1022,10 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(
-                                  LucideIcons.fileSearch,
-                                  size: 40,
-                                  color: Colors.grey,
+                                SvgPicture.asset(
+                                  'assets/SVG/invoice.svg',
+                                  height: 48,
+                                  colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
                                 ),
                                 const SizedBox(height: 12),
                                 Text(
@@ -1504,8 +1504,8 @@ class TrianglePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()..color = color..style = PaintingStyle.fill;
-    var path = Path();
+    final paint = Paint()..color = color..style = PaintingStyle.fill;
+    final path = Path();
     path.moveTo(0, size.height); 
     path.lineTo(size.width / 2, 0); 
     path.lineTo(size.width, size.height); 
@@ -2091,8 +2091,8 @@ class _CustomMonthFilterDropdownState extends State<CustomMonthFilterDropdown> {
                           spacing: 8,
                           runSpacing: 8,
                           children: List.generate(12, (index) {
-                            String monthVal = '$_currentYear-${(index + 1).toString().padLeft(2, '0')}';
-                            bool isSelected = widget.selectedMonth == monthVal;
+                            final String monthVal = '$_currentYear-${(index + 1).toString().padLeft(2, '0')}';
+                            final bool isSelected = widget.selectedMonth == monthVal;
                             
                             return InkWell(
                               onTap: () {
@@ -2138,7 +2138,7 @@ class _CustomMonthFilterDropdownState extends State<CustomMonthFilterDropdown> {
                             ),
                             InkWell(
                               onTap: () {
-                                DateTime now = DateTime.now();
+                                final DateTime now = DateTime.now();
                                 widget.onChanged('${now.year}-${now.month.toString().padLeft(2, '0')}');
                                 _closeDropdown();
                               },
@@ -2168,7 +2168,7 @@ class _CustomMonthFilterDropdownState extends State<CustomMonthFilterDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    String currentText = widget.selectedMonth == 'all' ? 'All Months' : widget.formatMonthYear(widget.selectedMonth);
+    final String currentText = widget.selectedMonth == 'all' ? 'All Months' : widget.formatMonthYear(widget.selectedMonth);
 
     return GestureDetector(
       onTap: _toggleDropdown,

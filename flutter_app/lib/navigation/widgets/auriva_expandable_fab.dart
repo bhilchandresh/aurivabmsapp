@@ -303,8 +303,8 @@ class _DashedLinesPainter extends CustomPainter {
     const dashWidth = 5.0;
     const dashSpace = 5.0;
     
-    var distance = (p2 - p1).distance;
-    var direction = (p2 - p1) / distance;
+    final distance = (p2 - p1).distance;
+    final direction = (p2 - p1) / distance;
     
     var currentDistance = 24.0; // Start lines outside the FAB radius
     while (currentDistance < distance) {

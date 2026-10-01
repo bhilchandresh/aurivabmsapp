@@ -136,7 +136,7 @@ class InvoiceController extends GetxController {
     try {
       isLoading.value = true;
       
-      List<String> queryParams = ['limit=1000'];
+      final List<String> queryParams = ['limit=1000'];
       if (month != null && month != 'all') queryParams.add('month=$month');
       if (status != null && status != 'all') queryParams.add('status=$status');
       if (sortBy != null && sortBy.isNotEmpty) {
@@ -148,7 +148,7 @@ class InvoiceController extends GetxController {
       }
       if (search != null && search.isNotEmpty) queryParams.add('search=$search');
       
-      String queryString = queryParams.isNotEmpty ? '?${queryParams.join('&')}' : '';
+      final String queryString = queryParams.isNotEmpty ? '?${queryParams.join('&')}' : '';
       
       final response = await ApiService.get('${ApiConstants.invoices}$queryString');
       if (response.statusCode == 200) {

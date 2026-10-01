@@ -5,7 +5,6 @@ import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import '../expenses_controller.dart';
-import '../../../core/constants/app_colors.dart';
 import '../expense_components.dart';
 
   void showExpenseDetailsBottomSheet(

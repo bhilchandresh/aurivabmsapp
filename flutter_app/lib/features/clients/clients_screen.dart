@@ -33,44 +33,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
   String _sortBy = 'newest'; // 'newest', 'oldest', 'alpha_asc', 'dues_high'
   int? _hoveredIndex;
 
-  final List<String> _indianStates = [
-    "Andaman and Nicobar Islands",
-    "Andhra Pradesh",
-    "Arunachal Pradesh",
-    "Assam",
-    "Bihar",
-    "Chandigarh",
-    "Chhattisgarh",
-    "Dadra and Nagar Haveli and Daman and Diu",
-    "Delhi",
-    "Goa",
-    "Gujarat",
-    "Haryana",
-    "Himachal Pradesh",
-    "Jammu and Kashmir",
-    "Jharkhand",
-    "Karnataka",
-    "Kerala",
-    "Ladakh",
-    "Lakshadweep",
-    "Madhya Pradesh",
-    "Maharashtra",
-    "Manipur",
-    "Meghalaya",
-    "Mizoram",
-    "Nagaland",
-    "Odisha",
-    "Puducherry",
-    "Punjab",
-    "Rajasthan",
-    "Sikkim",
-    "Tamil Nadu",
-    "Telangana",
-    "Tripura",
-    "Uttar Pradesh",
-    "West Bengal",
-  ];
-
   String _capitalizeName(String name) {
     if (name.trim().isEmpty) return name;
     return name
@@ -122,7 +84,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
 
   @override
   Widget build(BuildContext context) {
-//     final isDark = Theme.of(context).brightness == Brightness.dark;
+    //     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -152,8 +114,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
           _clientsController.clients,
         );
 
-        final isMobile = MediaQuery.of(context).size.width < 700;
-        final isLoading = _clientsController.isLoading.value && listItems.isEmpty;
+
+        final isLoading =
+            _clientsController.isLoading.value && listItems.isEmpty;
 
         return Skeletonizer(
           enabled: isLoading,
@@ -184,57 +147,71 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Register Label
-                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Client Register',
-                              style: context.typography.cardTitle.copyWith(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: (Theme.of(context).textTheme.displayLarge?.color ?? Colors.black),
-                              ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Client Register',
+                            style: context.typography.cardTitle.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color:
+                                  (Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge?.color ??
+                                  Colors.black),
                             ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(6),
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withValues(
+                                    alpha: 0.1,
                                   ),
-                                  child: Text(
-                                    'Total: ${listItems.length}',
-                                    style: TextStyle(
-                                      color: AppColors.primary,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'Total: ${listItems.length}',
+                                  style: const TextStyle(
+                                    color: AppColors.primary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                // View toggle (static for now to match UI exactly)
-                              
-                              ],
-                            ),
-                          ],
-                        ),
-                      
+                              ),
+                              const SizedBox(width: 12),
+
+                              // View toggle (static for now to match UI exactly)
+                            ],
+                          ),
+                        ],
+                      ),
+
                       const SizedBox(height: 12),
                       // Client Cards Grid/List
                       if (isLoading)
-                        _buildClientsList(List.generate(5, (index) => Client(
-                          id: 'loading_$index',
-                          name: 'Loading Client Name',
-                          email: 'loading@email.com',
-                          phone: '9876543210',
-                          address: '',
-                          state: '',
-                          gstin: '',
-                          totalBilled: 0.0,
-                          balance: 0.0,
-                        )))
+                        _buildClientsList(
+                          List.generate(
+                            5,
+                            (index) => Client(
+                              id: 'loading_$index',
+                              name: 'Loading Client Name',
+                              email: 'loading@email.com',
+                              phone: '9876543210',
+                              address: '',
+                              state: '',
+                              gstin: '',
+                              totalBilled: 0.0,
+                              balance: 0.0,
+                            ),
+                          ),
+                        )
                       else if (listItems.isEmpty)
                         _buildEmptyState()
                       else
@@ -278,20 +255,31 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       _searchQuery = val;
                     });
                   },
-                  style: context.typography.inputText.copyWith(color: Theme.of(context).textTheme.bodyLarge?.color),
+                  style: context.typography.inputText.copyWith(
+                    color: Theme.of(context).textTheme.bodyLarge?.color,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'search_clients'.tr,
-                    hintStyle: context.typography.searchHint.copyWith(fontSize: 13),
+                    hintStyle: context.typography.searchHint.copyWith(
+                      fontSize: 13,
+                    ),
                     prefixIcon: UnconstrainedBox(
                       child: SvgPicture.asset(
                         'assets/SVG/search.svg',
                         width: 18,
                         height: 18,
-                        colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                        colorFilter: const ColorFilter.mode(
+                          Colors.grey,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                     filled: true,
-                    fillColor: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5)),
+                    fillColor: (Theme.of(context).brightness == Brightness.dark
+                        ? Colors.grey.withValues(alpha: 0.1)
+                        : Theme.of(
+                            context,
+                          ).scaffoldBackgroundColor.withValues(alpha: 0.5)),
                     contentPadding: const EdgeInsets.symmetric(vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -304,14 +292,15 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
-                        color: context.colorScheme.outline.withValues(alpha: 0.5),
+                        color: context.colorScheme.outline.withValues(
+                          alpha: 0.5,
+                        ),
                         width: 1.5,
                       ),
                     ),
                   ),
                 ),
               ),
-            
             ],
           ),
           const SizedBox(height: 10),
@@ -331,17 +320,26 @@ class _ClientsScreenState extends State<ClientsScreen> {
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: _showAddClientDialog,
-                  icon: const Icon(LucideIcons.plus, size: 16, color: Colors.white),
+                  icon: const Icon(
+                    LucideIcons.plus,
+                    size: 16,
+                    color: Colors.white,
+                  ),
                   label: Text(
                     'add_client'.tr,
-                    style: context.typography.buttonText.copyWith(color: Colors.white, fontSize: 13),
+                    style: context.typography.buttonText.copyWith(
+                      color: Colors.white,
+                      fontSize: 13,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue.shade600,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ),
@@ -360,24 +358,25 @@ class _ClientsScreenState extends State<ClientsScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-        ),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            LucideIcons.users,
-            size: 40,
-            color: isDark ? const Color(0xFF475569) : Colors.grey,
+          SvgPicture.asset(
+            'assets/SVG/client01.svg',
+            height: 48,
+            colorFilter: ColorFilter.mode(
+              isDark ? const Color(0xFF475569) : Colors.grey,
+              BlendMode.srcIn,
+            ),
           ),
           const SizedBox(height: 12),
           Text(
-            'no_clients_matching_search'.tr,
+            'No clients found',
             style: context.typography.emptyStateDescription.copyWith(
               fontWeight: FontWeight.w600,
-              color: (Theme.of(context).textTheme.bodyMedium?.color ?? Colors.grey),
+              color: isDark ? const Color(0xFF475569) : Colors.grey,
             ),
           ),
         ],
@@ -497,14 +496,25 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       ),
                       const SizedBox(height: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.grey.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
                           children: [
-                            SvgPicture.asset('assets/SVG/setting.svg', height: 8, width: 8, colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn)),
+                            SvgPicture.asset(
+                              'assets/SVG/setting.svg',
+                              height: 8,
+                              width: 8,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.grey,
+                                BlendMode.srcIn,
+                              ),
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               'By: ${client.addedBy?.isNotEmpty == true ? client.addedBy : 'System'}',
@@ -547,12 +557,22 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 color: Colors.blue.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: SvgPicture.asset('assets/SVG/mail.svg', height: 10, width: 10, colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn)),
+                              child: SvgPicture.asset(
+                                'assets/SVG/mail.svg',
+                                height: 10,
+                                width: 10,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.blue,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                client.email.isNotEmpty ? client.email : 'no_email_added'.tr,
+                                client.email.isNotEmpty
+                                    ? client.email
+                                    : 'no_email_added'.tr,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -574,12 +594,22 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 color: Colors.green.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: SvgPicture.asset('assets/SVG/phone.svg', height: 10, width: 10, colorFilter: const ColorFilter.mode(Colors.green, BlendMode.srcIn)),
+                              child: SvgPicture.asset(
+                                'assets/SVG/phone.svg',
+                                height: 10,
+                                width: 10,
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.green,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                client.phone.isNotEmpty ? client.phone : 'no_phone_added'.tr,
+                                client.phone.isNotEmpty
+                                    ? client.phone
+                                    : 'no_phone_added'.tr,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -601,7 +631,11 @@ class _ClientsScreenState extends State<ClientsScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5)),
+                  color: (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.grey.withValues(alpha: 0.1)
+                      : Theme.of(
+                          context,
+                        ).scaffoldBackgroundColor.withValues(alpha: 0.5)),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -616,7 +650,15 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               color: Colors.green.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: SvgPicture.asset('assets/SVG/invoice.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.green, BlendMode.srcIn)),
+                            child: SvgPicture.asset(
+                              'assets/SVG/invoice.svg',
+                              height: 14,
+                              width: 14,
+                              colorFilter: const ColorFilter.mode(
+                                Colors.green,
+                                BlendMode.srcIn,
+                              ),
+                            ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -649,7 +691,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
                     Container(
                       height: 28,
                       width: 1,
-                      color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.2),
                       margin: const EdgeInsets.symmetric(horizontal: 10),
                     ),
                     // Pending Due
@@ -659,16 +703,42 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: balance > 0 
+                              color: balance > 0
                                   ? Colors.red.withValues(alpha: 0.1)
-                                  : (balance < 0 ? Colors.blue.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1)),
+                                  : (balance < 0
+                                        ? Colors.blue.withValues(alpha: 0.1)
+                                        : Colors.green.withValues(alpha: 0.1)),
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: balance > 0 
-                                ? SvgPicture.asset('assets/SVG/time.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.red, BlendMode.srcIn))
-                                : (balance < 0 
-                                    ? SvgPicture.asset('assets/SVG/invoice.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn))
-                                    : SvgPicture.asset('assets/SVG/accepted.svg', height: 14, width: 14, colorFilter: const ColorFilter.mode(Colors.green, BlendMode.srcIn))),
+                            child: balance > 0
+                                ? SvgPicture.asset(
+                                    'assets/SVG/time.svg',
+                                    height: 14,
+                                    width: 14,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.red,
+                                      BlendMode.srcIn,
+                                    ),
+                                  )
+                                : (balance < 0
+                                      ? SvgPicture.asset(
+                                          'assets/SVG/invoice.svg',
+                                          height: 14,
+                                          width: 14,
+                                          colorFilter: const ColorFilter.mode(
+                                            Colors.blue,
+                                            BlendMode.srcIn,
+                                          ),
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/SVG/accepted.svg',
+                                          height: 14,
+                                          width: 14,
+                                          colorFilter: const ColorFilter.mode(
+                                            Colors.green,
+                                            BlendMode.srcIn,
+                                          ),
+                                        )),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -676,7 +746,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  balance > 0 
+                                  balance > 0
                                       ? 'Pending Due'
                                       : (balance < 0 ? 'Advance' : 'Status'),
                                   style: TextStyle(
@@ -687,13 +757,17 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  balance == 0 ? 'Settled' : formatCurrency.format(balance.abs()),
+                                  balance == 0
+                                      ? 'Settled'
+                                      : formatCurrency.format(balance.abs()),
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w900,
-                                    color: balance > 0 
-                                        ? Colors.red 
-                                        : (balance < 0 ? Colors.blue : Colors.green),
+                                    color: balance > 0
+                                        ? Colors.red
+                                        : (balance < 0
+                                              ? Colors.blue
+                                              : Colors.green),
                                   ),
                                 ),
                               ],
@@ -729,17 +803,21 @@ class _ClientsScreenState extends State<ClientsScreen> {
         return StatefulBuilder(
           builder: (context, setSheetState) {
             final isDark = Theme.of(context).brightness == Brightness.dark;
-            final Color bgColor = Theme.of(context).cardTheme.color ?? Theme.of(context).scaffoldBackgroundColor;
+            final Color bgColor =
+                Theme.of(context).cardTheme.color ??
+                Theme.of(context).scaffoldBackgroundColor;
             return Container(
               constraints: BoxConstraints(
                 maxHeight: MediaQuery.of(context).size.height * 0.9,
               ),
               padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                ),
-                decoration: BoxDecoration(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              decoration: BoxDecoration(
                 color: bgColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
               ),
               child: SafeArea(
                 child: Column(
@@ -756,7 +834,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    
+
                     // Header
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -772,7 +850,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w900,
-                                    color: Theme.of(context).textTheme.displayLarge?.color,
+                                    color: Theme.of(
+                                      context,
+                                    ).textTheme.displayLarge?.color,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
@@ -789,7 +869,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           ),
                           Container(
                             decoration: BoxDecoration(
-                              color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                              color: isDark
+                                  ? Colors.grey.shade800
+                                  : Colors.grey.shade100,
                               shape: BoxShape.circle,
                             ),
                             child: IconButton(
@@ -804,7 +886,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    
+
                     // Form content
                     Flexible(
                       child: SingleChildScrollView(
@@ -820,11 +902,16 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 'assets/SVG/building.svg',
                                 width: 18,
                                 height: 18,
-                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.grey,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               fontSize: 14,
                               filled: true,
-                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              fillColor: isDark
+                                  ? Colors.grey.withValues(alpha: 0.1)
+                                  : Colors.white,
                               contentPaddingVertical: 12.0,
                             ),
                             const SizedBox(height: 16),
@@ -837,11 +924,16 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 'assets/SVG/mail.svg',
                                 width: 18,
                                 height: 18,
-                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.grey,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               fontSize: 14,
                               filled: true,
-                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              fillColor: isDark
+                                  ? Colors.grey.withValues(alpha: 0.1)
+                                  : Colors.white,
                               contentPaddingVertical: 12.0,
                             ),
                             const SizedBox(height: 16),
@@ -854,11 +946,16 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 'assets/SVG/call.svg',
                                 width: 18,
                                 height: 18,
-                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.grey,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               fontSize: 14,
                               filled: true,
-                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              fillColor: isDark
+                                  ? Colors.grey.withValues(alpha: 0.1)
+                                  : Colors.white,
                               contentPaddingVertical: 12.0,
                             ),
                             const SizedBox(height: 16),
@@ -870,11 +967,16 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 'assets/SVG/gst.svg',
                                 width: 18,
                                 height: 18,
-                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.grey,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               fontSize: 14,
                               filled: true,
-                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              fillColor: isDark
+                                  ? Colors.grey.withValues(alpha: 0.1)
+                                  : Colors.white,
                               contentPaddingVertical: 12.0,
                             ),
                             const SizedBox(height: 16),
@@ -882,13 +984,18 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 4, bottom: 8),
+                                  padding: const EdgeInsets.only(
+                                    left: 4,
+                                    bottom: 8,
+                                  ),
                                   child: Text(
                                     'STATE / UT',
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w700,
-                                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                                      color: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium?.color,
                                     ),
                                   ),
                                 ),
@@ -905,12 +1012,19 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                     );
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 12,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                                      color: isDark
+                                          ? Colors.grey.withValues(alpha: 0.1)
+                                          : Colors.white,
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+                                        color: isDark
+                                            ? Colors.grey.shade800
+                                            : Colors.grey.shade300,
                                       ),
                                     ),
                                     child: Row(
@@ -919,19 +1033,33 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                           'assets/SVG/location.svg',
                                           width: 18,
                                           height: 18,
-                                          colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                          colorFilter: const ColorFilter.mode(
+                                            Colors.grey,
+                                            BlendMode.srcIn,
+                                          ),
                                         ),
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
-                                            selectedState.isEmpty ? 'Select State' : selectedState,
+                                            selectedState.isEmpty
+                                                ? 'Select State'
+                                                : selectedState,
                                             style: TextStyle(
-                                              color: selectedState.isEmpty ? Colors.grey.shade500 : Theme.of(context).textTheme.displayLarge?.color,
+                                              color: selectedState.isEmpty
+                                                  ? Colors.grey.shade500
+                                                  : Theme.of(context)
+                                                        .textTheme
+                                                        .displayLarge
+                                                        ?.color,
                                               fontSize: 12,
                                             ),
                                           ),
                                         ),
-                                        const Icon(LucideIcons.chevronDown, size: 18, color: Colors.grey),
+                                        const Icon(
+                                          LucideIcons.chevronDown,
+                                          size: 18,
+                                          color: Colors.grey,
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -947,12 +1075,17 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 'assets/SVG/location.svg',
                                 width: 18,
                                 height: 18,
-                                colorFilter: const ColorFilter.mode(Colors.grey, BlendMode.srcIn),
+                                colorFilter: const ColorFilter.mode(
+                                  Colors.grey,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               maxLines: 3,
                               fontSize: 14,
                               filled: true,
-                              fillColor: isDark ? Colors.grey.withValues(alpha: 0.1) : Colors.white,
+                              fillColor: isDark
+                                  ? Colors.grey.withValues(alpha: 0.1)
+                                  : Colors.white,
                               contentPaddingVertical: 12.0,
                             ),
                             const SizedBox(height: 24),
@@ -960,7 +1093,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         ),
                       ),
                     ),
-                    
+
                     // Footer Buttons
                     Container(
                       padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -968,7 +1101,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
                         color: bgColor,
                         border: Border(
                           top: BorderSide(
-                            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                            color: isDark
+                                ? Colors.grey.shade800
+                                : Colors.grey.shade200,
                           ),
                         ),
                       ),
@@ -978,8 +1113,14 @@ class _ClientsScreenState extends State<ClientsScreen> {
                             child: OutlinedButton(
                               onPressed: () => Navigator.pop(context),
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
-                                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                side: BorderSide(
+                                  color: isDark
+                                      ? Colors.grey.shade700
+                                      : Colors.grey.shade300,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -987,7 +1128,9 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               child: Text(
                                 'cancel'.tr,
                                 style: TextStyle(
-                                  color: Theme.of(context).textTheme.displayLarge?.color,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge?.color,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 13,
                                 ),
@@ -1003,8 +1146,19 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                 final phone = phoneController.text.trim();
                                 final address = addressController.text.trim();
 
-                                if (name.isEmpty || email.isEmpty || phone.isEmpty || selectedState.isEmpty || address.isEmpty) {
-                                  Get.snackbar('error'.tr, 'Please fill all fields except GSTIN', backgroundColor: Colors.red.withValues(alpha: 0.1), colorText: Colors.red);
+                                if (name.isEmpty ||
+                                    email.isEmpty ||
+                                    phone.isEmpty ||
+                                    selectedState.isEmpty ||
+                                    address.isEmpty) {
+                                  Get.snackbar(
+                                    'error'.tr,
+                                    'Please fill all fields except GSTIN',
+                                    backgroundColor: Colors.red.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    colorText: Colors.red,
+                                  );
                                   return;
                                 }
                                 _clientsController.addClient(
@@ -1020,15 +1174,21 @@ class _ClientsScreenState extends State<ClientsScreen> {
                                   'client_saved'.tr,
                                   'client_added_successfully'.tr,
                                   snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: AppColors.success.withValues(alpha: 0.1),
+                                  backgroundColor: AppColors.success.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   colorText: AppColors.success,
                                 );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF2563EB), // Blue color from image
+                                backgroundColor: const Color(
+                                  0xFF2563EB,
+                                ), // Blue color from image
                                 foregroundColor: Colors.white,
                                 elevation: 0,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -1156,13 +1316,19 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
                           padding: const EdgeInsets.only(left: 32),
                           child: CustomPaint(
                             size: const Size(14, 7),
-                            painter: DropdownArrowPainter(color: Theme.of(context).cardTheme.color ?? Colors.white),
+                            painter: DropdownArrowPainter(
+                              color:
+                                  Theme.of(context).cardTheme.color ??
+                                  Colors.white,
+                            ),
                           ),
                         ),
                         Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).cardTheme.color ?? Colors.white,
+                            color:
+                                Theme.of(context).cardTheme.color ??
+                                Colors.white,
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
@@ -1175,10 +1341,31 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              _buildDropdownItem('newest', 'newest_first'.tr, LucideIcons.arrowDownUp, Colors.blue),
-                              _buildDropdownItem('oldest', 'oldest_first'.tr, LucideIcons.arrowDownUp, Colors.grey),
-                              _buildDropdownItem('alpha_asc', 'a_z_name'.tr, LucideIcons.arrowDownAZ, Colors.purple),
-                              _buildDropdownItem('dues_high', 'highest_dues'.tr, LucideIcons.database, Colors.teal, hasWarning: true),
+                              _buildDropdownItem(
+                                'newest',
+                                'newest_first'.tr,
+                                LucideIcons.arrowDownUp,
+                                Colors.blue,
+                              ),
+                              _buildDropdownItem(
+                                'oldest',
+                                'oldest_first'.tr,
+                                LucideIcons.arrowDownUp,
+                                Colors.grey,
+                              ),
+                              _buildDropdownItem(
+                                'alpha_asc',
+                                'a_z_name'.tr,
+                                LucideIcons.arrowDownAZ,
+                                Colors.purple,
+                              ),
+                              _buildDropdownItem(
+                                'dues_high',
+                                'highest_dues'.tr,
+                                LucideIcons.database,
+                                Colors.teal,
+                                hasWarning: true,
+                              ),
                             ],
                           ),
                         ),
@@ -1197,10 +1384,16 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
     setState(() => _isOpen = true);
   }
 
-  Widget _buildDropdownItem(String value, String label, IconData iconData, MaterialColor iconColor, {bool hasWarning = false}) {
+  Widget _buildDropdownItem(
+    String value,
+    String label,
+    IconData iconData,
+    MaterialColor iconColor, {
+    bool hasWarning = false,
+  }) {
     final isSelected = widget.selectedValue == value;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return InkWell(
       onTap: () {
         widget.onChanged(value);
@@ -1210,7 +1403,11 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? (isDark ? Colors.blue.withValues(alpha: 0.1) : Colors.blue.shade50.withValues(alpha: 0.5)) : Colors.transparent,
+          color: isSelected
+              ? (isDark
+                    ? Colors.blue.withValues(alpha: 0.1)
+                    : Colors.blue.shade50.withValues(alpha: 0.5))
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -1218,10 +1415,16 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.blue.withValues(alpha: 0.1) : iconColor.withValues(alpha: 0.1),
+                color: isSelected
+                    ? Colors.blue.withValues(alpha: 0.1)
+                    : iconColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(iconData, size: 16, color: isSelected ? Colors.blue : iconColor),
+              child: Icon(
+                iconData,
+                size: 16,
+                color: isSelected ? Colors.blue : iconColor,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1230,14 +1433,20 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
                   Text(
                     label,
                     style: TextStyle(
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.w600,
                       fontSize: 14,
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
                   if (hasWarning) ...[
                     const SizedBox(width: 6),
-                    const Icon(LucideIcons.alertTriangle, size: 14, color: Colors.grey),
+                    const Icon(
+                      LucideIcons.alertTriangle,
+                      size: 14,
+                      color: Colors.grey,
+                    ),
                   ],
                 ],
               ),
@@ -1249,7 +1458,11 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
                   color: Colors.blue,
                 ),
                 padding: const EdgeInsets.all(2),
-                child: const Icon(LucideIcons.check, size: 12, color: Colors.white),
+                child: const Icon(
+                  LucideIcons.check,
+                  size: 12,
+                  color: Colors.white,
+                ),
               )
             else
               const Icon(LucideIcons.circle, size: 20, color: Colors.black12),
@@ -1262,11 +1475,19 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
   @override
   Widget build(BuildContext context) {
     String label = '';
-    switch(widget.selectedValue) {
-      case 'newest': label = 'Newest'; break;
-      case 'oldest': label = 'Old'; break;
-      case 'alpha_asc': label = 'A-Z'; break;
-      case 'dues_high': label = 'Dues'; break;
+    switch (widget.selectedValue) {
+      case 'newest':
+        label = 'Newest';
+        break;
+      case 'oldest':
+        label = 'Old';
+        break;
+      case 'alpha_asc':
+        label = 'A-Z';
+        break;
+      case 'dues_high':
+        label = 'Dues';
+        break;
     }
 
     return CompositedTransformTarget(
@@ -1277,9 +1498,17 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           decoration: BoxDecoration(
-            color: (Theme.of(context).brightness == Brightness.dark ? Colors.grey.withValues(alpha: 0.1) : Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5)),
+            color: (Theme.of(context).brightness == Brightness.dark
+                ? Colors.grey.withValues(alpha: 0.1)
+                : Theme.of(
+                    context,
+                  ).scaffoldBackgroundColor.withValues(alpha: 0.5)),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).colorScheme.outline.withValues(alpha: 0.2),
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1287,7 +1516,11 @@ class _CustomSortDropdownState extends State<CustomSortDropdown> {
               Expanded(
                 child: Row(
                   children: [
-                    const Icon(LucideIcons.arrowDownUp, size: 16, color: Colors.grey),
+                    const Icon(
+                      LucideIcons.arrowDownUp,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(

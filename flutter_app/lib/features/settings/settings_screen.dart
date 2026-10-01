@@ -1212,7 +1212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   children: [
                     SvgPicture.asset('assets/SVG/delete.svg', height: 16, width: 16, colorFilter: const ColorFilter.mode(Color(0xFFDC2626), BlendMode.srcIn)),
                     const SizedBox(width: 8),
-                    Text(
+                    const Text(
                       'Request Account Deletion',
                       style: TextStyle(
                         color: Color(0xFFDC2626),
@@ -1300,18 +1300,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         text: TextSpan(
                           style: TextStyle(fontSize: 13, color: Theme.of(context).textTheme.bodyMedium?.color ?? const Color(0xFF4B5563), height: 1.5),
                           children: [
-                            TextSpan(
+                            const TextSpan(
                               text: 'Note: ',
                               style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFDC2626)),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: 'Since business data is crucial, we retain your data securely for ',
                             ),
                             TextSpan(
                               text: '30 days ',
                               style: TextStyle(fontWeight: FontWeight.w900, color: Theme.of(context).textTheme.displayLarge?.color ?? Colors.black87),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: 'after deletion. If you wish to recover your account during this period, please contact the AurivaBMS team.',
                             ),
                           ],

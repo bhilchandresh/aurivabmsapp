@@ -1,18 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:get/get.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../shared/widgets/app_top_bar.dart';
-import '../../shared/widgets/app_input_field.dart';
 import '../../core/theme/app_extensions.dart';
 import 'expenses_controller.dart';
 import 'widgets/expense_list_item.dart';
@@ -79,7 +76,7 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppTopBar(
+      appBar: const AppTopBar(
         title: 'All Expenses',
         showProfile: false,
         showBadge: false,
@@ -380,7 +377,7 @@ class _AllExpensesScreenState extends State<AllExpensesScreen> {
                                   ),
                                   child: Text(
                                     'Total: ${listItems.length}',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: AppColors.primary,
                                       fontSize: 11,
                                       fontWeight: FontWeight.bold,

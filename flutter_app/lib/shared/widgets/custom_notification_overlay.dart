@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
-import '../../core/theme/app_extensions.dart';
 
 class AurivaNotificationIcon extends StatelessWidget {
   final String type;
@@ -247,7 +246,7 @@ class _NotificationWidgetState extends State<_NotificationWidget>
   }
 
   Widget _buildNotificationCard() {
-    String? displayAmount = widget.amount;
+    final String? displayAmount = widget.amount;
     String? displayAction = '';
     String? displayFor = '';
     String fallbackMessage = widget.message;
@@ -339,7 +338,7 @@ class _NotificationWidgetState extends State<_NotificationWidget>
                         ],
                       ),
                       const SizedBox(height: 2),
-                      if (displayFor != null && displayFor!.isNotEmpty)
+                      if (displayFor.isNotEmpty)
                         Text(
                           displayFor,
                           style: const TextStyle(

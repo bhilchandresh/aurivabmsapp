@@ -4,7 +4,6 @@ import 'core/theme/app_theme.dart';
 import 'navigation/app_routes.dart';
 import 'core/localization/app_translations.dart';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_storage/get_storage.dart';
 import 'core/theme/theme_service.dart';
 import 'core/services/notification_service.dart';

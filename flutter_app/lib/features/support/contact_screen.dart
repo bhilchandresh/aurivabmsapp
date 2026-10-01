@@ -322,7 +322,7 @@ class _ContactScreenState extends State<ContactScreen> {
         _buildLabel(label, isDark),
         const SizedBox(height: 4),
         DropdownButtonFormField<String>(
-          value: _selectedSubject,
+          initialValue: _selectedSubject,
           icon: Icon(LucideIcons.chevronDown, size: 14, color: Colors.grey.shade400),
           style: GoogleFonts.inter(fontSize: 12, color: isDark ? Colors.white : Colors.black87),
           decoration: InputDecoration(

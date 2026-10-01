@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:get/get.dart';
 import '../constants/app_colors.dart';
 
 /// Centralized Typography system for AurivaBMS.

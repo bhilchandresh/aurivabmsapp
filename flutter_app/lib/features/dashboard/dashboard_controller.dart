@@ -57,7 +57,7 @@ class DashboardController extends GetxController {
         invoicesList.sort((a, b) {
           final dateA = a['createdAt']?.toString() ?? a['date']?.toString() ?? '';
           final dateB = b['createdAt']?.toString() ?? b['date']?.toString() ?? '';
-          int comp = dateB.compareTo(dateA);
+          final int comp = dateB.compareTo(dateA);
           if (comp == 0) {
             final invA = a['invoiceNumber']?.toString() ?? '';
             final invB = b['invoiceNumber']?.toString() ?? '';

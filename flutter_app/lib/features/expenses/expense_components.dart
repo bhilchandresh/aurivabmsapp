@@ -7,7 +7,6 @@ import 'package:intl/intl.dart';
 
 import '../../core/constants/app_colors.dart';
 import 'expenses_controller.dart';
-import 'all_expenses_screen.dart';
 import 'widgets/expense_details_bottom_sheet.dart';
 
 final formatCurrency = NumberFormat.currency(
@@ -203,9 +202,9 @@ class ExpenseFiltersRow extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: Row(
+                  child: const Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Icon(LucideIcons.download, size: 16, color: Colors.white),
                       SizedBox(width: 6),
                       Text(
@@ -317,9 +316,9 @@ class ExpenseListView extends StatelessWidget {
                   color: Theme.of(context).textTheme.displayLarge?.color,
                 ),
               ),
-              Row(
+              const Row(
                 children: [
-                  const Text(
+                  Text(
                     'View All',
                     style: TextStyle(
                       color: Colors.indigo,
@@ -327,8 +326,8 @@ class ExpenseListView extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(LucideIcons.chevronRight, size: 14, color: Colors.indigo),
+                  SizedBox(width: 4),
+                  Icon(LucideIcons.chevronRight, size: 14, color: Colors.indigo),
                 ],
               ),
             ],

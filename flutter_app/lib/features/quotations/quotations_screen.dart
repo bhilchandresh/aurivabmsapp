@@ -723,10 +723,13 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(
-                                    LucideIcons.fileSearch,
-                                    size: 40,
-                                    color: Colors.grey,
+                                  SvgPicture.asset(
+                                    'assets/SVG/qoutation.svg',
+                                    height: 48,
+                                    colorFilter: const ColorFilter.mode(
+                                      Colors.grey,
+                                      BlendMode.srcIn,
+                                    ),
                                   ),
                                   const SizedBox(height: 12),
                                   Text(

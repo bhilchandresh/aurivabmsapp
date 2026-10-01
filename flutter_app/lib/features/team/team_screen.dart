@@ -1347,7 +1347,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButtonFormField<String>(
-                              value: _selectedRole,
+                              initialValue: _selectedRole,
                               dropdownColor: cardColor,
                               icon: Icon(LucideIcons.chevronDown, size: 14, color: subtitleColor),
                               style: TextStyle(

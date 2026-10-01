@@ -7,7 +7,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
 import '../../shared/widgets/app_input_field.dart';
 import '../../shared/widgets/state_picker_bottom_sheet.dart';
 import 'clients_controller.dart';
@@ -1324,8 +1323,8 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
         final quote = sorted[index];
         final formattedDate = _safeFormatDate(quote.date);
 
-        Color iconBgColor = isDark ? Colors.deepPurple.shade900.withValues(alpha: 0.3) : const Color(0xFFF3F0FF);
-        Color iconColor = isDark ? Colors.deepPurple.shade300 : const Color(0xFF4C1D95);
+        final Color iconBgColor = isDark ? Colors.deepPurple.shade900.withValues(alpha: 0.3) : const Color(0xFFF3F0FF);
+        final Color iconColor = isDark ? Colors.deepPurple.shade300 : const Color(0xFF4C1D95);
         
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -1833,7 +1832,7 @@ class _ClientDetailsScreenState extends State<ClientDetailsScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'contact_client'.tr + ' ' + client.name,
+                            '${'contact_client'.tr} ${client.name}',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w900,

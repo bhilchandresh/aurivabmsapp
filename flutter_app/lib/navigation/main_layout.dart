@@ -13,10 +13,6 @@ import '../features/clients/clients_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/auth/auth_controller.dart';
 import '../core/services/permission_manager.dart';
-import '../features/invoices/create_invoice_screen.dart';
-import '../features/quotations/create_quotation_screen.dart';
-import 'app_routes.dart';
-import 'widgets/auriva_expandable_fab.dart';
 
 class MainLayoutController extends GetxController {
   var currentIndex = 0.obs;

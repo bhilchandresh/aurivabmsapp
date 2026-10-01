@@ -9,9 +9,9 @@ class RecordPaymentBottomSheet extends StatefulWidget {
   final String supplierId;
 
   const RecordPaymentBottomSheet({
-    Key? key,
+    super.key,
     required this.supplierId,
-  }) : super(key: key);
+  });
 
   @override
   State<RecordPaymentBottomSheet> createState() => _RecordPaymentBottomSheetState();

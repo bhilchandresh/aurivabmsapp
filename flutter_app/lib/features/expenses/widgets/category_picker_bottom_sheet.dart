@@ -6,8 +6,8 @@ import '../expenses_controller.dart';
 
   // --- CATEGORY SELECTION BOTTOM SHEET ---
   void showCategoryPickerBottomSheet(BuildContext context, bool isDark, List<String> allCategories) {
-    final _controller = Get.find<ExpensesController>();
-    String tempSelectedCategory = _controller.filterCategory.value.isEmpty ? 'All Categories' : _controller.filterCategory.value;
+    final controller = Get.find<ExpensesController>();
+    String tempSelectedCategory = controller.filterCategory.value.isEmpty ? 'All Categories' : controller.filterCategory.value;
     String searchQuery = '';
 
     Get.bottomSheet(
@@ -171,9 +171,9 @@ import '../expenses_controller.dart';
                   child: ElevatedButton(
                     onPressed: () {
                       if (tempSelectedCategory == 'All Categories') {
-                        _controller.filterCategory.value = '';
+                        controller.filterCategory.value = '';
                       } else {
-                        _controller.filterCategory.value = tempSelectedCategory;
+                        controller.filterCategory.value = tempSelectedCategory;
                       }
                       Get.back();
                     },
