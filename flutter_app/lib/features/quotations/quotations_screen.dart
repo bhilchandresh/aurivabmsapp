@@ -74,6 +74,42 @@ class Quotation {
     final String gst = clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
     final String state = clientObj['state'] ?? '';
 
+    String creator = 'Undefined';
+    if (json['createdBy'] != null) {
+      if (json['createdBy'] is Map) {
+        final name = (json['createdBy']['name'] ?? '').toString().trim();
+        if (name.isNotEmpty && name.toLowerCase() != 'null') {
+          creator = name;
+        }
+      } else if (json['createdBy'] is String) {
+        final str = json['createdBy'].toString().trim();
+        if (str.isNotEmpty && str.toLowerCase() != 'null' && (str.length != 24 || str.contains(' '))) {
+          creator = str;
+        }
+      }
+    }
+
+    if (creator == 'Undefined' && json['salesPerson'] != null) {
+      if (json['salesPerson'] is Map) {
+        final name = (json['salesPerson']['name'] ?? '').toString().trim();
+        if (name.isNotEmpty && name.toLowerCase() != 'null') {
+          creator = name;
+        }
+      } else if (json['salesPerson'] is String) {
+        final str = json['salesPerson'].toString().trim();
+        if (str.isNotEmpty && str.toLowerCase() != 'null' && (str.length != 24 || str.contains(' '))) {
+          creator = str;
+        }
+      }
+    }
+
+    if (creator.isEmpty || 
+        creator.toLowerCase() == 'null' || 
+        creator.toLowerCase() == 'admin' || 
+        creator.toLowerCase() == 'undefined') {
+      creator = 'Undefined';
+    }
+
     return Quotation(
       dbId: json['_id'] ?? json['id'] ?? '',
       id: json['quoteNumber'] ?? json['quotationNumber'] ?? '',
@@ -97,7 +133,7 @@ class Quotation {
           .toDouble(),
       validUntil: json['validUntil'] ?? json['dueDate'] ?? '',
       templateId: json['templateId'] ?? json['template'],
-      createdBy: json['createdBy']?.toString(),
+      createdBy: creator,
     );
   }
 }
@@ -160,6 +196,40 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
       default:
         return Colors.grey;
     }
+  }
+
+  Widget _buildCreatorTag(String? creator) {
+    String cleanCreator = (creator ?? '').trim();
+    if (cleanCreator.isEmpty ||
+        cleanCreator.toLowerCase() == 'null' ||
+        cleanCreator.toLowerCase() == 'admin' ||
+        cleanCreator.toLowerCase() == 'undefined') {
+      cleanCreator = 'Undefined';
+    }
+    final displayName = cleanCreator.split(' ').first;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey.shade800 : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: isDark ? Colors.grey.shade700 : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        displayName,
+        style: TextStyle(
+          fontSize: 8.5,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.grey.shade300 : const Color(0xFF64748B),
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
   }
 
   void _sharePublicLink(Quotation qt) {
@@ -358,57 +428,183 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
 
   void _convertToInvoice(Quotation qt) async {
     final screenContext = context;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: screenContext,
-      builder: (dialogContext) => AlertDialog(
-        title: Text('convert_to_invoice'.tr),
-        content: Text('Convert quotation ${qt.id} into a live invoice?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text('cancel'.tr),
+      builder: (dialogContext) => Dialog(
+        backgroundColor: isDark ? AppColors.darkSurface : Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+        ),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 360),
+          padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Convert to Invoice',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Convert quotation ${qt.id} into an invoice? This will create a new invoice from the quotation.',
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.4,
+                  color: isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkCard : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'QUOTATION NUMBER',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                        color: isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      qt.id,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? AppColors.darkTextPrimary : const Color(0xFF0F172A),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'The quotation will remain available for reference.',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: isDark ? AppColors.darkTextSecondary : const Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 42,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(
+                            color: isDark ? AppColors.darkBorder : const Color(0xFFE2E8F0),
+                            width: 1,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          backgroundColor: isDark ? Colors.transparent : Colors.white,
+                          elevation: 0,
+                          padding: EdgeInsets.zero,
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 42,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(dialogContext);
+
+                          BuildContext? loadingContext;
+                          showDialog(
+                            context: screenContext,
+                            barrierDismissible: false,
+                            builder: (ctx) {
+                              loadingContext = ctx;
+                              return const AppLoader(message: 'Converting quotation...');
+                            },
+                          );
+
+                          final invoiceId = await _clientsController
+                              .convertQuotationToInvoice(qt.dbId);
+
+                          if (loadingContext != null && loadingContext!.mounted) {
+                            Navigator.pop(loadingContext!);
+                          }
+
+                          if (invoiceId != null) {
+                            Fluttertoast.showToast(
+                              msg: "Converted to invoice successfully!",
+                              backgroundColor: AppColors.success,
+                              textColor: Colors.white,
+                            );
+                            if (Get.isRegistered<MainLayoutController>()) {
+                              Get.find<MainLayoutController>().changeIndex(1);
+                            }
+                          } else {
+                            Fluttertoast.showToast(
+                              msg: "Failed to convert quotation.",
+                              backgroundColor: AppColors.error,
+                              textColor: Colors.white,
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: EdgeInsets.zero,
+                        ),
+                        child: const Text(
+                          'Convert',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(dialogContext);
-
-              BuildContext? loadingContext;
-              showDialog(
-                context: screenContext,
-                barrierDismissible: false,
-                builder: (ctx) {
-                  loadingContext = ctx;
-                  return const AppLoader(message: 'Converting quotation...');
-                },
-              );
-
-              final invoiceId = await _clientsController
-                  .convertQuotationToInvoice(qt.dbId);
-
-              if (loadingContext != null && loadingContext!.mounted) {
-                Navigator.pop(loadingContext!);
-              }
-
-              if (invoiceId != null) {
-                Fluttertoast.showToast(
-                  msg: "Converted to invoice successfully!",
-                  backgroundColor: AppColors.success,
-                  textColor: Colors.white,
-                );
-                if (Get.isRegistered<MainLayoutController>()) {
-                  Get.find<MainLayoutController>().changeIndex(1);
-                }
-              } else {
-                Fluttertoast.showToast(
-                  msg: "Failed to convert quotation.",
-                  backgroundColor: AppColors.error,
-                  textColor: Colors.white,
-                );
-              }
-            },
-            child: Text('convert'.tr, style: context.typography.buttonText),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -1011,21 +1207,8 @@ class _QuotationsScreenState extends State<QuotationsScreen> {
                                                           overflow: TextOverflow.ellipsis,
                                                         ),
                                                       ),
-                                                      Container(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                        decoration: BoxDecoration(
-                                                          color: AppColors.primary.withValues(alpha: 0.1),
-                                                          borderRadius: BorderRadius.circular(4),
-                                                        ),
-                                                        child: const Text(
-                                                          'Admin',
-                                                          style: TextStyle(
-                                                            fontSize: 8,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: AppColors.primary,
-                                                          ),
-                                                        ),
-                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      _buildCreatorTag(qt.createdBy),
                                                     ],
                                                   ),
                                                 ],

@@ -4,9 +4,9 @@ const { getSettings, updateSettings, getContactMessages } = require('../controll
 
 const router = express.Router();
 
-// Settings routes are strictly for admins
+// Settings routes are strictly for super admins
 router.use(protect);
-router.use(authorize('admin'));
+router.use(authorize('super_admin'));
 
 router.route('/')
   .get(getSettings)

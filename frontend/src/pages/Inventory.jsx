@@ -12,7 +12,7 @@ const Inventory = () => {
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
-    const [planDetails, setPlanDetails] = useState(null); // { plan: 'basic', usage: 0 }
+    const [planDetails, setPlanDetails] = useState(null); // { plan: 'freelance', usage: 0 }
 
     // Modal States
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,8 +38,7 @@ const Inventory = () => {
             ]);
             return {
                 items: resItems.data.data,
-                maxLimit: resItems.data.maxLimit,
-                plan: resSettings.data.data.subscriptionPlan || 'basic'
+                plan: resSettings.data.data.subscriptionPlan || 'freelance'
             };
         },
         enabled: !!token
@@ -50,8 +49,7 @@ const Inventory = () => {
             setItems(fetchedData.items);
             setPlanDetails({ 
                 plan: fetchedData.plan, 
-                usage: fetchedData.items.length,
-                maxLimit: fetchedData.maxLimit
+                usage: fetchedData.items.length 
             });
             setLoading(false);
         }
@@ -134,7 +132,7 @@ const Inventory = () => {
     if (loading) return <Layout><div className="flex items-center justify-center p-20 font-bold text-slate-400">Loading Inventory...</div></Layout>;
 
     // 🔴 GATEKEEPING: STARTER PLAN LOCK SCREEN
-    if (planDetails?.plan === 'basic') {
+    if (planDetails?.plan === 'freelance') {
         return (
             <Layout>
                 <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -165,10 +163,9 @@ const Inventory = () => {
         );
     }
 
-    // Plan Limit Tracking Variables
-    const hasLimit = planDetails?.maxLimit !== undefined && planDetails?.maxLimit !== null && planDetails?.maxLimit > 0;
-    const limitHit = hasLimit && planDetails.usage >= planDetails.maxLimit;
-    const progressPercentage = hasLimit ? Math.min((planDetails.usage / planDetails.maxLimit) * 100, 100) : 0;
+    // Pro Limit Tracking Variables
+    const isPro = planDetails?.plan === 'pro';
+    const limitHit = isPro && planDetails.usage >= 100;
 
     const filteredItems = items.filter(i => i.itemName.toLowerCase().includes(searchTerm.toLowerCase()) || i.sku.toLowerCase().includes(searchTerm.toLowerCase()));
 
@@ -189,13 +186,13 @@ const Inventory = () => {
                     </div>
                     
                     <div className="flex items-center gap-4 w-full md:w-auto">
-                        {hasLimit && (
+                        {isPro && (
                             <div className="bg-blue-50/50 border border-blue-100 px-4 py-2.5 rounded-xl flex items-center gap-4 w-full md:w-auto transition-all">
                                 <span className="text-xs font-bold text-blue-700 uppercase tracking-widest">Usage</span>
                                 <div className="flex-1 w-24 h-2 bg-blue-200/50 rounded-full overflow-hidden">
-                                    <div className={`h-full rounded-full transition-all ${limitHit ? 'bg-rose-500' : 'bg-blue-600'}`} style={{ width: `${progressPercentage}%` }}></div>
+                                    <div className={`h-full rounded-full transition-all ${limitHit ? 'bg-rose-500' : 'bg-blue-600'}`} style={{ width: `${(planDetails.usage / 100) * 100}%` }}></div>
                                 </div>
-                                <span className={`text-xs font-black ${limitHit ? 'text-rose-600' : 'text-blue-800'}`}>{planDetails.usage} / {planDetails.maxLimit}</span>
+                                <span className={`text-xs font-black ${limitHit ? 'text-rose-600' : 'text-blue-800'}`}>{planDetails.usage} / 100</span>
                             </div>
                         )}
                     </div>
@@ -320,7 +317,7 @@ const Inventory = () => {
                                     </div>
                                     <div>
                                         <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex gap-1">Available Stock <span className="text-rose-500">*</span></label>
-                                        <input required type="number" min="0" value={formData.currentStock} onChange={e => setFormData({...formData, currentStock: e.target.value})} className="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
+                                        <input required type="number" step="any" min="0" value={formData.currentStock} onChange={e => setFormData({...formData, currentStock: e.target.value})} className="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-5">
@@ -328,14 +325,14 @@ const Inventory = () => {
                                         <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex gap-1">Purchase Price (₹)</label>
                                         <div className="relative">
                                             <span className="absolute left-3.5 top-3 text-slate-400 font-black">₹</span>
-                                            <input type="number" min="0" value={formData.purchasePrice} onChange={e => setFormData({...formData, purchasePrice: e.target.value})} className="w-full border border-slate-200 py-3 pl-8 pr-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
+                                            <input type="number" step="any" min="0" value={formData.purchasePrice} onChange={e => setFormData({...formData, purchasePrice: e.target.value})} className="w-full border border-slate-200 py-3 pl-8 pr-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
                                         </div>
                                     </div>
                                     <div>
                                         <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex gap-1">Selling Price (₹) <span className="text-rose-500">*</span></label>
                                         <div className="relative">
                                             <span className="absolute left-3.5 top-3 text-slate-400 font-black">₹</span>
-                                            <input required type="number" min="0" value={formData.unitPrice} onChange={e => setFormData({...formData, unitPrice: e.target.value})} className="w-full border border-slate-200 py-3 pl-8 pr-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
+                                            <input required type="number" step="any" min="0" value={formData.unitPrice} onChange={e => setFormData({...formData, unitPrice: e.target.value})} className="w-full border border-slate-200 py-3 pl-8 pr-3 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 font-black text-sm transition-all text-slate-800"/>
                                         </div>
                                     </div>
                                 </div>
@@ -371,7 +368,7 @@ const Inventory = () => {
                                     <p className="text-xs font-bold text-slate-500 mb-4 bg-slate-100 py-1.5 px-3 rounded-lg inline-block shadow-inner border border-slate-200/60">Current Stock: {restockItem.currentStock} Units</p>
                                     
                                     <label className="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-1.5 flex gap-1">Quantity to Add <span className="text-rose-500">*</span></label>
-                                    <input required type="number" min="1" value={restockQuantity} onChange={e => setRestockQuantity(e.target.value)} className="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-lg text-slate-800 transition-all text-center" placeholder="+" />
+                                    <input required type="number" step="any" min="0" value={restockQuantity} onChange={e => setRestockQuantity(e.target.value)} className="w-full border border-slate-200 p-3 rounded-xl outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 font-bold text-lg text-slate-800 transition-all text-center" placeholder="+" />
                                 </div>
                                 
                                 <div className="pt-2 flex gap-3">

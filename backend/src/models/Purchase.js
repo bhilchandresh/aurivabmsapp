@@ -11,6 +11,8 @@ const purchaseSchema = new mongoose.Schema({
     quantity: Number,
     rate: Number,
     amount: Number,
+    discount: { type: Number, default: 0 },
+    gstRate: { type: Number, default: 0 },
     addToInventory: { type: Boolean, default: false },
     sellingPrice: { type: Number, default: 0 },
     inventoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Inventory' }

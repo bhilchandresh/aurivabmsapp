@@ -26,9 +26,9 @@ exports.createOrder = async (req, res) => {
     
     // Define amounts for plans (in paise)
     const planAmounts = {
-      'basic': 29900,      // ₹299
-      'premium': 49900,    // ₹499
-      'enterprise': 99900   // ₹999
+      'freelance': 29900,      // ₹299
+      'pro': 49900,    // ₹499
+      'business': 99900   // ₹999
     };
 
     const amount = planAmounts[plan];

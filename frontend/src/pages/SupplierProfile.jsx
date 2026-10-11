@@ -5,7 +5,7 @@ import Layout from "../components/Layout";
 import toast from "react-hot-toast";
 import {
   ArrowLeft, Plus, Truck, IndianRupee, TrendingDown,
-  BadgeCheck, Clock, X, Trash2, Package, CreditCard
+  BadgeCheck, Clock, X, Trash2, Package, CreditCard, Eye, Pencil
 } from "lucide-react";
 import { getLocalDateString } from "../utils/dateUtils";
 
@@ -20,12 +20,101 @@ const StatusBadge = ({ status }) => {
   return <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${cls}`}>{status}</span>;
 };
 
-const AddBillModal = ({ supplierId, onClose, onAdded }) => {
-  const [form, setForm] = useState({
-    billNumber: "", date: getLocalDateString(), dueDate: "",
-    notes: "", totalAmount: ""
+const ViewBillModal = ({ bill, onClose }) => {
+  if (!bill) return null;
+  return (
+    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-6">
+        <div className="flex justify-between items-center p-6 border-b">
+          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2"><Package className="h-5 w-5 text-blue-600" /> View Purchase Bill</h2>
+          <button onClick={onClose}><X className="h-5 w-5 text-gray-500 hover:text-gray-800" /></button>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase mb-1">Bill / Invoice No.</p>
+              <p className="font-bold text-gray-800">{bill.billNumber}</p>
+            </div>
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase mb-1">Date</p>
+              <p className="font-bold text-gray-800">{new Date(bill.date).toLocaleDateString("en-IN")}</p>
+            </div>
+            {bill.dueDate && (
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase mb-1">Due Date</p>
+                <p className="font-bold text-gray-800">{new Date(bill.dueDate).toLocaleDateString("en-IN")}</p>
+              </div>
+            )}
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase mb-1">Status</p>
+              <StatusBadge status={bill.status} />
+            </div>
+          </div>
+          <div className="mb-6">
+            <h3 className="text-xs font-bold text-gray-500 uppercase mb-2">Items</h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-100 text-gray-500 font-bold border-b">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Item</th>
+                    <th className="px-4 py-2 text-right">Qty</th>
+                    <th className="px-4 py-2 text-right">Rate</th>
+                    <th className="px-4 py-2 text-right">Disc.</th>
+                    <th className="px-4 py-2 text-right">GST</th>
+                    <th className="px-4 py-2 text-right">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {bill.items?.map((item, idx) => (
+                    <tr key={idx}>
+                      <td className="px-4 py-2">{item.description}</td>
+                      <td className="px-4 py-2 text-right">{item.quantity}</td>
+                      <td className="px-4 py-2 text-right">₹{fmt(item.rate)}</td>
+                      <td className="px-4 py-2 text-right text-red-500">{item.discount > 0 ? `${item.discount}%` : "0%"}</td>
+                      <td className="px-4 py-2 text-right text-blue-500">{item.gstRate > 0 ? `${item.gstRate}%` : "0%"}</td>
+                      <td className="px-4 py-2 text-right font-semibold">₹{fmt(item.amount)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+            <div className="flex flex-col items-end gap-1.5 text-sm bg-gray-50 p-4 rounded-xl">
+              <div className="flex justify-between w-48"><span className="text-gray-500 font-medium">Subtotal:</span><span className="font-semibold text-gray-800">₹{fmt(bill.subTotal)}</span></div>
+              {bill.taxAmount > 0 && <div className="flex justify-between w-48"><span className="text-gray-500 font-medium">GST Tax:</span><span className="font-semibold text-blue-600">+₹{fmt(bill.taxAmount)}</span></div>}
+              <div className="flex justify-between w-48 text-lg mt-2 pt-2 border-t border-gray-200"><span className="font-bold text-gray-800">Total:</span><span className="font-black text-gray-900">₹{fmt(bill.totalAmount)}</span></div>
+              
+              <div className="flex justify-between w-48 mt-2"><span className="text-gray-500 font-medium">Amount Paid:</span><span className="font-bold text-green-600">₹{fmt(bill.amountPaid)}</span></div>
+              <div className="flex justify-between w-48 pt-1"><span className="text-gray-500 font-medium">Balance Due:</span><span className="font-bold text-red-500">₹{fmt(bill.totalAmount - bill.amountPaid)}</span></div>
+            </div>
+          {bill.notes && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg text-sm text-gray-700">
+              <span className="font-bold">Notes: </span>{bill.notes}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BillModal = ({ supplierId, onClose, onAdded, initialData }) => {
+  const [form, setForm] = useState(() => {
+    return {
+      billNumber: initialData?.billNumber || "", 
+      date: initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : getLocalDateString(), 
+      dueDate: initialData?.dueDate ? new Date(initialData.dueDate).toISOString().split('T')[0] : "",
+      notes: initialData?.notes || "", 
+      totalAmount: ""
+    };
   });
-  const [items, setItems] = useState([{ description: "", quantity: 1, rate: 0, amount: 0, inventoryId: null, addToInventory: false, sellingPrice: 0 }]);
+  const [items, setItems] = useState(initialData?.items && initialData.items.length > 0 
+    ? initialData.items.map(i => {
+        const base = Number(i.quantity || 0) * Number(i.rate || 0);
+        const discounted = base - (base * (Number(i.discount || 0) / 100));
+        return { ...i, amount: discounted };
+      }) 
+    : [{ description: "", quantity: 1, rate: 0, discount: 0, gstRate: 0, amount: 0, inventoryId: null, addToInventory: false, sellingPrice: 0 }]);
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -37,17 +126,25 @@ const AddBillModal = ({ supplierId, onClose, onAdded }) => {
     const next = [...items];
     if (typeof fieldOrUpdates === 'object' && fieldOrUpdates !== null) {
       next[i] = { ...next[i], ...fieldOrUpdates };
-      next[i].amount = Number(next[i].quantity || 0) * Number(next[i].rate || 0);
     } else {
       next[i] = { ...next[i], [fieldOrUpdates]: val };
-      if (fieldOrUpdates === "quantity" || fieldOrUpdates === "rate") {
-        next[i].amount = Number(next[i].quantity || 0) * Number(next[i].rate || 0);
-      }
     }
+    const baseAmt = Number(next[i].quantity || 0) * Number(next[i].rate || 0);
+    const discountedAmt = baseAmt - (baseAmt * (Number(next[i].discount || 0) / 100));
+    next[i].amount = discountedAmt;
     setItems(next);
   };
 
-  const subTotal = items.reduce((s, i) => s + (Number(i.amount) || 0), 0);
+  let subTotal = 0;
+  let taxAmount = 0;
+  items.forEach(i => {
+    const base = Number(i.quantity || 0) * Number(i.rate || 0);
+    const discounted = base - (base * (Number(i.discount || 0) / 100));
+    const tax = discounted * (Number(i.gstRate || 0) / 100);
+    subTotal += discounted;
+    taxAmount += tax;
+  });
+  const calculatedTotal = subTotal + taxAmount;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,13 +154,21 @@ const AddBillModal = ({ supplierId, onClose, onAdded }) => {
       const payload = {
         ...form,
         supplierId,
-        items: items.map(i => ({ ...i, quantity: Number(i.quantity), rate: Number(i.rate), amount: Number(i.amount), inventoryId: i.inventoryId || null, addToInventory: !!i.addToInventory, sellingPrice: Number(i.sellingPrice || 0) })),
+        items: items.map(i => ({ ...i, quantity: Number(i.quantity), rate: Number(i.rate), discount: Number(i.discount), gstRate: Number(i.gstRate), amount: Number(i.amount), inventoryId: i.inventoryId || null, addToInventory: !!i.addToInventory, sellingPrice: Number(i.sellingPrice || 0) })),
         subTotal,
-        totalAmount: Number(form.totalAmount) || subTotal
+        taxAmount,
+        totalAmount: form.totalAmount ? Number(form.totalAmount) : calculatedTotal
       };
-      const res = await api.post("/suppliers/purchases/all", payload);
-      toast.success("Purchase bill added!");
-      onAdded(res.data.data);
+      
+      if (initialData) {
+        const res = await api.put(`/suppliers/purchases/${initialData._id}`, payload);
+        toast.success("Purchase bill updated!");
+        onAdded(res.data.data);
+      } else {
+        const res = await api.post("/suppliers/purchases/all", payload);
+        toast.success("Purchase bill added!");
+        onAdded(res.data.data);
+      }
       onClose();
     } catch (err) {
       toast.error(err.response?.data?.message || "Failed to add bill");
@@ -76,8 +181,8 @@ const AddBillModal = ({ supplierId, onClose, onAdded }) => {
     <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl my-6">
         <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2"><Package className="h-5 w-5 text-blue-600" /> Add Purchase Bill</h2>
-          <button onClick={onClose}><X className="h-5 w-5 text-gray-500 hover:text-gray-800" /></button>
+          <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2"><Package className="h-5 w-5 text-blue-600" /> {initialData ? "Edit Purchase Bill" : "Add Purchase Bill"}</h2>
+          <button type="button" onClick={onClose}><X className="h-5 w-5 text-gray-500 hover:text-gray-800" /></button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -96,11 +201,11 @@ const AddBillModal = ({ supplierId, onClose, onAdded }) => {
               <input type="date" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })}
                 className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none" />
             </div>
-            <div>
+            <div className="col-span-2">
               <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Total Amount (override optional)</label>
               <input type="number" min="0" step="0.01" value={form.totalAmount} onChange={e => setForm({ ...form, totalAmount: e.target.value })}
                 className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
-                placeholder={subTotal > 0 ? `Auto: ₹${fmt(subTotal)}` : "₹ Amount"} />
+                placeholder={calculatedTotal > 0 ? `Auto: ₹${fmt(calculatedTotal)}` : "₹ Amount"} />
             </div>
           </div>
 
@@ -108,42 +213,70 @@ const AddBillModal = ({ supplierId, onClose, onAdded }) => {
           <div>
             <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Items / Materials Purchased</label>
             <div className="space-y-2">
+              <div className="hidden md:grid grid-cols-12 gap-2 px-2 md:pr-10 text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+                <div className="col-span-4">Item Details</div>
+                <div className="col-span-1 text-center">Qty</div>
+                <div className="col-span-2 text-right">Rate</div>
+                <div className="col-span-1 text-right">Disc</div>
+                <div className="col-span-1 text-right">GST</div>
+                <div className="col-span-3 text-right pr-6">Amount</div>
+              </div>
               {items.map((item, i) => (
-                <div key={i} className="border p-3 rounded-xl mb-3 relative bg-gray-50/50">
+                <div key={i} className="group relative bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all p-3 md:p-2 md:pr-10">
                   <button type="button" onClick={() => setItems(items.filter((_, j) => j !== i))}
-                    className="absolute top-3 right-3 text-red-400 hover:text-red-600 transition"><X className="h-4 w-4" /></button>
-                  <div className="grid grid-cols-12 gap-2 items-center pr-6">
-                    <input value={item.description} list="inv-list" onChange={e => {
-                      const val = e.target.value;
-                      const found = inventory.find(x => x.itemName === val);
-                      if (found) {
-                        updateItem(i, { description: found.itemName, rate: found.purchasePrice || 0, sellingPrice: found.unitPrice || 0, inventoryId: found._id, addToInventory: true });
-                      } else {
-                        updateItem(i, { description: val, inventoryId: null, addToInventory: false });
-                      }
-                    }}
-                      className="col-span-12 md:col-span-5 border bg-white rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-sm" placeholder="Item name" />
-                    <input type="number" value={item.quantity} onChange={e => updateItem(i, "quantity", e.target.value)}
-                      className="col-span-4 md:col-span-2 border bg-white rounded-lg p-2 text-sm text-center focus:ring-1 focus:ring-blue-400 outline-none shadow-sm" placeholder="Qty" />
-                    <input type="number" step="0.01" value={item.rate} onChange={e => updateItem(i, "rate", e.target.value)}
-                      className="col-span-4 md:col-span-2 border bg-white rounded-lg p-2 text-sm text-right focus:ring-1 focus:ring-blue-400 outline-none shadow-sm" placeholder="Rate/Buy Price" />
-                    <div className="col-span-4 md:col-span-3 text-right text-sm font-semibold text-gray-700">₹{fmt(item.amount)}</div>
-                  </div>
-                  
-                  {/* Inventory Sync Row */}
-                  <div className="mt-3 pt-3 border-t flex flex-wrap items-center gap-4 text-sm">
-                    <label className="flex items-center gap-2 cursor-pointer text-gray-700 font-semibold select-none">
-                      <input type="checkbox" checked={item.addToInventory} onChange={e => updateItem(i, "addToInventory", e.target.checked)}
-                        className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 bg-white" />
-                      Add / Sync to Inventory
-                    </label>
-                    {item.addToInventory && (
-                      <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2">
-                        <span className="text-gray-500 font-bold text-xs uppercase">Selling Price:</span>
-                        <input type="number" step="0.01" value={item.sellingPrice} onChange={e => updateItem(i, "sellingPrice", e.target.value)}
-                          className="border bg-white rounded-md p-1.5 w-28 text-sm text-right focus:ring-1 focus:ring-blue-400 outline-none shadow-sm" placeholder="0.00" />
+                    className="absolute top-2 right-2 md:top-1/2 md:-translate-y-1/2 text-gray-300 hover:text-red-500 transition">
+                    <X className="h-4 w-4" />
+                  </button>
+                  <div className="flex flex-col md:grid md:grid-cols-12 gap-3 md:gap-2 items-start md:items-center">
+                    
+                    <div className="md:col-span-4 w-full flex flex-col gap-1.5">
+                      <input value={item.description} list="inv-list" onChange={e => {
+                        const val = e.target.value;
+                        const found = inventory.find(x => x.itemName === val);
+                        if (found) {
+                          updateItem(i, { description: found.itemName, rate: found.purchasePrice || 0, sellingPrice: found.unitPrice || 0, inventoryId: found._id, addToInventory: true });
+                        } else {
+                          updateItem(i, { description: val, inventoryId: null, addToInventory: false });
+                        }
+                      }}
+                        className="w-full border rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none font-medium text-gray-800" placeholder="Enter item description..." />
+                      <div className="flex flex-wrap items-center gap-2 pl-1">
+                        <label className="flex items-center gap-1 cursor-pointer text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
+                          <input type="checkbox" checked={item.addToInventory} onChange={e => updateItem(i, "addToInventory", e.target.checked)}
+                            className="w-3 h-3 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+                          Track in Inventory
+                        </label>
+                        {item.addToInventory && (
+                          <div className="flex items-center gap-1 animate-in fade-in slide-in-from-left-2">
+                            <span className="text-[10px] font-bold text-gray-400">Sell At:</span>
+                            <input type="number" step="0.01" value={item.sellingPrice} onChange={e => updateItem(i, "sellingPrice", e.target.value)}
+                              className="border-b border-gray-300 bg-transparent w-16 text-xs font-semibold text-gray-700 outline-none focus:border-blue-500 px-1" placeholder="0.00" />
+                          </div>
+                        )}
                       </div>
-                    )}
+                    </div>
+
+                    <div className="w-full md:contents grid grid-cols-8 gap-2 items-center">
+                      <div className="col-span-2 md:col-span-1">
+                        <input type="number" step="any" value={item.quantity} onChange={e => updateItem(i, "quantity", e.target.value)}
+                          className="w-full border rounded-lg p-2 text-sm text-center focus:ring-1 focus:ring-blue-400 outline-none" placeholder="Qty" />
+                      </div>
+                      <div className="col-span-3 md:col-span-2">
+                        <input type="number" step="0.01" value={item.rate} onChange={e => updateItem(i, "rate", e.target.value)}
+                          className="w-full border rounded-lg p-2 text-sm text-right focus:ring-1 focus:ring-blue-400 outline-none" placeholder="Rate" />
+                      </div>
+                      <div className="col-span-3 md:col-span-1 relative">
+                        <input type="number" step="0.01" value={item.discount} onChange={e => updateItem(i, "discount", e.target.value)}
+                          className="w-full border rounded-lg p-2 text-sm text-right text-red-500 focus:ring-1 focus:ring-red-400 outline-none pr-5" placeholder="0" />
+                        <span className="absolute right-1.5 top-2.5 text-[10px] text-red-400 font-bold">%</span>
+                      </div>
+                      <div className="col-span-4 md:col-span-1 relative">
+                        <input type="number" step="0.01" value={item.gstRate} onChange={e => updateItem(i, "gstRate", e.target.value)}
+                          className="w-full border rounded-lg p-2 text-sm text-right text-blue-500 focus:ring-1 focus:ring-blue-400 outline-none pr-5" placeholder="GST" />
+                        <span className="absolute right-1.5 top-2.5 text-[10px] text-blue-400 font-bold">%</span>
+                      </div>
+                      <div className="col-span-4 md:col-span-3 text-right text-sm font-bold text-gray-800 pr-1">₹{fmt(item.amount)}</div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -155,8 +288,10 @@ const AddBillModal = ({ supplierId, onClose, onAdded }) => {
               className="mt-2 text-blue-600 text-sm font-semibold hover:underline flex items-center gap-1">
               <Plus className="h-3.5 w-3.5" /> Add Item
             </button>
-            <div className="text-right text-sm font-bold text-gray-700 mt-2">
-              Subtotal: ₹{fmt(subTotal)}
+            <div className="flex flex-col items-end gap-1.5 text-sm mt-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+              <div className="flex justify-between w-56"><span className="text-gray-500 font-medium">Subtotal:</span><span className="font-semibold text-gray-800">₹{fmt(subTotal)}</span></div>
+              {taxAmount > 0 && <div className="flex justify-between w-56"><span className="text-gray-500 font-medium">GST Tax:</span><span className="font-semibold text-blue-600">+₹{fmt(taxAmount)}</span></div>}
+              <div className="flex justify-between w-56 text-lg mt-2 pt-2 border-t border-gray-200"><span className="font-bold text-gray-800">Grand Total:</span><span className="font-black text-gray-900">₹{fmt(calculatedTotal)}</span></div>
             </div>
           </div>
 
@@ -265,6 +400,8 @@ export default function SupplierProfile() {
   const [activeTab, setActiveTab] = useState("bills");
   const [showBillModal, setShowBillModal] = useState(false);
   const [showPayModal, setShowPayModal] = useState(false);
+  const [viewingBill, setViewingBill] = useState(null);
+  const [editingBill, setEditingBill] = useState(null);
 
   const loadAll = useCallback(async () => {
     try {
@@ -422,8 +559,14 @@ export default function SupplierProfile() {
                       <td className="px-5 py-4 text-right font-semibold text-gray-800">₹{fmt(bill.totalAmount)}</td>
                       <td className="px-5 py-4 text-right text-green-600 font-semibold">₹{fmt(bill.amountPaid)}</td>
                       <td className="px-5 py-4 text-center"><StatusBadge status={bill.status} /></td>
-                      <td className="px-5 py-4 text-right">
-                        <button onClick={() => handleDeleteBill(bill._id)} className="text-red-400 hover:text-red-600 transition">
+                      <td className="px-5 py-4 text-right flex gap-3 justify-end items-center">
+                        <button onClick={() => setViewingBill(bill)} className="text-blue-500 hover:text-blue-700 transition" title="View">
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => setEditingBill(bill)} className="text-amber-500 hover:text-amber-700 transition" title="Edit">
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button onClick={() => handleDeleteBill(bill._id)} className="text-red-400 hover:text-red-600 transition" title="Delete">
                           <Trash2 className="h-4 w-4" />
                         </button>
                       </td>
@@ -490,11 +633,19 @@ export default function SupplierProfile() {
         )}
       </div>
 
-      {showBillModal && (
-        <AddBillModal supplierId={id} onClose={() => setShowBillModal(false)} onAdded={() => { setShowBillModal(false); loadAll(); }} />
+      {(showBillModal || editingBill) && (
+        <BillModal 
+          supplierId={id} 
+          initialData={editingBill}
+          onClose={() => { setShowBillModal(false); setEditingBill(null); }} 
+          onAdded={() => { setShowBillModal(false); setEditingBill(null); loadAll(); }} 
+        />
       )}
       {showPayModal && (
         <AddPaymentModal supplierId={id} onClose={() => setShowPayModal(false)} onAdded={() => { setShowPayModal(false); loadAll(); }} />
+      )}
+      {viewingBill && (
+        <ViewBillModal bill={viewingBill} onClose={() => setViewingBill(null)} />
       )}
     </Layout>
   );

@@ -2,9 +2,9 @@ const Tenant = require('../models/Tenant');
 
 // --- PLAN CONFIGURATION (Simple Hardcoded Limits) ---
 const PLANS = {
-    basic: { maxInvoices: 10, maxUsers: 1, canExport: false, maxInventory: 0, maxSuppliers: 0 },
-    premium: { maxInvoices: 100, maxUsers: 5, canExport: true, maxInventory: 100, maxSuppliers: 50 },
-    enterprise: { maxInvoices: Infinity, maxUsers: Infinity, canExport: true, maxInventory: Infinity, maxSuppliers: Infinity }
+    freelance: { maxInvoices: 10, maxUsers: 1, canExport: false, maxInventory: 0, maxSuppliers: 0 },
+    pro: { maxInvoices: 100, maxUsers: 5, canExport: true, maxInventory: 100, maxSuppliers: 50 },
+    business: { maxInvoices: Infinity, maxUsers: Infinity, canExport: true, maxInventory: Infinity, maxSuppliers: Infinity }
 };
 
 const checkSubscription = async (req, res, next) => {
@@ -37,7 +37,7 @@ const checkSubscription = async (req, res, next) => {
         // 3. OPTIONAL: CHECK LIMITS (Only for creation)
         // Agar user naya invoice bana raha hai (POST request)
         if (req.method === 'POST' && req.baseUrl.includes('invoices')) {
-            const planDetails = PLANS[tenant.subscriptionPlan || 'basic'];
+            const planDetails = PLANS[tenant.subscriptionPlan || 'freelance'];
             
             // Agar limit cross ho gayi (Note: Hame invoice count karna padega)
             // Abhi ke liye hum ise skip kar rahe hain taaki complexity na badhe

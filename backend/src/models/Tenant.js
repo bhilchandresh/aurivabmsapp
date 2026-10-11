@@ -60,8 +60,8 @@ const tenantSchema = new mongoose.Schema({
 
   subscriptionPlan: { 
     type: String, 
-    enum: ['basic', 'premium', 'enterprise'], 
-    default: 'basic' 
+    enum: ['freelance', 'pro', 'business'], 
+    default: 'freelance' 
   },
 
   subscriptionStart: { type: Date, default: Date.now },

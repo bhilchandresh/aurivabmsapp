@@ -95,6 +95,10 @@ const Layout = ({ children }) => {
     if (role === 'super_admin') {
       return [
         { name: "Master Control", path: "/super-admin", icon: BarChart3 },
+        { name: "Subscriptions", path: "/super-admin/subscriptions", icon: Users },
+        { name: "Transactions", path: "/super-admin/transactions", icon: Wallet },
+        { name: "Coupons", path: "/super-admin/coupons", icon: Settings },
+        { name: "Messages", path: "/super-admin/messages", icon: ShieldCheck },
         { name: "Analytics", path: "/super-admin/analytics", icon: TrendingUp },
         { name: "SOC (Security)", path: "/super-admin/security", icon: ShieldCheck },
         { name: "SMTP Settings", path: "/super-admin/settings", icon: Settings },

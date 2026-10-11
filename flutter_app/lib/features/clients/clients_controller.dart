@@ -61,6 +61,49 @@ class Client {
   }
 
   factory Client.fromJson(Map<String, dynamic> json) {
+    String? addedBy;
+    if (json['creator'] != null) {
+      if (json['creator'] is Map) {
+        final name = (json['creator']['name'] ?? '').toString().trim();
+        if (name.isNotEmpty && name.toLowerCase() != 'null') {
+          addedBy = name;
+        }
+      } else if (json['creator'] is String) {
+        final str = json['creator'].toString().trim();
+        if (str.isNotEmpty && str.toLowerCase() != 'null' && (str.length != 24 || str.contains(' '))) {
+          addedBy = str;
+        }
+      }
+    }
+
+    if (addedBy == null && json['createdBy'] != null) {
+      if (json['createdBy'] is Map) {
+        final name = (json['createdBy']['name'] ?? '').toString().trim();
+        if (name.isNotEmpty && name.toLowerCase() != 'null') {
+          addedBy = name;
+        }
+      } else if (json['createdBy'] is String) {
+        final str = json['createdBy'].toString().trim();
+        if (str.isNotEmpty && str.toLowerCase() != 'null' && (str.length != 24 || str.contains(' '))) {
+          addedBy = str;
+        }
+      }
+    }
+
+    if (addedBy == null && json['addedBy'] != null) {
+      if (json['addedBy'] is Map) {
+        final name = (json['addedBy']['name'] ?? '').toString().trim();
+        if (name.isNotEmpty && name.toLowerCase() != 'null') {
+          addedBy = name;
+        }
+      } else if (json['addedBy'] is String) {
+        final str = json['addedBy'].toString().trim();
+        if (str.isNotEmpty && str.toLowerCase() != 'null' && (str.length != 24 || str.contains(' '))) {
+          addedBy = str;
+        }
+      }
+    }
+
     return Client(
       id: json['_id'] ?? json['id'] ?? '',
       name: json['name'] ?? '',
@@ -74,7 +117,7 @@ class Client {
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
           : null,
-      addedBy: json['addedBy'],
+      addedBy: addedBy,
     );
   }
 }
@@ -86,6 +129,9 @@ class ClientInvoice {
   final double remainingAmount;
   final String date;
   final String status; // 'Paid', 'Pending', 'Partially Paid', 'Unpaid'
+  final String? createdBy;
+  final String? createdAt;
+  final Map<String, dynamic>? rawJson;
 
   ClientInvoice({
     required this.id,
@@ -94,16 +140,44 @@ class ClientInvoice {
     required this.remainingAmount,
     required this.date,
     required this.status,
+    this.createdBy,
+    this.createdAt,
+    this.rawJson,
   });
 
   factory ClientInvoice.fromJson(Map<String, dynamic> json) {
+    String? createdByName;
+    if (json['createdBy'] != null) {
+      if (json['createdBy'] is Map) {
+        createdByName = json['createdBy']['name']?.toString();
+      } else if (json['createdBy'] is String) {
+        final val = json['createdBy'].toString().trim();
+        if (!RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(val)) {
+          createdByName = val;
+        }
+      }
+    }
+    if (createdByName == null && json['salesPerson'] != null) {
+      if (json['salesPerson'] is Map) {
+        createdByName = json['salesPerson']['name']?.toString();
+      } else if (json['salesPerson'] is String) {
+        final val = json['salesPerson'].toString().trim();
+        if (!RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(val)) {
+          createdByName = val;
+        }
+      }
+    }
+
     return ClientInvoice(
       id: json['_id'] ?? json['id'] ?? '',
       invoiceNumber: json['invoiceNumber'] ?? '',
       totalAmount: (json['totalAmount'] ?? 0.0).toDouble(),
       remainingAmount: (json['remainingAmount'] ?? 0.0).toDouble(),
-      date: json['date'] ?? '',
+      date: json['date']?.toString() ?? json['createdAt']?.toString() ?? '',
       status: json['status'] ?? 'Pending',
+      createdBy: createdByName,
+      createdAt: json['createdAt']?.toString(),
+      rawJson: json,
     );
   }
 }
@@ -113,12 +187,16 @@ class ClientQuotation {
   final String quotationNumber;
   final double grandTotal;
   final String date;
+  final String status;
+  final Map<String, dynamic>? rawJson;
 
   ClientQuotation({
     required this.id,
     required this.quotationNumber,
     required this.grandTotal,
     required this.date,
+    this.status = 'Pending',
+    this.rawJson,
   });
 
   factory ClientQuotation.fromJson(Map<String, dynamic> json) {
@@ -126,7 +204,9 @@ class ClientQuotation {
       id: json['_id'] ?? json['id'] ?? '',
       quotationNumber: json['quoteNumber'] ?? json['quotationNumber'] ?? '',
       grandTotal: (json['totalAmount'] ?? json['grandTotal'] ?? 0.0).toDouble(),
-      date: json['date'] ?? json['createdAt'] ?? '',
+      date: json['date']?.toString() ?? json['createdAt']?.toString() ?? '',
+      status: json['status']?.toString() ?? 'Pending',
+      rawJson: json,
     );
   }
 }
@@ -135,8 +215,11 @@ class ClientPayment {
   final String id;
   final double amount;
   final String date;
-  final String paymentMode; // 'UPI', 'Bank Transfer', 'Cash', 'Cheque'
+  final String paymentMode; // 'UPI', 'Bank Transfer', 'Cash', 'Cheque', 'Other'
   final String referenceNote;
+  final String? invoiceNumber;
+  final String? createdBy;
+  final String? createdAt;
 
   ClientPayment({
     required this.id,
@@ -144,15 +227,44 @@ class ClientPayment {
     required this.date,
     required this.paymentMode,
     required this.referenceNote,
+    this.invoiceNumber,
+    this.createdBy,
+    this.createdAt,
   });
 
   factory ClientPayment.fromJson(Map<String, dynamic> json) {
+    String? invNum;
+    if (json['invoiceId'] != null) {
+      if (json['invoiceId'] is Map) {
+        invNum = json['invoiceId']['invoiceNumber']?.toString();
+      } else if (json['invoiceId'] is String) {
+        final val = json['invoiceId'].toString().trim();
+        if (!RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(val)) {
+          invNum = val;
+        }
+      }
+    }
+    String? createdByName;
+    if (json['createdBy'] != null) {
+      if (json['createdBy'] is Map) {
+        createdByName = json['createdBy']['name']?.toString();
+      } else if (json['createdBy'] is String) {
+        final val = json['createdBy'].toString().trim();
+        if (!RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(val)) {
+          createdByName = val;
+        }
+      }
+    }
+
     return ClientPayment(
       id: json['_id'] ?? json['id'] ?? '',
       amount: (json['amount'] ?? 0.0).toDouble(),
-      date: json['date'] ?? '',
-      paymentMode: json['paymentMode'] ?? '',
+      date: json['date']?.toString() ?? json['createdAt']?.toString() ?? '',
+      paymentMode: json['paymentMode'] ?? 'UPI',
       referenceNote: json['referenceNote'] ?? '',
+      invoiceNumber: invNum,
+      createdBy: createdByName,
+      createdAt: json['createdAt']?.toString(),
     );
   }
 }
@@ -192,35 +304,54 @@ class ClientsController extends GetxController {
     }
   }
 
-  Future<void> fetchInvoices() async {
+  Future<void> fetchInvoices([String? clientId]) async {
     try {
-      final response = await ApiService.get('${ApiConstants.invoices}?limit=10000');
+      final url = (clientId != null && clientId.isNotEmpty)
+          ? '${ApiConstants.invoices}?clientId=$clientId&limit=1000'
+          : '${ApiConstants.invoices}?limit=10000';
+      final response = await ApiService.get(url);
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
-          allInvoices.assignAll(data);
-
-          final Map<String, List<ClientInvoice>> groupedInvoices = {};
-
-          for (var item in data) {
-            final inv = ClientInvoice.fromJson(item);
-            final clientObj = item['client'];
-            String cid = '';
-            if (clientObj is Map) {
-              cid = clientObj['clientId'] ?? clientObj['_id'] ?? clientObj['id'] ?? '';
-            } else if (clientObj is String) {
-              cid = clientObj;
+          if (clientId == null || clientId.isEmpty) {
+            allInvoices.assignAll(data);
+          } else {
+            for (var item in data) {
+              if (!allInvoices.any((x) => x['_id'] == item['_id'] || x['id'] == item['id'])) {
+                allInvoices.add(item);
+              }
             }
-            if (cid.isNotEmpty) {
-              groupedInvoices.putIfAbsent(cid, () => []).add(inv);
+          }
+
+          final Map<String, List<ClientInvoice>> groupedInvoices =
+              Map.from(clientInvoices);
+
+          if (clientId != null && clientId.isNotEmpty) {
+            groupedInvoices[clientId] =
+                data.map((item) => ClientInvoice.fromJson(item)).toList();
+          } else {
+            groupedInvoices.clear();
+            for (var item in data) {
+              final inv = ClientInvoice.fromJson(item);
+              final clientObj = item['client'];
+              String cid = '';
+              if (clientObj is Map) {
+                cid = clientObj['clientId'] ?? clientObj['_id'] ?? clientObj['id'] ?? '';
+              } else if (clientObj is String) {
+                cid = clientObj;
+              }
+              if (cid.isNotEmpty) {
+                groupedInvoices.putIfAbsent(cid, () => []).add(inv);
+              }
             }
           }
           clientInvoices.assignAll(groupedInvoices);
         }
       }
-      // Fetch quotations sequentially
-      await fetchQuotations();
+      if (clientId == null || clientId.isEmpty) {
+        await fetchQuotations();
+      }
     } catch (e) {
       debugPrint('Error fetching invoices: $e');
     }
@@ -303,27 +434,45 @@ class ClientsController extends GetxController {
     return null;
   }
 
-  Future<void> fetchQuotations() async {
+  Future<void> fetchQuotations([String? clientId]) async {
     try {
-      final response = await ApiService.get('${ApiConstants.quotations}?limit=10000');
+      final url = (clientId != null && clientId.isNotEmpty)
+          ? '${ApiConstants.quotations}?clientId=$clientId&limit=1000'
+          : '${ApiConstants.quotations}?limit=10000';
+      final response = await ApiService.get(url);
       if (response.statusCode == 200) {
         final Map<String, dynamic> body = jsonDecode(response.body);
         if (body['success'] == true) {
           final List<dynamic> data = body['data'] ?? [];
-          allQuotations.assignAll(data);
-          final Map<String, List<ClientQuotation>> groupedQuotes = {};
-
-          for (var item in data) {
-            final quote = ClientQuotation.fromJson(item);
-            final clientObj = item['client'];
-            String cid = '';
-            if (clientObj is Map) {
-              cid = clientObj['clientId'] ?? clientObj['_id'] ?? clientObj['id'] ?? '';
-            } else if (clientObj is String) {
-              cid = clientObj;
+          if (clientId == null || clientId.isEmpty) {
+            allQuotations.assignAll(data);
+          } else {
+            for (var item in data) {
+              if (!allQuotations.any((x) => x['_id'] == item['_id'] || x['id'] == item['id'])) {
+                allQuotations.add(item);
+              }
             }
-            if (cid.isNotEmpty) {
-              groupedQuotes.putIfAbsent(cid, () => []).add(quote);
+          }
+          final Map<String, List<ClientQuotation>> groupedQuotes =
+              Map.from(clientQuotations);
+
+          if (clientId != null && clientId.isNotEmpty) {
+            groupedQuotes[clientId] =
+                data.map((item) => ClientQuotation.fromJson(item)).toList();
+          } else {
+            groupedQuotes.clear();
+            for (var item in data) {
+              final quote = ClientQuotation.fromJson(item);
+              final clientObj = item['client'];
+              String cid = '';
+              if (clientObj is Map) {
+                cid = clientObj['clientId'] ?? clientObj['_id'] ?? clientObj['id'] ?? '';
+              } else if (clientObj is String) {
+                cid = clientObj;
+              }
+              if (cid.isNotEmpty) {
+                groupedQuotes.putIfAbsent(cid, () => []).add(quote);
+              }
             }
           }
           clientQuotations.assignAll(groupedQuotes);

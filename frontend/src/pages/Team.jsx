@@ -9,14 +9,14 @@ import { AlertCircle, CheckCircle, Plus, Trash2, Upload, RefreshCw, Lock, ArrowR
 
 // Plan limits mirror the backend PLANS config
 const PLAN_LIMITS = {
-  basic:      { maxUsers: 1 },
-  premium:    { maxUsers: 5 },
-  enterprise: { maxUsers: Infinity },
+  freelance: { maxUsers: 1 },
+  pro:       { maxUsers: 3 },
+  business:  { maxUsers: Infinity },
 };
 
 const Team = () => {
   const [team, setTeam] = useState([]);
-  const [plan, setPlan] = useState("basic");
+  const [plan, setPlan] = useState("freelance");
   const [pageLoading, setPageLoading] = useState(true);
   const { token, user } = useContext(AuthContext);
 
@@ -54,7 +54,7 @@ const Team = () => {
         api.get("/auth/settings"),
       ]);
       setTeam(resUsers.data.data || []);
-      setPlan(resSettings.data.data.subscriptionPlan || "basic");
+      setPlan(resSettings.data.data.subscriptionPlan || "freelance");
     } catch (error) {
       setApiError("Error fetching team details.");
     } finally {
@@ -155,7 +155,7 @@ const Team = () => {
           )}
         </div>
 
-        {plan !== "enterprise" && (
+        {plan !== "business" && (
           <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
             <div className="flex justify-between text-sm mb-2">
               <span className="font-semibold text-gray-700">Team Slots Used</span>
@@ -171,7 +171,7 @@ const Team = () => {
             </div>
             {isAtLimit && (
               <p className="text-xs text-red-600 mt-2 flex items-center gap-1">
-                <AlertCircle className="h-3 w-3" /> Team limit reached. <Link to="/settings" className="underline font-bold">Upgrade to {plan === 'basic' ? 'Pro' : 'Business'}</Link> for more members.
+                <AlertCircle className="h-3 w-3" /> Team limit reached. <Link to="/settings" className="underline font-bold">Upgrade to {plan === 'freelance' ? 'Pro' : 'Business'}</Link> for more members.
               </p>
             )}
           </div>

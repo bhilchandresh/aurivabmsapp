@@ -41,7 +41,7 @@ const syncPurchaseStatus = async (supplierId, tenantId) => {
 };
 
 const getPlanLimits = (planName) => {
-  return checkSubscription.PLANS[planName] || checkSubscription.PLANS['basic'];
+  return checkSubscription.PLANS[planName] || checkSubscription.PLANS['freelance'];
 };
 
 // --- HELPER FUNCTION: Sync Inventory for Purchase ---
@@ -147,8 +147,15 @@ exports.createSupplier = async (req, res) => {
         }
         
         const supp = await Supplier.create({ ...req.body, tenantId: req.user.tenantId, createdBy: req.user._id });
+        await supp.populate('createdBy', 'name email');
+        const enhancedSupp = {
+            ...supp.toObject(),
+            totalPurchased: 0,
+            totalPaid: 0,
+            balance: 0
+        };
         if(typeof logActivity === 'function') await logActivity(req, 'CREATE_SUPPLIER', `Added supplier: ${supp.name}`);
-        res.status(201).json({ success: true, data: supp });
+        res.status(201).json({ success: true, data: enhancedSupp });
     } catch (e) {
         res.status(400).json({ success: false, message: e.message });
     }
@@ -212,6 +219,36 @@ exports.createPurchase = async (req, res) => {
         }
 
         res.status(201).json({ success: true, data: bill });
+    } catch (e) {
+        res.status(400).json({ success: false, message: e.message });
+    }
+};
+
+exports.updatePurchase = async (req, res) => {
+    try {
+        const billId = req.params.billId;
+        const tenantId = req.user.tenantId;
+
+        const oldBill = await Purchase.findOne({ _id: billId, tenantId });
+        if (!oldBill) return res.status(404).json({ success: false, message: "Purchase bill not found" });
+
+        const supplier = await Supplier.findById(req.body.supplierId || oldBill.supplierId);
+        if (!supplier) return res.status(404).json({ success: false, message: "Supplier not found" });
+
+        // Revert old inventory
+        await revertInventoryForPurchase(tenantId, billId);
+
+        // Update the bill
+        const bill = await Purchase.findOneAndUpdate({ _id: billId, tenantId }, req.body, { new: true });
+
+        // Sync new inventory
+        if (bill.items && Array.isArray(bill.items)) {
+            await syncInventoryForPurchase(tenantId, bill.items, bill._id, supplier.name);
+        }
+
+        await syncPurchaseStatus(bill.supplierId, tenantId);
+
+        res.json({ success: true, data: bill });
     } catch (e) {
         res.status(400).json({ success: false, message: e.message });
     }

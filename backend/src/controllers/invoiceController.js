@@ -274,7 +274,8 @@ exports.getInvoices = async (req, res) => {
       .sort(sortObj)
       .skip(skip)
       .limit(limit)
-      .populate('createdBy', 'name email');
+      .populate('createdBy', 'name email')
+      .populate('salesPerson', 'name email');
 
     const total = await Invoice.countDocuments(query);
 

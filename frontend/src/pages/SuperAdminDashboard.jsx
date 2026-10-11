@@ -54,7 +54,7 @@ const SuperAdminDashboard = () => {
   } = useForm({
       defaultValues: {
           subscriptionEnd: getDefaultDate(),
-          plan: 'basic',
+          plan: 'freelance',
           templatePreference: 'standard',
           quotationTemplate: 'standard'
       }
@@ -178,7 +178,7 @@ const SuperAdminDashboard = () => {
   const handleOpenCreate = () => {
     resetCreate({
         subscriptionEnd: getDefaultDate(),
-        plan: 'basic',
+        plan: 'freelance',
         templatePreference: 'standard',
         quotationTemplate: 'standard',
         companyName: '',
@@ -285,7 +285,7 @@ const SuperAdminDashboard = () => {
       setEditingTenant(null);
       setViewMode('list');
       fetchData();
-    } catch (e) { toast.error("Update Failed"); }
+    } catch (e) { toast.error(e.response?.data?.message || "Update Failed"); }
   };
 
   const handleDelete = async (id) => {
@@ -369,10 +369,10 @@ const SuperAdminDashboard = () => {
                           </td>
                           <td className="p-4">
                              <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 text-xs font-bold uppercase border border-blue-100">
-                                {t.subscriptionPlan === 'basic' ? 'Freelancer' : t.subscriptionPlan === 'premium' ? 'Pro' : 'Business'}
+                                {t.subscriptionPlan === 'freelance' ? 'Freelancer' : t.subscriptionPlan === 'pro' ? 'Pro' : 'Business'}
                              </span>
                              <div className="text-xs text-gray-500 mt-1">
-                                {t.subscriptionPlan === 'enterprise' ? '₹599' : t.subscriptionPlan === 'premium' ? '₹299' : '₹199'}
+                                {t.subscriptionPlan === 'business' ? '₹599' : t.subscriptionPlan === 'pro' ? '₹299' : '₹199'}
                              </div>
                           </td>
                           <td className="p-4 min-w-[200px]">
@@ -444,9 +444,9 @@ const SuperAdminDashboard = () => {
                         <div>
                             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Select Plan</label>
                             <select {...registerCreate("plan", { required: true })} className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium">
-                                <option value="basic">Freelancer (₹199)</option>
-                                <option value="premium">Pro (₹299)</option>
-                                <option value="enterprise">Business (₹599)</option>
+                                <option value="freelance">Freelancer (₹199)</option>
+                                <option value="pro">Pro (₹299)</option>
+                                <option value="business">Business (₹599)</option>
                             </select>
                         </div>
                         <div>
@@ -556,7 +556,7 @@ const SuperAdminDashboard = () => {
                             <h4 className="text-sm font-bold text-gray-900 uppercase mb-4 flex items-center gap-2"><CheckCircle className="w-4 h-4 text-blue-500"/> Account Status</h4>
                             <div className="grid grid-cols-2 gap-4">
                                 <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Status</label><select {...registerEdit("status")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="active">Active</option><option value="suspended">Suspended</option><option value="deleted">Deleted</option></select></div>
-                                <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Plan</label><select {...registerEdit("subscriptionPlan")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="basic">Freelancer</option><option value="premium">Pro (Popular)</option><option value="enterprise">Business</option></select></div>
+                                <div><label className="text-xs font-bold text-gray-500 uppercase block mb-1">Plan</label><select {...registerEdit("subscriptionPlan")} className="w-full border p-2.5 rounded-lg bg-gray-50 font-medium outline-none"><option value="freelance">Freelancer</option><option value="pro">Pro (Popular)</option><option value="business">Business</option></select></div>
                             </div>
                         </div>
 

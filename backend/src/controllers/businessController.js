@@ -223,6 +223,19 @@ exports.getDashboardStats = async (req, res) => {
     const expenses = await Expense.find({ tenantId });
     const purchases = await Purchase.find({ tenantId });
 
+    const filter = req.query.filter || 'lifetime';
+    let filterDate = null;
+    if (filter !== 'lifetime') {
+      const now = new Date();
+      if (filter === 'this_year') filterDate = new Date(now.getFullYear(), 0, 1);
+      else if (filter === 'this_quarter') {
+        const quarter = Math.floor(now.getMonth() / 3);
+        filterDate = new Date(now.getFullYear(), quarter * 3, 1);
+      }
+      else if (filter === 'this_month') filterDate = new Date(now.getFullYear(), now.getMonth(), 1);
+      else if (filter === 'today') filterDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
     let totalRevenue = 0;
     let totalPendingAmount = 0;
     let totalCogs = 0;
@@ -230,9 +243,10 @@ exports.getDashboardStats = async (req, res) => {
     let pendingCount = 0;
 
     invoices.forEach(inv => {
+      if (filterDate && new Date(inv.date) < filterDate) return;
       totalRevenue += (inv.totalAmount || 0);
       totalCogs += (inv.totalCogs || 0);
-      if (inv.status === 'Pending' || inv.status === 'Overdue') {
+      if (inv.status === 'Pending' || inv.status === 'Overdue' || inv.status === 'Unpaid') {
         totalPendingAmount += (inv.totalAmount || 0);
         pendingCount++;
       }
@@ -243,11 +257,13 @@ exports.getDashboardStats = async (req, res) => {
 
     let totalExpenses = 0;
     expenses.forEach(exp => {
+      if (filterDate && new Date(exp.date) < filterDate) return;
       totalExpenses += (Number(exp.amount) || 0);
     });
 
     let totalPurchases = 0;
     purchases.forEach(p => {
+      if (filterDate && new Date(p.date) < filterDate) return;
       totalPurchases += (p.totalAmount || 0);
     });
 

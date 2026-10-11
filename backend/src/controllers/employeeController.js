@@ -27,20 +27,50 @@ const syncEmployeeSalary = async (employee, tenantId) => {
     const daysWorked = endDay - startDay + 1;
     
     if (daysWorked > 0) {
-      const amount = Math.round((employee.monthlySalary / daysInMonth) * daysWorked);
+      const baseAmount = Math.round((employee.monthlySalary / daysInMonth) * daysWorked);
       const description = `Salary for ${new Date(year, month).toLocaleString('default', { month: 'short', year: 'numeric' })} (Auto)`;
       
       await EmployeeTransaction.updateOne(
         { employeeId: employee._id, tenantId, type: 'Salary Credit', forMonth: monthStr },
         {
           $set: {
-            amount,
+            amount: baseAmount,
             description,
             date: new Date(year, month, endDay)
           }
         },
         { upsert: true }
       );
+
+      // Clear previous auto-generated leave deductions for this month
+      await EmployeeTransaction.deleteMany({
+        employeeId: employee._id,
+        tenantId,
+        type: 'Deduction',
+        forMonth: monthStr,
+        description: /^Unpaid Leave on/
+      });
+
+      // Create explicit deduction for each leave
+      const dailyRate = Math.round(employee.monthlySalary / daysInMonth);
+      const leavesInMonth = (employee.unpaidLeaves || []).filter(dateStr => {
+        const leaveDate = new Date(dateStr);
+        return leaveDate.getFullYear() === year && leaveDate.getMonth() === month && leaveDate.getDate() >= startDay && leaveDate.getDate() <= endDay;
+      });
+
+      for (const dateStr of leavesInMonth) {
+        const lDate = new Date(dateStr);
+        await EmployeeTransaction.create({
+          employeeId: employee._id,
+          tenantId,
+          createdBy: employee.createdBy, // optional
+          type: 'Deduction',
+          amount: dailyRate,
+          description: `Unpaid Leave on ${lDate.toLocaleDateString('en-GB')}`,
+          forMonth: monthStr,
+          date: lDate
+        });
+      }
     }
     
     // Move to next month
@@ -174,6 +204,37 @@ exports.deleteTransaction = async (req, res) => {
     });
     if (!tx) return res.status(404).json({ success: false, message: 'Transaction not found' });
     res.status(200).json({ success: true, data: {} });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Toggle a leave date for an employee
+exports.toggleLeave = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date } = req.body; // Expecting 'YYYY-MM-DD'
+    
+    if (!date) return res.status(400).json({ success: false, message: 'Date is required' });
+
+    const employee = await Employee.findOne({ _id: id, tenantId: req.user.tenantId });
+    if (!employee) return res.status(404).json({ success: false, message: 'Employee not found' });
+
+    const leaves = employee.unpaidLeaves || [];
+    const index = leaves.indexOf(date);
+    
+    if (index > -1) {
+      // Remove it
+      leaves.splice(index, 1);
+    } else {
+      // Add it
+      leaves.push(date);
+    }
+
+    employee.unpaidLeaves = leaves;
+    await employee.save();
+
+    res.status(200).json({ success: true, message: 'Leave updated', leaves: employee.unpaidLeaves });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

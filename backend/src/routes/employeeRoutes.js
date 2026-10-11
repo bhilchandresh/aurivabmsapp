@@ -1,5 +1,5 @@
 const express = require('express');
-const { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee, getEmployeeTransactions, addTransaction, deleteTransaction } = require('../controllers/employeeController');
+const { getEmployees, getEmployee, createEmployee, updateEmployee, deleteEmployee, getEmployeeTransactions, addTransaction, deleteTransaction, toggleLeave } = require('../controllers/employeeController');
 const { protect } = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -14,6 +14,9 @@ router.route('/:id')
   .get(getEmployee)
   .put(updateEmployee)
   .delete(deleteEmployee);
+
+router.route('/:id/leaves')
+  .post(toggleLeave);
 
 router.route('/:id/transactions')
   .get(getEmployeeTransactions)

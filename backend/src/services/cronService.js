@@ -43,30 +43,31 @@ const checkInvoices = async () => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 1) {
-      // Due Tomorrow
+      const clientName = inv.client?.name || 'Client';
       await dispatchNotification({
         tenantId: inv.tenantId,
         type: 'invoice_due',
-        message: `⏳ Invoice ${inv.invoiceNumber} worth ₹${inv.totalAmount} is due tomorrow.`,
+        message: `⏳ ${clientName}'s Invoice ${inv.invoiceNumber} (₹${inv.totalAmount}) is due tomorrow.`,
         preferenceKey: 'invoiceDueTomorrow',
         metadata: { entityId: inv._id, entityModel: 'Invoice' }
       });
     } else if (diffDays === 0) {
-      // Due Today
+      const clientName = inv.client?.name || 'Client';
       await dispatchNotification({
         tenantId: inv.tenantId,
         type: 'invoice_due',
-        message: `⚠️ Payment expected today for ${inv.invoiceNumber} (₹${inv.totalAmount}).`,
+        message: `⚠️ Payment expected today from ${clientName} for Invoice ${inv.invoiceNumber} (₹${inv.totalAmount}).`,
         preferenceKey: 'invoiceDueToday',
         metadata: { entityId: inv._id, entityModel: 'Invoice' }
       });
     } else if (diffDays < 0 && inv.status !== 'Overdue') {
       // Overdue
       const overdueDays = Math.abs(diffDays);
+      const clientName = inv.client?.name || 'Client';
       await dispatchNotification({
         tenantId: inv.tenantId,
         type: 'invoice_due',
-        message: `🚨 Invoice ${inv.invoiceNumber} is overdue by ${overdueDays} days.`,
+        message: `🚨 ${clientName}'s Invoice ${inv.invoiceNumber} is overdue by ${overdueDays} days.`,
         preferenceKey: 'invoiceOverdue',
         metadata: { entityId: inv._id, entityModel: 'Invoice' }
       });
@@ -91,10 +92,11 @@ const checkQuotations = async () => {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 3) {
+      const clientName = qt.client?.name || 'Client';
       await dispatchNotification({
         tenantId: qt.tenantId,
         type: 'quotation_alert',
-        message: `⏱️ Quotation ${qt.quotationNumber} expires in 3 days.`,
+        message: `⏱️ Quotation ${qt.quotationNumber} for ${clientName} expires in 3 days.`,
         preferenceKey: 'quotationExpiring',
         metadata: { entityId: qt._id, entityModel: 'Quotation' }
       });

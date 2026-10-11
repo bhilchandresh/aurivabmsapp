@@ -116,7 +116,7 @@ function getSortObj(sortBy) {
 // Get Single Client
 exports.getClientById = async (req, res) => {
   try {
-    const client = await Client.findOne({ _id: req.params.id, tenantId: req.user.tenantId });
+    const client = await Client.findOne({ _id: req.params.id, tenantId: req.user.tenantId }).populate('createdBy', 'name email');
     if (!client) return res.status(404).json({ success: false, message: "Client not found" });
     res.status(200).json({ success: true, data: client });
   } catch (error) {
@@ -344,7 +344,10 @@ exports.getClientPayments = async (req, res) => {
     const payments = await Payment.find({
       tenantId: req.user.tenantId,
       clientId: req.params.id
-    }).sort({ date: -1 }).populate('createdBy', 'name email');
+    })
+      .sort({ date: -1 })
+      .populate('createdBy', 'name email')
+      .populate('invoiceId', 'invoiceNumber');
     res.status(200).json({ success: true, data: payments });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

@@ -46,7 +46,7 @@ class Invoice {
     required this.placeOfSupply,
     required this.items,
     this.advancePayment = 0.0,
-    this.createdBy = 'Admin',
+    this.createdBy = 'Undefined',
   });
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
@@ -58,13 +58,40 @@ class Invoice {
     final String gst = clientObj['gstin'] ?? clientObj['gstNumber'] ?? '';
     final String state = clientObj['state'] ?? '';
     
-    String creator = 'Admin';
+    String creator = 'Undefined';
     if (json['createdBy'] != null) {
       if (json['createdBy'] is Map) {
-        creator = json['createdBy']['name'] ?? 'Admin';
+        final name = (json['createdBy']['name'] ?? '').toString().trim();
+        if (name.isNotEmpty && name.toLowerCase() != 'null') {
+          creator = name;
+        }
       } else if (json['createdBy'] is String) {
-        creator = json['createdBy'];
+        final str = json['createdBy'].toString().trim();
+        if (str.isNotEmpty && str.toLowerCase() != 'null' && (str.length != 24 || str.contains(' '))) {
+          creator = str;
+        }
       }
+    }
+
+    if (creator == 'Undefined' && json['salesPerson'] != null) {
+      if (json['salesPerson'] is Map) {
+        final name = (json['salesPerson']['name'] ?? '').toString().trim();
+        if (name.isNotEmpty && name.toLowerCase() != 'null') {
+          creator = name;
+        }
+      } else if (json['salesPerson'] is String) {
+        final str = json['salesPerson'].toString().trim();
+        if (str.isNotEmpty && str.toLowerCase() != 'null' && (str.length != 24 || str.contains(' '))) {
+          creator = str;
+        }
+      }
+    }
+
+    if (creator.isEmpty || 
+        creator.toLowerCase() == 'null' || 
+        creator.toLowerCase() == 'admin' || 
+        creator.toLowerCase() == 'undefined') {
+      creator = 'Undefined';
     }
 
     return Invoice(

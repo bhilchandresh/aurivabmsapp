@@ -27,7 +27,7 @@ const ExpiryPopup = () => {
     try {
       // 1. Create order on backend
       const res = await api.post('/payments/create-order', { 
-        plan: subscription.plan || 'basic' 
+        plan: subscription.plan || 'freelance' 
       });
 
       if (!res.data.success) throw new Error(res.data.message);

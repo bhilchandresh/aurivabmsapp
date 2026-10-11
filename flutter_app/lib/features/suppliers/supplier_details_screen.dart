@@ -7,12 +7,19 @@ import '../../core/constants/app_colors.dart';
 import 'suppliers_controller.dart';
 import '../inventory/inventory_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'widgets/add_purchase_bill_bottom_sheet.dart';
 import 'widgets/record_payment_bottom_sheet.dart';
+
 class SupplierDetailsScreen extends StatefulWidget {
   final String supplierId;
+  final Supplier? initialSupplier;
 
-  const SupplierDetailsScreen({super.key, required this.supplierId});
+  const SupplierDetailsScreen({
+    super.key,
+    required this.supplierId,
+    this.initialSupplier,
+  });
 
   @override
   State<SupplierDetailsScreen> createState() => _SupplierDetailsScreenState();
@@ -20,6 +27,59 @@ class SupplierDetailsScreen extends StatefulWidget {
 
 class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
     with SingleTickerProviderStateMixin {
+  bool _isLoading = true;
+
+  static final Supplier _dummySupplier = Supplier(
+    id: 'skeleton_supplier_id',
+    name: 'Loading Supplier Details',
+    email: 'supplier@example.com',
+    phone: '+91 98765 43210',
+    gstNumber: '24AAAAA0000A1Z5',
+    address: 'Loading address...',
+    totalPurchased: 85000.0,
+    totalPaid: 60000.0,
+    createdBy: 'Undefined',
+  );
+
+  static final List<SupplierPurchaseBill> _mockBills = [
+    SupplierPurchaseBill(
+      id: 'mock_bill_1',
+      billNumber: 'PB-0012',
+      date: '2026-10-10',
+      dueDate: '2026-10-25',
+      totalAmount: 15400.0,
+      amountPaid: 15400.0,
+      status: 'Paid',
+      notes: 'Purchase items',
+      items: [],
+      createdBy: 'Undefined',
+    ),
+    SupplierPurchaseBill(
+      id: 'mock_bill_2',
+      billNumber: 'PB-0011',
+      date: '2026-10-05',
+      dueDate: '2026-10-20',
+      totalAmount: 22000.0,
+      amountPaid: 10000.0,
+      status: 'Partial',
+      notes: 'Hardware batch',
+      items: [],
+      createdBy: 'Undefined',
+    ),
+  ];
+
+  static final List<SupplierPayment> _mockPayments = [
+    SupplierPayment(
+      id: 'mock_pay_1',
+      amount: 50000.0,
+      paymentDate: '2026-08-26',
+      paymentMode: 'Bank Transfer',
+      referenceNumber: '',
+      notes: '',
+      createdBy: 'Admin',
+    ),
+  ];
+
   final formatCurrency = NumberFormat.currency(
     locale: 'en_IN',
     symbol: '₹',
@@ -43,7 +103,42 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
       duration: const Duration(milliseconds: 600),
     );
     _animationController.forward();
-    _suppliersController.fetchSupplierDetails(widget.supplierId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadData();
+      }
+    });
+  }
+
+  Future<void> _loadData() async {
+    if (mounted && !_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
+
+    try {
+      final futures = <Future<dynamic>>[
+        _suppliersController.fetchSupplierDetails(widget.supplierId),
+      ];
+
+      if (_suppliersController.suppliers.isEmpty) {
+        futures.add(_suppliersController.fetchSuppliers());
+      }
+
+      // Smooth skeleton shimmer duration matching client details screen
+      futures.add(Future.delayed(const Duration(milliseconds: 450)));
+
+      await Future.wait(futures);
+    } catch (e) {
+      debugPrint('Error loading supplier details: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -52,10 +147,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
     super.dispose();
   }
 
-  String _safeFormatDate(String dateStr) {
-    if (dateStr.isEmpty) return 'N/A';
+  String _safeFormatDate(String? dateStr) {
+    if (dateStr == null || dateStr.trim().isEmpty) return 'N/A';
     try {
-      final parsed = DateTime.tryParse(dateStr);
+      final parsed = DateTime.tryParse(dateStr.trim());
       if (parsed == null) return dateStr;
       return _displayDateFormat.format(parsed);
     } catch (_) {
@@ -67,128 +162,141 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Obx(() {
-      final supplierIndex = _suppliersController.suppliers.indexWhere(
-        (s) => s.id == widget.supplierId,
-      );
-      if (supplierIndex == -1) {
-        return Scaffold(
-          body: Center(
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
+        elevation: 0,
+        leading: Center(
+          child: Container(
+            width: 36,
+            height: 36,
+            margin: const EdgeInsets.only(left: 16.0),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+              ),
+            ),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: SvgPicture.asset(
+                'assets/SVG/backarrow.svg',
+                width: 18,
+                height: 18,
+                colorFilter: ColorFilter.mode(
+                  Theme.of(context).textTheme.displayLarge?.color ??
+                      Colors.black,
+                  BlendMode.srcIn,
+                ),
+              ),
+              onPressed: () => Get.back(),
+            ),
+          ),
+        ),
+        title: Text(
+          'Supplier Details',
+          style: context.typography.invoiceTitle.copyWith(
+            color: Theme.of(context).textTheme.displayLarge?.color,
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: false,
+      ),
+      body: Obx(() {
+        final supplierIndex = _suppliersController.suppliers.indexWhere(
+          (s) => s.id == widget.supplierId,
+        );
+
+        Supplier? currentSupplier;
+        if (supplierIndex != -1) {
+          currentSupplier = _suppliersController.suppliers[supplierIndex];
+        } else if (widget.initialSupplier != null) {
+          currentSupplier = widget.initialSupplier;
+        } else if (_isLoading) {
+          currentSupplier = _dummySupplier;
+        }
+
+        if (currentSupplier == null) {
+          return Center(
             child: Text(
               'Supplier not found',
               style: context.typography.emptyStateDescription.copyWith(
                 color: Theme.of(context).textTheme.displayLarge?.color,
               ),
             ),
+          );
+        }
+
+        final supplier = currentSupplier;
+        final rawBills = _suppliersController.supplierBills[widget.supplierId];
+        final rawPayments =
+            _suppliersController.supplierPayments[widget.supplierId];
+
+        final bills = (_isLoading && (rawBills == null || rawBills.isEmpty))
+            ? _mockBills
+            : (rawBills ?? <SupplierPurchaseBill>[]);
+        final payments =
+            (_isLoading && (rawPayments == null || rawPayments.isEmpty))
+                ? _mockPayments
+                : (rawPayments ?? <SupplierPayment>[]);
+
+        return SafeArea(
+          child: RefreshIndicator(
+            onRefresh: _loadData,
+            color: Theme.of(context).colorScheme.primary,
+            child: Skeletonizer(
+              enabled: _isLoading,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Supplier Info Card
+                    _buildSupplierHeaderCard(supplier, isDark),
+                    const SizedBox(height: 16),
+
+                    // Stats Cards Section
+                    _buildStatsGrid(
+                      supplier,
+                      bills,
+                      payments,
+                      isDark,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Action Buttons Row
+                    _buildActionsRow(context, supplier.id, isDark),
+                    const SizedBox(height: 24),
+
+                    // Tabs Header
+                    _buildTabHeader(
+                      isDark,
+                      bills.length,
+                      payments.length,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Tab Content with Animated Switcher
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 300),
+                      child: _activeTab == 'bills'
+                          ? _buildBillsTab(supplier, bills, isDark)
+                          : _buildPaymentsTab(payments, isDark),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         );
-      }
-
-      final supplier = _suppliersController.suppliers[supplierIndex];
-      final bills = _suppliersController.supplierBills[widget.supplierId];
-      final payments = _suppliersController.supplierPayments[widget.supplierId];
-
-      final showSpinner =
-          _suppliersController.isLoading.value &&
-          (bills == null || payments == null);
-
-      return Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
-          elevation: 0,
-          leading: Center(
-            child: Container(
-              width: 36,
-              height: 36,
-              margin: const EdgeInsets.only(left: 16.0),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                shape: BoxShape.circle,
-                border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: SvgPicture.asset(
-                  'assets/SVG/backarrow.svg',
-                  width: 18,
-                  height: 18,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).textTheme.displayLarge?.color ?? Colors.black,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ),
-          title: Text(
-            'Supplier Details',
-            style: context.typography.invoiceTitle.copyWith(
-              color: Theme.of(context).textTheme.displayLarge?.color,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
-          centerTitle: false,
-        ),
-        body: SafeArea(
-          child: showSpinner
-              ? Center(
-                  child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary),
-                )
-              : RefreshIndicator(
-                  onRefresh: () => _suppliersController.fetchSupplierDetails(
-                    widget.supplierId,
-                  ),
-                  color: Theme.of(context).colorScheme.primary,
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(
-                      parent: BouncingScrollPhysics(),
-                    ),
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Supplier Info Card
-                        _buildSupplierHeaderCard(supplier, isDark),
-                        const SizedBox(height: 16),
-
-                        // Stats Cards Section
-                        _buildStatsGrid(
-                          supplier,
-                          bills ?? [],
-                          payments ?? [],
-                          isDark,
-                        ),
-                        const SizedBox(height: 20),
-
-                        // Action Buttons Row
-                        _buildActionsRow(context, supplier.id, isDark),
-                        const SizedBox(height: 24),
-
-                        // Tabs Header
-                        _buildTabHeader(
-                          isDark,
-                          (bills ?? []).length,
-                          (payments ?? []).length,
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Tab Content with Animated Switcher
-                        AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: _activeTab == 'bills'
-                              ? _buildBillsTab(supplier, bills ?? [], isDark)
-                              : _buildPaymentsTab(payments ?? [], isDark),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-        ),
-      );
-    });
+      }),
+    );
   }
 
   Widget _buildSupplierHeaderCard(Supplier supplier, bool isDark) {
@@ -214,7 +322,9 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
             ),
             child: Center(
               child: Text(
-                supplier.name.substring(0, 1).toUpperCase(),
+                supplier.name.isNotEmpty
+                    ? supplier.name.substring(0, 1).toUpperCase()
+                    : 'S',
                 style: context.typography.clientName.copyWith(
                   color: isDark ? Colors.blue.shade300 : Colors.blue.shade700,
                   fontWeight: FontWeight.w700,
@@ -456,7 +566,15 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
       children: [
         Expanded(
           child: ElevatedButton.icon(
-            onPressed: () => showAddPurchaseBillBottomSheet(context, supplierId),
+            onPressed: () async {
+              await Get.bottomSheet(
+                AddPurchaseBillBottomSheet(supplierId: supplierId),
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                ignoreSafeArea: false,
+              );
+              if (mounted) _loadData();
+            },
             icon: SvgPicture.asset(
               'assets/SVG/plus.svg',
               width: 16,
@@ -478,7 +596,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
         const SizedBox(width: 12),
         Expanded(
           child: ElevatedButton.icon(
-            onPressed: () => _showRecordPaymentDialog(context, supplierId),
+            onPressed: () async {
+              await _showRecordPaymentDialog(context, supplierId);
+              if (mounted) _loadData();
+            },
             icon: SvgPicture.asset(
               'assets/SVG/card.svg',
               width: 16,
@@ -597,13 +718,21 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
     final statusColor = _getStatusColor(bill.status);
     final statusBgColor = statusColor.withValues(alpha: 0.15);
 
+    final String rawCreator = bill.createdBy.trim();
+    final String creatorTag = (rawCreator.isEmpty ||
+            rawCreator.toLowerCase() == 'admin' ||
+            rawCreator.toLowerCase() == 'unknown' ||
+            rawCreator.toLowerCase() == 'null')
+        ? 'Undefined'
+        : rawCreator;
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.35),
         ),
       ),
       child: Column(
@@ -621,48 +750,56 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                       bill.billNumber,
                       style: context.typography.invoiceNumber.copyWith(
                         fontWeight: FontWeight.w700,
-                        fontSize: 14,
+                        fontSize: 13,
                         color: Theme.of(context).textTheme.displayLarge?.color,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Text(
                       _safeFormatDate(bill.date),
                       style: context.typography.dueDate.copyWith(
-                        fontSize: 11,
+                        fontSize: 10.5,
                         color: Colors.grey.shade500,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                        borderRadius: BorderRadius.circular(12),
+                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                          width: 0.5,
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(3),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
+                            width: 15,
+                            height: 15,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                               shape: BoxShape.circle,
                             ),
                             child: Text(
-                              bill.createdBy.isNotEmpty ? bill.createdBy.substring(0, 1).toUpperCase() : 'S',
-                              style: const TextStyle(
-                                fontSize: 9,
+                              creatorTag.isNotEmpty
+                                  ? creatorTag.substring(0, 1).toUpperCase()
+                                  : 'U',
+                              style: TextStyle(
+                                fontSize: 8,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                color: isDark ? Colors.white : Colors.black87,
                               ),
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 5),
                           Text(
-                            bill.createdBy.isNotEmpty ? bill.createdBy : 'Unknown',
+                            creatorTag,
                             style: TextStyle(
-                              fontSize: 10,
+                              fontSize: 9.5,
                               fontWeight: FontWeight.w600,
                               color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
                             ),
@@ -677,24 +814,24 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                 onTap: () => _confirmDeleteBill(bill.id, bill.billNumber),
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
                     color: Colors.red.shade50,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: SvgPicture.asset(
                     'assets/SVG/delete.svg',
-                    width: 16,
-                    height: 16,
+                    width: 14,
+                    height: 14,
                     colorFilter: ColorFilter.mode(Colors.red.shade400, BlendMode.srcIn),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height:6),
-          Divider(height: 1, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.25)),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
+          Divider(height: 1, color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2)),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
@@ -705,16 +842,16 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                     Text(
                       'Amount',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 9,
                         color: Colors.grey.shade500,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       formatCurrency.format(bill.totalAmount),
                       style: context.typography.invoiceAmount.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 13.5,
                         color: Theme.of(context).textTheme.displayLarge?.color,
                       ),
                     ),
@@ -723,10 +860,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
               ),
               Container(
                 width: 1,
-                height: 24,
+                height: 22,
                 color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 flex: 2,
                 child: Column(
@@ -735,16 +872,16 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                     Text(
                       'Paid',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 9,
                         color: Colors.grey.shade500,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       formatCurrency.format(bill.amountPaid),
                       style: context.typography.invoiceAmount.copyWith(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 13.5,
                         color: Colors.green,
                       ),
                     ),
@@ -753,10 +890,10 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
               ),
               Container(
                 width: 1,
-                height: 24,
+                height: 22,
                 color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 flex: 1,
                 child: Column(
@@ -765,24 +902,24 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
                     Text(
                       'Status',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 9,
                         color: Colors.grey.shade500,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 6,
-                        vertical: 3,
+                        vertical: 2,
                       ),
                       decoration: BoxDecoration(
                         color: statusBgColor,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         bill.status,
                         style: context.typography.invoiceStatus.copyWith(
-                          fontSize: 10,
+                          fontSize: 9,
                           fontWeight: FontWeight.bold,
                           color: statusColor,
                         ),
@@ -844,140 +981,287 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
     );
   }
 
+  String _getPaymentModeSvg(String? mode) {
+    final lower = (mode ?? '').toLowerCase();
+    if (lower.contains('bank') || lower.contains('transfer')) {
+      return 'assets/SVG/bank.svg';
+    } else if (lower.contains('cash')) {
+      return 'assets/SVG/cash.svg';
+    } else if (lower.contains('upi')) {
+      return 'assets/SVG/upi.svg';
+    } else if (lower.contains('cheque')) {
+      return 'assets/SVG/cheque.svg';
+    }
+    return 'assets/SVG/bank.svg';
+  }
+
   Widget _buildPaymentCard(SupplierPayment payment, bool isDark) {
+    final String rawCreator = payment.createdBy.trim();
+    final String creatorTag = (rawCreator.isEmpty ||
+            rawCreator.toLowerCase() == 'undefined' ||
+            rawCreator.toLowerCase() == 'null')
+        ? 'Admin'
+        : rawCreator;
+
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.15),
+          color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.25),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Top Row: Date on Left, Delete & Creator on Right
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                _safeFormatDate(payment.paymentDate),
-                style: context.typography.dueDate.copyWith(
-                  fontSize: 12,
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              InkWell(
-                onTap: () => _confirmDeletePayment(payment.id, payment.amount),
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      SvgPicture.asset(
-                        'assets/SVG/delete.svg',
-                        width: 12,
-                        height: 12,
-                        colorFilter: ColorFilter.mode(Colors.red.shade400, BlendMode.srcIn),
+              // Date with Calendar SVG Icon
+              Padding(
+                padding: const EdgeInsets.only(top: 2.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/SVG/calendernormal.svg',
+                      width: 14,
+                      height: 14,
+                      colorFilter: ColorFilter.mode(
+                        isDark ? Colors.grey.shade400 : const Color(0xFF64748B),
+                        BlendMode.srcIn,
                       ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Delete',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.red.shade400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    formatCurrency.format(payment.amount),
-                    style: context.typography.invoiceAmount.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                      color: Colors.green.shade600,
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: payment.paymentMode.toLowerCase() == 'cash' 
-                          ? Colors.green.shade50 
-                          : Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      payment.paymentMode,
-                      style: context.typography.invoiceStatus.copyWith(
-                        fontSize: 11,
+                    const SizedBox(width: 6),
+                    Text(
+                      _safeFormatDate(payment.paymentDate),
+                      style: TextStyle(
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: payment.paymentMode.toLowerCase() == 'cash' 
-                            ? Colors.green.shade700 
-                            : Colors.blue.shade700,
+                        color: isDark ? Colors.grey.shade300 : const Color(0xFF475569),
                       ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Right action badges (Delete & Creator)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // Delete Button Pill
+                  InkWell(
+                    onTap: () => _confirmDeletePayment(payment.id, payment.amount),
+                    borderRadius: BorderRadius.circular(8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.red.shade900.withValues(alpha: 0.3)
+                            : const Color(0xFFFEE2E2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/SVG/delete.svg',
+                            width: 11,
+                            height: 11,
+                            colorFilter: ColorFilter.mode(
+                              isDark ? Colors.red.shade300 : const Color(0xFFDC2626),
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Delete',
+                            style: TextStyle(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.red.shade300 : const Color(0xFFDC2626),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+
+                  // Creator / Admin Pill
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF1E293B)
+                          : const Color(0xFFEEF2FF),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isDark ? Colors.indigo.shade900 : const Color(0xFFE0E7FF),
+                        width: 0.5,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          'assets/SVG/profile.svg',
+                          width: 10,
+                          height: 10,
+                          colorFilter: ColorFilter.mode(
+                            isDark ? Colors.indigo.shade300 : const Color(0xFF4F46E5),
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          creatorTag,
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.indigo.shade300 : const Color(0xFF4F46E5),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+            ],
+          ),
+
+          const SizedBox(height: 3),
+
+          // Middle Section: Amount and Received status pill
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                formatCurrency.format(payment.amount),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF15803D), // matching image strong green
+                  letterSpacing: -0.5,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? const Color(0xFF14532D).withValues(alpha: 0.35)
+                      : const Color(0xFFDCFCE7),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      payment.referenceNumber.isNotEmpty
-                          ? 'UTR/Ref: ${payment.referenceNumber}'
-                          : 'UTR/Ref: —',
-                      textAlign: TextAlign.right,
-                      style: context.typography.tableCell.copyWith(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey.shade700,
+                    Container(
+                      width: 5,
+                      height: 5,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF16A34A),
+                        shape: BoxShape.circle,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    if (payment.notes.isNotEmpty)
-                      Text(
-                        payment.notes,
-                        textAlign: TextAlign.right,
-                        style: context.typography.cardDescription.copyWith(
-                          fontSize: 13,
-                          color: Colors.grey.shade500,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Received',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF15803D),
                       ),
+                    ),
                   ],
                 ),
               ),
             ],
           ),
+
+          const SizedBox(height: 10),
+
+          // Bottom Row: Payment Mode Pill on Left & UTR/Ref on Right
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Payment Mode Pill
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4.5),
+                decoration: BoxDecoration(
+                  color: isDark
+                      ? Colors.blue.shade900.withValues(alpha: 0.3)
+                      : const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      _getPaymentModeSvg(payment.paymentMode),
+                      width: 12,
+                      height: 12,
+                      colorFilter: const ColorFilter.mode(
+                        Color(0xFF2563EB),
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      payment.paymentMode.isNotEmpty ? payment.paymentMode : 'Bank Transfer',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2563EB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // UTR / Reference Number
+              Text(
+                payment.referenceNumber.trim().isNotEmpty
+                    ? 'UTR/Ref: ${payment.referenceNumber.trim()}'
+                    : 'UTR/Ref: —',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.grey.shade400 : const Color(0xFF64748B),
+                ),
+              ),
+            ],
+          ),
+
+          // Optional Notes
+          if (payment.notes.trim().isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text(
+              payment.notes.trim(),
+              style: TextStyle(
+                fontSize: 10.5,
+                fontStyle: FontStyle.italic,
+                color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -2395,8 +2679,8 @@ class _SupplierDetailsScreenState extends State<SupplierDetailsScreen>
   }
 
   // --- Record Payment Form Modal ---
-  void _showRecordPaymentDialog(BuildContext context, String supplierId) {
-    Get.bottomSheet(
+  Future<void> _showRecordPaymentDialog(BuildContext context, String supplierId) async {
+    await Get.bottomSheet(
       RecordPaymentBottomSheet(supplierId: supplierId),
       isScrollControlled: true,
       backgroundColor: Colors.transparent,

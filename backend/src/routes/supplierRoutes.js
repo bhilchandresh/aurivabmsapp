@@ -22,7 +22,9 @@ router.route('/purchases/all')
   .get(supplierController.getPurchases)
   .post(supplierController.createPurchase);
 
-router.delete('/purchases/:billId', supplierController.deletePurchase);
+router.route('/purchases/:billId')
+  .put(supplierController.updatePurchase)
+  .delete(supplierController.deletePurchase);
 
 // Payments (Ledger)
 router.route('/:supplierId/payments')

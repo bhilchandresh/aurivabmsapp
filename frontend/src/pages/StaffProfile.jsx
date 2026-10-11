@@ -110,6 +110,7 @@ export default function StaffProfile() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [leaveDateInput, setLeaveDateInput] = useState("");
 
   const loadData = useCallback(async () => {
     try {
@@ -138,6 +139,18 @@ export default function StaffProfile() {
       loadData();
     } catch (err) {
       toast.error("Failed to delete transaction");
+    }
+  };
+
+  const handleToggleLeave = async (dateToToggle) => {
+    if (!dateToToggle) return toast.error("Select a date first.");
+    try {
+      await api.post(`/employees/${id}/leaves`, { date: dateToToggle });
+      toast.success("Leave date updated");
+      setLeaveDateInput("");
+      loadData(); // Re-trigger syncEmployeeSalary and fetch new balance
+    } catch (err) {
+      toast.error("Failed to update leave");
     }
   };
 
@@ -225,6 +238,42 @@ export default function StaffProfile() {
             <p className="text-xs font-bold text-slate-500 uppercase flex items-center gap-1.5 mb-1"><TrendingDown size={14} className="text-orange-500" /> Total Deductions</p>
             <p className="text-2xl font-black text-slate-800">₹{formatCurrency(totalDeductions)}</p>
           </div>
+        </div>
+
+        {/* Leave Management */}
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-black text-slate-800">Unpaid Leaves</h2>
+            <div className="flex gap-2">
+              <input 
+                type="date" 
+                value={leaveDateInput} 
+                onChange={(e) => setLeaveDateInput(e.target.value)}
+                className="border border-slate-200 p-2 rounded-lg text-sm outline-none focus:border-indigo-500" 
+              />
+              <button 
+                onClick={() => handleToggleLeave(leaveDateInput)}
+                className="bg-slate-100 text-slate-700 font-bold px-4 py-2 rounded-lg hover:bg-slate-200 transition text-sm"
+              >
+                Mark Leave
+              </button>
+            </div>
+          </div>
+          {(!employee.unpaidLeaves || employee.unpaidLeaves.length === 0) ? (
+            <p className="text-sm text-slate-500">No unpaid leaves recorded yet.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {employee.unpaidLeaves.sort().map(ldate => (
+                <div key={ldate} className="bg-rose-50 border border-rose-100 text-rose-700 px-3 py-1.5 rounded-lg flex items-center gap-2 text-sm font-bold">
+                  {new Date(ldate).toLocaleDateString('en-GB')}
+                  <button onClick={() => handleToggleLeave(ldate)} className="text-rose-400 hover:text-rose-700 rounded-full p-0.5">
+                    &times;
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-slate-400 mt-3 italic">Adding a leave automatically deducts a day's pay from the respective month's salary.</p>
         </div>
 
         {/* Ledger Table */}

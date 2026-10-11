@@ -68,22 +68,70 @@ class Supplier {
     );
   }
 
-  static String _parseCreatedBy(Map<String, dynamic> json) {
+  static String _parseCreatedBy(Map<String, dynamic>? json) {
+    if (json == null) return '';
     try {
-      if (json['user'] != null && json['user'] is Map) {
-        final name = json['user']['name'];
-        if (name != null) return name.toString();
+      // 1. Direct tag field
+      if (json['tag'] != null && json['tag'].toString().trim().isNotEmpty) {
+        final t = json['tag'].toString().trim();
+        if (t.toLowerCase() != 'null') return t;
       }
-      if (json['createdBy'] != null && json['createdBy'] is Map) {
-        final name = json['createdBy']['name'];
-        if (name != null) return name.toString();
+      if (json['tags'] is List && (json['tags'] as List).isNotEmpty) {
+        final t = (json['tags'] as List).first.toString().trim();
+        if (t.toLowerCase() != 'null') return t;
       }
-      if (json['createdBy'] != null && json['createdBy'] is String) {
-        return json['createdBy'].toString();
+
+      // 2. Check 'createdBy' object (populated in supplierController.js / backend)
+      final createdByVal = json['createdBy'];
+      if (createdByVal is Map) {
+        final name = createdByVal['name'] ??
+            createdByVal['fullName'] ??
+            createdByVal['userName'] ??
+            createdByVal['email'];
+        if (name != null && name.toString().trim().isNotEmpty) {
+          final str = name.toString().trim();
+          if (str.toLowerCase() != 'null') return str;
+        }
+      } else if (createdByVal is String && createdByVal.trim().isNotEmpty) {
+        final str = createdByVal.trim();
+        if (!RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(str) && str.toLowerCase() != 'null') {
+          return str;
+        }
       }
-      return 'Admin';
-    } catch (e) {
-      return 'Admin';
+
+      // 3. Check 'user' object
+      final userVal = json['user'];
+      if (userVal is Map) {
+        final name = userVal['name'] ??
+            userVal['fullName'] ??
+            userVal['userName'] ??
+            userVal['email'];
+        if (name != null && name.toString().trim().isNotEmpty) {
+          final str = name.toString().trim();
+          if (str.toLowerCase() != 'null') return str;
+        }
+      } else if (userVal is String && userVal.trim().isNotEmpty) {
+        final str = userVal.trim();
+        if (!RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(str) && str.toLowerCase() != 'null') {
+          return str;
+        }
+      }
+
+      // 4. Check 'recordedBy' or 'addedBy'
+      if (json['recordedBy'] is Map && json['recordedBy']['name'] != null) {
+        final name = json['recordedBy']['name'].toString().trim();
+        if (name.isNotEmpty && name.toLowerCase() != 'null') return name;
+      }
+      if (json['addedBy'] != null && json['addedBy'].toString().trim().isNotEmpty) {
+        final ab = json['addedBy'].toString().trim();
+        if (!RegExp(r'^[0-9a-fA-F]{24}$').hasMatch(ab) && ab.toLowerCase() != 'null') {
+          return ab;
+        }
+      }
+
+      return '';
+    } catch (_) {
+      return '';
     }
   }
   static double _parseDouble(dynamic value) {
@@ -142,29 +190,61 @@ class PurchaseBillItem {
 }
 
 class SupplierPurchaseBill {
-  final String id;
-  final String billNumber;
-  final String date;
-  final String dueDate;
-  final double totalAmount;
-  final double amountPaid;
-  final String status; // 'Paid', 'Partial', 'Unpaid'
-  final String notes;
-  final List<PurchaseBillItem> items;
-  final String createdBy;
+  final String? _id;
+  final String? _billNumber;
+  final String? _date;
+  final String? _dueDate;
+  final double? _totalAmount;
+  final double? _amountPaid;
+  final String? _status; // 'Paid', 'Partial', 'Unpaid'
+  final String? _notes;
+  final List<PurchaseBillItem>? _items;
+  final String? _createdBy;
 
   SupplierPurchaseBill({
-    required this.id,
-    required this.billNumber,
-    required this.date,
-    required this.dueDate,
-    required this.totalAmount,
-    required this.amountPaid,
-    required this.status,
-    required this.notes,
-    required this.items,
-    required this.createdBy,
-  });
+    String? id,
+    String? billNumber,
+    String? date,
+    String? dueDate,
+    double? totalAmount,
+    double? amountPaid,
+    String? status,
+    String? notes,
+    List<PurchaseBillItem>? items,
+    String? createdBy,
+  })  : _id = id,
+        _billNumber = billNumber,
+        _date = date,
+        _dueDate = dueDate,
+        _totalAmount = totalAmount,
+        _amountPaid = amountPaid,
+        _status = status,
+        _notes = notes,
+        _items = items,
+        _createdBy = createdBy;
+
+  String get id => _id ?? '';
+  String get billNumber => _billNumber ?? '';
+  String get date => _date ?? '';
+  String get dueDate => _dueDate ?? '';
+  double get totalAmount => _totalAmount ?? 0.0;
+  double get amountPaid => _amountPaid ?? 0.0;
+  String get status => _status ?? 'Unpaid';
+  String get notes => _notes ?? '';
+  List<PurchaseBillItem> get items => _items ?? [];
+  String get createdBy {
+    final creator = _createdBy;
+    if (creator == null) return 'Undefined';
+    final trimmed = creator.trim();
+    if (trimmed.isEmpty ||
+        trimmed.toLowerCase() == 'admin' ||
+        trimmed.toLowerCase() == 'null' ||
+        trimmed.toLowerCase() == 'unknown' ||
+        trimmed.toLowerCase() == 'undefined') {
+      return 'Undefined';
+    }
+    return trimmed;
+  }
 
   factory SupplierPurchaseBill.fromJson(Map<String, dynamic> json) {
     final list = json['items'] as List? ?? [];
@@ -173,14 +253,14 @@ class SupplierPurchaseBill {
         .toList();
 
     return SupplierPurchaseBill(
-      id: json['_id'] ?? json['id'] ?? '',
-      billNumber: json['billNumber'] ?? '',
+      id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
+      billNumber: json['billNumber']?.toString() ?? '',
       date: json['date'] != null ? json['date'].toString() : '',
       dueDate: json['dueDate'] != null ? json['dueDate'].toString() : '',
       totalAmount: Supplier._parseDouble(json['totalAmount']),
       amountPaid: Supplier._parseDouble(json['amountPaid']),
-      status: json['status'] ?? 'Unpaid',
-      notes: json['notes'] ?? '',
+      status: json['status']?.toString() ?? 'Unpaid',
+      notes: json['notes']?.toString() ?? '',
       items: itemsList,
       createdBy: Supplier._parseCreatedBy(json),
     );
@@ -188,32 +268,62 @@ class SupplierPurchaseBill {
 }
 
 class SupplierPayment {
-  final String id;
-  final double amount;
-  final String paymentDate;
-  final String paymentMode; // 'Cash', 'Bank Transfer', 'UPI', 'Cheque', 'Other'
-  final String referenceNumber;
-  final String notes;
+  final String? _id;
+  final double? _amount;
+  final String? _paymentDate;
+  final String? _paymentMode; // 'Cash', 'Bank Transfer', 'UPI', 'Cheque', 'Other'
+  final String? _referenceNumber;
+  final String? _notes;
+  final String? _createdBy;
 
   SupplierPayment({
-    required this.id,
-    required this.amount,
-    required this.paymentDate,
-    required this.paymentMode,
-    required this.referenceNumber,
-    required this.notes,
-  });
+    String? id,
+    double? amount,
+    String? paymentDate,
+    String? paymentMode,
+    String? referenceNumber,
+    String? notes,
+    String? createdBy,
+  })  : _id = id,
+        _amount = amount,
+        _paymentDate = paymentDate,
+        _paymentMode = paymentMode,
+        _referenceNumber = referenceNumber,
+        _notes = notes,
+        _createdBy = createdBy;
+
+  String get id => _id ?? '';
+  double get amount => _amount ?? 0.0;
+  String get paymentDate => _paymentDate ?? '';
+  String get paymentMode {
+    final mode = _paymentMode;
+    return (mode != null && mode.trim().isNotEmpty) ? mode : 'Bank Transfer';
+  }
+  String get referenceNumber => _referenceNumber ?? '';
+  String get notes => _notes ?? '';
+  String get createdBy {
+    final creator = _createdBy;
+    if (creator == null) return 'Admin';
+    final trimmed = creator.trim();
+    if (trimmed.isEmpty ||
+        trimmed.toLowerCase() == 'undefined' ||
+        trimmed.toLowerCase() == 'null') {
+      return 'Admin';
+    }
+    return trimmed;
+  }
 
   factory SupplierPayment.fromJson(Map<String, dynamic> json) {
     return SupplierPayment(
-      id: json['_id'] ?? json['id'] ?? '',
+      id: json['_id']?.toString() ?? json['id']?.toString() ?? '',
       amount: Supplier._parseDouble(json['amount']),
       paymentDate: json['paymentDate'] != null
           ? json['paymentDate'].toString()
-          : '',
-      paymentMode: json['paymentMode'] ?? 'Bank Transfer',
-      referenceNumber: json['referenceNumber'] ?? '',
-      notes: json['notes'] ?? '',
+          : (json['date'] != null ? json['date'].toString() : ''),
+      paymentMode: json['paymentMode']?.toString() ?? 'Bank Transfer',
+      referenceNumber: json['referenceNumber']?.toString() ?? '',
+      notes: json['notes']?.toString() ?? '',
+      createdBy: Supplier._parseCreatedBy(json),
     );
   }
 }
@@ -327,8 +437,8 @@ class SuppliersController extends GetxController {
           // Recompute final suppliers with correct aggregated stats
           final finalSuppliers = tempSuppliers.map((s) {
             return s.copyWith(
-              totalPurchased: purchasedMap[s.id] ?? 0.0,
-              totalPaid: paidMap[s.id] ?? 0.0,
+              totalPurchased: purchasedMap[s.id] ?? s.totalPurchased,
+              totalPaid: s.totalPaid > 0 ? s.totalPaid : (paidMap[s.id] ?? 0.0),
             );
           }).toList();
 
@@ -353,39 +463,52 @@ class SuppliersController extends GetxController {
     try {
       isLoading.value = true;
 
-      final responses = await Future.wait([
-        ApiService.get(
-          '${ApiConstants.suppliers}/purchases/all?supplierId=$supplierId',
-        ),
-        ApiService.get('${ApiConstants.suppliers}/$supplierId/payments'),
+      // Fetch bills and payments in parallel with independent error handling
+      await Future.wait([
+        () async {
+          try {
+            final billsRes = await ApiService.get(
+              '${ApiConstants.suppliers}/purchases/all?supplierId=$supplierId',
+            );
+            if (billsRes.statusCode == 200) {
+              final Map<String, dynamic> body = jsonDecode(billsRes.body);
+              if (body['success'] == true) {
+                final List<dynamic> data = body['data'] ?? [];
+                supplierBills[supplierId] = data
+                    .map((b) => SupplierPurchaseBill.fromJson(b))
+                    .toList();
+              }
+            }
+          } catch (e) {
+            debugPrint('Error fetching supplier bills for $supplierId: $e');
+          }
+        }(),
+        () async {
+          try {
+            final paymentsRes = await ApiService.get(
+              '${ApiConstants.suppliers}/$supplierId/payments',
+            );
+            if (paymentsRes.statusCode == 200) {
+              final Map<String, dynamic> body = jsonDecode(paymentsRes.body);
+              if (body['success'] == true) {
+                final List<dynamic> data = body['data'] ?? [];
+                supplierPayments[supplierId] = data
+                    .map((p) => SupplierPayment.fromJson(p))
+                    .toList();
+              }
+            }
+          } catch (e) {
+            debugPrint('Error fetching supplier payments for $supplierId: $e');
+          }
+        }(),
       ]);
 
-      final billsRes = responses[0];
-      final paymentsRes = responses[1];
-
-      if (billsRes.statusCode == 200) {
-        final Map<String, dynamic> body = jsonDecode(billsRes.body);
-        if (body['success'] == true) {
-          final List<dynamic> data = body['data'] ?? [];
-          supplierBills[supplierId] = data
-              .map((b) => SupplierPurchaseBill.fromJson(b))
-              .toList();
-        }
-      }
-
-      if (paymentsRes.statusCode == 200) {
-        final Map<String, dynamic> body = jsonDecode(paymentsRes.body);
-        if (body['success'] == true) {
-          final List<dynamic> data = body['data'] ?? [];
-          supplierPayments[supplierId] = data
-              .map((p) => SupplierPayment.fromJson(p))
-              .toList();
-        }
-      }
-
       _recomputeSupplierStats(supplierId);
+      supplierBills.refresh();
+      supplierPayments.refresh();
+      suppliers.refresh();
     } catch (e) {
-      debugPrint('Error fetching supplier details for $supplierId: $e');
+      debugPrint('Error in fetchSupplierDetails for $supplierId: $e');
     } finally {
       isLoading.value = false;
     }
@@ -578,6 +701,7 @@ class SuppliersController extends GetxController {
         totalPurchased: totalPurchased,
         totalPaid: totalPaid,
       );
+      suppliers.refresh();
     }
   }
 }

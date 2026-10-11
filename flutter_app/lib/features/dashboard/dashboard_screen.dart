@@ -98,7 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     clientsController.fetchClients();
     expensesController.fetchExpenses();
     authController.fetchTenantSettings();
-    dashboardController.fetchDashboardStats();
+    dashboardController.fetchDashboardStats(_mapFilterToBackend(_globalFilter));
   }
 
   @override
@@ -255,6 +255,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return const Color(0xFF6366F1);
     }
   }
+  String _mapFilterToBackend(String filter) {
+    switch (filter) {
+      case 'This Year':
+        return 'this_year';
+      case 'This Month':
+        return 'this_month';
+      case 'Today':
+        return 'today';
+      case 'Lifetime':
+      default:
+        return 'lifetime';
+    }
+  }
 
   Future<void> _showTimeframeFilterBottomSheet(BuildContext context) async {
     final filters = [
@@ -305,273 +318,297 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ? Colors.white.withValues(alpha: 0.1)
             : Colors.black.withValues(alpha: 0.08);
 
-        return Container(
-          decoration: BoxDecoration(
-            color: bgColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 20,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 42,
-                      height: 4.5,
-                      margin: const EdgeInsets.only(bottom: 18),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.white24 : Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
+        return Align(
+          alignment: Alignment.bottomCenter,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 520,
+              maxHeight: MediaQuery.of(ctx).size.height * 0.85,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+                border: Border.all(color: borderColor, width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 20,
+                    offset: const Offset(0, -4),
                   ),
-                  Row(
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: SvgPicture.asset(
-                          'assets/SVG/allcube.svg',
-                          width: 17,
-                          height: 17,
-                          colorFilter: const ColorFilter.mode(
-                            AppColors.primary,
-                            BlendMode.srcIn,
+                      Center(
+                        child: Container(
+                          width: 42,
+                          height: 4.5,
+                          margin: const EdgeInsets.only(bottom: 18),
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.white24 : Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Dashboard Timeframe',
-                              style: TextStyle(
-                                fontSize: 14.5,
-                                fontWeight: FontWeight.bold,
-                                color: isDark
-                                    ? Colors.white
-                                    : const Color(0xFF0F172A),
-                              ),
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              'Select period to filter stats & analytics',
-                              style: TextStyle(
-                                fontSize: 11.5,
-                                color: isDark
-                                    ? Colors.white60
-                                    : Colors.grey.shade600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.of(ctx).pop(),
-                        icon: Icon(
-                          LucideIcons.x,
-                          size: 16,
-                          color: isDark ? Colors.white60 : Colors.grey.shade700,
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 32,
-                          minHeight: 32,
-                        ),
-                        padding: EdgeInsets.zero,
-                        style: IconButton.styleFrom(
-                          backgroundColor: isDark
-                              ? Colors.white.withValues(alpha: 0.08)
-                              : Colors.grey.shade100,
-                          shape: const CircleBorder(),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  ...filters.map((opt) {
-                    final isSelected = _globalFilter == opt['id'];
-                    final color = opt['color'] as Color;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: () async {
-                            Navigator.of(ctx).pop();
-                            final selectedVal = opt['id'] as String;
-                            if (selectedVal != _globalFilter) {
-                              setState(() {
-                                _globalFilter = selectedVal;
-                                _isManualRefreshing = true;
-                              });
-                              await Future.wait([
-                                clientsController.fetchClients(),
-                                expensesController.fetchExpenses(),
-                                Future.delayed(
-                                  const Duration(milliseconds: 500),
-                                ),
-                              ]);
-                              if (mounted) {
-                                setState(() {
-                                  _isManualRefreshing = false;
-                                });
-                              }
-                            }
-                          },
-                          borderRadius: BorderRadius.circular(14),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 10,
-                            ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: isSelected
-                                  ? color.withValues(
-                                      alpha: isDark ? 0.15 : 0.08,
-                                    )
-                                  : (isDark
-                                        ? Colors.white.withValues(alpha: 0.03)
-                                        : Colors.grey.shade50),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: isSelected
-                                    ? color.withValues(alpha: 0.8)
-                                    : borderColor,
-                                width: isSelected ? 1.2 : 1,
+                              color: AppColors.primary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: SvgPicture.asset(
+                              'assets/SVG/allcube.svg',
+                              width: 17,
+                              height: 17,
+                              colorFilter: const ColorFilter.mode(
+                                AppColors.primary,
+                                BlendMode.srcIn,
                               ),
                             ),
-                            child: Row(
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: color.withValues(alpha: 0.12),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    opt['icon'] as String,
-                                    width: 17,
-                                    height: 17,
-                                    colorFilter: ColorFilter.mode(
-                                      color,
-                                      BlendMode.srcIn,
-                                    ),
+                                Text(
+                                  'Dashboard Timeframe',
+                                  style: TextStyle(
+                                    fontSize: 14.5,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark
+                                        ? Colors.white
+                                        : const Color(0xFF0F172A),
                                   ),
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            opt['title'] as String,
-                                            style: TextStyle(
-                                              fontSize: 13.5,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.bold
-                                                  : FontWeight.w600,
-                                              color: isDark
-                                                  ? Colors.white
-                                                  : const Color(0xFF0F172A),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Container(
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 6,
-                                              vertical: 1.5,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: color.withValues(
-                                                alpha: 0.12,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            child: Text(
-                                              opt['badge'] as String,
-                                              style: TextStyle(
-                                                fontSize: 9,
-                                                fontWeight: FontWeight.bold,
-                                                color: color,
-                                                letterSpacing: 0.3,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        opt['subtitle'] as String,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: isDark
-                                              ? Colors.white60
-                                              : Colors.grey.shade600,
-                                        ),
-                                      ),
-                                    ],
+                                const SizedBox(height: 1),
+                                Text(
+                                  'Select period to filter stats & analytics',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: isDark
+                                        ? Colors.white60
+                                        : Colors.grey.shade600,
                                   ),
-                                ),
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isSelected
-                                        ? color
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                      color: isSelected
-                                          ? color
-                                          : (isDark
-                                                ? Colors.white30
-                                                : Colors.grey.shade400),
-                                      width: isSelected ? 0 : 1.2,
-                                    ),
-                                  ),
-                                  child: isSelected
-                                      ? const Center(
-                                          child: Icon(
-                                            Icons.check_rounded,
-                                            color: Colors.white,
-                                            size: 13,
-                                          ),
-                                        )
-                                      : null,
                                 ),
                               ],
                             ),
                           ),
-                        ),
+                          IconButton(
+                            onPressed: () => Navigator.of(ctx).pop(),
+                            icon: Icon(
+                              LucideIcons.x,
+                              size: 16,
+                              color: isDark ? Colors.white60 : Colors.grey.shade700,
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                            padding: EdgeInsets.zero,
+                            style: IconButton.styleFrom(
+                              backgroundColor: isDark
+                                  ? Colors.white.withValues(alpha: 0.08)
+                                  : Colors.grey.shade100,
+                              shape: const CircleBorder(),
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  }),
-                  const SizedBox(height: 4),
-                ],
+                      const SizedBox(height: 14),
+                      ...filters.map((opt) {
+                        final isSelected = _globalFilter == opt['id'];
+                        final color = opt['color'] as Color;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () async {
+                                Navigator.of(ctx).pop();
+                                final selectedVal = opt['id'] as String;
+                                if (selectedVal != _globalFilter) {
+                                  setState(() {
+                                    _globalFilter = selectedVal;
+                                    _isManualRefreshing = true;
+                                  });
+                                  final backendFilter =
+                                      _mapFilterToBackend(selectedVal);
+                                  await Future.wait([
+                                    dashboardController
+                                        .fetchDashboardStats(backendFilter),
+                                    clientsController.fetchClients(),
+                                    expensesController.fetchExpenses(),
+                                  ]);
+                                  if (mounted) {
+                                    setState(() {
+                                      _isManualRefreshing = false;
+                                    });
+                                  }
+                                }
+                              },
+                              borderRadius: BorderRadius.circular(14),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? color.withValues(
+                                          alpha: isDark ? 0.15 : 0.08,
+                                        )
+                                      : (isDark
+                                          ? Colors.white.withValues(alpha: 0.03)
+                                          : Colors.grey.shade50),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? color.withValues(alpha: 0.8)
+                                        : borderColor,
+                                    width: isSelected ? 1.2 : 1,
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 36,
+                                      height: 36,
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: color.withValues(alpha: 0.12),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: SvgPicture.asset(
+                                        opt['icon'] as String,
+                                        width: 17,
+                                        height: 17,
+                                        colorFilter: ColorFilter.mode(
+                                          color,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  opt['title'] as String,
+                                                  style: TextStyle(
+                                                    fontSize: 13.5,
+                                                    fontWeight: isSelected
+                                                        ? FontWeight.bold
+                                                        : FontWeight.w600,
+                                                    color: isDark
+                                                        ? Colors.white
+                                                        : const Color(
+                                                            0xFF0F172A),
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 6,
+                                                  vertical: 1.5,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: color.withValues(
+                                                    alpha: 0.12,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                ),
+                                                child: Text(
+                                                  opt['badge'] as String,
+                                                  style: TextStyle(
+                                                    fontSize: 9,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: color,
+                                                    letterSpacing: 0.3,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            opt['subtitle'] as String,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: isDark
+                                                  ? Colors.white60
+                                                  : Colors.grey.shade600,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      width: 20,
+                                      height: 20,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: isSelected
+                                            ? color
+                                            : Colors.transparent,
+                                        border: Border.all(
+                                          color: isSelected
+                                              ? color
+                                              : (isDark
+                                                  ? Colors.white30
+                                                  : Colors.grey.shade400),
+                                          width: isSelected ? 0 : 1.2,
+                                        ),
+                                      ),
+                                      child: isSelected
+                                          ? const Center(
+                                              child: Icon(
+                                                Icons.check_rounded,
+                                                color: Colors.white,
+                                                size: 13,
+                                              ),
+                                            )
+                                          : null,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -606,7 +643,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           await clientsController.fetchClients();
           await expensesController.fetchExpenses();
           await authController.fetchTenantSettings();
-          await dashboardController.fetchDashboardStats();
+          await dashboardController.fetchDashboardStats(
+            _mapFilterToBackend(_globalFilter),
+          );
           if (mounted) {
             setState(() {
               _isManualRefreshing = false;

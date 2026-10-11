@@ -133,6 +133,40 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
     }
   }
 
+  Widget _buildCreatorTag(String? creator) {
+    String cleanCreator = (creator ?? '').trim();
+    if (cleanCreator.isEmpty ||
+        cleanCreator.toLowerCase() == 'null' ||
+        cleanCreator.toLowerCase() == 'admin' ||
+        cleanCreator.toLowerCase() == 'undefined') {
+      cleanCreator = 'Undefined';
+    }
+    final displayName = cleanCreator.split(' ').first;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey.shade800 : const Color(0xFFF1F5F9),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: isDark ? Colors.grey.shade700 : const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+      ),
+      child: Text(
+        displayName,
+        style: TextStyle(
+          fontSize: 8.5,
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.grey.shade300 : const Color(0xFF64748B),
+        ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+
   void _sharePublicLink(Invoice inv) {
     final publicLink =
         '${ApiConstants.publicWebUrl}/public/invoice/${inv.dbId}';
@@ -1164,23 +1198,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen>
                                         ),
                                       ),
                                       const SizedBox(height: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primary.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          (inv.createdBy ?? 'Admin').length > 7 ? '${(inv.createdBy ?? 'Admin').substring(0, 7)}..' : (inv.createdBy ?? 'Admin'),
-                                          style: const TextStyle(
-                                            fontSize: 8,
-                                            fontWeight: FontWeight.bold,
-                                            color: AppColors.primary,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
+                                      _buildCreatorTag(inv.createdBy),
                                     ],
                                   ),
                                   const SizedBox(width: 14),

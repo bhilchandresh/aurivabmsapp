@@ -430,7 +430,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
   Widget _buildClientCard(Client client, int index) {
     final isHovered = _hoveredIndex == index;
     final balance = client.balance;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final cardBgColor = Theme.of(context).cardTheme.color ?? Colors.white;
     final cardBorderColor = isHovered
@@ -444,7 +443,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
       onExit: (_) => setState(() => _hoveredIndex = null),
       child: InkWell(
         onTap: () {
-          Get.to(() => ClientDetailsScreen(clientId: client.id));
+          Get.to(
+            () => ClientDetailsScreen(
+              clientId: client.id,
+              initialClient: client,
+            ),
+          );
         },
         borderRadius: BorderRadius.circular(16),
         child: AnimatedContainer(
@@ -505,6 +509,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             SvgPicture.asset(
                               'assets/SVG/setting.svg',
@@ -516,12 +521,17 @@ class _ClientsScreenState extends State<ClientsScreen> {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Text(
-                              'By: ${client.addedBy?.isNotEmpty == true ? client.addedBy : 'System'}',
-                              style: TextStyle(
-                                fontSize: 8,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade600,
+                            ConstrainedBox(
+                              constraints: const BoxConstraints(maxWidth: 75),
+                              child: Text(
+                                'By: ${client.addedBy?.isNotEmpty == true ? _capitalizeName(client.addedBy!) : 'System'}',
+                                style: TextStyle(
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade600,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],

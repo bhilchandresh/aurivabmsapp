@@ -465,6 +465,7 @@ exports.convertToInvoice = async (req, res) => {
       bankDetailsSnapshot: quote.bankDetailsSnapshot,
       authorizedSignatoryImage: quote.authorizedSignatoryImage,
       salesPerson: req.user._id,
+      createdBy: req.user._id,
     });
 
     quote.status = 'Accepted';

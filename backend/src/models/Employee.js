@@ -42,6 +42,10 @@ const employeeSchema = new mongoose.Schema({
   leaveDate: {
     type: Date
   },
+  unpaidLeaves: {
+    type: [String],
+    default: []
+  },
   isActive: {
     type: Boolean,
     default: true

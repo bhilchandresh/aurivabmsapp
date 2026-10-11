@@ -180,7 +180,7 @@ const Dashboard = () => {
                    <span className="hidden sm:inline-block text-slate-300">•</span>
                    <div className="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-full">
                       <span className="text-[10px] font-black uppercase text-indigo-700">
-                         {tenantInfo.subscriptionPlan === 'enterprise' ? 'Business' : tenantInfo.subscriptionPlan === 'premium' ? 'Pro' : 'Freelancer'}
+                         {tenantInfo.subscriptionPlan === 'business' ? 'Business' : tenantInfo.subscriptionPlan === 'pro' ? 'Pro' : 'Freelancer'}
                       </span>
                       <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${getDaysLeft(tenantInfo.subscriptionEnd) <= 15 ? 'bg-red-100 text-red-600 animate-pulse' : 'bg-emerald-100 text-emerald-600'}`}>
                          {getDaysLeft(tenantInfo.subscriptionEnd) > 0 ? `${getDaysLeft(tenantInfo.subscriptionEnd)} Days Left` : 'Expired'}
@@ -200,6 +200,7 @@ const Dashboard = () => {
               <option value="this_year">This Year</option>
               <option value="this_quarter">This Quarter</option>
               <option value="this_month">This Month</option>
+              <option value="today">Today</option>
            </select>
         </div>
       </div>

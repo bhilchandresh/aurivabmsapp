@@ -27,6 +27,7 @@ const settingsRoutes = require('./routes/settingsRoutes');
 const publicRoutes = require('./routes/publicRoutes');
 const securityRoutes = require('./routes/securityRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
+const superadminRoutes = require('./routes/superadminRoutes');
 const ipBlocker = require('./middleware/ipBlocker');
 const { trafficMonitor } = require('./middleware/trafficMonitor');
 const BlockedIP = require('./models/BlockedIP');
@@ -112,6 +113,7 @@ app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1/security', securityRoutes);
 app.use('/api/v1/webhooks', webhookRoutes);
+app.use('/api/v1/superadmin', superadminRoutes);
 // --- 4. Base Route ---
 app.get('/', (req, res) => {
   res.send('AurivaBMS API is running securely...');

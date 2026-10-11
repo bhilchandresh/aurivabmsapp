@@ -5,7 +5,7 @@ const checkSubscription = require('../middleware/checkSubscription');
 const logActivity = require('../utils/logger');
 
 const getPlanLimits = (planName) => {
-    return checkSubscription.PLANS[planName] || checkSubscription.PLANS['basic'];
+    return checkSubscription.PLANS[planName] || checkSubscription.PLANS['freelance'];
 };
 
 exports.getItems = async (req, res) => {
@@ -13,15 +13,7 @@ exports.getItems = async (req, res) => {
     const items = await Inventory.find({ tenantId: req.user.tenantId })
       .populate('createdBy', 'name email')
       .sort({ createdAt: -1 });
-    const tenant = await Tenant.findById(req.user.tenantId);
-    const limits = getPlanLimits(tenant ? tenant.subscriptionPlan : 'basic');
-    
-    res.status(200).json({ 
-      success: true, 
-      count: items.length, 
-      maxLimit: limits.maxInventory,
-      data: items 
-    });
+    res.status(200).json({ success: true, count: items.length, data: items });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -186,7 +178,7 @@ exports.bulkImportInventory = async (req, res) => {
         purchasePrice: Number(item.purchasePrice) || 0,
         unitPrice: Number(item.unitPrice) || 0,
         currentStock: Number(item.currentStock) || 0,
-        status: (item.status && (item.status.toString().toLowerCase() === 'inactive' || item.status.toString().toLowerCase() === 'out of stock' || item.status.toString() === '0')) ? 'inactive' : 'active'
+        status: item.status || 'In Stock'
       });
       importedCount++;
       currentCount++;

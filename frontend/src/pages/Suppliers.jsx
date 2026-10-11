@@ -108,7 +108,7 @@ const AddSupplierModal = ({ onClose, onAdded }) => {
 export default function Suppliers() {
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [plan, setPlan] = useState("basic");
+  const [plan, setPlan] = useState("freelance");
   const [maxSuppliers, setMaxSuppliers] = useState(0);
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -124,7 +124,7 @@ export default function Suppliers() {
       ]);
       return {
         suppliers: resSup.data.data,
-        plan: resSettings.data.data.subscriptionPlan || "basic"
+        plan: resSettings.data.data.subscriptionPlan || "freelance"
       };
     }
   });
@@ -134,7 +134,7 @@ export default function Suppliers() {
       setSuppliers(fetchedSuppliers.suppliers);
       const p = fetchedSuppliers.plan;
       setPlan(p);
-      setMaxSuppliers(p === "basic" ? 0 : p === "premium" ? 50 : Infinity);
+      setMaxSuppliers(p === "freelance" ? 0 : p === "pro" ? 50 : Infinity);
       setLoading(false);
     }
   }, [fetchedSuppliers]);
@@ -158,7 +158,7 @@ export default function Suppliers() {
     (s.email || "").toLowerCase().includes(search.toLowerCase())
   );
 
-  const isLocked = plan === "basic";
+  const isLocked = plan === "freelance";
   const usagePct = maxSuppliers === Infinity ? 0 : Math.min(100, (suppliers.length / maxSuppliers) * 100);
 
   return (
@@ -198,7 +198,7 @@ export default function Suppliers() {
         {!loading && isLocked ? <StarterLock /> : !loading && (
           <>
             {/* PRO USAGE BAR */}
-            {plan === "premium" && (
+            {plan === "pro" && (
               <div className="bg-white border border-gray-200 rounded-[2rem] p-6 mb-6 shadow-sm">
                 <div className="flex justify-between text-sm mb-2">
                   <span className="font-semibold text-gray-700">Supplier Slots Used</span>

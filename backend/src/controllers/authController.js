@@ -123,7 +123,7 @@ exports.registerTenant = async (req, res) => {
       slug: slug,
       email: email,
       status: 'active',
-      subscriptionPlan: 'basic',
+      subscriptionPlan: 'freelance',
       subscriptionEnd: defaultExpiry, // ✅ Added Default 1 Year
       templatePreference: 'standard',
       quotationTemplate: 'standard'
@@ -253,7 +253,7 @@ exports.login = async (req, res) => {
         hasCompletedTour: user.hasCompletedTour
       },
       subscription: {
-        plan: tenant?.subscriptionPlan || 'basic',
+        plan: tenant?.subscriptionPlan || 'freelance',
         daysLeft,
         expiryWarning,
         expiryDate: tenant?.subscriptionEnd
@@ -348,7 +348,7 @@ exports.createTenantByAdmin = async (req, res) => {
       name: companyName,
       slug,
       email,
-      subscriptionPlan: plan || 'basic',
+      subscriptionPlan: plan || 'freelance',
       subscriptionEnd: expiryDate, // ✅ Set Expiry
       status: 'active',
       templatePreference: templatePreference || 'standard',
@@ -444,6 +444,7 @@ exports.updateTenantBySuperAdmin = async (req, res) => {
 
     res.status(200).json({ success: true, data: tenant, message: "Tenant Updated Successfully" });
   } catch (error) {
+    require('fs').appendFileSync('/Users/apple/Downloads/invoice-system-AURIVA/saas-invoice-app/backend/error.log', new Date().toISOString() + ' - UPDATE ERROR: ' + error.message + '\n' + JSON.stringify(req.body) + '\n');
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -514,9 +515,9 @@ exports.getSystemStats = async (req, res) => {
 
     // Calculate Estimated Revenue (INR Logic)
     // Freelancer: 199, Pro: 299, Business: 599
-    const starters = await Tenant.countDocuments({ subscriptionPlan: 'basic' }); // 'basic' is used for Freelancer
-    const pros = await Tenant.countDocuments({ subscriptionPlan: 'premium' }); // 'premium' is used for Pro
-    const businesses = await Tenant.countDocuments({ subscriptionPlan: 'enterprise' }); // 'enterprise' is used for Business
+    const starters = await Tenant.countDocuments({ subscriptionPlan: 'freelance' }); // 'freelance' is used for Freelancer
+    const pros = await Tenant.countDocuments({ subscriptionPlan: 'pro' }); // 'pro' is used for Pro
+    const businesses = await Tenant.countDocuments({ subscriptionPlan: 'business' }); // 'business' is used for Business
 
     const estRevenue = (starters * 199) + (pros * 299) + (businesses * 599); // ✅ Updated Formula with new prices
 
@@ -545,9 +546,9 @@ exports.getSystemStats = async (req, res) => {
         $group: {
           _id: { year: { $year: "$createdAt" }, month: { $month: "$createdAt" } },
           count: { $sum: 1 },
-          starters: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "basic"] }, 1, 0] } },
-          pros: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "premium"] }, 1, 0] } },
-          businesses: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "enterprise"] }, 1, 0] } }
+          starters: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "freelance"] }, 1, 0] } },
+          pros: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "pro"] }, 1, 0] } },
+          businesses: { $sum: { $cond: [{ $eq: ["$subscriptionPlan", "business"] }, 1, 0] } }
         }
       },
       { $sort: { "_id.year": 1, "_id.month": 1 } }

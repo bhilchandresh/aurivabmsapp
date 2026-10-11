@@ -14,7 +14,6 @@ import '../../shared/widgets/app_button.dart';
 import '../../core/utils/api_service.dart';
 import '../../core/constants/api_constants.dart';
 import '../auth/auth_controller.dart';
-import 'edit_legal_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -879,58 +878,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
                         ),
                       ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // 5. LEGAL & COMPLIANCE
-                TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 650),
-                  tween: Tween<double>(begin: 0.0, end: 1.0),
-                  builder: (context, value, child) {
-                    return Transform.translate(
-                      offset: Offset(0, 15 * (1.0 - value)),
-                      child: Opacity(opacity: value, child: child),
-                    );
-                  },
-                  child: _buildSectionCard(
-                    index: 4,
-                    title: 'Legal Documents',
-                    subtitle: 'Manage Privacy Policy and Terms & Conditions',
-                    svgIcon: SvgPicture.asset('assets/SVG/note.svg', height: 20, width: 20, colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn)),
-                    child: InkWell(
-                      onTap: () {
-                        Get.to(() => const EditLegalScreen());
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset('assets/SVG/editnote.svg', height: 18, width: 18, colorFilter: const ColorFilter.mode(AppColors.primary, BlendMode.srcIn)),
-                            const SizedBox(width: 12),
-                            const Expanded(
-                              child: Text(
-                                'Edit Legal Documents',
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            Icon(LucideIcons.chevronRight, size: 18, color: AppColors.primary.withValues(alpha: 0.5)),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 ),

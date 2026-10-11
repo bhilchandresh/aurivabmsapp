@@ -22,6 +22,24 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
   );
   String _searchQuery = '';
   int? _hoveredIndex;
+  bool _isNavigating = false;
+
+  void _navigateToSupplierDetails(Supplier supplier) {
+    if (_isNavigating) return;
+    _isNavigating = true;
+    Get.to(
+      () => SupplierDetailsScreen(
+        supplierId: supplier.id,
+        initialSupplier: supplier,
+      ),
+      preventDuplicates: true,
+    )?.then((_) {
+      if (mounted) _isNavigating = false;
+    });
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _isNavigating = false;
+    });
+  }
 
   @override
   void initState() {
@@ -240,7 +258,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                           address: '123 Loading Street, Bangalore',
                           totalPurchased: 0.0,
                           totalPaid: 0.0,
-                          createdBy: 'Admin',
+                          createdBy: 'Undefined',
                         ),
                       )
                     : _filteredSuppliers;
@@ -298,13 +316,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                           );
                         },
                         child: InkWell(
-                          onTap: () {
-                            Get.to(
-                              () => SupplierDetailsScreen(
-                                supplierId: supplier.id,
-                              ),
-                            );
-                          },
+                          onTap: () => _navigateToSupplierDetails(supplier),
                           onHover: (hovering) {
                             setState(() {
                               _hoveredIndex = hovering ? index : null;
@@ -479,9 +491,7 @@ class _SuppliersScreenState extends State<SuppliersScreen> {
                                   children: [
                                     Expanded(
                                       child: ElevatedButton(
-                                        onPressed: () {
-                                          Get.to(() => SupplierDetailsScreen(supplierId: supplier.id));
-                                        },
+                                        onPressed: () => _navigateToSupplierDetails(supplier),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFEFF6FF).withValues(alpha: 0.1) : const Color(0xFFEFF6FF)), // Light blue
                                           foregroundColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), // Blue text

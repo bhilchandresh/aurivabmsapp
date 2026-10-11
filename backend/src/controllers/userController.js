@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const checkSubscription = require('../middleware/checkSubscription');
 
 const getPlanLimits = (planName) => {
-  return checkSubscription.PLANS[planName] || checkSubscription.PLANS['basic'];
+  return checkSubscription.PLANS[planName] || checkSubscription.PLANS['freelance'];
 };
 
 // @desc    Get all users for the current Tenant
@@ -30,7 +30,7 @@ exports.addTeamMember = async (req, res) => {
       const limits = getPlanLimits(tenant.subscriptionPlan);
       const currentCount = await User.countDocuments({ tenantId: req.user.tenantId });
       if (currentCount >= limits.maxUsers) {
-        const planName = tenant.subscriptionPlan === 'basic' ? 'Starter' : tenant.subscriptionPlan === 'premium' ? 'Pro' : 'Business';
+        const planName = tenant.subscriptionPlan === 'freelance' ? 'Freelance' : tenant.subscriptionPlan === 'pro' ? 'Pro' : 'Business';
         return res.status(403).json({
           success: false,
           message: `Team member limit reached for the ${planName} plan (max ${limits.maxUsers} users). Please upgrade your plan.`

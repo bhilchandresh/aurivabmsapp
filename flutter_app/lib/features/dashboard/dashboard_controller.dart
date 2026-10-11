@@ -27,16 +27,20 @@ class DashboardController extends GetxController {
   final chartDataMonthly = <Map<String, dynamic>>[].obs;
   final chartDataYearly = <Map<String, dynamic>>[].obs;
 
+  final currentFilter = 'lifetime'.obs;
+
   @override
   void onInit() {
     super.onInit();
     fetchDashboardStats();
   }
 
-  Future<void> fetchDashboardStats() async {
+  Future<void> fetchDashboardStats([String filter = 'lifetime']) async {
     try {
       isLoading(true);
-      final response = await ApiService.get(ApiConstants.dashboardStats);
+      currentFilter.value = filter;
+      final queryParam = filter.isNotEmpty ? '?filter=$filter' : '';
+      final response = await ApiService.get('${ApiConstants.dashboardStats}$queryParam');
       
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);

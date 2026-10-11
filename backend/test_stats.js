@@ -10,9 +10,9 @@ const User = require('./src/models/User');
 async function test() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected");
-  const starters = await Tenant.countDocuments({ subscriptionPlan: 'basic' });
-  const pros = await Tenant.countDocuments({ subscriptionPlan: 'premium' });
-  const businesses = await Tenant.countDocuments({ subscriptionPlan: 'enterprise' });
+  const starters = await Tenant.countDocuments({ subscriptionPlan: 'freelance' });
+  const pros = await Tenant.countDocuments({ subscriptionPlan: 'pro' });
+  const businesses = await Tenant.countDocuments({ subscriptionPlan: 'business' });
 
   console.log("Starters:", starters, "Pros:", pros, "Businesses:", businesses);
 

@@ -1,9 +1,9 @@
 const PLANS = {
-  starter: {
-    name: 'Starter',
+  freelance: {
+    name: 'Freelance',
     price: 499,
     limits: {
-      invoices: 50, // Max 50 per month
+      invoices: 50,
       clients: 50,
       users: 1
     },
@@ -11,19 +11,6 @@ const PLANS = {
       'create_invoice', 
       'download_pdf', 
       'basic_reports'
-    ]
-  },
-  growth: {
-    name: 'Growth',
-    price: 699,
-    limits: {
-      invoices: Infinity, // Unlimited
-      clients: Infinity,
-      users: 1
-    },
-    features: [
-      'create_invoice', 'download_pdf', 'basic_reports',
-      'custom_branding', 'reminders', 'export_excel', 'analytics'
     ]
   },
   pro: {
@@ -40,9 +27,9 @@ const PLANS = {
       'expense_tracking', 'recurring_invoices', 'multi_user'
     ]
   },
-  enterprise: {
-    name: 'Enterprise',
-    price: 0, // Custom
+  business: {
+    name: 'Business',
+    price: 1999, // Custom
     limits: {
       invoices: Infinity,
       clients: Infinity,

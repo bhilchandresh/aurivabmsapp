@@ -30,9 +30,14 @@ import StaffProfile from "./pages/StaffProfile";
 import ImportData from "./pages/ImportData";
 import PrivateRoute from "./components/PrivateRoute";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import SubscriptionsList from "./pages/SuperAdmin/SubscriptionsList";
+import TransactionsList from "./pages/SuperAdmin/TransactionsList";
+import CouponsManage from "./pages/SuperAdmin/CouponsManage";
+import MessagesList from "./pages/SuperAdmin/MessagesList";
 import ContactUs from "./pages/ContactUs";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import DeleteAccount from "./pages/DeleteAccount";
 
 function App() {
   const { token, user, loading } = useContext(AuthContext);
@@ -82,6 +87,7 @@ function App() {
       <Route path="/contact" element={<ContactUs />} />
       <Route path="/terms" element={<TermsAndConditions />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/delete-account" element={<DeleteAccount />} />
       
       {/* --- TENANT ROUTES (Admin & User) --- */}
       <Route path="/dashboard" element={
@@ -167,6 +173,18 @@ function App() {
       } />
       <Route path="/super-admin/security" element={
         <PrivateRoute allowedRoles={SUPER_ACCESS}><SuperAdminDashboard /></PrivateRoute>
+      } />
+      <Route path="/super-admin/subscriptions" element={
+        <PrivateRoute allowedRoles={SUPER_ACCESS}><SubscriptionsList /></PrivateRoute>
+      } />
+      <Route path="/super-admin/transactions" element={
+        <PrivateRoute allowedRoles={SUPER_ACCESS}><TransactionsList /></PrivateRoute>
+      } />
+      <Route path="/super-admin/coupons" element={
+        <PrivateRoute allowedRoles={SUPER_ACCESS}><CouponsManage /></PrivateRoute>
+      } />
+      <Route path="/super-admin/messages" element={
+        <PrivateRoute allowedRoles={SUPER_ACCESS}><MessagesList /></PrivateRoute>
       } />
 
       {/* --- FALLBACK --- */}
